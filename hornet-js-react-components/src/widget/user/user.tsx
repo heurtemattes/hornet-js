@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,7 +110,7 @@ export class User<UserProps, S> extends HornetComponent<any, any> {
         user: false
     };
 
-    private loginButton;
+    protected loginButton;
 
     constructor(props, context?: any) {
         super(props, context);
@@ -145,14 +145,14 @@ export class User<UserProps, S> extends HornetComponent<any, any> {
      */
     componentDidMount() {
         super.componentDidMount();
-        this.setState({isMounted: true})
+        this.setState({ isMounted: true })
     }
 
     render(): JSX.Element {
         return (
             <div className="profil-container" id={this.props.id}>
                 <Dropdown
-                    items={[{label: this.state.text, url: this.state.url, className: "link"}]}
+                    items={[ { label: this.state.text, url: this.state.url, className: "link" }]}
                     title={this.state.title}
                     icon="picto-user"
                     className="profil-content"
@@ -178,14 +178,14 @@ export class User<UserProps, S> extends HornetComponent<any, any> {
      * Display user info
      * @returns JSX
      */
-    private renderUserInfosButton() {
+    protected renderUserInfosButton() {
         this.state.loginLabel = this.initRessourceProperty(this.state.loginLabel, this.i18n("navigation.connect"));
         if (!this.state.defaultUserLabel) {
             this.state.defaultUserLabel = this.i18n("application.user.guest");
         }
         // get the user login
         let userLogin: string = (this.user && this.user.name) || this.state.defaultUserLabel;
-        this.state.logoutLabel = this.initRessourceProperty(this.state.logoutLabel, this.i18n("navigation.disconnect", {userLogin}));
+        this.state.logoutLabel = this.initRessourceProperty(this.state.logoutLabel, this.i18n("navigation.disconnect", { userLogin }));
         // if user is defined, generate logout url, if not, generate login url
         let url: string = this.user ? this.state.logoutUrl : this.state.loginUrl;
         // if user is defined, get localization

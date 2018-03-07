@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,10 +82,8 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { DropdownItem } from "src/widget/dropdown/dropdown-item";
-import { Picto } from "src/img/picto";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import EventHandler = __React.EventHandler;
 
 
 export enum Position {
@@ -119,6 +117,7 @@ export interface DropdownProps extends HornetComponentProps {
     /** boolean qui cache ou non le dropdown apres le click sur un item */
     closeClick?: boolean;
     title?: string;
+    type?: string;
 }
 
 /**
@@ -138,7 +137,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
     items = [];
     dropDown: any;
     /** Tableau pour matcher Enum avec className */
-    lstPosition = ["position-bottom-left", "position-bottom-right", "position-top-left", "position-top-right"];
+    lstPosition = [ "position-bottom-left", "position-bottom-right", "position-top-left", "position-top-right" ];
     boxStyle: any;
     arrowStyle: any;
 
@@ -179,62 +178,118 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         };
 
         if (this.state.className) {
-            dropdownClasses[this.state.className] = true;
+            dropdownClasses[ this.state.className ] = true;
         }
 
-        let img = null;
-        if (typeof this.props.icon == "string") {
-            img = <span className={"icon " + this.props.icon}/>;
-        } else {
-            img = this.props.icon;
-        }
 
-        let labelClass = this.props.labelClassName || "dropdown-label-span";
 
         return (
             <div id={this.state.id} title={this.state.title} className={classNames(dropdownClasses)}>
-                <a
-                    onClick={this.handleClick.bind(this)}
-                    onKeyDown={this.handleKeyDownDropDown}
-                    role="button"
-                    aria-haspopup="true"
-                    href="#"
-                    tabIndex={0}
-                    aria-label={this.props.ariaLabel}
-                    ref={button => this.button = button}
-                    className={`dropdown-button button-action`}
-                    disabled={this.state.disabled}
-                    aria-expanded={this.state.isActive ? "true" : "false"}
-                >
-                    <span
-                        className={"label" + " " + labelClass}>{this.props.label ? this.props.label : this.props.valueCurrent}</span>
-                    {img}
-                </a>
+                {(this.props.type == "button") ? this.renderButton() : this.renderLink()}
                 {this.renderDropDown()}
             </div>
         );
     }
 
+
+    renderLink() {
+
+        let img = null;
+        if (typeof this.props.icon == "string") {
+            img = <span className={"icon " + this.props.icon} />;
+        } else {
+            img = this.props.icon;
+        }
+
+        let labelClass: string = this.props.labelClassName || "dropdown-label-span";
+
+        let aProps: any = {
+            onClick: this.handleClick.bind(this),
+            onKeyDown: this.handleKeyDownDropDown,
+            role: "button",
+            href: "#",
+            tabIndex: 0,
+            ref: (button) => {
+                this.button = button;
+            },
+            className: `dropdown-button button-action`,
+            disabled: this.state.disabled,
+            "aria-expanded": this.state.isActive ? "true" : "false",
+            "aria-haspopup": true
+        };
+        return (
+            <a {...aProps}>
+                {this.state.label ? null : <span className="dropdown-hidden-label">{this.props.ariaLabel}</span>}
+                <span
+                    className={"label" + " " + labelClass}>{this.props.label ? this.props.label : this.props.valueCurrent}</span>
+                {img}
+            </a>
+        )
+    }
+
+    renderButton() {
+
+        let img = null;
+        if (typeof this.props.icon == "string") {
+            img = <span className={"icon " + this.props.icon} ></span>;
+        } else {
+            img = this.props.icon;
+        }
+
+        let buttonProps: any = {
+            onClick: this.handleClick.bind(this),
+            onKeyDown: this.handleKeyDownDropDown,
+            role: "button",
+            tabIndex: 0,
+            ref: (button) => {
+                this.button = button;
+            },
+            className: `button-action`,
+            disabled: this.state.disabled,
+            "aria-expanded": this.state.isActive ? "true" : "false",
+            "aria-haspopup": true,
+            "aria-label": this.props.ariaLabel
+        };
+
+        let labelClass: string = this.props.labelClassName || "dropdown-label-span";
+        return (
+            <button {...buttonProps}>
+                {img}
+                {<span className="dropdown-hidden-label">{this.props.title}</span>}
+                <span className={"label" + " " + labelClass}>{this.props.label ? this.props.label : this.props.valueCurrent}</span>
+            </button>
+        )
+
+    }
+
     /**
      * Rendu type Dropdown
      * @returns {any}
-     * @private
+     * @protected
      */
     renderDropDown(): JSX.Element {
         let items;
         const buildItem = (item, index) => {
-            return <DropdownItem
-                label={item.label}
-                action={item.action}
-                url={item.url}
-                className={item.className}
-                srcImg={item.srcImg}
-                key={`dropdown-${this.props.id}-${index}`}
-                handleKeyDown={this.handleKeyDownDropDownItem}
-                getRef={item => this.items.push(item)}
-                disabled={item.disabled}
-                valueCurrent={item.valueCurrent}
-            />;
+
+
+            let dropdownItemsProps = {
+                label: item.label,
+                url: item.url,
+                className: item.className,
+                srcImg: item.srcImg,
+                key: `dropdown-${this.props.id}-${index}`,
+                handleKeyDown: this.handleKeyDownDropDownItem,
+                getRef: item => this.items.push(item),
+                disabled: item.disabled,
+                valueCurrent: item.valueCurrent,
+                lang: item.lang
+            };
+
+            if (item.action) {
+                dropdownItemsProps[ "action" ] = item.action
+            }
+
+            return <DropdownItem {...dropdownItemsProps} />;
         };
 
         if (this.state.items && this.state.items.length > 0) {
@@ -255,19 +310,18 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             "dropdown-content": true,
             "dropdown-content-hidden": !this.state.isActive
         };
-        let classStyle = this.lstPosition[this.props.position];
+        let classStyle = this.lstPosition[ this.props.position ];
         let position = (this.props.drawArrow) ? classStyle : "";
 
         return (
             <div id={this.state.id + "content"} className={classStyle + " " + classNames(dropDownClasses)}
-                 style={this.boxStyle}>
+                style={this.boxStyle}>
+                <span style={this.arrowStyle} className={"arrow " + position}/>
                 <ul
                     className={"dropdown-list " + position}
                     ref={dropDown => this.dropDown = dropDown}
-                    role="list"
                     aria-expanded={this.state.isActive}
                 >
-                    <span style={this.arrowStyle} className={"arrow " + position}/>
                     {items}
                 </ul>
             </div>);
@@ -276,8 +330,8 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
 
     calculPositionBox() {
         let valRightArrow = 0, valLeftBox = 0, valLeftArrow = 0;
-        let widthIcon = this.button.getElementsByClassName("icon")[0].getBoundingClientRect().width;
-        let widthLabel = this.button.getElementsByClassName("label")[0].getBoundingClientRect().width;
+        let widthIcon = this.button.getElementsByClassName("icon")[ 0 ].getBoundingClientRect().width;
+        let widthLabel = this.button.getElementsByClassName("label")[ 0 ].getBoundingClientRect().width;
         switch (this.props.position) {
 
             case Position.BOTTOMRIGHT:
@@ -318,8 +372,8 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
      * ouvre le dropdown et focus le premier enfant
      */
     openPanel() {
-        this.setState({isActive: true}, () => {
-            this.dropDown.firstElementChild.nextElementSibling.firstElementChild.focus();
+        this.setState({ isActive: true }, () => {
+            this.dropDown.firstElementChild.firstElementChild.focus();
         });
     }
 
@@ -327,7 +381,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
      * ferme le dropdown et focus le bouton parent
      */
     closePanel() {
-        this.setState({isActive: false}, () => {
+        this.setState({ isActive: false }, () => {
             this.button.focus();
         });
     }
@@ -367,16 +421,15 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
     handleKeyDownDropDownItem = (e, action, url) => {
         // current event
         let item;
-
         switch (e.keyCode) {
             // la touche echappe ferme le panneau
             case KeyCodes.ESCAPE:
                 this.closePanel();
                 break;
-
-            // la barre d'espace execute l'action
-            // portée par l'item et ferme le
+            // la barre d'espace et entrer executent l'action
+            // portée par l'item et ferment le
             // panneau
+            case KeyCodes.ENTER:
             case KeyCodes.SPACEBAR:
                 e.preventDefault();
                 if (this.state.isActive) {
@@ -426,7 +479,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         if (document.getElementById(this.state.id + "content") != null) {
             if (!document.getElementById(this.state.id + "content").contains(e.target)) {
                 // the click was outside your component, so handle closing here
-                this.setState({isActive: false});
+                this.setState({ isActive: false });
             } else {
                 this.handleClick();
             }

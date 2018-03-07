@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,7 +118,8 @@ export class CodesError {
     static DATASOURCE_ADD_ERROR: number = 10304;
     static DATASOURCE_DELETE_ERROR: number = 10305;
     static DATASOURCE_RESPONSE_ERROR: number = 10306;
-
+    static DATASOURCE_SORT_ARGS_ERROR: number = 10307;
+    static DATASOURCE_CONFIGURATION_ERROR: number = 10320;
     /**
      * codes error INJECT 10400 - 10499
      */
@@ -149,4 +150,3 @@ export class CodesError {
     static BATCH_OPTIONS_UNDEFINED: number = 10700;
 
 }
-

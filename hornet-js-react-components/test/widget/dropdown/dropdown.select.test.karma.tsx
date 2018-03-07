@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -139,7 +139,7 @@ class DropdownTest extends BaseTest {
         expect(document.querySelector('#main1 .language .dropdown-button .label'), "Problème élément Label non trouvé").to.exist;
         expect(document.querySelector('#main1 .language .dropdown-button .icon'), "Problème élément Icon non trouvé").to.exist;
         /* Existance de la dropListe */
-        expect(document.querySelector('#main1 .language .dropdown-content.dropdown-content-hidden .dropdown-list '), "Problème élément dropdownlist non trouvé").isNull;
+        expect(document.querySelector('#main1 .language .dropdown-content.dropdown-content-hidden .dropdown-list '), "Problème élément dropdownlist non trouvé").to.exist;
         this.end();
 
     };

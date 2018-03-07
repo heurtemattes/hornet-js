@@ -73,13 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
+import { RouteAuthorization } from "src/routes/abstract-routes";
 import * as nodeUtil from "util";
 import * as _ from "lodash";
 
@@ -95,10 +96,10 @@ declare global {
 /* Inclusion du polyfill pour support du constructeur CustomEvent pour IE >= 9 */
 if (typeof window !== "undefined" && typeof window.CustomEvent !== "function" && document.createEvent) {
     (function () {
-        function CustomEvent ( event, params ) {
+        function CustomEvent(event, params) {
             params = params || { bubbles: false, cancelable: false, detail: undefined };
             var evt = document.createEvent("CustomEvent");
-            evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
             return evt;
         }
 
@@ -124,14 +125,14 @@ export class BaseEvent {
     target: EventTarget;
     timeStamp: number;
     type: string;
-    initEvent(eventTypeArg: string, canBubbleArg: boolean, cancelableArg: boolean) {};
-    preventDefault() {}
-    stopImmediatePropagation() {}
-    stopPropagation() {}
+    initEvent(eventTypeArg: string, canBubbleArg: boolean, cancelableArg: boolean) { };
+    preventDefault() { }
+    stopImmediatePropagation() { }
+    stopPropagation() { }
     static AT_TARGET: number;
     static BUBBLING_PHASE: number;
     static CAPTURING_PHASE: number;
-    constructor(type: string, eventInitDict?: EventInit) {};
+    constructor(type: string, eventInitDict?: EventInit) { };
 }
 
 if (!Utils.isServer) {
@@ -141,10 +142,10 @@ if (!Utils.isServer) {
 export class HornetEvent<EventDetailInterface> extends BaseEvent {
     // héritage de BaseEvent pour permettre l'autocomplétion/compilation typescript sur les attributs classiques des Event
     // même si en réalité c'est pas directement un HornetEvent qui est déclenché mais un clone
-    name:string;
-    detail:EventDetailInterface;
+    name: string;
+    detail: EventDetailInterface;
 
-    constructor(name:string) {
+    constructor(name: string) {
         super(name);
         this.name = name;
     }
@@ -152,8 +153,8 @@ export class HornetEvent<EventDetailInterface> extends BaseEvent {
     /**
      * @returns {HornetEvent<EventDetailInterface>} un clone de cet évènement
      */
-    private clone():HornetEvent<EventDetailInterface> {
-        var cloned:HornetEvent<EventDetailInterface> = new HornetEvent<EventDetailInterface>(this.name);
+    protected clone(): HornetEvent<EventDetailInterface> {
+        var cloned: HornetEvent<EventDetailInterface> = new HornetEvent<EventDetailInterface>(this.name);
         /* On ne peut cloner les autres attributs : cela déclenche une erreur de type Illegal invocation*/
         return cloned;
     }
@@ -162,7 +163,7 @@ export class HornetEvent<EventDetailInterface> extends BaseEvent {
      * @param data détail de l'évènement à créer
      * @returns {HornetEvent} un clone de cet évènement alimenté avec le détail indiqué
      */
-    withData(data:EventDetailInterface):HornetEvent<EventDetailInterface>  {
+    withData(data: EventDetailInterface): HornetEvent<EventDetailInterface> {
         /* Avec Chrome 50, on ne peut utiliser clone ou cloneDeep sur une instance de Event :
         en effet Event.toString() renvoie  [object Event], et cette signature ne fait pas partie des éléments
         clonables de lodash
@@ -170,18 +171,18 @@ export class HornetEvent<EventDetailInterface> extends BaseEvent {
         et https://github.com/lodash/lodash/blob/master/dist/lodash.js#L70)
         */
         //var cloneEvent = _.clone(this, 1);
-        var cloneEvent:HornetEvent<EventDetailInterface> = this.clone();
+        var cloneEvent: HornetEvent<EventDetailInterface> = this.clone();
         cloneEvent.detail = data;
         return cloneEvent;
     }
 }
 
-export function listenWindowEvent(eventName:string, callback:EventListener, capture:boolean = true) {
+export function listenWindowEvent(eventName: string, callback: EventListener, capture: boolean = true) {
     window.addEventListener(eventName, callback, capture);
 }
 
-export function listenOnceWindowEvent(eventName:string, callback:EventListener, capture:boolean = true) {
-    var wrapped = function() {
+export function listenOnceWindowEvent(eventName: string, callback: EventListener, capture: boolean = true) {
+    var wrapped = function () {
         // on supprime le listener pour simuler l'écoute unique de l'évènement
         removeWindowEvent(eventName, wrapped, capture);
         callback.apply(undefined, arguments);
@@ -189,11 +190,11 @@ export function listenOnceWindowEvent(eventName:string, callback:EventListener, 
     listenWindowEvent(eventName, wrapped, capture);
 }
 
-export function removeWindowEvent(eventName:string, callback:EventListener, capture:boolean = true) {
+export function removeWindowEvent(eventName: string, callback: EventListener, capture: boolean = true) {
     window.removeEventListener(eventName, callback, capture);
 }
 
-export function listenHornetEvent<T extends HornetEvent<any>>(event:T, callback:(ev:T)=>void, capture:boolean = true) {
+export function listenHornetEvent<T extends HornetEvent<any>>(event: T, callback: (ev: T) => void, capture: boolean = true) {
     if (!Utils.isServer) {
         listenWindowEvent(event.name, callback as any, capture);
     } else {
@@ -201,7 +202,7 @@ export function listenHornetEvent<T extends HornetEvent<any>>(event:T, callback:
     }
 }
 
-export function listenOnceHornetEvent<T extends HornetEvent<any>>(event:T, callback:(ev:T)=>void, capture:boolean = true) {
+export function listenOnceHornetEvent<T extends HornetEvent<any>>(event: T, callback: (ev: T) => void, capture: boolean = true) {
     if (!Utils.isServer) {
         listenOnceWindowEvent(event.name, callback as any, capture);
     } else {
@@ -209,7 +210,7 @@ export function listenOnceHornetEvent<T extends HornetEvent<any>>(event:T, callb
     }
 }
 
-export function removeHornetEvent<T extends HornetEvent<any>>(event:T, callback:(ev:T)=>void, capture:boolean = true) {
+export function removeHornetEvent<T extends HornetEvent<any>>(event: T, callback: (ev: T) => void, capture: boolean = true) {
     if (!Utils.isServer) {
         removeWindowEvent(event.name, callback as any, capture);
     } else {
@@ -217,12 +218,12 @@ export function removeHornetEvent<T extends HornetEvent<any>>(event:T, callback:
     }
 }
 
-export function fireHornetEvent<T extends HornetEvent<any>>(event:T, eventOptions:any = {}) {
+export function fireHornetEvent<T extends HornetEvent<any>>(event: T, eventOptions: any = {}) {
     if (!Utils.isServer) {
 
         var ev = new CustomEvent(event.name, _.assign({
-                detail: event.detail
-            }, {
+            detail: event.detail
+        }, {
                 bubbles: true,
                 cancelable: true
             },
@@ -243,13 +244,16 @@ export var ASYNCHRONOUS_REQUEST_EVENT = new HornetEvent<RequestEventDetail>("ASY
 export var ASYNCHRONOUS_REQUEST_EVENT_COMPONENT = new HornetEvent<RequestEventDetail>("ASYNCHRONOUS_REQUEST_COMPONENT");
 
 export class ServiceEvent {
-    public static setRequestInProgress(inProgress:boolean) {
-        fireHornetEvent(ASYNCHRONOUS_REQUEST_EVENT.withData({inProgress:inProgress}));
+    public static setRequestInProgress(inProgress: boolean) {
+        fireHornetEvent(ASYNCHRONOUS_REQUEST_EVENT.withData({ inProgress: inProgress }));
     }
-    public static setRequestComponentInProgress(inProgress:boolean) {
-        fireHornetEvent(ASYNCHRONOUS_REQUEST_EVENT_COMPONENT.withData({inProgress:inProgress}));
+    public static setRequestComponentInProgress(inProgress: boolean) {
+        fireHornetEvent(ASYNCHRONOUS_REQUEST_EVENT_COMPONENT.withData({ inProgress: inProgress }));
     }
 }
 
 export interface ChangeUrlWithDataEventDetail { url: string; data: any, cb: () => void }
 export var CHANGE_URL_WITH_DATA_EVENT = new HornetEvent<ChangeUrlWithDataEventDetail>("CHANGE_URL_WITH_DATA_EVENT");
+
+export interface UnauthorizeErrorEventDetail { user: any; routeAuthorization: RouteAuthorization, cb?: () => void }
+export var UNAUTHORIZE_ERROR_EVENT = new HornetEvent<UnauthorizeErrorEventDetail>("UNAUTHORIZE_ERROR_EVENT");

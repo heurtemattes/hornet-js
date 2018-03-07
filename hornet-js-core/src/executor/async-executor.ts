@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,10 +88,10 @@ import * as domain from "domain";
 const logger: Logger = Utils.getLogger("hornet-js-core.executor.AsyncExecutor");
 
 export class AsyncExecutor extends EventEmitter {
-    private started = false;
-    private ended = false;
-    private asyncElements: Array<AsyncElement> = [];
-    private errorAsyncElement: AsyncElement = undefined;
+    protected started = false;
+    protected ended = false;
+    protected asyncElements: Array<AsyncElement> = [];
+    protected errorAsyncElement: AsyncElement = undefined;
 
     constructor() {
         super();
@@ -163,7 +163,7 @@ export class AsyncExecutor extends EventEmitter {
         });
     }
 
-    private toPromise(asyncElement: AsyncElement, resolvedError?: any): Promise<any> {
+    protected toPromise(asyncElement: AsyncElement, resolvedError?: any): Promise<any> {
         var p = new Promise<any>((resolve, reject) => {
             var d = domain.create();
             d.on("error", (err) => {

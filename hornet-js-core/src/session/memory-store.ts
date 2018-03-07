@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,9 +92,9 @@ var defer = typeof setImmediate === "function" ? setImmediate : function (fn, a?
 
 
 export class MemoryStore extends Store {
-    private sessions:any;
-    private expiredCheckInterval:number;
-    private lastExpiredCheck:number = 0;
+    protected sessions: any;
+    protected expiredCheckInterval: number;
+    protected lastExpiredCheck: number = 0;
 
     /**
      * Constructor
@@ -112,7 +112,7 @@ export class MemoryStore extends Store {
      *
      * @returns {boolean}
      */
-    isTouchImplemented():boolean {
+    isTouchImplemented(): boolean {
         return true;
     }
 
@@ -122,7 +122,7 @@ export class MemoryStore extends Store {
      * @param {function} fn
      * @public
      */
-    clear(fn:Function) {
+    clear(fn: Function) {
         this.sessions = Object.create(null);
         fn && defer(fn);
     }
@@ -134,9 +134,9 @@ export class MemoryStore extends Store {
      * @param {function} fn
      * @public
      */
-    destroy(session:Session, fn:Function) {
+    destroy(session: Session, fn: Function) {
         logger.trace("destroying session :", session.getId());
-        delete this.sessions[session.getId()];
+        delete this.sessions[ session.getId() ];
         fn && defer(fn);
     }
 
@@ -147,9 +147,9 @@ export class MemoryStore extends Store {
      * @param {function} fn
      * @public
      */
-    get(sid:string, fn:Function) {
+    get(sid: string, fn: Function) {
         this.checkExpired();
-        defer(fn, null, this.sessions[sid]);
+        defer(fn, null, this.sessions[ sid ]);
     }
 
     /**
@@ -162,28 +162,28 @@ export class MemoryStore extends Store {
         fn && defer(fn, null, Object.keys(this.sessions).length);
     }
 
-    set(session:Session, fn:Function) {
+    set(session: Session, fn: Function) {
         logger.trace("saving session", session);
-        this.sessions[session.getId()] = session;
+        this.sessions[ session.getId() ] = session;
         fn && defer(fn);
     }
 
-    touch(session:Session, fn:Function) {
+    touch(session: Session, fn: Function) {
         logger.trace("touching session", session);
-        this.sessions[session.getId()] = session;
+        this.sessions[ session.getId() ] = session;
         fn && defer(fn);
     }
 
-    private checkExpired() {
+    protected checkExpired() {
         var now = Date.now();
         if (now - this.lastExpiredCheck > this.expiredCheckInterval) {
             this.lastExpiredCheck = now;
             logger.trace("checking expired sessions");
             Object.keys(this.sessions).forEach((sid) => {
-                var session:Session = this.sessions[sid];
+                var session: Session = this.sessions[ sid ];
                 if (now - session.getLastAccessTime().getTime() > session.getMaxInactiveInterval()) {
                     logger.trace("session #" + session.getId() + " expired => removed from the MemoryStore");
-                    session.invalidate(()=> {});
+                    session.invalidate(() => { });
                 }
             });
         }

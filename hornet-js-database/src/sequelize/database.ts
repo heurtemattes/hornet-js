@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,9 +87,9 @@ import { Utils } from "hornet-js-utils";
 import { Injector } from "hornet-js-core/src/inject/injector";
 
 export class Database {
-    private _config: Configuration;
-    private _sequelize: Sequelize.Sequelize;
-    private _namespace: any;
+    protected _config: Configuration;
+    protected _sequelize: Sequelize.Sequelize;
+    protected _namespace: any;
 
     /**
      * @param configName Nom de la configuration de la base de données
@@ -124,13 +124,13 @@ export class Database {
     static getSQLFromFile(fileName: string): string[] {
         // Extract SQL queries from files. Assumes no ';' in the fileNames
         return fs.readFileSync(fileName).toString()
-        .replace(/(\r\n|\n|\r)/gm, " ") // remove newlines
-        .replace(/\s+/g, " ") // excess white space
-        .split(";") // split into all statements
-        .map(Function.prototype.call, String.prototype.trim)
-        .filter(function (el) {
-            return el.length !== 0;
-        }); // remove any empty ones
+            .replace(/(\r\n|\n|\r)/gm, " ") // remove newlines
+            .replace(/\s+/g, " ") // excess white space
+            .split(";") // split into all statements
+            .map(Function.prototype.call, String.prototype.trim)
+            .filter(function (el) {
+                return el.length !== 0;
+            }); // remove any empty ones
     }
 
     static sequence(tasks, fn): Promise<any> {
@@ -140,13 +140,13 @@ export class Database {
     static runScripts(list: {}[]): Promise<Boolean> {
         let p: Promise<any>[] = [];
         _.forEach(list, (item) => {
-            DbConnect.init(item["configName"]);
-            let cfg: Database = DbConnect.getGlobal(item["configName"]);
+            DbConnect.init(item[ "configName" ]);
+            let cfg: Database = DbConnect.getGlobal(item[ "configName" ]);
 
-            let files: string[] = item["files"];
-            p.push(Database.sequence(item["files"].map((path) => {
+            let files: string[] = item[ "files" ];
+            p.push(Database.sequence(item[ "files" ].map((path) => {
                 return Database.getSQLFromFile(path);
-            }), Database.run.bind({cfg: cfg})));
+            }), Database.run.bind({ cfg: cfg })));
         });
         return Promise.all(p).then(() => {
             return true;
@@ -154,17 +154,22 @@ export class Database {
     }
 
     static run(sql: string[]) {
-        let cfg: Database = this["cfg"];
+        let cfg: Database = this[ "cfg" ];
         return new Promise((resolve, reject) => {
-            let list = [];
-            cfg._sequelize.transaction((t) => {
-                sql.forEach((query) => {
-                    list.push(cfg._sequelize.query(query));
+            let databaseConfName = Injector.getRegistered("databaseConfigName");
+            if (Utils.config.getOrDefault("database." + databaseConfName + ".reload", false)) {
+                let list = [];
+                cfg._sequelize.transaction((t) => {
+                    sql.forEach((query) => {
+                        list.push(cfg._sequelize.query(query));
+                    });
+                    return Promise.all(list).then(() => {
+                        resolve(true);
+                    });
                 });
-                return Promise.all(list).then(() => {
-                    resolve(true);
-                });
-            });
+            } else {
+                resolve(true);
+            }
         });
     }
 }

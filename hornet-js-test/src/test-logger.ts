@@ -73,14 +73,33 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import * as path from "path";
+if(typeof window !== "undefined") {
+    process.env.LOG4JS_CONFIG = {
+        "disableClustering": true,
+        "appenders": {
+            "console": {
+                "type": "console",
+                "layout": {
+                    "type": "pattern",
+                    "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+                }
+            }
+        },
+        "categories": {
+            "default": { "appenders": ["console"], "level": "INFO" }
+        }
+    }
+} else {
+    process.env.LOG4JS_CONFIG = path.join(__dirname, "log-config.json");
+}
 
 import * as Log4jsNode from "log4js";
 import * as _ from "lodash";
-import * as path from "path";
 import * as fs from "fs";
 
 export class TestLogger {
@@ -112,28 +131,17 @@ export class TestLogger {
      * @returns {function(any): undefined}
      */
     static getLoggerBuilder(logConfig) {
-        logConfig.appenders.forEach((appender) => {
-                appender.layout.tokens = TestLogger.appenderLayoutTokens;
-
-                // creation du repertoire de log si non existant
-                if (appender.filename && path.dirname(appender.filename)) {
-                    if (appender.createDir) {
-                        let dirLogs = path.dirname(appender.filename);
-                        let dirToCreate = [];
-                        while (!fs.existsSync(dirLogs)) {
-                            dirToCreate.unshift(dirLogs);
-                            dirLogs = path.dirname(dirLogs);
-                        }
-
-                        dirToCreate.forEach(dir => {
-                            fs.mkdirSync(dir);
-                        });
-                    } else if (!fs.existsSync(path.dirname(appender.filename))) {
-                        throw new Error("You must specify a exsiting directory filename");
-                    }
+        Object.keys(logConfig.appenders).forEach((keyAppender) => {
+                let appender = logConfig.appenders[keyAppender];
+                if(appender.layout){
+                    appender.layout.tokens = TestLogger.appenderLayoutTokens;
                 }
             }
         );
+
+        (Log4jsNode as any).configure = function() {
+
+        };
 
         Log4jsNode.configure(logConfig);
 

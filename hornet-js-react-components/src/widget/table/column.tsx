@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -154,6 +154,9 @@ export interface ColumnProps extends HornetComponentProps {
     defaultStyle?: CSSProperties;
     /** Texte alternatif */
     alt?: string;
+    headers?: string | string[];
+    /** Méthode de comparaison custom pour le tri de la colonne */
+    compareMethod?:(sortData:SortData, a, b) => void;
 }
 
 /**
@@ -179,7 +182,7 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
 
     static defaultProps = {
         sortable: false,
-        defaultStyle: {"width": "10em"},
+        defaultStyle: { "width": "10em" },
         hiddenable: true
     };
 
@@ -213,7 +216,7 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
      * @return Class<HeaderCell<HeaderCellProps, any>>
      */
     public getHeaderCell(): Class<AbstractHeaderCell<AbstractHeaderCellProps, any>> {
-        return HeaderCell;
+        return HeaderCell as any;
     }
 
     /**
@@ -252,6 +255,7 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
         props.isEditing = this.state.isEditing;
         props.nbColumns = this.props.nbColumns;
         props.key = Column.getCellKey(props);
+        props.compareMethod = this.props.compareMethod || null;
 
         return props;
     }

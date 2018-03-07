@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -114,12 +114,12 @@ export interface HornetComponentDatasourceProps {
     /**
      * Permet de cacher le spinner du composant.
      */
-    hideSpinner?:boolean;
+    hideSpinner?: boolean;
 
     /**
      * Permet de surchager le message
      */
-    loadingMessage? : any;
+    loadingMessage?: any;
 }
 
 
@@ -133,7 +133,6 @@ export enum Alignment {
  * Classe parente des composants graphiques Hornet basés sur React.
  */
 export class HornetComponent<P extends HornetComponentProps, S extends HornetComponentState> extends React.Component<P, S> implements IHornetComponent<P, S> {
-
     /** Indique si les erreurs sont encapsulées de façon à rediriger vers la page d'erreur*/
     static ERROR_MANAGED: boolean = true;
 
@@ -149,7 +148,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
         this.copyInitialPropsToState(this.props, this.state);
     }
 
-    private rendering = false;
+    protected rendering = false;
     protected hasError = false;
 
     protected mounted = false;
@@ -199,14 +198,14 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
              *
              * On ne veut pas dans ce cas écraser l'état avec l'ancienne propriété. En effet l'état peut avaoir été modifié
              * via un setter alors que la propriété utilisée initialement pour le constructeur n'a pas changé.*/
-            if (!_.isEqual((this as any).props[key], nextProps[key])) {
+            if (!_.isEqual((this as any).props[ key ], nextProps[ key ])) {
                 /* On se base sur le 'setter' portant le même nom que la propriété */
                 let setterName: string = _.camelCase("set " + (key));
-                if (this[setterName]) {
-                    this[setterName](nextProps[key]);
+                if (this[ setterName ]) {
+                    this[ setterName ](nextProps[ key ]);
                 } else {
                     let state: any = {};
-                    state[key] = nextProps[key];
+                    state[ key ] = nextProps[ key ];
                     this.setState(state);
                 }
             }
@@ -241,15 +240,15 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
 
     protected copyInitialPropsToState(props: P, state: any) {
         for (let i in props) {
-            state[i] = props[i];
+            state[ i ] = props[ i ];
         }
     }
 
-    private autobinding() {
-        let blacklist = {constructor: 1, errorManagement: 1, wrapMethod: 1};
+    protected autobinding() {
+        let blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
         for (let fn in this) {
-            if (_.isFunction(this[fn]) && !(fn in blacklist)) {
-                this[fn] = this[fn]["bind"](this);
+            if (_.isFunction(this[ fn ]) && !(fn in blacklist)) {
+                this[ fn ] = this[ fn ][ "bind" ](this);
             }
         }
     }
@@ -258,12 +257,12 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      * Si la gestion des erreurs est activée, encapsule toutes les fonctions de ce composant avec une gestion d'erreur
      * commune.
      */
-    private errorManagement() {
+    protected errorManagement() {
         /* Fonctions à ne pas encapsuler */
-        let blacklist = {constructor: 1, errorManagement: 1, wrapMethod: 1};
+        let blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
         if (this.isErrorManaged()) {
             for (let fn in this) {
-                if (_.isFunction(this[fn]) && !(fn in blacklist)) {
+                if (_.isFunction(this[ fn ]) && !(fn in blacklist)) {
                     //this.wrapMethod(fn);
                 }
             }
@@ -319,25 +318,25 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      * Méthode permettant d'enrober un composant
      * @param method
      */
-    private wrapMethod(method) {
-        let unwrapped = this[method];
+    protected wrapMethod(method) {
+        let unwrapped = this[ method ];
         let self = this;
-        self[method] = function() {
+        self[ method ] = function () {
             try {
                 if (method == "render") self.rendering = true;
 
                 return unwrapped.apply(undefined, arguments);
             } catch (e) {
-                if (!e["hasBeenReported"] && (!self.rendering || method == "render")) {
+                if (!e[ "hasBeenReported" ] && (!self.rendering || method == "render")) {
                     let errorReport = {
-                        componentName: self.constructor["name"],
+                        componentName: self.constructor[ "name" ],
                         method: method,
                         methodArguments: arguments,
                         props: self.props,
                         state: self.state,
                         error: e
                     };
-                    e["hasBeenReported"] = true;
+                    e[ "hasBeenReported" ] = true;
                     self.getErrorHandler()(errorReport, self.getErrorComponent());
                 }
 
@@ -346,8 +345,8 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
                 if (method == "render") {
                     self.hasError = true;
                     return null;
-                } else if (!e["hasBeenThrown"]) {
-                    e["hasBeenThrown"] = true;
+                } else if (!e[ "hasBeenThrown" ]) {
+                    e[ "hasBeenThrown" ] = true;
                     throw e;
                 }
             } finally {
@@ -367,7 +366,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
         React.Children.map(this.props.children, (child: React.ReactChild) => {
             if ((child as React.ReactElement<any>).type === ComponentType) {
 
-                if((child as React.ReactElement<any>).props.children) {
+                if ((child as React.ReactElement<any>).props.children) {
                     if (Array.isArray((child as React.ReactElement<any>).props.children)) {
                         children = (child as React.ReactElement<any>).props.children;
                     } else {
@@ -376,9 +375,6 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
                 }
             }
         });
-
-
-
         return children.filter((element) => (element != null && element));
     }
 
@@ -458,7 +454,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
         let elements: any[] = this.getChildrenOf(Component);
         let nbMax = elements.length;
         for (let i = 0; i < nbMax; i++) {
-            if (elements[i] && (elements[i] as React.ReactElement<any>).type === ComponentType) {
+            if (elements[ i ] && (elements[ i ] as React.ReactElement<any>).type === ComponentType) {
                 return true;
             }
         }
@@ -489,7 +485,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      * @param {HornetComponent} componentProps props du composant à wrapper
      * @param {Object} otherProps nouvelle props à ajouter
      */
-    static wrap<P, S>(ComponentToWrap, hornetComponentContext: HornetComponent<HornetComponentProps,HornetComponentState>, componentProps: P, otherProps: P) {
+    static wrap<P, S>(ComponentToWrap, hornetComponentContext: HornetComponent<HornetComponentProps, HornetComponentState>, componentProps: P, otherProps: P) {
         class WrapComponent extends HornetComponent<P, S> {
 
             public componentToWrap;
@@ -512,7 +508,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
                 this.componentToWrap.setState(arguments)
             }
 
-            public getThisBind():HornetComponent<HornetComponentProps,HornetComponentState> {
+            public getThisBind(): HornetComponent<HornetComponentProps, HornetComponentState> {
                 if ((hornetComponentContext as any).getThisBind) {
                     return (hornetComponentContext as any).getThisBind();
                 }
@@ -547,11 +543,11 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
 
         let merge = (finalObj, obj) => {
 
-            if(typeof obj == "object") {
+            if (typeof obj == "object") {
                 let keys = Object.keys(obj);
                 if (Array.isArray(keys) && keys.length > 0) {
                     keys.map((key) => {
-                        finalObj[key] = obj[key];
+                        finalObj[ key ] = obj[ key ];
                     });
                 }
             }
@@ -559,7 +555,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
         };
 
 
-        let finalObj:any = merge({}, obj1);
+        let finalObj: any = merge({}, obj1);
         return merge(finalObj, obj2);
     }
 

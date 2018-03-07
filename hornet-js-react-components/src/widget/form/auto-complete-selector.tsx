@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -96,7 +96,7 @@ const logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-comp
  */
 export interface AutoCompleteSelectorProps extends HornetComponentProps {
     choices?: Array<any>;
-    onOptionSelected: MouseEventHandler<HTMLElement>;
+    onOptionSelected: (event: __React.MouseEvent<HTMLElement>, choice: any) => void;
     currentTypedText?: string;
 
     // todo: A supprimer suite à l'usage de AutompleteState ?!?
@@ -118,7 +118,7 @@ export interface AutoCompleteSelectorProps extends HornetComponentProps {
 export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorProps, any> {
 
     static defaultProps = {
-        onOptionSelected: function (event: __React.MouseEvent<HTMLElement>): void {
+        onOptionSelected: function (event: __React.MouseEvent<HTMLElement>, choice: any): void {
             event.preventDefault();
         },
         currentTypedText: "",
@@ -128,12 +128,11 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         disabled: false
     };
 
-
     protected liElts: HTMLElement[];
     protected liReact: JSX.Element[];
     protected choicesSelected: string | string[];
 
-    private noResultLabelDefault: string = AutoCompleteSelector.getI18n("form.autoCompleteField.noResultLabel");
+    protected noResultLabelDefault: string = AutoCompleteSelector.getI18n("form.autoCompleteField.noResultLabel");
 
     constructor(props, context?: any) {
         super(props, context);
@@ -181,10 +180,20 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     /**
      * Fonction appelée lors du click sur un élément de la liste
      **/
-    private onListClick(event: __React.MouseEvent<HTMLElement>) {
+    protected onListClick(event: __React.MouseEvent<HTMLElement>, choice: any) {
         event.preventDefault();
         this.state.onListClick = true;
-        return this.state.onOptionSelected(event);
+        return this.state.onOptionSelected(event, choice);
+    }
+
+    protected onListClickMulti(event: any, index: number, choice: any) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        if (event.button == 0) {
+            this.state.onListClick = true;
+            return this.state.onOptionSelected(event, choice);
+        }
     }
 
     /**
@@ -340,7 +349,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     /**
      * Retourne le rendu de la liste de choix
      **/
-    private renderOptionList(): JSX.Element[] {
+    protected renderOptionList(): JSX.Element[] {
         logger.trace("render AutoCompleteSelector option list");
         let res: JSX.Element[] = [];
 
@@ -364,20 +373,18 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
                     };
 
                     let classList: string = classNames(classes);
-
+                    let checkboxChecked: boolean = false;
                     res.push((
-                        <li onMouseDown={!this.props.readOnly && !this.props.disabled ? this.onListClick : null}
+                        <li onMouseDown={!this.props.readOnly && !this.props.disabled ? (event) => this.onListClick(event, choice) : null}
                             id={this.state.selectorId + "_" + indexTab}
                             className={classList}
-                            data-real-text={choice.text}
+                            aria-selected={this.state.choicesSelected == choice.value}
                             data-real-value={choice.value}
                             role="option"
                             key={"autocomplete-" + choice.text + "-" + choice.value}
                             ref={(liElt) => {
                                 if (liElt != null) this.liElts.push(liElt);
-                            }
-                            }
-                            >
+                            }}>
 
                             {choice.text ? choice.text.substring(0, index) : ""}
                             <b>
@@ -396,7 +403,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     /**
      * indique un clic sur une checkbox
      **/
-    multiClick() {
+    multiClick(event) {
         this.state.onListClick = true;
     }
 
@@ -404,7 +411,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     /**
      * Retourne le rendu de la liste de choix
      **/
-    private renderOptionMultipleList(): JSX.Element[] {
+    protected renderOptionMultipleList(): JSX.Element[] {
 
         logger.trace("render AutoCompleteSelector option multiple");
         let res: JSX.Element[] = [];
@@ -425,25 +432,35 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
                     let checkboxChecked: boolean = false;
 
-                    if (_.indexOf(this.props.choicesSelected, choice.value) > -1) {
+                    if (_.indexOf(this.props.choicesSelected, choice.value.toString()) > -1) {
                         checkboxChecked = true;
                     }
                     let classList: string = classNames(classes);
                     res.push((
                         <li
-                            onMouseDown={!this.props.readOnly && !this.props.disabled ? this.onListClick : null}
+                            onMouseDown={!this.props.readOnly && !this.props.disabled ? (e) => { this.onListClickMulti(e, indexTab, choice) } : null}
                             id={this.state.selectorId + "_" + indexTab}
+                            onKeyDown={!this.props.readOnly && !this.props.disabled ? (e) => {
+                                this.onListClickMulti(e, indexTab, choice)
+                            } : null}
                             className={classList}
-                            data-real-text={choice.text}
                             data-real-value={choice.value}
                             role="option"
+                            aria-selected={checkboxChecked}
                             key={"autocomplete-" + choice.text + "-" + choice.value}
                             ref={(liElt) => {
                                 if (liElt != null) this.liElts.push(liElt);
                             }
                             }
-                            >
-                            <CheckBox onMouseUp={this.multiClick} label={choice.text} onChange={() => { } } checked={checkboxChecked} readOnly={this.props.readOnly} disabled={this.props.disabled} />
+
+                        >
+                            <CheckBox id={"autocomplete-selector-checkbox-" + indexTab}
+                                      key={"autocomplete-selector-checkbox-" + indexTab + "-" + checkboxChecked}
+                                      checked={checkboxChecked}
+                                      label={choice.text}
+                                      onChange={() => { }}
+                                      readOnly={this.props.readOnly}
+                                      disabled={this.props.disabled} />
                         </li>
                     ));
                 }
@@ -489,7 +506,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         return (
             <div className={classList}>
                 <div className={classContentList}>
-                    <ul className="autocomplete-selector-list" role="listbox" id={this.state.selectorId} style={styleUl}>
+                    <ul className="autocomplete-selector-list" role="listbox" id={this.state.selectorId} style={styleUl} aria-multiselectable={this.props.isMultiple}>
                         {this.liReact.length > 0 ? this.liReact : no_result}
                     </ul>
                 </div>

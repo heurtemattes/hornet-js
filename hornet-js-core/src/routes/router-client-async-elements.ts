@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { AsyncElement } from "src/executor/async-element";
-import { HornetEvent, fireHornetEvent } from "src/event/hornet-event";
+import { HornetEvent, fireHornetEvent, UNAUTHORIZE_ERROR_EVENT} from "src/event/hornet-event";
 import { RouteAuthorization, PageRouteInfos } from "src/routes/abstract-routes";
 import { SecurityError } from "hornet-js-utils/src/exception/security-error";
 import { AuthUtils } from "hornet-js-utils/src/authentication-utils";
@@ -93,9 +93,9 @@ import { manageError } from "src/component/error-manager";
 //                                      ContextInitializerElement
 // ------------------------------------------------------------------------------------------------------------------- //
 export class ContextInitializerElement extends AsyncElement {
-    private authorization;
-    private handler;
-    private params;
+    protected authorization;
+    protected handler;
+    protected params;
 
     constructor(authorization, handler, params) {
         super();
@@ -136,11 +136,11 @@ export class UrlChangeElement extends AsyncElement {
 //                                      UserAccessSecurityAction
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UserAccessSecurityElement extends AsyncElement {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UserAccessSecurityElement");
-    
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UserAccessSecurityElement");
+
     execute(next) {
         var user = Utils.getCls("hornet.user");
-        var routeAuthorization:RouteAuthorization = Utils.getCls("hornet.routeAuthorization");
+        var routeAuthorization: RouteAuthorization = Utils.getCls("hornet.routeAuthorization");
 
         if (routeAuthorization && routeAuthorization.length > 0) {
             // cas de la redirection vers la page de login si page authentifiée et pas connecté
@@ -154,7 +154,7 @@ export class UserAccessSecurityElement extends AsyncElement {
                 // cela permet de pouvoir utiliser le bouton "back" depuis la page de login et de revenir sur l'url de la page publique plutôt que sur la page privée
                 history.back();
                 // la redirection se fait dans un setTimeout car le "back" est asynchrone
-                setTimeout(function() {
+                setTimeout(function () {
                     window.location.href = Utils.buildContextPath(Utils.appSharedProps.get("loginUrl")) + "?previousUrl=" + oldUrl;
                 }, 50);
 
@@ -162,6 +162,7 @@ export class UserAccessSecurityElement extends AsyncElement {
             } else {
                 UserAccessSecurityElement.logger.trace("Route avec restriction d'accès sur les rôles:", routeAuthorization);
                 if (!AuthUtils.isAllowed(user, routeAuthorization)) {
+                    fireHornetEvent(UNAUTHORIZE_ERROR_EVENT.withData({ user: user, routeAuthorization: routeAuthorization }));
                     throw new SecurityError();
                 }
             }
@@ -177,21 +178,21 @@ export class UserAccessSecurityElement extends AsyncElement {
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      ViewRenderingAction
 // ------------------------------------------------------------------------------------------------------------------- //
-export interface ComponentChangeEventDetail { newComponent: Class<IHornetPage<any,any>>; data: any; }
+export interface ComponentChangeEventDetail { newComponent: Class<IHornetPage<any, any>>; data: any; }
 export var COMPONENT_CHANGE_EVENT = new HornetEvent<ComponentChangeEventDetail>("COMPONENT_CHANGE_EVENT");
 export class ViewRenderingElement extends AsyncElement {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.ViewRenderingElement");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.ViewRenderingElement");
 
-    private appComponent;
+    protected appComponent;
     constructor(appComponent) {
         super();
         this.appComponent = appComponent;
     }
 
     execute(next) {
-        var routeInfos:PageRouteInfos = Utils.getCls("hornet.routeInfos");
+        var routeInfos: PageRouteInfos = Utils.getCls("hornet.routeInfos");
         let dataToPass = Utils.getCls("hornet.navigateData");
-        fireHornetEvent(COMPONENT_CHANGE_EVENT.withData({ newComponent: routeInfos.getViewComponent(), data : dataToPass }));
+        fireHornetEvent(COMPONENT_CHANGE_EVENT.withData({ newComponent: routeInfos.getViewComponent(), data: dataToPass }));
         next();
     }
 }
@@ -200,9 +201,9 @@ export class ViewRenderingElement extends AsyncElement {
 //                                      UnmanagedViewErrorElement
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UnmanagedViewErrorElement extends AsyncElement {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UnmanagedViewErrorElement");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UnmanagedViewErrorElement");
 
-    private errorComponent;
+    protected errorComponent;
     constructor(errorComponent) {
         super();
         this.errorComponent = errorComponent;

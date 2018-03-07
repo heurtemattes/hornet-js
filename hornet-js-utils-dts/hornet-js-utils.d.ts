@@ -73,7 +73,7 @@ declare module "hornet-js-utils/src/app-shared-props" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -230,7 +230,7 @@ declare module "hornet-js-utils/src/common-register" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -777,7 +777,7 @@ declare module "hornet-js-utils/src/object-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -881,7 +881,7 @@ declare module "hornet-js-utils/src/string-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -994,7 +994,7 @@ declare module "hornet-js-utils/src/typescript-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1109,7 +1109,7 @@ declare module "hornet-js-utils/src/exception/business-error-list" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1201,7 +1201,7 @@ declare module "hornet-js-utils/src/exception/business-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1289,7 +1289,7 @@ declare module "hornet-js-utils/src/exception/codes-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1434,7 +1434,7 @@ declare module "hornet-js-utils/src/exception/http-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1523,7 +1523,7 @@ declare module "hornet-js-utils/src/exception/not-found-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1612,7 +1612,7 @@ declare module "hornet-js-utils/src/exception/security-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1701,7 +1701,7 @@ declare module "hornet-js-utils/src/exception/technical-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1789,7 +1789,7 @@ declare module "hornet-js-utils/src/exception/validation-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

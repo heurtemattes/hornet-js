@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,6 +100,8 @@ import * as _ from "lodash";
 import ErrorObject = ajv.ErrorObject;
 import { SelectField } from "src/widget/form/select-field";
 import { ButtonsArea } from "src/widget/form/buttons-area";
+import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
+import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.form");
 
@@ -107,8 +109,12 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.f
  * Propriétés du formulaire hornet.
  */
 export interface FormProps extends AbstractFormProps {
+    /** Identifiant du formulaire */
+    id: string;
     /** Nom du formulaire */
     name?: string;
+    /** Fonction déclenchée lors de la soumission du formulaire, avant la validation */
+    onBeforeSubmit?: (data: any) => void;
     /** Fonction déclenchée lors de la soumission du formulaire, lorsque celui-ci est valide */
     onSubmit?: (data: any) => void;
     /** Fonction déclenchée lors de la modification d'un champ du formulaire */
@@ -120,6 +126,8 @@ export interface FormProps extends AbstractFormProps {
     subTitle?: string;
     /** Texte descriptif éventuel */
     text?: string;
+    /** langue du texte descriptif */
+    textLang?: string;
     /** Nom de la classe CSS à affecter au formulaire. */
     className?: string;
     /** Lorsqu'égal à false, les libellés des champs obligatoires ne sont pas marqués avec un astérisque */
@@ -139,11 +147,9 @@ export interface FormProps extends AbstractFormProps {
     customValidators?: ICustomValidation[];
     /** Données initiales du formulaire */
     defaultValues?: any;
-
     /** Identifiant du groupe de notifications auquel seront rattachées les notifications d'erreurs de validation
      * de ce formulaire */
     notifId?: string;
-
     /** Lorsqu'égal à true, les boutons de validation ne sont pas affichés */
     hideButtons?: boolean;
 }
@@ -156,7 +162,7 @@ export class Form extends AbstractForm<FormProps, any> {
 
     static idx = 0;
 
-    private debouncedValidateAndSubmit: any;
+    protected debouncedValidateAndSubmit: any;
 
     /** Valeur de propriétés par défaut */
     static defaultProps: FormProps = _.assign(_.cloneDeep(AbstractForm.defaultProps), {
@@ -181,93 +187,99 @@ export class Form extends AbstractForm<FormProps, any> {
         this.state.calendarLocale = calendarLocale;
         this.state.customNotif = props.notifId != null;
         this.state.notifId = props.notifId != null ? props.notifId : "Form-" + (Form.idx++);
+
+        this.listen(VALUE_CHANGED_EVENT, (ev: HornetEvent<any>) => {
+            if (ev.detail.form.id == this.state.id) {
+                this.state.onFormChange();
+            }
+        });
     }
 
     // Setters (pas de setter sur defaultValues, car cette propriété sert uniquement lors du montage initial du composant
 
     setName(value: string, callback?: () => any): this {
-        this.setState({name: value}, callback);
+        this.setState({ name: value }, callback);
         return this;
     }
 
     setOnSubmit(handler: (data: any) => void, callback?: () => any): this {
-        this.setState({onSubmit: handler}, callback);
+        this.setState({ onSubmit: handler }, callback);
         return this;
     }
 
     setOnFormChange(handler: __React.FormEventHandler<HTMLElement>, callback?: () => any): this {
-        this.setState({onFormChange: handler}, callback);
+        this.setState({ onFormChange: handler }, callback);
         return this;
     }
 
     setIsMandatoryFieldsHidden(value: boolean, callback?: () => any): this {
-        this.setState({isMandatoryFieldsHidden: value}, callback);
+        this.setState({ isMandatoryFieldsHidden: value }, callback);
         return this;
     }
 
     setSubTitle(value: string, callback?: () => any): this {
-        this.setState({subTitle: value}, callback);
+        this.setState({ subTitle: value }, callback);
         return this;
     }
 
     setText(value: string, callback?: () => any): this {
-        this.setState({text: value}, callback);
+        this.setState({ text: value }, callback);
         return this;
     }
 
     setClassName(value: string, callback?: () => any): this {
-        this.setState({className: value}, callback);
+        this.setState({ className: value }, callback);
         return this;
     }
 
     setMarkRequired(value: boolean, callback?: () => any): this {
-        this.setState({markRequired: value}, callback);
+        this.setState({ markRequired: value }, callback);
         /* Propagation de la propriété aux champs Hornet appartenant à ce formulaire */
         this.updateMarkRequiredFields(value);
         return this;
     }
 
     setImgFilePath(value: string, callback?: () => any): this {
-        this.setState({imgFilePath: value}, callback);
+        this.setState({ imgFilePath: value }, callback);
         /* Propagation de la propriété aux champs Hornet appartenant à ce formulaire */
         this.updateImagFilePathFields(value);
         return this;
     }
 
     setSchema(value: any, callback?: () => any): this {
-        this.setState({schema: value}, callback);
+        this.setState({ schema: value }, callback);
         return this;
     }
 
     setValidationOptions(value: ajv.Options, callback?: () => any): this {
-        this.setState({validationOptions: value}, callback);
+        this.setState({ validationOptions: value }, callback);
         return this;
     }
 
     setFormMessages(value: any, callback?: () => any): this {
-        this.setState({formMessages: value}, callback);
+        this.setState({ formMessages: value }, callback);
         return this;
     }
 
     setCustomValidators(value: ICustomValidation[], callback?: () => any): this {
-        this.setState({customValidators: value}, callback);
+        this.setState({ customValidators: value }, callback);
         return this;
     }
 
     setNotifId(value: string, callback?: () => any): this {
         if (value != null) {
-            this.setState({notifId: value, customNotif: true}, callback);
+            this.setState({ notifId: value, customNotif: true }, callback);
         } else {
-            this.setState({notifId: "Form-" + (Form.idx++), customNotif: false}, callback);
+            this.setState({ notifId: "Form-" + (Form.idx++), customNotif: false }, callback);
         }
         return this;
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        NotificationManager.clean(this.state.notifId);
+        NotificationManager.clean(this.state.notifId, this.state.id);
         if (this.formElement) {
-            this.formElement["__component"] = null;
+            this.formElement[ "__component" ] = null;
         }
     }
 
@@ -290,11 +302,11 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param isMarkRequired valeur à assigner à la propriété 'markRequired'
      * @return ce formulaire
      */
-    private updateMarkRequiredFields(isMarkRequired: boolean): this {
-        let fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
+    protected updateMarkRequiredFields(isMarkRequired: boolean): this {
+        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         /* Met à jour l'affichage de chaque champ en cas de readOnly*/
-        Object.keys(fields).every(function(key: string): boolean {
-            let field: DomAdapter<any, any> = fields[key];
+        Object.keys(fields).every(function (key: string): boolean {
+            let field: DomAdapter<any, any> = fields[ key ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setMarkRequired(isMarkRequired);
             }
@@ -308,10 +320,10 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param imgFilePath valeur à assigner à la propriété 'imgFilePath'
      * @return ce formulaire
      */
-    private updateImagFilePathFields(imgFilePath: string): this {
-        let fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function(key: string): boolean {
-            let field: DomAdapter<any, any> = fields[key];
+    protected updateImagFilePathFields(imgFilePath: string): this {
+        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        Object.keys(fields).every(function (key: string): boolean {
+            let field: DomAdapter<any, any> = fields[ key ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setImgFilePath(imgFilePath);
             }
@@ -330,65 +342,65 @@ export class Form extends AbstractForm<FormProps, any> {
         for (let nameField in fields) {
             let val = _.get(data, nameField);
             if (val != null) {
-                if (fields[nameField] instanceof CheckBoxField) {
+                if (fields[ nameField ] instanceof CheckBoxField) {
                     /* Traitement spécifique pour une checkbox : on affecte currentChecked lorsque la valeur est booléenne*/
                     // if (val === true || val === false) {
                     //     fields[name].setCurrentValue("");
-                    fields[nameField].setCurrentChecked(val as boolean);
+                    fields[ nameField ].setCurrentChecked(val as boolean);
                     // } else {
                     //     fields[name].setCurrentValue(val);
                     // }
                 } else {
-                    if (fields[nameField] instanceof SelectField || fields[nameField] instanceof AutoCompleteField) {
+                    if (fields[ nameField ] instanceof SelectField || fields[ nameField ] instanceof AutoCompleteField) {
                         if (val instanceof Array) {
                             let choices = [];
                             /** TODO : a deplace dans le composant autocompleteField */
-                            if (fields[nameField].state.multiple) {
-                                for (let i = 0; i < fields[nameField].state.allChoices.length; i++) {
-                                    let choice = fields[nameField].state.allChoices[i];
+                            if (fields[ nameField ].state.multiple) {
+                                for (let i = 0; i < fields[ nameField ].state.allChoices.length; i++) {
+                                    let choice = fields[ nameField ].state.allChoices[ i ];
                                     for (let j = 0; j < val.length; j++) {
-                                        if (val[j].toString() == choice["value"]) {
-                                            choices.push(choice["value"]);
+                                        if (val[ j ].toString() == choice[ "value" ]) {
+                                            choices.push(choice[ "value" ]);
                                             break;
                                         }
                                     }
                                 }
                             } else {
-                                for (let i = 0; i < fields[nameField].state.dataSource.length; i++) {
-                                    let choice = fields[nameField].state.dataSource[i];
+                                for (let i = 0; i < fields[ nameField ].state.dataSource.length; i++) {
+                                    let choice = fields[ nameField ].state.dataSource[ i ];
                                     for (let j = 0; j < val.length; j++) {
-                                        if (val[j].toString() == choice[fields[nameField].state.valueKey]) {
-                                            choices.push(choice[fields[nameField].state.valueKey]);
+                                        if (val[ j ].toString() == choice[ fields[ nameField ].state.valueKey ]) {
+                                            choices.push(choice[ fields[ nameField ].state.valueKey ]);
                                             break;
                                         }
                                     }
                                 }
                             }
-                            fields[nameField].setCurrentValue(choices);
+                            fields[ nameField ].setCurrentValue(choices);
                         } else {
-                            fields[nameField].setCurrentValue(val);
+                            fields[ nameField ].setCurrentValue(val);
                         }
                     } else {
                         /* Traitement des champs radio et select en mode readOnly */
-                        if ((fields[nameField].state.choices) && (this.state.readOnly || fields[nameField].state.readOnly )) {
+                        if ((fields[ nameField ].state.choices) && (this.state.readOnly || fields[ nameField ].state.readOnly)) {
 
-                            for (let i = 0; i < fields[nameField].state.dataSource.length; i++) {
-                                let choice = fields[nameField].state.dataSource[i];
-                                if (val.toString() == choice[fields[nameField].state.valueKey]) {
-                                    fields[nameField].setCurrentValue(choice[fields[nameField].state.valueKey]);
+                            for (let i = 0; i < fields[ nameField ].state.dataSource.length; i++) {
+                                let choice = fields[ nameField ].state.dataSource[ i ];
+                                if (val.toString() == choice[ fields[ nameField ].state.valueKey ]) {
+                                    fields[ nameField ].setCurrentValue(choice[ fields[ nameField ].state.valueKey ]);
                                     break;
                                 }
                             }
                         } else {
-                            fields[nameField].setCurrentValue(val);
+                            fields[ nameField ].setCurrentValue(val);
                         }
                     }
                 }
             } else {
-                if (fields[nameField] instanceof CheckBoxField) {
-                    fields[nameField].setCurrentChecked(false);
+                if (fields[ nameField ] instanceof CheckBoxField) {
+                    fields[ nameField ].setCurrentChecked(false);
                 } else {
-                    fields[nameField].setCurrentValue(null);
+                    fields[ nameField ].setCurrentValue(null);
                 }
             }
         }
@@ -399,12 +411,12 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param fields champs du formulaire
      * @param notifs notifications d'erreurs de validation
      */
-    private processAutocompleteErrors(fields: { [key: string]: DomAdapter<any, any> }, notifs: Notifications): void {
+    protected processAutocompleteErrors(fields: { [ key: string ]: DomAdapter<any, any> }, notifs: Notifications): void {
         let processedNotifs: Array<INotificationType> = notifs.getNotifications().map(
-            function(notif: INotificationType): INotificationType {
+            function (notif: INotificationType): INotificationType {
                 /* Parcours de tous les champs */
-                Object.keys(fields).every(function(key: string): boolean {
-                    let field: DomAdapter<any, any> = fields[key];
+                Object.keys(fields).every(function (key: string): boolean {
+                    let field: DomAdapter<any, any> = fields[ key ];
                     if (field instanceof AutoCompleteField) {
                         let autoField: AutoCompleteField<AutoCompleteFieldProps> = field as AutoCompleteField<AutoCompleteFieldProps>;
                         /* La notification référence le nom global du champ d'auto-complétion
@@ -430,11 +442,11 @@ export class Form extends AbstractForm<FormProps, any> {
      * Déclenche les notifications correspondant aux éventuelles erreurs de validation
      * @param errors erreurs de validation de formulaire, éventuellement vides
      */
-    private notifyErrors(errors: Array<ErrorObject>): void {
+    protected notifyErrors(errors: Array<ErrorObject>): void {
         if (errors) {
             let fieldsMessages = this.state.formMessages && this.state.formMessages.fields;
             let genericValidationMessages = this.i18n("form.validation");
-            let fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
+            let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
 
             let notificationsError: Notifications = FormUtils.getErrors(errors, fields, fieldsMessages, genericValidationMessages);
 
@@ -442,8 +454,8 @@ export class Form extends AbstractForm<FormProps, any> {
             this.processAutocompleteErrors(fields, notificationsError);
 
             /* Met à jour les erreurs affichées par chaque composant champ */
-            Object.keys(fields).every(function(key: string): boolean {
-                let field: DomAdapter<any, any> = fields[key];
+            Object.keys(fields).every(function (key: string): boolean {
+                let field: DomAdapter<any, any> = fields[ key ];
                 if (field instanceof AbstractField) {
                     field.setErrors(notificationsError.getNotifications());
                 }
@@ -451,7 +463,7 @@ export class Form extends AbstractForm<FormProps, any> {
             });
 
             /* Emission des notifications */
-            NotificationManager.notify(null, notificationsError);
+            NotificationManager.notify(this.state.notifId, this.state.id, notificationsError);
         }
     }
 
@@ -463,22 +475,22 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param schema schéma de validation JSON-Schema
      * @param data données de formualaire
      */
-    private transformDatesToISO(schema: any, data: any): void {
+    protected transformDatesToISO(schema: any, data: any): void {
         if (schema && schema.properties && data) {
             let propNames: string[] = Object.keys(schema.properties);
             let property: any, propName: string;
             for (let i: number = 0; i < propNames.length; i++) {
-                propName = propNames[i];
-                property = schema.properties[propName];
+                propName = propNames[ i ];
+                property = schema.properties[ propName ];
                 if (property.type == "object") {
                     /* Appel récursif sur les éventuelles propriétés incluses dans le sous-schéma */
-                    this.transformDatesToISO(property, data[propName]);
+                    this.transformDatesToISO(property, data[ propName ]);
                 } else if (property.format == "date-time") {
-                    if (data[propName]) {
-                        let date: Date = Utils.dateUtils.parseInTZ(data[propName], this.state.calendarLocale.dateFormat);
+                    if (data[ propName ]) {
+                        let date: Date = Utils.dateUtils.parseInTZ(data[ propName ], this.state.calendarLocale.dateFormat);
                         if (date) {
                             /* La chaîne de caractères est une date valide pour la locale : on convertit en représentation ISO 8601.*/
-                            data[propName] = date.toISOString();
+                            data[ propName ] = date.toISOString();
                         }
                         /* Sinon la valeur incorrecte est conservée*/
                     }
@@ -491,7 +503,7 @@ export class Form extends AbstractForm<FormProps, any> {
     /**
      * Déclenche la validation du formulaire, notifie les erreurs éventuelles et exécute la fonction
      * onSubmit présente dans les propriétés s'il n'y a pas d'erreurs
-     * @private
+     * 
      */
     public validateAndSubmit() {
         if (this.formElement) {
@@ -499,6 +511,9 @@ export class Form extends AbstractForm<FormProps, any> {
 
             let data = this.extractData();
 
+            if (this.state.onBeforeSubmit) {
+                this.state.onBeforeSubmit(data);
+            }
 
             let options: ajv.Options = this.state.validationOptions;
             let schema = DataValidator.transformRequiredStrings(this.state.schema);
@@ -521,14 +536,14 @@ export class Form extends AbstractForm<FormProps, any> {
      * Supprime les nofifications d'erreurs et les erreurs associées à chaque champ de ce formulaire
      */
     cleanFormErrors(): void {
-        let fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
+        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         for (let fieldName in fields) {
-            let field: DomAdapter<any, any> = fields[fieldName];
+            let field: DomAdapter<any, any> = fields[ fieldName ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setErrors(null);
             }
         }
-        NotificationManager.clean(this.state.notifId);
+        NotificationManager.clean(this.state.notifId, this.state.id);
     }
 
     /**
@@ -544,9 +559,9 @@ export class Form extends AbstractForm<FormProps, any> {
     /**
      * Méthode permettant d'alimenter le bloc Notifications d'erreurs puis de déléguer l'évent au composant parent
      * @param e
-     * @private
+     * 
      */
-    private _submitHornetForm(e: React.SyntheticEvent<HTMLElement>): void {
+    protected _submitHornetForm(e: React.SyntheticEvent<HTMLElement>): void {
         /* e.preventDefault ne doit pas être 'débouncée', sinon la soumission par défaut du formulaire serait effectuée */
         e.preventDefault();
 
@@ -557,9 +572,9 @@ export class Form extends AbstractForm<FormProps, any> {
     protected propagateParentState(): void {
         /* Le composant parent se charge de propager les propriétés readOnly et disabled */
         super.propagateParentState();
-        let fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function(key: string): boolean {
-            let field: DomAdapter<any, any> = fields[key];
+        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        Object.keys(fields).every(function (key: string): boolean {
+            let field: DomAdapter<any, any> = fields[ key ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setMarkRequired(this.state.markRequired);
                 (field as AbstractField<any, any>).setImgFilePath(this.state.imgFilePath);
@@ -569,21 +584,21 @@ export class Form extends AbstractForm<FormProps, any> {
     }
 
     /** @override */
-    protected extractFields(): { [key: string]: DomAdapter<any, any> } {
-        let fields: { [key: string]: DomAdapter<any, any> } = {};
+    protected extractFields(): { [ key: string ]: DomAdapter<any, any> } {
+        let fields: { [ key: string ]: DomAdapter<any, any> } = {};
         if (this.formElement) {
             for (let index = 0; index < this.formElement.elements.length; index++) {
 
-                let item: Element = this.formElement.elements[index];
-                if (item["name"]) {
-                    if (item["__component"]) {
-                        fields[item["name"]] = item["__component"];
+                let item: Element = this.formElement.elements[ index ];
+                if (item[ "name" ]) {
+                    if (item[ "__component" ]) {
+                        fields[ item[ "name" ] ] = item[ "__component" ];
                     } else {
-                        if (fields[item["name"]]) {
-                            fields[item["name"]].addHtmlElement(item);
+                        if (fields[ item[ "name" ] ]) {
+                            fields[ item[ "name" ] ].addHtmlElement(item);
                         } else {
-                            fields[item["name"]] = new DomAdapter<any, any>();
-                            fields[item["name"]].registerHtmlElement(item);
+                            fields[ item[ "name" ] ] = new DomAdapter<any, any>();
+                            fields[ item[ "name" ] ].registerHtmlElement(item);
                         }
                     }
                 }
@@ -598,17 +613,17 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param items
      * @returns {boolean}
      */
-    private isMultiPartForm(items: Array<React.ReactChild>): boolean {
+    protected isMultiPartForm(items: Array<React.ReactChild>): boolean {
 
         let isMultiPart: boolean = false;
 
         React.Children.map(items, (child: React.ReactChild) => {
             if (!isMultiPart) {
                 if (child != null) {
-                    if (child["props"] && child["props"].children) {
-                        isMultiPart = this.isMultiPartForm(child["props"].children);
+                    if (child[ "props" ] && child[ "props" ].children) {
+                        isMultiPart = this.isMultiPartForm(child[ "props" ].children);
                     }
-                    if (!isMultiPart && ( child as React.ReactElement<any> ).type === UploadFileField) {
+                    if (!isMultiPart && (child as React.ReactElement<any>).type === UploadFileField) {
                         isMultiPart = true;
                     }
                 }
@@ -623,16 +638,16 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param items
      * @returns {boolean}
      */
-    private isOneRequired(items: Array<React.ReactChild>): boolean {
+    protected isOneRequired(items: Array<React.ReactChild>): boolean {
 
         let isOneRequired: boolean = false;
         React.Children.map(items, (child: React.ReactChild) => {
             if (!isOneRequired) {
                 if (child != null) {
-                    if (child["props"] && child["props"].children) {
-                        isOneRequired = this.isOneRequired(child["props"].children);
+                    if (child[ "props" ] && child[ "props" ].children) {
+                        isOneRequired = this.isOneRequired(child[ "props" ].children);
                     }
-                    if (!isOneRequired && ( child as any).props && ( child as any).props.required == true) {
+                    if (!isOneRequired && (child as any).props && (child as any).props.required == true) {
                         isOneRequired = true;
                     }
                 }
@@ -656,13 +671,14 @@ export class Form extends AbstractForm<FormProps, any> {
 
         let customNotif = null;
         if (!this.state.customNotif) {
-            customNotif = (<Notification id={this.state.notifId}/>);
+            customNotif = (<Notification id={this.state.notifId} />);
         }
 
         /* La validation de formulaire HTML 5 est désactivée (noValidate="true") :
          on s'appuie uniquement sur la validation à la soumission et on a ainsi un rendu cohérent entre navigateurs. */
 
         let formProps = {
+            id: this.state.id,
             name: this.state.name,
             className: this.state.className,
             method: "post",
@@ -673,7 +689,11 @@ export class Form extends AbstractForm<FormProps, any> {
         };
 
         if (this.isMultiPartForm(this.state.children)) {
-            formProps["encType"] = "multipart/form-data";
+            formProps[ "encType" ] = "multipart/form-data";
+        }
+
+        let textHtmlProps = {
+            lang: this.props.textLang ? this.props.textLang : null
         }
         return (
             <section className="form-container">
@@ -683,8 +703,9 @@ export class Form extends AbstractForm<FormProps, any> {
                         {(this.state.subTitle || this.state.text
                             || (this.state.markRequired && !this.state.isMandatoryFieldsHidden)) ?
                             <div className="form-titles">
-                                {this.state.subTitle ? <h1 className="form-soustitre">{this.state.subTitle}</h1> : null}
-                                {this.state.text ? <p className="form-texte">{this.state.text}</p> : null}
+                                {this.state.subTitle ? <h3 className="form-soustitre">{this.state.subTitle}</h3> : null}
+                                {this.state.text ?
+                                    <p className="form-texte" {...textHtmlProps}>{this.state.text}</p> : null}
                                 {this.state.markRequired && !this.state.isMandatoryFieldsHidden ?
                                     <p className="discret">{this.i18n("form.fillField")}</p> : null}
                             </div>
@@ -707,9 +728,9 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param children
      * @returns {Array<any>}
      */
-    private getButtonsArea(children): Array<any> {
+    protected getButtonsArea(children): Array<any> {
         let tableauButtonsArea: Array<any> = [];
-        React.Children.map(children, function(child: any) {
+        React.Children.map(children, function (child: any) {
             if (child.type === ButtonsArea) {
                 tableauButtonsArea.push(child);
             }

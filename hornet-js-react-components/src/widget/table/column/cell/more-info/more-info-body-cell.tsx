@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -121,24 +121,25 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
         };
 
         if (this.state.className) {
-            classes[this.state.className] = true;
+            classes[ this.state.className ] = true;
         }
+        let aProps: any = {
+            href: this.state.url || "#",
+            className: classNames(classes),
+            title: this.title,
+            onClick: this.onClick,
+            disabled: this.props.contentState.itemInEdition && this.state.isEditing === false,
+            tabIndex: -1,
+            onKeyDown: this.handleKeyDownButton,
+            "aria-haspopup": this.state.hasPopUp
+        };
 
         return (
             this.state.visible ?
 
-                <a href={this.state.url || "#"}
-                   className={classNames(classes)}
-                   title={this.title}
-                   aria-label={this.title}
-                   onClick={this.onClick}
-                   aria-haspopup={this.state.hasPopUp}
-                   disabled={this.props.contentState.itemInEdition && this.state.isEditing === false}
-                   tabIndex={-1}
-                   onKeyDown={this.handleKeyDownButton}
-                >
+                <a {...aProps}>
                     <img src={(this.props as any).srcImg} className={this.state.classNameImg}
-                         alt={this.title}/>
+                        alt={this.title} />
                     <span className="label-button-action">{this.state.label}</span>
                 </a>
                 : null

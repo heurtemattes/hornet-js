@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -156,14 +156,14 @@ class tableTest extends HornetReactTest {
         this.end();
     };
 
-    @Decorators.it('afficher un cellule editable ')
+    @Decorators.it('afficher une cellule editable ')
     editerElement() {
-        table = this.renderIntoDocument(tableElement, "main1");
+        table = this.renderIntoDocument(tableElement, "main99990");
         dataSource.on("fetch", (value) => {
-            this.triggerMouseEvent(document.querySelector('#main1 #lite-0-colBody-0-2 .edition-button-action'), "click");
+            this.triggerMouseEvent(document.querySelector('#main99990 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
 
-            expect(document.querySelector("#main1 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
-            expect(document.querySelectorAll("#main1 #lite-0-colBody-0-2 .edition-button-action").length).to.be.equal(2);
+            expect(document.querySelector("#main99990 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
+            expect(document.querySelectorAll("#main99990 #lite-0-colBody-0-2 .edition-button-action").length).to.be.equal(2);
 
             this.end();
         });
@@ -172,19 +172,21 @@ class tableTest extends HornetReactTest {
 
     @Decorators.it('Annuler modification cellule editable ')
     AnnulerElement() {
-        table = this.renderIntoDocument(tableElement, "main2");
+        table = this.renderIntoDocument(tableElement, "main99991");
         dataSource.on("fetch", (value) => {
 
-            this.triggerMouseEvent(document.querySelector('#main2 #lite-0-colBody-0-2 .edition-button-action'), "click");
+            this.triggerMouseEvent(document.querySelector('#main99991 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
 
-            expect(document.querySelector("#main2 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
+            expect(document.querySelector("#main99991 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
+            expect(document.querySelector("#main99991 #lite-0-colBody-0-2 button[title=Annuler]")).to.exist;
+            this.triggerMouseEvent(document.querySelector("#main99991 #lite-0-colBody-0-2 button[title=Annuler]"), "click");
 
-            this.triggerMouseEvent(document.querySelector("#main2 #lite-0-colBody-0-2 button[title='Annuler']"), "click");
-            expect(document.querySelector(".widget-dialogue-header")).to.exist;
             setTimeout(() => {
-
-                this.triggerMouseEvent(document.querySelector("button[id='alertOK'"), "click");
+                
+                expect(document.querySelector(".widget-dialogue-header")).to.exist;
+                expect(document.querySelector("button[id=confirmOK]")).to.exist;
                 //Annimation fermeture de la boite de dialog
+                this.triggerMouseEvent(document.querySelector("button[id=confirmOK]"), "click");
                 setTimeout(() => {
                     this.end();
                 }, 1000);

@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,49 +81,49 @@
 import * as _ from "lodash";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 
-export default function(target) {
+export default function (target) {
 
-    if (!target.prototype.__pull__){
-        target.prototype.__pull__ = function(options){
+    if (!target.prototype.__pull__) {
+        target.prototype.__pull__ = function (options) {
 
             //liste des champs à mapper
-            let destMap = JSON.parse(this.__proto__.__mapFields__?this.__proto__.__mapFields__:null);
+            let destMap = JSON.parse(this.__proto__.__mapFields__ ? this.__proto__.__mapFields__ : null);
 
             //instance à mapper
             let object = options.object;
 
             //option permettant de serialiser les objects
             //et ainsi supprimer les attributs non désirables dans la réponse
-            if (options.serialize){
-                for(let key in this){
-                    if (this[key] != "function") {
-                        delete this[key];
+            if (options.serialize) {
+                for (let key in this) {
+                    if (this[ key ] != "function") {
+                        delete this[ key ];
                     }
                 }
             }
 
 
             if (destMap) {
-                for(let idxField = 0; idxField < destMap.length; idxField++) {
+                for (let idxField = 0; idxField < destMap.length; idxField++) {
                     let result;
                     //nom de la propriété courante
-                    let fieldName = destMap[idxField];
+                    let fieldName = destMap[ idxField ];
                     //valeur de la propriété
-                    let prop = object[fieldName];
+                    let prop = object[ fieldName ];
 
                     //Y a t'il un alias sur la propriété
-                    let mapAlias = JSON.parse(this.__proto__.__alias__?this.__proto__.__alias__:null);
-                    if (mapAlias && mapAlias[fieldName]){
-                        let alias = mapAlias[fieldName];
+                    let mapAlias = JSON.parse(this.__proto__.__alias__ ? this.__proto__.__alias__ : null);
+                    if (mapAlias && mapAlias[ fieldName ]) {
+                        let alias = mapAlias[ fieldName ];
                         _.each(alias, (value) => {
                             let val;
-                            try{
+                            try {
                                 //val = eval('object.'+value);
                                 val = ObjectUtils.getSubObject(object, value)
-                            }catch(e){
+                            } catch (e) {
                                 //nothing
                             }
-                            if (val){
+                            if (val) {
                                 prop = val;
                                 return false;
                             }
@@ -133,25 +133,30 @@ export default function(target) {
                     //Phase de copie
                     //si on a un Array ou un Object on instancie la classe cible
                     //sinon on fait une copie brute.
-                    if ((prop instanceof Object && this.__proto__.__mapClass__[fieldName]) || prop instanceof Array){
+                    if ((prop instanceof Object && this.__proto__.__mapClass__[ fieldName ]) || prop instanceof Array) {
 
-                        let Clazz =  this.__proto__.__mapClass__[fieldName];
+                        let Clazz = this.__proto__.__mapClass__[ fieldName ];
                         if (prop instanceof Array) {
                             result = [];
                             prop.forEach(res => {
                                 if (Clazz) {
-                                    result.push(new Clazz().__pull__(_.extend(options, {object: res})));
-                                }else{
+                                    result.push(new Clazz().__pull__(_.extend(options, { object: res })));
+                                } else {
                                     result.push(res);
                                 }
                             })
-                        }else{
-                            result=new Clazz().__pull__(_.extend(options, {object : prop}));
+                        } else {
+                            result = new Clazz().__pull__(_.extend(options, { object: prop }));
                         }
-                        this[fieldName] = result;
-                    }else{
-                        this[fieldName] = prop;
+                        this[ fieldName ] = result;
+                    } else {
+                        this[ fieldName ] = prop;
                     }
+                }
+                if (options.serialize) {
+                    this[ '__proto__' ] = null;
+                    delete this[ '__proto__' ];
+
                 }
             }
             return this;
@@ -161,10 +166,10 @@ export default function(target) {
     if (!target.prototype.clone) {
         target.prototype.clone = function (options) {
             let res;
-            if (options.deep){
+            if (options.deep) {
 
                 res = _.cloneDeep(this);
-            }else{
+            } else {
                 res = _.clone(this);
             }
             return res;
@@ -172,13 +177,13 @@ export default function(target) {
     }
     if (!target.prototype.map) {
         target.prototype.map = function (options) {
-            return this.__pull__(_.extend(options, {serialize : false}));
+            return this.__pull__(_.extend(options, { serialize: false }));
         }
     }
 
     if (!target.prototype.serialize) {
         target.prototype.serialize = function (options) {
-            return this.__pull__(_.extend(options, {serialize : true}));
+            return this.__pull__(_.extend(options, { serialize: true }));
         }
     }
 };

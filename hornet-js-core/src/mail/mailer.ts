@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,26 +99,26 @@ export interface NodeMailerMessage {
     cc?: string | any[];
     /** Comma separated list or an array of recipients email addresses that will appear on the Bcc: field */
     bcc?: string | any[];
-  	/** An e-mail address that will appear on the Reply-To: field */
-	replyTo?: string;
-	/** The message-id this message is replying */
+    /** An e-mail address that will appear on the Reply-To: field */
+    replyTo?: string;
+    /** The message-id this message is replying */
     inReplyTo?: string;
-	/** Message-id list (an array or space separated string) */
-    references?: string|string[];
+    /** Message-id list (an array or space separated string) */
+    references?: string | string[];
     /** The subject of the email */
-  	subject: string;
+    subject: string;
     /** The plaintext version of the message as an Unicode string, Buffer, Stream or an attachment-like object ({path: ‘/var/data/…’}) */
     text: any;
     /** The HTML version of the message as an Unicode string, Buffer, Stream or an attachment-like object ({path: ‘http://…‘}) */
     html?: any;
     /** An array of attachment objects. Attachments can be used for embedding images as well. */
     attachments?: any[];
-   	/** optional Message-Id value, random value will be generated if not set */
-	messageId?: string;
-	/** optional Date value, current UTC string will be used if not set */
+    /** optional Message-Id value, random value will be generated if not set */
+    messageId?: string;
+    /** optional Date value, current UTC string will be used if not set */
     date?: Date;
     /** optional transfer encoding for the textual parts (defaults to 'quoted-printable') */
-	encoding?: string;
+    encoding?: string;
 }
 
 export class Mailer {
@@ -132,9 +132,9 @@ export class Mailer {
         logger: logger
     };
 
-    private static _instance: Mailer;
+    protected static _instance: Mailer;
 
-    private constructor() {
+    protected constructor() {
     }
 
     static get Instance() {

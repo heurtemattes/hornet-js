@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -126,10 +126,10 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
                 aria-haspopup={true}
                 role="tooltip"
             >
-                    <img id={this.state.idImg} alt={this.state.alt} src={urlIcoTooltip}
-                         className={this.state.classImg} tabIndex={0}/>
-                    <span id={this.state.idSpan} data-tooltip={this.state.alt} role="tooltip" aria-hidden="true"></span>
-                </span>
+                <img id={this.state.idImg} alt={this.state.alt} src={urlIcoTooltip}
+                    className={this.state.classImg} tabIndex={0} />
+                <span id={this.state.idSpan} className="tooltip-label" role="tooltip" aria-hidden="true" style={{ display: "none" }}>{this.state.alt}</span>
+            </span>
         );
     }
 
@@ -151,7 +151,7 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
      * Gestion des touches du clavier
      * @param event
      */
-    private handleKeyDown(event): void {
+    protected handleKeyDown(event): void {
         let keyCode: number = event.keyCode;
         if (keyCode == KeyCodes.ESCAPE) {
             this.hideTip(event);
@@ -163,14 +163,14 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
      * Fonction déclenchée lorsque le champ de saisie libre perd le focus
      * @param event
      */
-    private hideTip(event: React.SyntheticEvent<HTMLElement>): void {
+    protected hideTip(event: React.SyntheticEvent<HTMLElement>): void {
         if (this.state.idSpan) {
             document.getElementById(this.state.idSpan).setAttribute("aria-hidden", "true");
             document.getElementById(this.state.idSpan).style.display = "none";
         }
     }
 
-    private showTip(event: React.SyntheticEvent<HTMLElement>): void {
+    protected showTip(event: React.SyntheticEvent<HTMLElement>): void {
         if (this.state.idSpan) {
             document.getElementById(this.state.idSpan).setAttribute("aria-hidden", "false");
             document.getElementById(this.state.idSpan).style.display = "inline";

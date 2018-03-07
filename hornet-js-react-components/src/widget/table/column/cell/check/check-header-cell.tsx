@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,7 +92,7 @@ export interface CheckHeaderCellProps extends AbstractHeaderCellProps {
 }
 
 export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends AbstractHeaderCell<P, any> {
-    private checkBoxRef: any;
+    protected checkBoxRef: any;
 
     constructor(props: P, context?: any) {
         super(props, context);
@@ -115,24 +115,24 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
         // todo: rajouter title à la checkbox action de masse
 
         let functionToggleAll: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
-            this.props.toggleSelectLines(null, !this.state.isSelected);
+            this.props.toggleSelectLines(null);
         };
 
         let title: string = this.state.isSelected ? "table.deselectedAllTitle" : "table.selectedAllTitle";
 
         let checkBoxProps: any = {
             ref: (instance: any) => {
-                this.checkBoxRef = instance;
+                if (instance) this.checkBoxRef = instance;
             },
             checked: this.state.isSelected,
             onChange: functionToggleAll,
             title: title && this.i18n(title),
-            name: "selectedItems-" + this.state.value,
+            name: this.state.value ? "selectedItems-" + this.state.value : "selectedItems-none",
             disabled: this.props.contentState.items.length === 0 || this.props.contentState.itemInEdition
         };
 
         return (
-            <CheckBox {...checkBoxProps}/>
+            <CheckBox {...checkBoxProps} />
         );
     }
 
@@ -147,7 +147,7 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
         if (tableCellRef instanceof HTMLInputElement) {
             (tableCellRef as HTMLElement).tabIndex = -1;
         } else if (tableCellRef.children) {
-            this.blurActions(tableCellRef.children[0]);
+            this.blurActions(tableCellRef.children[ 0 ]);
         }
     }
 
@@ -161,7 +161,7 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
                 (tableCellRef as HTMLElement).focus();
                 (tableCellRef as HTMLElement).tabIndex = 0;
             } else if (tableCellRef.children) {
-                this.handleCellFocus(tableCellRef.children[0]);
+                this.handleCellFocus(tableCellRef.children[ 0 ]);
             }
         }
 
@@ -175,11 +175,9 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
     handleChange(selectedItems: any[], all: boolean) {
         if (this.checkBoxRef) {
             if (ArrayUtils.isInclude(this.props.contentState.items, selectedItems)) {
-                // this.checkBoxRef.title = this.i18n("table.deselectedAllTitle");
-                this.setState({isSelected: true});
+                this.setState({ isSelected: true });
             } else {
-                // this.checkBoxRef.title = this.i18n("table.selectedAllTitle");
-                this.setState({isSelected: false});
+                this.setState({ isSelected: false });
             }
         }
     }

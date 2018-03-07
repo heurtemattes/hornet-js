@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -131,12 +131,14 @@ class RadioFieldTest extends BaseTest {
         datasource.on("fetch", () => {
             datasource.results.forEach(() => {
                 index++;
+                debugger;
                 (document.querySelector('#exampleRadio-' + index) as any).click()
             })
         });
 
         datasource.on("select", () => {
-            expect(datasource.selected, "Problème de selection de élément" + index).to.equal("exampleRadio-" + index);
+            debugger;
+            expect(datasource.selected.value, "Problème de selection de élément" + index).to.equal(index);
             if (index == datasource.results.length) this.end();
         });
 

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -111,7 +111,7 @@ export class TableState extends events.EventEmitter {
             if (items === contentState.items) {
                 this.index = index;
                 this.emit(TableState.INDEX_CHANGE_EVENT,
-                    null, this.contentsState[index].items
+                    null, this.contentsState[ index ].items
                 );
             }
         });
@@ -137,8 +137,9 @@ export class ContentState extends events.EventEmitter {
     public itemInEdition: any;
     public hiddenColumns: any = {};
     public firstVisibleColumnState: ColumnState;
-
-    private oldFirstVisibleColumnState: ColumnState;
+    protected oldFirstVisibleColumnState: ColumnState;
+    public hasCheckColumnMassSelection: boolean;
+    public keyColumnMassSelection: string;
 
     public setFocusOn(focusedCell: CellCoordinates) {
         this.emit(ContentState.BLUR_EVENT, this.focusedCell);
@@ -149,7 +150,7 @@ export class ContentState extends events.EventEmitter {
     public setItemInEdition(itemInEditionValue: any, lineIndex: number) {
         this.itemInEdition = itemInEditionValue;
         if (this.itemInEdition) {
-            this.itemInEdition["row"] = lineIndex;
+            this.itemInEdition[ "row" ] = lineIndex;
         }
         this.emit(ContentState.EDITION_CLIC_EVENT, lineIndex);
     }
@@ -169,5 +170,13 @@ export class ContentState extends events.EventEmitter {
             this.oldFirstVisibleColumnState = this.firstVisibleColumnState;
             this.firstVisibleColumnState = columnState;
         }
+    }
+
+    public setHasCheckColumnMassSelection(value: boolean) {
+        this.hasCheckColumnMassSelection = value;
+    }
+
+    public setKeycolumnMassSelection(keyColumn: string) {
+        this.keyColumnMassSelection = keyColumn;
     }
 }

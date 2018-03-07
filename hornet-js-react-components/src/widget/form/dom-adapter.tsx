@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,9 +92,9 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.d
 export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
     /** Nom du champ */
-    private name;
+    protected name;
     /** Type HTML */
-    private type;
+    protected type;
     /** Référence vers l'élément react */
     protected htmlElement: any;
 
@@ -104,11 +104,11 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
         super(props, context);
     }
 
-    private getElementType(elt) {
+    protected getElementType(elt) {
         let tag = this.htmlElement.tagName.toLowerCase();
         let type = null;
         if (tag == "input") {
-            type = this.htmlElement["type"];
+            type = this.htmlElement[ "type" ];
         } else if (tag == "textarea") {
             type = "textarea";
         } else if (tag == "select") {
@@ -121,14 +121,14 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
         if (this.htmlElement) {
             return this.htmlElement.form.__component;
         } else {
-            return this.multipleElement[0].form.__component;
+            return this.multipleElement[ 0 ].form.__component;
         }
     }
 
     registerHtmlElement(elt) {
         if (elt == null) {
             if (this.htmlElement) {
-                this.htmlElement["__component"] = null;
+                this.htmlElement[ "__component" ] = null;
             }
             this.name = null;
             this.type = null;
@@ -140,7 +140,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                 this.htmlElement = elt;
                 this.name = this.htmlElement.name;
                 this.type = this.getElementType(elt);
-                this.htmlElement["__component"] = this;
+                this.htmlElement[ "__component" ] = this;
             }
         }
     }
@@ -151,14 +151,14 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             if (this.type == type && type == "radio") {
                 this.multipleElement = [];
                 this.multipleElement.push(this.htmlElement);
-                elt["__component"] = this;
+                elt[ "__component" ] = this;
                 this.multipleElement.push(elt);
                 this.htmlElement = null;
             } else {
                 logger.error("DomAdapter.addHtmlElement > different or unallowed types : " + this.type + " and " + type);
             }
         } else {
-            elt["__component"] = this;
+            elt[ "__component" ] = this;
             this.multipleElement.push(elt);
         }
     }
@@ -169,7 +169,9 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
      * @returns {string} la valeur ou null si la propriété n'est pas définie
      */
     getAttribute(name): string {
-        return this.htmlElement.getAttribute(name);
+        if (this.htmlElement) {
+            return this.htmlElement.getAttribute(name);
+        }
     }
 
     /**
@@ -183,7 +185,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             this.htmlElement.setAttribute(name, value);
         } else if (this.multipleElement) {
             for (let i = 0; i < this.multipleElement.length; i++) {
-                this.multipleElement[i].setAttribute(name, value);
+                this.multipleElement[ i ].setAttribute(name, value);
             }
         }
         return this;
@@ -222,8 +224,8 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                     this.htmlElement.value = null;
                     value.forEach((val) => {
                         for (let i = 0; i < this.htmlElement.options.length; i++) {
-                            if (this.htmlElement.options[i].value == val) {
-                                this.htmlElement.options[i].selected = true;
+                            if (this.htmlElement.options[ i ].value == val) {
+                                this.htmlElement.options[ i ].selected = true;
                                 return;
                             }
                         }
@@ -236,10 +238,10 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
         } else if (this.multipleElement) {
             for (let i = 0; i < this.multipleElement.length; i++) {
-                if (this.multipleElement[i].value == strValue) {
-                    this.multipleElement[i].checked = true;
+                if (this.multipleElement[ i ].value == strValue) {
+                    this.multipleElement[ i ].checked = true;
                 } else {
-                    this.multipleElement[i].checked = false;
+                    this.multipleElement[ i ].checked = false;
                 }
             }
         }
@@ -273,7 +275,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                 val = [];
                 /* Note : l'attribut selectedOptions n'est pas supporté par Internet Explorer */
                 for (let i = 0; i < (this.htmlElement as HTMLSelectElement).options.length; i++) {
-                    let option: HTMLOptionElement = (this.htmlElement as HTMLSelectElement).options[i] as HTMLOptionElement;
+                    let option: HTMLOptionElement = (this.htmlElement as HTMLSelectElement).options[ i ] as HTMLOptionElement;
                     if (option.selected) {
                         val.push(option.value);
                     }
@@ -295,7 +297,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                 if (fileList && fileList.length >= 1) {
                     /* Pour simplifier la validation et la transmission via super-agent,
                      un seul fichier par champ de type "file" est pris en compte */
-                    val = fileList[0];
+                    val = fileList[ 0 ];
                 } else {
                     /* Aucun fichier n'a été sélectionné : on récupère les informations de celui qui avait
                      éventuellement déjà été transmis */
@@ -306,8 +308,8 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
         } else if (this.multipleElement) {
             for (let i = 0; i < this.multipleElement.length; i++) {
-                if (this.multipleElement[i].checked) {
-                    val = this.multipleElement[i].value;
+                if (this.multipleElement[ i ].checked) {
+                    val = this.multipleElement[ i ].value;
                     break;
                 }
             }

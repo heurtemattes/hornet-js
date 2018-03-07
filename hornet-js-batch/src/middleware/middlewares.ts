@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -114,7 +114,7 @@ import { RouteType } from "hornet-js-core/src/routes/abstract-routes";
 // ------------------------------------------------------------------------------------------------------------------- //
 
 export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
 
     constructor() {
         super((req: Request, res: Response, next: Function) => {

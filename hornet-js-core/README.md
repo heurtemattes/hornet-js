@@ -13,14 +13,13 @@ Les composants techniques du framework :
 * `Webpack` : outil de création de paquetages (JavaScript, CSS, ...) pour les navigateurs web
 * `Gulp` : outil pour la création de tâches de développement
 
-
 ## Prérequis #
 
-* NodeJS 6.X
+* NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -30,7 +29,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet.js`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -38,6 +37,9 @@ Compiler les sources typescript de `hornet.js`
 Ajouter au package.json
 
 ```shell
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
     "hornet-js-core": "5.1.X"
   }
@@ -46,45 +48,38 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-    $ hb install
+hb install
 ```
 
-### <a id="Routeur"></a>Routeur
-
-Ce composant est le point central de la navigation. Il permet de gérer de manière identique la navigation au sein de l’application que ce soit côté client ou côté serveur (nodeJs).
-
-Ce composant est configuré à partir d’un ensemble de « routes » qui viennent faire le lien entre une URL et les actions du pattern décrit ci-dessus.
-
-Le routeur Hornet s'appuie sur le composant [Director](https://github.com/flatiron/director).
-
-Le routeur se décline en 2 parties:
-
-* routerPage: permet de router vers le composant Page associé à la route appelée
-* routerData: permet d'exécuter l'action associée à la route appelée
 
 ### Actions
 
-Les actions portent les traitements de l’application. Leur réalisation est à la charge du développeur de l’application.
+Les actions sont exécutées côté serveur et portent les traitements de l’application. Les services externes sont appelés depuis les actions afin d’effectuer les traitements demandés par l’utilisateur.
 
-Les services externes sont appelés depuis les actions afin d’effectuer les traitements demandés par l’utilisateur. Les retours des services externes renvoient des Promises.
+Chaque **action** doit être une fonction retournant une `Promise` effectuant l’action à proprement parler (au sens métier). Ce fonctionnement est nécessaire afin de permettre au `routeur` :
 
-L’isomorphisme met l'accent sur les points les suivants :
-
-Chaque *action* doit être une fonction retournant une `Promise` effectuant l’action à proprement parler (au sens métier). Ce fonctionnement est nécessaire afin de permettre au routeur :
-* de savoir quand effectuer le rendu de la page côté serveur en s’enregistrant en callback.
+* de savoir quand effectuer le rendu de la page côté serveur.
 * de pouvoir désactiver les actions lors du premier affichage de la page côté client pour éviter un double appel des API externes (serveur puis client).
+
+
+#### Routeur
+
+Ce composant est le point central de la navigation. Il permet de gérer de manière identique la navigation au sein de l’application que ce soit côté client (avec ou sans JavaScript) ou côté serveur.
+
+Ce composant est configuré à partir d’un ensemble de « routes » qui viennent faire le lien entre une URL et les actions du pattern (dans son implémentation isomorphe).
+
+Le routeur d'Hornet s'appuie sur le composant [Director](http://github.com/flatiron/director).
+
+Les particularités :
+
+* Transmission des données `POST` par une méthode spécifique afin de ne pas modifier l’url du navigateur
+* Utilisation du mode « historique » html5 (mode `pushState` à la place de la notation `!#`) afin d’uniformiser les urls entre la partie client et serveur.
 
 ### Vues
 
 Les vues sont les composants servant à produire le code html affiché à l'utilisateur.
 
 Les composants de cette brique utilisent le moteur de rendu [React](http://facebook.github.io/react/) :
-
-* Un rendu des composants à partir d’un template JSX/TSX/JavaScript
-* Une gestion des évènements permettant un binding unidirectionnel (vue -> modèle).
-
-Les composants graphiques sont implémentés avec la librairie React.
-
 
 ## Licence
 

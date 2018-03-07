@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -94,11 +94,11 @@ var parseString = require("xml2js").parseString,
 
 export class CasStrategy implements AuthenticationStrategy {
 
-    private _name = "cas";
+    protected _name = "cas";
 
     protected static optionXml: any = {
         explicitRoot: false,
-        tagNameProcessors: [stripPrefix]
+        tagNameProcessors: [ stripPrefix ]
     };
 
     protected configuration: CasConfiguration;
@@ -147,7 +147,7 @@ export class CasStrategy implements AuthenticationStrategy {
 
         request.get(
             url.format(urlObject),
-            function(casErr, casRes, casBody) {
+            function (casErr, casRes, casBody) {
                 logger.debug("verification de la réponse de validation du ticket");
 
                 if (casErr || casRes.statusCode !== 200) {
@@ -163,17 +163,17 @@ export class CasStrategy implements AuthenticationStrategy {
      * Traitement de la réponse à la validation du ticket CAS
      * @param casBody reponse du CAS à parser
      */
-    private validateCasResponse(casBody) {
+    protected validateCasResponse(casBody) {
         logger.debug("ticket validation : validate response");
         let _self: any = this;
-        parseString(casBody, CasStrategy.optionXml, function(err, serviceResponse) {
+        parseString(casBody, CasStrategy.optionXml, function (err, serviceResponse) {
             if (err) {
                 return _self.error("Error from CAS. (" + err.message + ")");
             }
 
-            let success = serviceResponse && serviceResponse.authenticationSuccess && serviceResponse.authenticationSuccess[0],
-                user = success && success.user && success.user[0],
-                failure = serviceResponse && serviceResponse.authenticationFailure && serviceResponse.authenticationFailure[0]._;
+            let success = serviceResponse && serviceResponse.authenticationSuccess && serviceResponse.authenticationSuccess[ 0 ],
+                user = success && success.user && success.user[ 0 ],
+                failure = serviceResponse && serviceResponse.authenticationFailure && serviceResponse.authenticationFailure[ 0 ]._;
 
             if (!serviceResponse) {
                 logger.error("ticket validation : Invalid response from CAS");
@@ -185,7 +185,7 @@ export class CasStrategy implements AuthenticationStrategy {
                 return _self.fail(new Error(failure));
             }
 
-            let verified = function(err, user, info) {
+            let verified = function (err, user, info) {
                 if (err) {
                     return _self.error(err);
                 }
@@ -240,7 +240,7 @@ export class CasStrategy implements AuthenticationStrategy {
     /**
      * @override
      */
-    public connect(passport:any, req:Request, res:Response, next:(err?:Error)=>void) {
+    public connect(passport: any, req: Request, res: Response, next: (err?: Error) => void) {
 
         if (!req.isAuthenticated()) {
             if (req.query.ticket) {
@@ -274,16 +274,16 @@ export class CasStrategy implements AuthenticationStrategy {
     /**
      * @override
      */
-    public disconnect(passport:any, req:Request, res:Response, next:(err?:Error)=>void) {
-        let _self:CasStrategy = this;
-        
+    public disconnect(passport: any, req: Request, res: Response, next: (err?: Error) => void) {
+        let _self: CasStrategy = this;
+
         req.logout(); // suppression du user dans la session s'il est déjà présent
         req.getSession().invalidate(() => {
             res.redirect(307, _self.configuration.casLogoutUrl);
         });
     }
 
-    private manageRedirectToCas(req: Request, res: Response): any {
+    protected manageRedirectToCas(req: Request, res: Response): any {
         logger.trace("Deconnexion detectée - reconnexion au CAS en cours");
 
         // url de retour par defaut (page d'accueil)
@@ -355,7 +355,7 @@ export class CasStrategy implements AuthenticationStrategy {
     /**
      * @override
      */
-    public isRequestForStrategie(req:Request) : boolean {
+    public isRequestForStrategie(req: Request): boolean {
         return (req.query && req.query.ticket) || (req.user && req.user.strategy && req.user.strategy == this.name);
     }
 }

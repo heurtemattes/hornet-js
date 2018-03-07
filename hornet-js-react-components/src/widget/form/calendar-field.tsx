@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -155,7 +155,7 @@ if (!Utils.isServer) {
 export class CalendarField<P extends CalendarFieldProps, S extends CalendarFieldState>
     extends InputField<CalendarFieldProps, CalendarFieldState> {
 
-    private hasKeyPress: boolean = false;
+    protected hasKeyPress: boolean = false;
 
     readonly props: Readonly<CalendarFieldProps>;
 
@@ -197,7 +197,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
     /**
      * Récupère le format d'affichage des dates
      */
-    private getFormat() {
+    protected getFormat() {
         let internationalisation = Utils.getCls("hornet.internationalization");
         let dateFormat = internationalisation.messages.calendar.dateFormat;
         return dateFormat;
@@ -217,7 +217,9 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         if (this.state.isDatePicker) {
             reactIconTag =
                 <button className="agenda icon" type="button" onClick={this.showCalendar}
-                        disabled={this.state.readOnly || this.state.disabled} aria-haspopup={true}>
+                        title={this.state.title || this.state.calendarLocale.agendaTitle}
+                        disabled={this.state.readOnly || this.state.disabled} aria-haspopup={true} value="calendar"
+                >
                     <img src={CalendarField.genUrlTheme("/img/calendar/icon_calendar.svg")}
                          alt={this.state.title || this.state.calendarLocale.agendaTitle}/>
                 </button>;
@@ -347,7 +349,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      * Méthode délenchée lors d'une intéraction avec le champ input du composant Calendar
      * @param e
      */
-    private handleInputChange(e: React.SyntheticEvent<HTMLElement>): void {
+    protected handleInputChange(e: React.SyntheticEvent<HTMLElement>): void {
         /* L'attribut DOM onChange est éventuellement aussi renseigné sur le composant */
         if (this.state.onChange) {
             this.state.onChange(e);
@@ -372,7 +374,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      * Méthode délenchée lorsque l'utilisateur quitte l'input du composant Calendar
      * @param e
      */
-    private handleInputLeave(e: React.SyntheticEvent<HTMLElement>): void {
+    protected handleInputLeave(e: React.SyntheticEvent<HTMLElement>): void {
         /* transforme la date au format définit */
         let input: HTMLInputElement = e.target as HTMLInputElement;
         let text = input.value;
@@ -419,7 +421,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      * Controle des touches claviers
      * @param e
      */
-    private handleInputKeyPress(e: React.KeyboardEvent<HTMLElement>): void {
+    protected handleInputKeyPress(e: React.KeyboardEvent<HTMLElement>): void {
 
         let text = (e.target as HTMLInputElement).value;
         let time = moment(text, this.getFormat());

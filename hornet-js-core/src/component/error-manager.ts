@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,18 +98,21 @@ const logger: Logger = Utils.getLogger("hornet-js-core.exception.error-manager")
  * @param errorPage page à afficher en cas d'erreur technique
  * @param method contexte éventuel de l'erreur : il s'agit de la fonction dans laquelle l'erreur s'est produite
  */
-export function manageError(error:any, errorPage: Class<IHornetPage<any,any>>, method?: string) {
-    let notify:boolean = error instanceof BusinessError && method != "render";
+export function manageError(error: any, errorPage: Class<IHornetPage<any, any>>, method?: string) {
+    if (Utils.isServer || window.Config[ "env" ] !== "production") {
+        logger.error(error);
+    }
+    let notify: boolean = error instanceof BusinessError && method != "render";
     if (notify) {
-        let exceptions:BusinessError[];
+        let exceptions: BusinessError[];
         if (error instanceof BusinessErrorList) {
             exceptions = (error as BusinessErrorList).getErrors();
         } else {
-            exceptions = [error];
+            exceptions = [ error ];
         }
-        NotificationManager.notify(null, null, null, exceptions);
+        NotificationManager.notify(null, this, null, null, exceptions);
     } else {
         Utils.setCls("hornet.currentError", error);
-        fireHornetEvent(COMPONENT_CHANGE_EVENT.withData({newComponent: errorPage, data:  {}}));
+        fireHornetEvent(COMPONENT_CHANGE_EVENT.withData({ newComponent: errorPage, data: {} }));
     }
 }

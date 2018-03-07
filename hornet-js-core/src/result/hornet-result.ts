@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,13 +95,13 @@ export class HornetResult {
      * référence le mediaType du result
      * @instance
      */
-    private _mediaType : MediaType;
+    protected _mediaType : MediaType;
 
     /**
      * référence les options à utiliser dans les methodes {@link HornetResult#__compute}  & {@link HornetResult#__configure}
      * @instance
      */
-    private _options : Options;
+    protected _options : Options;
 
     constructor(options : Options, mediaType : MediaType){
         this._options = options;

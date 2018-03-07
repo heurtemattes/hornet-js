@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,15 +99,24 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.
 export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends AbstractCell<P, S> {
 
     protected defaultClassName: string;
+    protected focus: boolean = false;
 
     constructor(props: P, context?: any) {
         super(props, context);
-        let altValue = (typeof props.value[props.keyColumn] == "number") ? "0" : "";
+        let altValue = (typeof props.value[ props.keyColumn ] == "number") ? "0" : "";
         this.state.value = new Template("${" + props.keyColumn + "}").process(props.value, this.props.replaceUndef || altValue);
 
         this.defaultClassName = "default-body-cell";
         if (this.state.titleCell) {
             this.state.titleCell = new Template(this.state.titleCell).process(this.props.value, this.props.replaceUndef || "?");
+        }
+    }
+
+    componentDidUpdate(nextProps: any, nextState: any, nextContext: any) {
+        super.componentDidUpdate(nextProps, nextState, nextContext);
+        if (this.focus) {
+            this.props.contentState.setFocusOn(this.props.cellCoordinate);
+            this.focus = false
         }
     }
 
@@ -118,7 +127,7 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
 
         logger.trace("render BodyCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
         return (
-            <td {...this.getDefaultTdProps()}>
+            <td {...this.getDefaultTdProps() }>
                 {this.renderCell()}
             </td>
         );
@@ -153,12 +162,15 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
      * @returns {{ref: ((instance:HTMLTableCellElement)=>undefined), className: string, onKeyDown: any, tabIndex: number, aria-selected: (((props:any)=>boolean)|any), onFocus: any, style: any}}
      */
     getDefaultTdProps() {
-        let classes: ClassDictionary = {"datatable-cell": true};
-        classes["datatable-cell-custom-" + this.props.keyColumn] = true;
-        classes["datatable-cell-in-edition"] = this.props.contentState.itemInEdition && this.state.abstractisEditing;
+        let classes: ClassDictionary = { "datatable-cell": true };
+        classes[ "datatable-cell-custom-" + this.props.keyColumn ] = true;
+        classes[ "datatable-cell-in-edition" ] = this.props.contentState.itemInEdition && this.state.abstractisEditing;
         let key = this.props.id + "-colBody-" + this.props.cellCoordinate.row + "-" + this.props.coordinates.column;
-        classes[this.props.id + "-" + this.props.keyColumn] = true;
-        classes[this.defaultClassName] = true;
+        if (this.props.cellCoordinate.column == 0 && this.props.contentState.itemInEdition) {
+            this.focus = true;
+        }
+        classes[ this.props.id + "-" + this.props.keyColumn ] = true;
+        classes[ this.defaultClassName ] = true;
 
         return ({
             ref: (instance: HTMLTableCellElement) => {
@@ -170,6 +182,7 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
             "aria-selected": this.state.isFocused,
             onFocus: (e) => {
                 this.props.contentState.setFocusOn(this.props.cellCoordinate);
+                this.moveCaretAtEnd(e);
             },
             // disabled s'il existe un item en cours d'edition et l'indicateur isEditing  est a false pour cette cellule
             disabled: this.setDisabled(),
@@ -177,8 +190,18 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
             key: key,
             id: key,
             role: "gridcell",
-            title: this.state.titleCell instanceof Function ? this.state.titleCell(this.state.value) :
-                this.state.titleCell ? this.state.titleCell : this.getCellTitle()
+            title: this.state.visible ? (this.state.titleCell instanceof Function ? this.state.titleCell(this.state.value) :
+                this.state.titleCell ? this.state.titleCell : this.getCellTitle()) : null
         });
+    }
+
+    /**
+     *
+     * @param e
+     */
+    moveCaretAtEnd(e) {
+        let temp_value = e.target.value;
+        e.target.value = "";
+        e.target.value = temp_value;
     }
 }

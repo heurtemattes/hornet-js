@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,7 @@ import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils
 import { Logger } from "hornet-js-utils/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { ExpandingLayoutRequest } from "hornet-js-core/src/services/expanding-layout-request";
+import { ExpandingLayout } from "hornet-js-core/src/services/default/expanding-layout";
 import { UPDATE_PAGE_EXPAND_MENU } from "src/widget/screen/layout-switcher";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.component.hornet-page");
@@ -149,7 +149,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     /**
      * Service middleware pour le layout
      */
-    protected layoutService: ExpandingLayoutRequest = new ExpandingLayoutRequest();
+    protected layoutService: ExpandingLayout = new ExpandingLayout();
 
     /**
      * @returns {any} les informations de routage associées à la page
@@ -161,7 +161,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
             }
         };
     }
-    
+
     /**
      * Permet d'effectuer les appels d'API et initialisations éventuellement nécessaires une fois le composant page
      * monté côté client.
@@ -169,7 +169,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     public prepareClient(): void {
         logger.trace("prepareClient HornetPage.");
     }
-    
+
     /**
      * Permet d'effectuer les appels d'API et initialisations éventuellement nécessaires une fois le composant page
      * monté côté client et après le componentDidUpdate.
@@ -185,7 +185,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
             this.service = new (this.getRouteInfos().getService() as Class<T>)() as T;
         }
         if (!this.props.workingZoneWidth) {
-            this.copyInitialPropsToState({workingZoneWidth: "1200px"}, this.state);
+            this.copyInitialPropsToState({ workingZoneWidth: "1200px" }, this.state);
         }
         this.handleStyleAndWidth();
     }
@@ -220,9 +220,9 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     }
 
     componentDidCatch(error, info) {
-        this.setState({ hasError: true , error: error});
+        this.setState({ hasError: true, error: error });
         let errorReport = {
-            componentName: this.constructor["name"],
+            componentName: this.constructor[ "name" ],
             method: "render",
             methodArguments: arguments,
             props: this.props,
@@ -233,7 +233,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
         // You can also log the error to an error reporting service
     }
 
-    render(): JSX.Element | false {
+    render(): React.ReactNode {
         if (this.state.hasError) {
             return <h1>Something went wrong.</h1>;
         }
@@ -272,7 +272,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * @param newClassName
      * @param specifiedMaxWidth
      */
-    private fetchHtmlElementsToSetClassBy(currentClassName: string, newClassName: string, specifiedMaxWidth?: string): void {
+    protected fetchHtmlElementsToSetClassBy(currentClassName: string, newClassName: string, specifiedMaxWidth?: string): void {
         if (!Utils.isServer) {
             let htmlElements: HTMLCollectionOf<Element> = document.getElementsByClassName(currentClassName);
             if (htmlElements && htmlElements.length > 0) {
@@ -291,8 +291,8 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * @param newClassName
      * @param specifiedMaxWidth
      */
-    private majCssStyleExpand(htmlElements: HTMLCollectionOf<Element>, i: number, currentClassName: string, newClassName: string, specifiedMaxWidth?: string) {
-        let element = document.getElementById(htmlElements[i].id);
+    protected majCssStyleExpand(htmlElements: HTMLCollectionOf<Element>, i: number, currentClassName: string, newClassName: string, specifiedMaxWidth?: string) {
+        let element = document.getElementById(htmlElements[ i ].id);
 
         if (element && element.classList) {
             let elementClasses = element.classList;
@@ -324,8 +324,8 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      *
      * @param value
      */
-    private setIsLayoutExpandedThroughService(value: boolean) {
-        this.layoutService.setExpandedLayout({isExpandedLayout: value}).then((retourApi) => {
+    protected setIsLayoutExpandedThroughService(value: boolean) {
+        this.layoutService.setExpandedLayout({ isExpandedLayout: value }).then((retourApi) => {
             logger.trace("Retour API ExpandingLayoutRequest.setExpandedLayout :", retourApi.body.isExpandedLayout);
             Utils.appSharedProps.set("isExpandedLayout", retourApi.body.isExpandedLayout);
             fireHornetEvent(UPDATE_PAGE_EXPAND_MENU.withData(true));
@@ -338,7 +338,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * Ces states sont utilisées par le composant LayoutSwitcher
      * pour étendre les composants
      */
-    private handleStyleAndWidth() {
+    protected handleStyleAndWidth() {
         // préparation de la taille pour le layout expanding
         let maxWidth;
         let classNameExpanded = "mainLayoutClassNameExpanded";
@@ -359,7 +359,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * @param {() => void} cb - callback
      */
     protected navigateTo(url: string, data: any, cb: () => void) {
-        this.fire(CHANGE_URL_WITH_DATA_EVENT.withData({url: url, data: data, cb: cb}));
+        this.fire(CHANGE_URL_WITH_DATA_EVENT.withData({ url: url, data: data, cb: cb }));
     }
 
     /**

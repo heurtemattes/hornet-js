@@ -88,5 +88,10 @@ module.exports = {
         // chemin vers le fichier "definition.d.ts" généré
         conf.generatedTypings.dir = path.join("..", project.name + "-dts");
         conf.generatedTypings.file = project.name + ".d.ts";
+    },
+    config: {
+        remap: {
+            exclude: /src\/extended\/.*.js/
+        }
     }
 };

@@ -73,23 +73,23 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {Utils} from "hornet-js-utils";
+import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 const logger: Logger = Utils.getLogger("hornet-js-core.session.session");
 
 var sessionManager = null;
 
 export class Session {
-    private sid: string;
-    private data: any = {};
-    private creationTime: Date;
-    private lastAccessedTime: Date;
-    private maxInactiveInterval;
+    protected sid: string;
+    protected data: any = {};
+    protected creationTime: Date;
+    protected lastAccessedTime: Date;
+    protected maxInactiveInterval;
 
     constructor(sid: string, maxInactiveInterval, data?) {
         this.sid = sid;
@@ -119,15 +119,15 @@ export class Session {
     }
 
     getAttribute(key: string): any {
-        return this.data[key];
+        return this.data[ key ];
     }
 
     setAttribute(key: string, value: any) {
-        this.data[key] = value;
+        this.data[ key ] = value;
     }
 
     removeAttribute(key: string) {
-        delete this.data[key];
+        delete this.data[ key ];
     }
 
     touch() {

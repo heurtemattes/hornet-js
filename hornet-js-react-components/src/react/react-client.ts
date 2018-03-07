@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,10 +99,10 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.react.react-c
 export class ReactClientInitializer implements IClientInitializer<HornetEvent<ComponentChangeEventDetail>> {
 
     /** Composant page correspondant à l'application */
-    private appComponent: Class<HornetPage<any, any, any>>;
+    protected appComponent: Class<HornetPage<any, any, any>>;
 
     /** Fonction à appeler une fois le client initialisé */
-    private readyCallback: () => void;
+    protected readyCallback: () => void;
 
     /**
      * Constructeur
@@ -116,7 +116,7 @@ export class ReactClientInitializer implements IClientInitializer<HornetEvent<Co
     }
 
 
-    initErrorComponent(errorPage:{new (...args): IHornetPage<any, any>}) {
+    initErrorComponent(errorPage: { new(...args): IHornetPage<any, any> }) {
         HornetComponent.ERROR_COMPONENT = errorPage as Class<HornetPage<any, any, any>>;
     }
 

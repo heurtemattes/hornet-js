@@ -2,11 +2,11 @@
 
 ## Prérequis #
 
-* NodeJS 6.X
+* NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -16,7 +16,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet.js`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -24,6 +24,9 @@ Compiler les sources typescript de `hornet.js`
 Ajouter au package.json
 
 ```shell
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
     "hornet-js-batch": "5.1.X"
   }
@@ -32,7 +35,7 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-    $ hb install
+hb install
 ```
 
 ## Objectif
@@ -122,7 +125,7 @@ Valeur par défaut : `500`
 
 ### Lancement du batch
 
-Vu qu'il s'agit d'une application web, mais avec des traitements non bloquant, pour le lancer il suffit d'appelé une url, voici un exemple :
+Vu qu'il s'agit d'une application web, mais avec des traitements non bloquant, pour le lancer il suffit d'appeler une url, voici un exemple :
 
 ```shell
 curl  http://localhost:8889/secteurs/batch/1
@@ -133,8 +136,6 @@ voici les codes retours:
 - RUNNING => code_retour : -9999
 - MINOR_ERROR => code_retour : 2
 - MAJOR_ERROR => code_retour : 1
-
-
 
 ## Licence
 

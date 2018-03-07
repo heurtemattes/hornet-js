@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -183,7 +183,7 @@ class tableTest extends BaseTest {
         table = this.renderIntoDocument(tableElement, "main3");
         dataSource.on("fetch", () => {
 
-            this.triggerMouseEvent(document.querySelector('#main3 #lite-0-colBody-0-2 .edition-button-action'), "click");
+            this.triggerMouseEvent(document.querySelector('#main3 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
 
             expect(document.querySelector("#main3 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
 
@@ -204,7 +204,7 @@ class tableTest extends BaseTest {
 
     submitLineForm = (item) => {
 
-        NotificationManager.notify(null, null, Notifications.makeSingleNotification("", "Modification effectuée"));
+        NotificationManager.notify(null, null, null, Notifications.makeSingleNotification("", "Modification effectuée"));
         data[0] = {id: 1, label: item.label, desc: item.desc}
         dataSource.deleteAll();
         dataSource.add(true, data);

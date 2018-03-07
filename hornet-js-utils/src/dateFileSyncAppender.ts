@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,16 +86,19 @@ let os = require("os");
 let eol = os.EOL || "\n";
 let format = require("log4js/lib/date_format");
 
+/**
+ * @deprecated since version 5.1.1, Use dateFile instead from log4js.
+ */
 class DateRollingFileSync {
-    private currentSize: number;
-    private baseFilename: string;
-    private filename: string;
-    private pattern: string;
-    private options: any;
-    private now: Function;
-    private previousTime: Date;
-    private lastTimeWeWroteSomething: Date;
-    private alwaysIncludePattern: boolean;
+    protected currentSize: number;
+    protected baseFilename: string;
+    protected filename: string;
+    protected pattern: string;
+    protected options: any;
+    protected now: Function;
+    protected previousTime: Date;
+    protected lastTimeWeWroteSomething: Date;
+    protected alwaysIncludePattern: boolean;
 
     /**
      * Constructeur
@@ -105,13 +108,15 @@ class DateRollingFileSync {
      * @param now
      */
     constructor(filename: string, pattern: any, options: any, now?: Function) {
+        console.warn("Deprecated since version 5.1.1, Use dateFile instead from log4js.")
+
         debug("In DateRollingFileSync");
 
         this.filename = filename;
-        this.options = options || {encoding: "utf8", mode: parseInt("0644", 8), flags: "a"};
+        this.options = options || { encoding: "utf8", mode: parseInt("0644", 8), flags: "a" };
 
         debug("Now is " + now);
-        if (pattern && typeof(pattern) === "object") {
+        if (pattern && typeof (pattern) === "object") {
             now = options;
             options = pattern;
             pattern = null;
@@ -149,7 +154,7 @@ class DateRollingFileSync {
     /**
      * Checks arguments
      */
-    private throwErrorIfArgumentsAreNotValid() {
+    protected throwErrorIfArgumentsAreNotValid() {
         if (!this.filename) {
             throw new Error("You must specify a filename");
         }
@@ -231,10 +236,10 @@ export function appender(filename: string, pattern: any, alwaysIncludePattern: b
     let logFile = new DateRollingFileSync(
         filename,
         pattern,
-        {alwaysIncludePattern: alwaysIncludePattern}
+        { alwaysIncludePattern: alwaysIncludePattern }
     );
 
-    return function(logEvent) {
+    return function (logEvent) {
         logFile.write(layout(logEvent, timezoneOffset) + eol, "utf8");
     };
 

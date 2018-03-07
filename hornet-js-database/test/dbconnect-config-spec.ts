@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,18 +84,18 @@ import { TestLogger } from "hornet-js-test/src/test-logger";
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
 
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "levels": {
-        "[all]": "INFO"
-    },
-    "appenders": [
-        {
-            "type": "console",
-            "layout": {
-                "type": "pattern",
-                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-            }
+    "appenders": {
+        "console": {
+        "type": "console",
+        "layout": {
+            "type": "pattern",
+            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
         }
-    ]
+        }
+    },
+    "categories": {
+        "default": { "appenders": ["console"], "level": "INFO" }
+    }
 });
 
 let expect = TestUtils.chai.expect;

@@ -5,11 +5,11 @@ Ce module est basé sur les annotations *@Bean* et *@Map*.
 
 ## Prérequis #
 
-* NodeJS 6.X
+* NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -19,7 +19,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet.js`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -27,6 +27,9 @@ Compiler les sources typescript de `hornet.js`
 Ajouter au package.json
 
 ```shell
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
     "hornet-js-bean": "5.1.X"
   }
@@ -35,7 +38,7 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-    $ hb install
+hb install
 ```
 
 ### Définition d'un Bean Hornet
@@ -104,7 +107,7 @@ BeanUtils.mapObject(ObjetMetier,source).then((result:ObjetMetier) =>{
 
 ### Utilisation du mapper via l'annotation @Map sur une Promise
 
-si une fonction renvoie une promesse de résultat, il est possible de chainer le mapping de deux façons:
+Si une fonction renvoie une promesse de résultat, il est possible de chainer le mapping de deux façons:
 
 ```javascript
 
@@ -176,7 +179,6 @@ BeanUtils.mapObject(ObjetMetier,source).then((result:ObjetMetier) =>{
 ...
 
 ```
-
 ## Licence
 
 `hornet-js-bean` est sous [licence cecill 2.1](./LICENSE.md).

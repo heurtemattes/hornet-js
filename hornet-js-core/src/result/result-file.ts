@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,6 +81,7 @@
 import { HornetResult } from "src/result/hornet-result";
 import { MediaType } from "src/protocol/media-type";
 import { OptionsFiles } from "src/result/hornet-result-interface";
+import { DispositionType } from "src/result/disposition-type";
 import { Response } from "express";
 
 /**
@@ -89,20 +90,28 @@ import { Response } from "express";
  */
 export class ResultFile extends HornetResult {
 
-    constructor(options : OptionsFiles, mediaType : MediaType){
-        super(options, mediaType)
+    constructor(options: OptionsFiles, mediaType: MediaType) {
+        super(options, mediaType);
+        options.dispositionType = options.dispositionType || DispositionType.ATTACHMENT;
     }
 
     /*
      *@inheritdoc
      */
-    protected configure(res : Response):boolean{
-        if (this.options.filename) {
-            res.header("Content-Disposition","attachment; filename=\"" + this.options.filename + "\"");
-        }
-        res.contentType(this.mediaType.MIME);
-        res.writeHead(200); //send headers
-        res.write(this.options.data instanceof Buffer?this.options.data : new Buffer(this.options.data)); //send body
-        return true;
+    protected configure(res: Response): boolean {
+
+        let buffer: Buffer = this.options.data instanceof Buffer ? this.options.data : new Buffer(this.options.data);
+        let headers = {
+            "Content-Type": this.mediaType.MIME,
+            "Content-Length": buffer.length
+        };
+
+
+        headers[ "Content-Disposition" ] = this.options.dispositionType + "; filename=\"" + (this.options.filename || "filename") + "\"";
+
+
+        res.writeHead(200, headers);
+        res.end(buffer);
+        return false;
     }
 }

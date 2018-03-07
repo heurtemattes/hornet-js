@@ -73,26 +73,66 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
-import { ServiceRequest } from "src/services/service-request";
-import { SpinnerType } from "src/services/hornet-superagent-request";
-
-const logger: Logger = Utils.getLogger("hornet-js-core.services.i18n-service-api");
-
-export class I18nServiceApi extends ServiceRequest {
-
-    changeLanguage(data: any):Promise<any> {
-        logger.trace("CHANGEMENT DE LOCALE I18N:", data.hornetI18n);
-        return this.fetch({
-            spinnerType: SpinnerType.Default,
-            method: "get",
-            url: Utils.buildContextPath("/changeLanguage/" + data.hornetI18n)
-        });
+import { TestLogger } from "hornet-js-test/src/test-logger";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
+    "appenders": {
+        "console": {
+        "type": "console",
+        "layout": {
+            "type": "pattern",
+            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+        }
+        }
+    },
+    "categories": {
+        "default": { "appenders": ["console"], "level": "INFO" }
     }
-}
+});
+
+var expect:any = TestUtils.chai.expect;
+
+import { I18nLoader } from "src/i18n/i18n-loader";
+import * as path from "path";
+
+
+describe.skip("Test of I18nLoader : ", () => {
+
+    let i18nLoader = new I18nLoader(path.join(__dirname, "simple"));
+
+    it("find 2 locales", (done) => {
+        expect(i18nLoader.getLocales().length).to.eql(2);
+        done();
+    });
+
+
+    it("load message and merge", (done) => {
+        expect(i18nLoader.getMessages().messages.testValue).to.eql("label");
+        done();
+    });
+
+    it("load message first locale", (done) => {
+        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.testValue).to.eql("fr");
+        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.labelLanguage).to.eql("test-fr");
+        done();
+    });
+
+    it("load message second locale", (done) => {
+        expect(i18nLoader.getMessages({lang: "ab", locale: "ab-AB"}).messages.testValue).to.eql("ab");
+        expect(i18nLoader.getMessages({lang: "ab", locale: "ab-AB"}).messages.labelLanguage).to.eql("test-ab");
+        done();
+    });
+
+
+    it("load message second locale not overhide first locale", (done) => {
+        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.testValue).to.eql("fr");
+        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.labelLanguage).to.eql("test-fr");
+        done();
+    });
+});

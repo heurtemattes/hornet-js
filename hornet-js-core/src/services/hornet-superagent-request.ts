@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,6 +83,7 @@ import { Request, Response } from "superagent";
 import { IncomingMessage, ServerResponse } from "http";
 import { MediaType } from "src/protocol/media-type";
 import { CacheKey } from "src/services/hornet-superagent";
+import { ClientSessionTimeout } from "src/session/client-session-configuration";
 
 /**
  * Surcharge pour la compilation des plugins
@@ -108,6 +109,9 @@ export interface HornetRequest {
     cert?: string;
     key?: string;
     progress?: Function;
+    resultDisposition?: HornetRequestResultDisposition;
+    clientTimeout?: ClientSessionTimeout;
+    manageBusiness?: boolean;
 }
 
 export interface Attachment {
@@ -121,6 +125,17 @@ export interface HornetRequestHeader {
     Authorization?: string;
 }
 
+export interface HornetRequestResultDisposition {
+    type: ResultDispositionType;
+    data?: HornetRequestResultDispositionData | any;
+}
+
+export interface HornetRequestResultDispositionData {
+    name?: string;
+    specs?: any;
+    replace?: boolean;
+}
+
 /**
  * Type de spinnerType
  * valeur possible (None, Default, Component[depreacated])
@@ -129,4 +144,13 @@ export enum SpinnerType {
     None,
     Default,
     Component
+};
+
+/**
+ * Type de spinnerType
+ * valeur possible (None, Default, Component[depreacated])
+ */
+export enum ResultDispositionType {
+    Custom = "custom",
+    Default = "default"
 };

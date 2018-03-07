@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,7 @@ export const INJECT_METADATA_KEY = "injectParameters";
 
 export class Injector {
 
-    private static registry: {[key: string]: any} = {};
+    protected static registry: { [ key: string ]: any } = {};
 
     /**
      * Retourne la classe enregistrée pour une clé donnée
@@ -101,17 +101,17 @@ export class Injector {
      * @param  side {Side} complément de clé correspondant au côté d'exécution (Client ou Serveur)
      * @returns La valeur stockée
      * */
-    static getRegistered(key:Class<any> | AbstractClass<any> | string, side?:Side): any {
-        if (!side)  {
+    static getRegistered(key: Class<any> | AbstractClass<any> | string, side?: Side): any {
+        if (!side) {
             side = Utils.isServer ? Side.SERVER : Side.CLIENT;
         }
         let id = key;
-        
+
         if (!_.isString(key)) {
-            id = key[ID_NAME];
+            id = key[ ID_NAME ];
         }
-        
-        return Injector.registry[id as string] && Injector.registry[id as string][side];
+
+        return Injector.registry[ id as string ] && Injector.registry[ id as string ][ side ];
     }
 
     /**
@@ -119,23 +119,23 @@ export class Injector {
      * @param  key {any} clé de stockage
      * @param  side {Side} complément de clé correspondant au côté d'exécution (Client ou Serveur)
      * */
-    static removeRegistered<T>(key:Class<any> | AbstractClass<any> | string, side?:Side): void {
-        if (!side)  {
+    static removeRegistered<T>(key: Class<any> | AbstractClass<any> | string, side?: Side): void {
+        if (!side) {
             side = Utils.isServer ? Side.SERVER : Side.CLIENT;
         }
 
         let id = key;
-        
+
         if (!_.isString(key)) {
-            id = key[ID_NAME];
+            id = key[ ID_NAME ];
         }
 
         if (!id) {
             logger.error("Error: Injector Bean " + key + " must be registered before remove.");
-            throw new TechnicalError('ERR_TECH_' + CodesError.INJECT_NOT_DEFINED_ERROR, {errorMessage: CodesError.DEFAULT_ERROR_MSG});
+            throw new TechnicalError('ERR_TECH_' + CodesError.INJECT_NOT_DEFINED_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
         }
-        
-        delete Injector.registry[id as string][side];
+
+        delete Injector.registry[ id as string ][ side ];
     }
 
     /**
@@ -144,50 +144,51 @@ export class Injector {
      * @param  side {Side} complément de clé correspondant au côté d'exécution (Client ou Serveur)
      * @returns La valeur stockée
      * */
-    static register(key:Class<any> | AbstractClass<any> | string, value: any, scope:Scope=Scope.VALUE, side?:Side) {
-        
-        if (!side)  {
+    static register(key: Class<any> | AbstractClass<any> | string, value: any, scope: Scope = Scope.VALUE, side?: Side) {
+
+        if (!side) {
             side = Utils.isServer ? Side.SERVER : Side.CLIENT;
         } else if ((side as Side == Side.SERVER && Utils.isServer) || (side == Side.CLIENT && !Utils.isServer)) {
             logger.trace("Error: Injector Key <" + key + "> scope <" + scope + "> wrong Side <" + (side == Side.CLIENT ? "client" : "server") + ">");
         }
 
         let id = key;
-        
+
         if (!_.isString(key)) {
-            id = key[ID_NAME];
+            id = key[ ID_NAME ];
         }
 
         if (!id) {
-            id = key[ID_NAME] = _.uniqueId();
-        }
-        
-        let registered = Injector.registry[id as string] && Injector.registry[id as string][side];
-        if (registered) {
-            logger.error("Error: Injector Bean " + key + " is already registered.");
-            throw new TechnicalError('ERR_TECH_' + CodesError.INJECT_ALREADY_DEFINED_ERROR, {errorMessage: CodesError.DEFAULT_ERROR_MSG});
+            id = key[ ID_NAME ] = _.uniqueId();
         }
 
-        registered = Injector.registry[id as string];
+        let registered = Injector.registry[ id as string ] && Injector.registry[ id as string ][ side ];
+        if (registered) {
+            logger.error("Error: Injector Bean " + key + " is already registered.");
+            throw new TechnicalError('ERR_TECH_' + CodesError.INJECT_ALREADY_DEFINED_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
+        }
+
+        registered = Injector.registry[ id as string ];
         if (!registered) {
-            Injector.registry[id as string] = {};
+            Injector.registry[ id as string ] = {};
         }
         try {
-            switch(scope) {
+            switch (scope) {
                 case Scope.VALUE:
-                    Injector.registry[id as string][side] = value;
+                    Injector.registry[ id as string ][ side ] = value;
                     break;
                 case Scope.SINGLETON:
-                    Injector.registry[id as string][side] = new value();
+                    Injector.registry[ id as string ][ side ] = new value();
                     break;
                 case Scope.PROTOTYPE:
-                    Object.defineProperty(Injector.registry[id as string], side+"", {
-                        get : () => { return new value(); }, configurable: true})
+                    Object.defineProperty(Injector.registry[ id as string ], side + "", {
+                        get: () => { return new value(); }, configurable: true
+                    })
                     break;
             }
         } catch (e) {
             logger.error("Error: Injector Key <" + key + "> scope <" + scope + ">. cause :", e);
-            throw new TechnicalError('ERR_TECH_' + CodesError.INJECT_ERROR, {errorMessage: CodesError.DEFAULT_ERROR_MSG});
+            throw new TechnicalError('ERR_TECH_' + CodesError.INJECT_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
         }
     }
 

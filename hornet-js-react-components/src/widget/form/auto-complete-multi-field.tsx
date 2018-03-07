@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -210,6 +210,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             "aria-expanded": shouldShow,
             "aria-owns": this.state.ariaSelectorId,
             "aria-activedescendant": shouldShow ? this.state.ariaSelectorId + "_" + this.state.selectedIndex : undefined,
+            "aria-multiselectable": true,
             "id": this.state.id ? this.state.id : this.getFreeTypingFieldName(),
             "type": "text",
             "name": this.getFreeTypingFieldName(),
@@ -236,7 +237,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                     data-multiple={true}
                     readOnly={!this.props.writable || this.state.readOnly}
                     data-writable={this.props.writable}
-                    />
+                />
 
                 <AutoCompleteSelector
                     ref="selector"
@@ -250,7 +251,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                     autoCompleteState={this.autoCompleteState}
                     disabled={this.state.disabled || this.state.readOnly}
                     noResultLabel={this.state.noResultLabel}
-                    />
+                />
             </div>
         );
     }
@@ -498,7 +499,10 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
         this.changeSelectedChoice();
 
         if (value) {
-            this.props.dataSource.select(value);
+            let res = value.map((item) => {
+                return _.find(this.props.dataSource.results, { value: item })
+            })
+            this.props.dataSource.select(res);
         } else {
             this.props.dataSource.selectClean(true)
         }
@@ -640,9 +644,9 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      * Fonction appelée lorsque l'utilisateur clique sur un item de la liste des valeurs possibles
      * @param event
      */
-    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>): void {
+    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
         logger.trace("Selection Multiple click");
-        let selectedValue = event.currentTarget[ "getAttribute" ]("data-real-value");
+        let selectedValue = choice.value;
         if (event.target !== event.currentTarget) {
             this.state.onSelected = true;
         }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,6 +109,8 @@ export interface UploadFileFieldProps extends HornetClickableProps,
     fileSelectedLabel?: string;
     /** permet de surcharger le css du bouton de suppression */
     classNameDelete?: string;
+    /** clé i18n pour le label */
+    i18nLabelKey?: string;
 }
 
 /**
@@ -116,11 +118,12 @@ export interface UploadFileFieldProps extends HornetClickableProps,
  */
 export class UploadFileField<P extends UploadFileFieldProps> extends AbstractField<UploadFileFieldProps, any> {
 
-    private inputFileElement: HTMLElement;
+    protected inputFileElement: HTMLElement;
     public readonly props: Readonly<UploadFileFieldProps>;
 
     static defaultProps = _.assign(AbstractField.defaultProps, {
-        fileSelectedLabel: UploadFileField.getI18n("uploadFile.selectedFile", { "count": 0 })
+        fileSelectedLabel: UploadFileField.getI18n("uploadFile.selectedFile", {"count": 0}),
+        i18nLabelKey: "uploadFile.selectedFile"
     });
 
     constructor(props?: P, context?: any) {
@@ -142,15 +145,13 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * Gestion du changement de fichier sélectionné
      * @param e évènement
      */
-    private handleChange(e: __React.SyntheticEvent<HTMLElement>): void {
+    protected handleChange(e: __React.SyntheticEvent<HTMLElement>): void {
         let input: HTMLInputElement = e.target as HTMLInputElement;
-        let hasSelected: boolean = false;
         if (input.files && input.files.length > 0) {
-            hasSelected = true;
-            this.setState({activeButtonLabel: this.i18n("uploadFile.selectedFile", { "count": input.files.length })});
+            this.setState({activeButtonLabel: this.i18n(this.state.i18nLabelKey, {"count": input.files.length})});
 
         } else {
-            this.setState({activeButtonLabel: this.i18n("uploadFile.selectedFile", { "count": 0 })});
+            this.setState({activeButtonLabel: this.i18n(this.state.i18nLabelKey, {"count": 0})});
         }
 
         /* Déclenchement de la fonction onChange éventuellement passée en propriété */
@@ -159,10 +160,10 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
         }
     }
 
-    /**setReadOnlyFile
+    /**
      * @returns {any} les propriétés du fichier en consultation converties en attributs html data
      */
-    private getDataFileProps(): any {
+    protected getDataFileProps(): any {
         let dataProps: any = {};
         if (this.state.defaultFile) {
             dataProps["data-file-id"] = this.state.defaultFile.id;
@@ -180,7 +181,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      */
     setCurrentValue(formData: any): this {
         //let value:any = _.get(formData, this.state.name);
-        if(!formData) {
+        if (!formData) {
             this.handleDelete();
         }
         this.setState({
@@ -191,11 +192,18 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
         return this;
     }
 
+    registerUploadFieldElement(elt) {
+        this.registerHtmlElement(elt);
+        this.inputFileElement = elt;
+    }
+
     /**
      * Génère le rendu spécifique du champ
      * @returns {any}
      */
     renderWidget(): JSX.Element {
+
+        logger.info("Rendu composant UploadFileField");
 
         let preview = "";
         if (this.props.renderPreviewFile) {
@@ -212,17 +220,29 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
          * on utilise donc ici les attributs data-* pour stocker les propriétés de l'éventuel fichier déjà sélectionné.
          * Celles-ci seront ensuite récupérées lors de l'envoi du formulaire, si un autre fichier n'a pas été sélectionné.*/
         let dataProps = this.getDataFileProps();
-        let inputFile = <input ref={(elt) => {
-            this.registerHtmlElement(elt);
-            this.inputFileElement = elt;
-        }} type="file" onChange={this.handleChange}
-
-                               {...dataProps} {...htmlProps} />;
+        let inputFile =
+            <input
+                ref={(elt) => {
+                    this.registerUploadFieldElement(elt);
+                }}
+                type="file"
+                onChange={this.handleChange}
+                {...dataProps}
+                {...htmlProps}
+            />;
 
         let labelProps = {
             htmlFor: htmlProps["id"],
             readOnly: htmlProps["readOnly"],
             className: "upload-content"
+        };
+
+        let aProps: any = {
+            href: "#",
+            onClick: this.downloadButtonActionHandler,
+            onKeyDown: this.downloadButtonKeyDownHandler,
+            disabled: htmlProps["readOnly"],
+            "aria-haspopup": true
         };
 
 
@@ -231,8 +251,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
                 {inputFile}
                 <label {...labelProps}>
 
-                    <a href="#" aria-haspopup={true} onClick={this.downloadButtonActionHandler}
-                       onKeyDown={this.downloadButtonKeyDownHandler} disabled={htmlProps["readOnly"]}>
+                    <a {...aProps}>
                         <span className="upload-text">{this.state.activeButtonLabel}</span>
                     </a>
                 </label>
@@ -250,7 +269,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     /* suppression du fichier sélectionné  dans le champs input */
     handleDelete() {
         this.htmlElement.value = "";
-        this.setState({defaultFile: null, activeButtonLabel: this.i18n("uploadFile.selectedFile", { "count": 0 })});
+        this.setState({defaultFile: null, activeButtonLabel: this.i18n(this.state.i18nLabelKey, {"count": 0})});
 
     }
 

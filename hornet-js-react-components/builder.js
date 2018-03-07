@@ -91,10 +91,24 @@ module.exports = {
     },
     config: {
         karma: {
-            template: {
-                debug: "./test/template/debug.html",
-                context: "./test/template/context.html",
-                clientContext: "./test/template/client_with_context.html"
+            //browsers: ["Firefox"],
+            //template: {
+            //    debug: "./test/template/debug.html",
+            //    context: "./test/template/context.html",
+            //    clientContext: "./test/template/client_with_context.html"
+            //},
+            clientContext: [
+                [/moment[\/\\]locale$/, /fr|en/],
+                [/intl[\/\\]locale-data[\/\\]jsonp$/, /fr|en/],
+                [/.appender/, /console/],
+                [/^\.$/, (context) => {
+                    if ( !/\/log4js\/lib$/.test(context.context) ) return;
+                    context.regExp = /^\.\/appenders\/console.*$/;
+                    context.request = ".";
+                }]
+            ],
+            clientExclude: {
+                modules: ["cluster", "continuation-local-storage", "config", "cluster"]
             }
         }
     }

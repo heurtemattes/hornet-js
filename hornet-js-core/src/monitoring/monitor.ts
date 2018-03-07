@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,7 +90,7 @@ import path = require("path");
 var Module = require("module").Module;
 
 function requireGlobal(moduleName) {
-    var globalDir = process.env["HORNET_GLOBAL_MODULE_DIR"];
+    var globalDir = process.env[ "HORNET_GLOBAL_MODULE_DIR" ];
     if (!globalDir) {
         //Utils.getLogger("hornet-js-utils").error("La variable d'environnement 'HORNET_GLOBAL_MODULE_DIR' n'est pas définie. Impossible de charger un module global !!");
         throw new Error("La variable d'environnement 'HORNET_GLOBAL_MODULE_DIR' n'est pas définie. Impossible de charger un module global !!");
@@ -122,9 +122,9 @@ try {
 }
 
 export class Monitor {
-    private server;
-    private monitorServer;
-    private connexion = {
+    protected server;
+    protected monitorServer;
+    protected connexion = {
         max: 0,
         available: 0,
         opened: 0,
@@ -132,13 +132,13 @@ export class Monitor {
         idle: 0,
         error: 0
     };
-    private request = {
+    protected request = {
         received: 0,
         sendingReply: 0,
         completed: 0,
         error: 0
     };
-    private eventLoopStats = {
+    protected eventLoopStats = {
         samples: [],
         sampleTimeInterval: 4000,
         sample1MinCount: 0,
@@ -146,12 +146,12 @@ export class Monitor {
         sample15MinCount: 0,
         samplesToKeep: 0,
         stats: {
-            average1min: {p50: 0, p90: 0, p95: 0, p99: 0, p100: 0},
-            average5min: {p50: 0, p90: 0, p95: 0, p99: 0, p100: 0},
-            average15min: {p50: 0, p90: 0, p95: 0, p99: 0, p100: 0}
+            average1min: { p50: 0, p90: 0, p95: 0, p99: 0, p100: 0 },
+            average5min: { p50: 0, p90: 0, p95: 0, p99: 0, p100: 0 },
+            average15min: { p50: 0, p90: 0, p95: 0, p99: 0, p100: 0 }
         }
     };
-    private api = {
+    protected api = {
         requestSended: 0,
         requestCompleted: 0,
         responseError: 0,
@@ -254,7 +254,7 @@ export class Monitor {
         var realCount = Math.min(count, this.eventLoopStats.samples.length);
         var sample;
         for (var i = 0; i < realCount; i++) {
-            sample = this.eventLoopStats.samples[i];
+            sample = this.eventLoopStats.samples[ i ];
             med50p += sample.p50;
             med90p += sample.p90;
             med95p += sample.p95;
@@ -353,7 +353,7 @@ export class Monitor {
                 heapUsed: memUsage.heapUsed
             },
             heap: v8.getHeapStatistics(),
-            gc: process[GC_STATISTICS_OBJECT_KEY] || "Statistiques du garbage collector indisponibles",
+            gc: process[ GC_STATISTICS_OBJECT_KEY ] || "Statistiques du garbage collector indisponibles",
             server: {
                 connection: this.connexion,
                 request: this.request

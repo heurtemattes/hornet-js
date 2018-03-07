@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -135,27 +135,27 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      */
     render(): JSX.Element {
         let item = this.state.item;
-        logger.trace("MenuLink.render item.id : ", item.id);
+        logger.debug("MenuLink.render item.id : ", item.id);
         let attributesA = {};
 
         let hasSubMenu = NavigationUtils.hasVisibleSubMenu(item);
-        attributesA["href"] = (item.url) && !(hasSubMenu) ? this.genUrl(item.url) : "#";
-        attributesA["className"] = hasSubMenu ? HAVING_SUBMENU_CLASSNAME : null;
-        attributesA["id"] = item.id;
-        attributesA["data-indice"] = item.id;
-        attributesA["role"] = "menuitem";
+        attributesA[ "href" ] = (item.url) && !(hasSubMenu) ? this.genUrl(item.url) : "#";
+        attributesA[ "className" ] = hasSubMenu ? HAVING_SUBMENU_CLASSNAME : null;
+        attributesA[ "id" ] = item.id;
+        attributesA[ "data-indice" ] = item.id;
+        attributesA[ "role" ] = "menuitem";
         if (this.state.dataPassThru) {
-            attributesA["data-pass-thru"] = "true";
+            attributesA[ "data-pass-thru" ] = "true";
         }
         /* On se branche sur les évènements React onMouseEnter et onMouseLeave car plusieurs évènements
          onMouseOver et onMouseOut sont déclenchés et génèrent donc un rendu React pour le survol d'un même élément de menu */
-        attributesA["onMouseEnter"] = this.handleMouseEnter;
-        attributesA["onMouseLeave"] = this.handleMouseLeave;
+        attributesA[ "onMouseEnter" ] = this.handleMouseEnter;
+        attributesA[ "onMouseLeave" ] = this.handleMouseLeave;
         /* On n'accède pas aux éléments de menu (autres que le premier) via la tabulation */
         if (item.id == MENU_ROOT + "0") {
-            attributesA["tabIndex"] = 0;
+            attributesA[ "tabIndex" ] = 0;
         } else {
-            attributesA["tabIndex"] = -1;
+            attributesA[ "tabIndex" ] = -1;
         }
         let subMenuLibelle = this.i18n("navigation.submenu");
         return (
@@ -170,7 +170,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * Gestion du clic sur entrer ou espace
      * @param event
      */
-    private handleKeyDown(event): void {
+    protected handleKeyDown(event): void {
         if (event.keyCode == KeyCodes.ENTER || event.keyCode == KeyCodes.SPACEBAR) {
             let item = this.state.item;
             let url = (item.url) ? this.genUrl(item.url) : "#";
@@ -185,7 +185,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
     /**
      * Méthode appelée lors du click sur le lien
      */
-    private activateLink() {
+    protected activateLink() {
         fireHornetEvent(MENU_LINK_ACTIVATED);
         if (this.props.closeOnLinkClick) {
             this.closeMenu();
@@ -196,7 +196,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
     /**
      * Méthode appelée pour femer le menu
      */
-    private closeMenu() {
+    protected closeMenu() {
         let item = this.state.item;
         let hasSubMenu = NavigationUtils.hasVisibleSubMenu(item);
         if (!hasSubMenu) {
@@ -208,7 +208,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
     /**
      * Gestion de l'évènement d'entrée de la souris sur l'élément
      */
-    private handleMouseEnter() {
+    protected handleMouseEnter() {
         let element = document.getElementById(this.state.item.id);
 
         /* On affiche tous les éléments parents de l'élément sélectionné en partant du root */
@@ -222,9 +222,9 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
 
     /**
      * Evènement lancé lorsque le pointer n'est plus sur le lien
-     * @private
+     * @protected
      */
-    handleMouseLeave() {
+    protected handleMouseLeave() {
         let element = document.getElementById(this.state.item.id);
 
         /* On masque tous les éléments parents en partant du parent */
@@ -242,16 +242,16 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * @param libelle
      * @param hover
      * @returns {string}
-     * @private
+     * @protected
      */
-    private getImgSubMenu(item: IMenuItem, libelle: string, hover?: boolean) {
+    protected getImgSubMenu(item: IMenuItem, libelle: string, hover?: boolean) {
         let imgSubMenu = <div></div>;
 
         if (item.submenu && NavigationUtils.hasVisibleSubMenu(item)) {
             let props = {};
 
-            props["alt"] = libelle + this.i18n(item.text);
-            props["className"] = "subnav-0";
+            props[ "alt" ] = libelle + this.i18n(item.text);
+            props[ "className" ] = "subnav-0";
 
             imgSubMenu = <img {...props} />;
         }
@@ -264,9 +264,9 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * @param item
      * @param hover
      * @returns {string}
-     * @private
+     * @protected
      */
-    private getFilePathImg(item: IMenuItem, hover: boolean) {
+    protected getFilePathImg(item: IMenuItem, hover: boolean) {
 
         let srcImg = (hover) ? DOWN_ARROW_IMG_HOVER : DOWN_ARROW_IMG;
         if (item.level > 0) {

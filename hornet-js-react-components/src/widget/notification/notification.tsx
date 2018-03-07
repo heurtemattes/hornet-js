@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,6 +93,7 @@ import {
 } from "hornet-js-core/src/notification/notification-events";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
+import { NotificationType } from 'hornet-js-core/src/notification/notification-manager';
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification");
 
@@ -138,6 +139,20 @@ export interface NotificationContentProps extends HornetComponentProps {
     color?: string;
     logo?: string;
     exceptions?: Array<BaseError>;
+    idComponent?: string
+}
+
+
+/**
+ * Type d'erreur 
+ */
+export enum notificationType {
+
+    ERROR = "error",
+    WARNING = "warning",
+    PERSONNALS = "personnal",
+    INFOS = "info",
+    EXCEPTION = "exception"
 }
 
 /**
@@ -169,17 +184,17 @@ export class Notification extends HornetComponent<NotificationProps, any> {
                 }
 
                 if (!ev.detail.id || !(ev.detail.id in Notification.INSTANCES)) {
-                    ev.detail.id = Notification.ORDER[Notification.ORDER.length - 1];
+                    ev.detail.id = Notification.ORDER[ Notification.ORDER.length - 1 ];
                 }
-                Notification.INSTANCES[ev.detail.id].setState(state);
+                Notification.INSTANCES[ ev.detail.id ].setState(state);
             });
 
             this.listen(CLEAN_NOTIFICATION_EVENT, (ev) => {
-                if (!ev.detail.id || !(ev.detail.id in Notification.INSTANCES)) {
-                    ev.detail.id = Notification.ORDER[Notification.ORDER.length - 1];
+                if (!ev.detail.id) {
+                    ev.detail.id = Notification.ORDER[ Notification.ORDER.length - 1 ];
                 }
-                if (Notification.INSTANCES[ev.detail.id]) {
-                    Notification.INSTANCES[ev.detail.id].setState({
+                else if (Notification.INSTANCES[ ev.detail.id ]) {
+                    Notification.INSTANCES[ ev.detail.id ].setState({
                         infos: null,
                         errors: null,
                         exceptions: null,
@@ -187,11 +202,30 @@ export class Notification extends HornetComponent<NotificationProps, any> {
                         personnals: null
                     });
                 }
+                else if (ev.detail.id) {
+                    let idComponent = Notification.ORDER[ Notification.ORDER.length - 1 ];
+                    if (ev.detail.idComponent) {
+                        idComponent = ev.detail.idComponent;
+                    }
+                    let messages = [];
+                    let currentNotification = Notification.INSTANCES[ idComponent ];
+
+                    if (currentNotification && currentNotification.state) {
+                        currentNotification.state.infos.map((message) => {
+                            if (message.id != ev.detail.id) {
+                                messages.push(message);
+                            }
+                        });
+                        currentNotification.setState({ infos: messages });
+                    }
+
+
+                }
             });
 
             this.listen(CLEAN_ALL_NOTIFICATION_EVENT, (ev) => {
                 for (let id in Notification.INSTANCES) {
-                    this.fire(CLEAN_NOTIFICATION_EVENT.withData({id: id}));
+                    this.fire(CLEAN_NOTIFICATION_EVENT.withData({ id: id, idComponent: undefined }));
                 }
             });
             Notification.started = true;
@@ -199,19 +233,19 @@ export class Notification extends HornetComponent<NotificationProps, any> {
     }
 
     setInfos(infos) {
-        this.fire(ADD_NOTIFICATION_EVENT.withData({id: this.state.id, infos: infos}));
+        this.fire(ADD_NOTIFICATION_EVENT.withData({ id: this.state.id, infos: infos }));
     }
 
     setWarnings(warnings) {
-        this.fire(ADD_NOTIFICATION_EVENT.withData({id: this.state.id, warnings: warnings}));
+        this.fire(ADD_NOTIFICATION_EVENT.withData({ id: this.state.id, warnings: warnings }));
     }
 
     setErrors(errors) {
-        this.fire(ADD_NOTIFICATION_EVENT.withData({id: this.state.id, errors: errors}));
+        this.fire(ADD_NOTIFICATION_EVENT.withData({ id: this.state.id, errors: errors }));
     }
 
     setExceptions(exceptions) {
-        this.fire(ADD_NOTIFICATION_EVENT.withData({id: this.state.id, exceptions: exceptions}));
+        this.fire(ADD_NOTIFICATION_EVENT.withData({ id: this.state.id, exceptions: exceptions }));
     }
 
     /**
@@ -219,32 +253,35 @@ export class Notification extends HornetComponent<NotificationProps, any> {
      */
     render(): JSX.Element {
         return (
-            <NotificationContent errorsTitle={this.state.errorsTitle}
-                                 errors={this.state.errors}
-                                 warningsTitle={this.state.warningsTitle}
-                                 warnings={this.state.warnings}
-                                 personnalsTitle={this.state.personnalsTitle}
-                                 personnals={this.state.personnals}
-                                 infosTitle={this.state.infosTitle}
-                                 infos={this.state.infos}
-                                 exceptions={this.state.exceptions}
-                                 color={this.state.color}
-                                 logo={this.state.logo}
-                                 ref={(component) => {
-                                     if (component === null) {
-                                         delete Notification.INSTANCES[this.state.id];
-                                         let idx = Notification.ORDER.indexOf(this.state.id);
-                                         Notification.ORDER.splice(idx, 1);
-                                     } else {
-                                         if (this.state.id in Notification.INSTANCES) {
-                                             let idx = Notification.ORDER.indexOf(this.state.id);
-                                             Notification.ORDER.splice(idx, 1);
-                                         }
-                                         Notification.ORDER.push(this.state.id);
-                                         Notification.INSTANCES[this.state.id] = component;
-                                     }
-                                 }}
-            />);
+            <div id={this.state.id}>
+                <NotificationContent errorsTitle={this.state.errorsTitle}
+                    errors={this.state.errors}
+                    warningsTitle={this.state.warningsTitle}
+                    warnings={this.state.warnings}
+                    personnalsTitle={this.state.personnalsTitle}
+                    personnals={this.state.personnals}
+                    infosTitle={this.state.infosTitle}
+                    infos={this.state.infos}
+                    exceptions={this.state.exceptions}
+                    color={this.state.color}
+                    logo={this.state.logo}
+                    ref={(component) => {
+                        if (component === null) {
+                            delete Notification.INSTANCES[ this.state.id ];
+                            let idx = Notification.ORDER.indexOf(this.state.id);
+                            Notification.ORDER.splice(idx, 1);
+                        } else {
+                            if (this.state.id in Notification.INSTANCES) {
+                                let idx = Notification.ORDER.indexOf(this.state.id);
+                                Notification.ORDER.splice(idx, 1);
+                            }
+                            Notification.ORDER.push(this.state.id);
+                            Notification.INSTANCES[ this.state.id ] = component;
+                        }
+                    }}
+                    idComponent={this.props.id}
+                />
+            </ div>);
     }
 }
 
@@ -254,6 +291,12 @@ export class Notification extends HornetComponent<NotificationProps, any> {
 class NotificationContent extends HornetComponent<NotificationContentProps, any> {
 
     static firstRender = true;
+
+    width;
+    notif;
+    listError: any = {};
+    btnError: HTMLButtonElement;
+    btnInfo: HTMLButtonElement;
 
     constructor(props?: NotificationProps, context?: any) {
         super(props, context);
@@ -272,69 +315,40 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
             this.scrollToNotifications();
         }
         /** Si il y a des notifications de type erreurs, on place le focus sur 1 er champ */
-        if (this.state.errors && Array.isArray(this.state.errors) && this.state.errors.length > 0) {
-            let element = document.getElementsByName(
-                this.state.errors[0].field) ?
-                document.getElementsByName(this.state.errors[0].field)[0] :
-                document.getElementById(this.state.errors[0].field);
-            if (element && element.focus) {
-                Accordion.handleFocusOnAccordion(element);
-                element.focus();
-            } else {
-                logger.error("Impossible de mettre le focus sur l'élément", this.state.field);
+        if (this.state.errors != prevState.errors) {
+            if (this.state.errors && Array.isArray(this.state.errors) && this.state.errors.length > 0) {
+                let element = document.getElementsByName(
+                    this.state.errors[ 0 ].field) ?
+                    document.getElementsByName(this.state.errors[ 0 ].field)[ 0 ] :
+                    document.getElementById(this.state.errors[ 0 ].field);
+                if (element && element.focus) {
+                    Accordion.handleFocusOnAccordion(element);
+                    element.focus();
+                } else {
+                    logger.error("Impossible de mettre le focus sur l'élément", this.state.field);
+                }
             }
         }
-
     }
 
     /**
      * Fait défiler la page courante de façon à afficher le bloc de notifications
      */
     scrollToNotifications() {
-        if (this.state.infos || this.state.errors) {
+        if (this.state.infos || this.state.errors || this.state.exceptions) {
             let element = ReactDom.findDOMNode(this) as any;
             if (element && element.scrollIntoView) {
                 element.scrollIntoView();
+                //déplacement pour le sticky header
+                window.scroll(window.scrollX, window.scrollY - 59);
             } else {
                 logger.warn("Impossible de scroller sur les notifications.");
             }
         }
     }
 
-    /**
-     * Rendu d'un message d'erreur
-     * @returns {any}
-     */
-    renderExceptionMessage() {
-        let errorMessages = this.state.exceptions.map((exception: BaseError, index) => {
-            let text = "";
-            let stack;
-            try {
-                text = exception.message != null && exception.message !== "" ?
-                    exception.message : this.i18n("error.message." + exception.code, exception.args);
-                stack = this.exceptionStackDev(exception);
-            } catch (e) {
-                logger.error("Impossible de récupérer l'exception d'origine", e, "Exception d'origine : ", exception);
-                text = e.message;
-            }
-            let messageItemKey = (exception.code) ? exception.code : index;
-            return <MessageItem key={messageItemKey} text={text} className="error-message-text">{stack}</MessageItem>;
-        });
-        return (
-            <section>
-                <div className="messageBox errorBox error-message">
-                    <div>
-                        <h1 className="titleError error-message-title">{this._getErrorsTitle()}</h1>
-                        <ul className="error-message-list">
-                            {errorMessages}
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        );
-    }
 
-    private exceptionStackDev(exception: BaseError) {
+    protected exceptionStackDev(exception: BaseError) {
         let stack;
         if (process.env.NODE_ENV !== "production") {
             let stackToPrint = (exception.err_cause && exception.err_cause.stack) || exception.stack;
@@ -353,97 +367,81 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
     }
 
     /**
-     * Rendu d'un message d'erreur (rouge)
-     * @returns {any}
-     */
-    renderErrorMessage() {
-        let errorMessages = this.state.errors.map((message) => {
-            return <MessageItem key={message.id} anchor={message.anchor} {...message} className="error-message-text"/>;
+    * Rendu d'un message
+    * @returns {any}
+    */
+    renderMessage(errors, notifType) {
+
+        let idMessages = [];
+
+        let generateMessage = (exception: BaseError, index) => {
+            let text = "";
+            let stack;
+            try {
+                text = exception.message != null && exception.message !== "" ?
+                    exception.message : this.i18n("error.message." + exception.code, exception.args);
+                stack = this.exceptionStackDev(exception);
+            } catch (e) {
+                logger.error("Impossible de récupérer l'exception d'origine", e, "Exception d'origine : ", exception);
+                text = e.message;
+            }
+            let messageItemKey = (exception.code) ? exception.code : "message-item-" + index;
+            return <MessageItem key={messageItemKey} text={text} className="error-message-text">{stack}</MessageItem>;
+        }
+
+        let Messages = errors.map((message) => {
+
+            if (notifType === notificationType.EXCEPTION) {
+                if (Array.isArray(message.message)) {
+                    return message.message.map(generateMessage);
+                } else {
+                    return generateMessage(message, 0);
+                }
+            } else {
+
+                idMessages.push(message.id);
+                return <MessageItem key={message.id} anchor={message.anchor} {...message}
+                    className={notifType + "-message-text"} />;
+            }
         });
+
+        let button;
+        if (notifType != notificationType.INFOS) {
+            button = <button className="error-button-open" ref={(btnError) => (this.btnError = btnError)} onClick={this.handleClickShowError.bind(this)} title={"Afficher/Masquer"} > Afficher/Masquer</button >
+        } else {
+            button = <button className="info-button" ref={(btnInfo) => (this.btnInfo = btnInfo)} onClick={this.handleClickRemove.bind(this, idMessages)} title={"Supprimer"}>Supprimer</button>
+        }
+
+        let CustomContainertStyle = (notifType == notificationType.PERSONNALS) ? { border: "0.063em solid " + this.state.color } : {};
+        let CustomContentStyle = (notifType == notificationType.PERSONNALS) ? {
+            color: this.state.color,
+            backgroundImage: "url('" + this.state.logo + "')"
+        } : {};
+        let ulStyle = (notifType == notificationType.PERSONNALS) ? { color: this.state.color } : {}
+
+
+        //on utilise la meme class css pour les errors et les exeptions
+        notifType = (notifType === notificationType.EXCEPTION) ? "error" : notifType;
         return (
             <section>
-                <div className="messageBox errorBox error-message">
-                    <div>
-                        <h1 className="titleError error-message-title">{this._getErrorsTitle()}</h1>
-                        <ul className="error-message-list">
-                            {errorMessages}
+                <div className={"messageBox " + notifType + "Box " + notifType + "-message"} style={CustomContainertStyle}>
+                    <div ref={(elt) => {
+                        this.notif = elt
+                    }}>
+                        {button}
+                        <h1 className={"title" + notifType + " " + notifType + "-message-title"} style={CustomContentStyle}>{this._getTitle()}</h1>
+                        <ul style={ulStyle} className={notifType + "-message-list"} ref={(listError) => {
+
+                            if (listError && !this.listError[ this.props.idComponent + notifType ]) {
+                                this.listError[ this.props.idComponent + notifType ] = listError;
+                                this.width = listError.clientWidth;
+                            }
+                        }} >
+                            {Messages}
                         </ul>
                     </div>
-                </div>
-            </section>
-        );
-    }
-
-    /**
-     * Rendu d'un message d'attention (Orange)
-     * @returns {any}
-     */
-    renderWarningMessage() {
-        let warningMessages = this.state.warnings.map((message) => {
-            return <MessageItem key={message.id} anchor={message.anchor} {...message}
-                                className="warning-message-text"/>;
-        });
-        return (
-            <section>
-                <div className="messageBox warningBox warning-message">
-                    <div>
-                        <h1 className="titleWarning warning-message-title">{this._getWarningsTitle()}</h1>
-                        <ul className="warning-message-list">
-                            {warningMessages}
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-
-    /**
-     * Rendu d'un message d'information (vert)
-     * @returns {any}
-     */
-    renderInfoMessage() {
-        let infoMessages = this.state.infos.map((message) => {
-            return <MessageItem key={message.id}  {...message} className="info-message-text"/>;
-        });
-        return (
-            <section>
-                <div className="messageBox infoBox info-message">
-                    <div>
-                        <h1 className="titleInfo info-message-title">{this._getInfosTitle()}</h1>
-                        <ul className="info-message-list">
-                            {infoMessages}
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    /**
-     * Rendu d'un message personnel ( couleur et logo au choix)
-     * @returns {any}
-     */
-    renderPersonnalMessage() {
-        let personnalMessages = this.state.personnals.map((message) => {
-            return <MessageItem key={message.id} anchor={message.anchor} {...message}
-                                className="personnal-message-text"/>;
-        });
-        return (
-            <section>
-                <div className="messageBox personnalBox personnal-message"
-                     style={{border: "0.063em solid " + this.state.color}}>
-                    <div>
-                        <h1 className="titlePersonnal personnal-message-title" style={{
-                            color: this.state.color,
-                            backgroundImage: "url('" + this.state.logo + "')"
-                        }}>{this._getPersonnalsTitle()}</h1>
-                        <ul style={{color: this.state.color}} className="personnal-message-list">
-                            {personnalMessages}
-                        </ul>
-                    </div>
-                </div>
-            </section>
+                </div >
+            </section >
         );
     }
 
@@ -453,48 +451,65 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
     render(): JSX.Element {
         return (
             <span>
-                {(this.state.exceptions && this.state.exceptions.length > 0) ? this.renderExceptionMessage() : null}
-                {(this.state.errors && this.state.errors.length > 0) ? this.renderErrorMessage() : null}
-                {(this.state.warnings && this.state.warnings.length > 0) ? this.renderWarningMessage() : null}
-                {(this.state.infos && this.state.infos.length > 0) ? this.renderInfoMessage() : null}
-                {(this.state.personnals && this.state.personnals.length > 0) ? this.renderPersonnalMessage() : null}
+                {(this.state.exceptions && this.state.exceptions.length > 0) ? this.renderMessage(this.state.exceptions, notificationType.EXCEPTION) : null}
+                {(this.state.errors && this.state.errors.length > 0) ? this.renderMessage(this.state.errors, notificationType.ERROR) : null}
+                {(this.state.warnings && this.state.warnings.length > 0) ? this.renderMessage(this.state.warnings, notificationType.WARNING) : null}
+                {(this.state.infos && this.state.infos.length > 0) ? this.renderMessage(this.state.infos, notificationType.INFOS) : null}
+                {(this.state.personnals && this.state.personnals.length > 0) ? this.renderMessage(this.state.personnals, notificationType.PERSONNALS) : null}
             </span>
         );
     }
 
     /**
-     * Extrait le libelle valide passé dans les propriétés du composant ou indique un libellé par défaut
-     * @returns {*|string|string}
-     * @private
+     * Affiche le titre de la notification
      */
-    private _getInfosTitle() {
-        return this.state.infosTitle || this.i18n("notification.infosTitle");
+    protected _getTitle() {
+
+        if (this.state.infos) { return this.state.infosTitle || this.i18n("notification.infosTitle") }
+        if (this.state.warnings) { return this.state.warningsTitle || this.i18n("notification.warningsTitle") }
+        if (this.state.personnals) { return (this.state.personnalsTitle) || this.i18n("notification.personnalsTitle") }
+        if (this.state.errors || this.state.exceptions) { return this.state.errorsTitle || this.i18n("notification.errorsTitle"); }
+
     }
 
     /**
-     * Extrait le libelle valide passé dans les propriétés du composant ou indique un libellé par défaut
-     * @returns {*|string|string}
-     * @private
+     * Affiche/Masque les erreurs dans la zone de notification
+     * 
      */
-    private _getWarningsTitle() {
-        return this.state.warningsTitle || this.i18n("notification.warningsTitle");
+    handleClickShowError(e) {
+
+        //change l'orientation de la fleche
+        if (this.btnError && this.btnError.classList.contains("error-button-open")) {
+            this.btnError.classList.add("error-button-close");
+            this.btnError.classList.remove("error-button-open");
+        } else {
+            this.btnError.classList.add("error-button-open");
+            this.btnError.classList.remove("error-button-close");
+        }
+
+        // affiche ou masque la liste
+        if (this.listError) {
+
+            let errorList = this.listError[ this.props.idComponent + notificationType.ERROR ] || this.listError[ this.props.idComponent + notificationType.PERSONNALS ]
+                || this.listError[ this.props.idComponent + notificationType.WARNING ];
+
+            if (errorList && errorList.classList && errorList.classList.contains("close")) {
+                errorList.classList.remove("close");
+            } else {
+                errorList.classList.add("close");
+            }
+
+        }
+        this.notif.style.width = this.width + "px";
     }
 
     /**
-     * Extrait le libelle valide passé dans les propriétés du composant ou indique un libellé par défaut
-     * @returns {*|string|string}
-     * @private
+     * Suppression de la notification success(info)
+     * @param items 
      */
-    private _getPersonnalsTitle() {
-        return this.state.personnalsTitle || this.i18n("notification.personnalsTitle");
-    }
-
-    /**
-     * Extrait le libelle valide passé dans les propriétés du composant ou indique un libellé par défaut
-     * @returns {*|string|string}
-     * @private
-     */
-    private _getErrorsTitle() {
-        return this.state.errorsTitle || this.i18n("notification.errorsTitle");
+    handleClickRemove(items) {
+        items.map((id) => {
+            this.fire(CLEAN_NOTIFICATION_EVENT.withData({ id: id, idComponent: this.props.idComponent }));
+        })
     }
 }

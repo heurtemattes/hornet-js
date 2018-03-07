@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,8 +87,8 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import KeyboardEvent = __React.KeyboardEvent;
-import SyntheticEvent = __React.SyntheticEvent;
+import * as classNames from "classnames";
+import KeyboardEvent = React.KeyboardEvent;
 
 const logger: Logger = Utils.getLogger("hornet-js-components.widget.pager.pager");
 
@@ -155,13 +155,13 @@ export const ITEMS_PER_PAGE_ALL: number = 2147483647;
  */
 export class Pager extends HornetComponent<PagerProps, any> {
 
-    private tableInputPager;
+    protected tableInputPager;
 
     static defaultProps = {
         message: HornetComponent.getI18n("table"),
         className: ""
     };
-    private defaultPageSizeSelect: PageSizeItem[] = [
+    protected defaultPageSizeSelect: PageSizeItem[] = [
         {value: 10, textKey: this.i18n("table.10")},
         {value: 20, textKey: this.i18n("table.20")},
         {value: 50, textKey: this.i18n("table.50")},
@@ -181,6 +181,9 @@ export class Pager extends HornetComponent<PagerProps, any> {
         super.componentDidMount();
         this.props.dataSource.on("fetch", this.updateOnFetch);
         this.props.dataSource.on("pagination", (result) => {
+            if(this.tableInputPager && result.pagination) {
+                this.tableInputPager.value = result.pagination.pageIndex;
+            }
             this.setState({pagination: _.cloneDeep(result.pagination)});
         });
     }
@@ -199,13 +202,11 @@ export class Pager extends HornetComponent<PagerProps, any> {
         }
     }
 
-
-    // TODO à supprimer : se baser plutôt sur les setters
     shouldComponentUpdate(nextProps, nextState) {
-        let shouldUpdate: boolean = this.state.pagination.pageIndex !== nextState.pagination.pageIndex
-            || this.state.pagination.itemsPerPage !== nextState.pagination.itemsPerPage
-            || this.state.pagination.totalItems !== nextState.pagination.totalItems
-            || this.state.disabled !== nextState.disabled;
+        let shouldUpdate: boolean = (this.state.pagination.pageIndex != nextState.pagination.pageIndex && nextState.pagination.pageIndex != "")
+            || this.state.pagination.itemsPerPage != nextState.pagination.itemsPerPage
+            || this.state.pagination.totalItems != nextState.pagination.totalItems
+            || this.state.disabled != nextState.disabled;
         logger.trace("shouldComponentUpdate", shouldUpdate);
         return shouldUpdate;
     }
@@ -214,7 +215,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * met a jour la pagination dans le state et la valeur de la page courante.
      * @param result (liste des resultats du dataSource)
      */
-    private updateOnFetch(result) {
+    protected updateOnFetch(result) {
         this.setState({pagination: (!result || result.length == 0) ? {} : _.cloneDeep(this.props.dataSource.pagination)});
         if (this.tableInputPager) {
             this.tableInputPager.value = this.state.pagination.pageIndex; // mise a jour de l'index de la page affichée
@@ -226,14 +227,22 @@ export class Pager extends HornetComponent<PagerProps, any> {
      */
     render(): JSX.Element {
         logger.trace("render");
-        let className: string = "datatable-pagination";
+        let className: ClassDictionary = {
+            "datatable-pagination": true
+        };
         if (this.state.className) {
-            className += " " + this.state.className
+            className[this.state.className] = true;
         }
+
+        let divProps: any = {
+            className: classNames(className),
+            id: this.props.id,
+            disabled: this.state.disabled
+        };
 
         return (
             this.state.pagination.pageIndex ?
-                <div className={className} id={this.props.id} disabled={this.state.disabled}>
+                <div {...divProps}>
                     {this.renderSelectItemsPerPage()}
                     {this.getButtons()}
                 </div> : <div/>);
@@ -241,10 +250,9 @@ export class Pager extends HornetComponent<PagerProps, any> {
 
     /**
      * Génère la liste déroulante permettant de sélectionner le nombre d'éléments par page.
-     * @param pageSizeSelect éléments de choix de taille de page
-     * @returns {JSX.Element}
+     * @returns {ReactElement}
      */
-    private renderSelectItemsPerPage(): JSX.Element {
+    protected renderSelectItemsPerPage(): React.ReactElement<PagerProps> {
         logger.trace("renderSelectItemsPerPage");
 
         let pageSizeSelect = this.state.pageSizeSelect || this.defaultPageSizeSelect;
@@ -308,7 +316,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * Méthode permettant de générer le code HTML lié aux boutons
      * @returns {JSX.Element[]}
      */
-    private getButtons(): JSX.Element[] {
+    protected getButtons(): JSX.Element[] {
         logger.trace("getButtons");
 
         let firstPage: number, prevPage: number, nextPage: number, lastPage: number;
@@ -344,7 +352,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
             this.renderButton(this.i18n(`table.prevPage`) + " [page " + prevPage + "/" + totalPages + "]", prevPage, startOnClickActif, "prevPage"),
             this.renderPageInput(firstPage, lastPage),
             this.renderButton("[page " + nextPage + "/" + totalPages + "] " + this.i18n(`table.nextPage`), nextPage, endOnClickActif, "nextPage"),
-            this.renderButton("[page " + totalPages + "/" + totalPages + "] " + this.i18n(`table.lastPage`), lastPage, endOnClickActif, "lastPage"),
+            this.renderButton("[page " + totalPages + "/" + totalPages + "] " + this.i18n(`table.lastPage`), lastPage, endOnClickActif, "lastPage")
         ];
     }
 
@@ -356,7 +364,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * @param key clé de l'élément React
      * @returns l'élément React correspondant
      */
-    private renderButton(infoTitle: string, page: number, enabled: boolean, key: string): JSX.Element {
+    protected renderButton(infoTitle: string, page: number, enabled: boolean, key: string): JSX.Element {
         logger.trace("renderButton");
         let className: string = "datatable-pagination-button datatable-pagination-button-" + key.toLowerCase();
         if (enabled) {
@@ -367,6 +375,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
 
         return (
             <button
+                type="button"
                 className={className}
                 onClick={() => {
                     this.props.dataSource.goToPage(page);
@@ -388,21 +397,21 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * @param lastPage numéro de la dernière page
      * @returns rendu du composant
      */
-    private renderPageInput(firstPage: number, lastPage: number) {
+    protected renderPageInput(firstPage: number, lastPage: number) {
         let index = this.state.pagination.pageIndex;
         let defaultValue = (!index || index < 1) ? 1 : index;
         return (
             <input
                 defaultValue={defaultValue}
-                value={index}
                 type={(!this.isMobile()) ? "number" : "tel"}
                 min={(!this.isMobile()) ? firstPage : undefined}
                 max={(!this.isMobile()) ? lastPage : undefined}
                 className="datatable-pagination-input"
                 ref={(element) => {
-                    this.tableInputPager = element
+                    this.tableInputPager = element;
                 }}
                 name="tableInputPager"
+                onChange={this.handleChangeValue}
                 onKeyDown={this.handleInputKeyDown}
                 key={this.props.id}
             />
@@ -425,7 +434,32 @@ export class Pager extends HornetComponent<PagerProps, any> {
                 } else {
                     this.tableInputPager.value = this.state.pagination.pageIndex;
                 }
+
+
+                const pagination = _.cloneDeep(this.state.pagination);
+                pagination.pageIndex = this.tableInputPager.value;
+                this.setState({pagination: pagination});
             }
+        }
+    }
+
+    /**
+     * L'index de page étant dans un input mappé par la prop value
+     * React oblige l'utilisation d'un event sur onChange pour valider la modification
+     * @param e
+     */
+    protected handleChangeValue(e) {
+        let pagination = _.cloneDeep(this.state.pagination);
+        const maxPages: number = Pager.getTotalPages(this.state.pagination.totalItems, this.state.pagination.itemsPerPage);
+
+        // Si NaN, on rend une chaine vide
+        pagination.pageIndex = !_.isNaN(e.target.valueAsNumber) ? e.target.valueAsNumber : "";
+        if (_.isNumber(pagination.pageIndex) && pagination.pageIndex < 1) {
+            pagination.pageIndex = 1;
+            this.tableInputPager.value = 1;
+        }
+        if (pagination.pageIndex > maxPages) {
+            pagination.pageIndex = this.tableInputPager.value = maxPages;
         }
     }
 
@@ -434,7 +468,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * @param value
      * @param pageChanged
      */
-    private onFormChange(value, pageChanged): void {
+    protected onFormChange(value, pageChanged): void {
         logger.trace("onFormChange");
 
         if (pageChanged) {

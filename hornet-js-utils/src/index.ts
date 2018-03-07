@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -115,8 +115,8 @@ export class Utils {
     static dateUtils = DateUtils;
 
     static appSharedProps = AppSharedProps;
-    private static _config:ConfigLib;
-    private static _contextPath:string;
+    protected static _config:ConfigLib;
+    protected static _contextPath:string;
 
     static log4js:any;
     static notify:(nid, errors, infos?)=>void;

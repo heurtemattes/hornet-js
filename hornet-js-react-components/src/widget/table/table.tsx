@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,6 +92,7 @@ import { TableState, ContentState } from "src/widget/table/table-state";
 import { Notification } from "src/widget/notification/notification";
 import { ToggleColumnsButton } from "src/widget/table/toggle-columns-button";
 import { UNIT_SIZE } from "src/widget/table/content";
+import { CheckColumn } from "src/widget/table/column/check-column";
 
 const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.table");
 
@@ -114,8 +115,8 @@ export interface TableProps extends HornetComponentProps {
  */
 export class Table extends HornetComponent<TableProps, any> {
 
-    private tableState: TableState;
-    private contentState: ContentState;
+    protected tableState: TableState;
+    protected contentState: ContentState;
 
     static defaultProps = {
         className: "hornet-datatable-header",
@@ -131,6 +132,7 @@ export class Table extends HornetComponent<TableProps, any> {
             this.tableState.once(TableState.RESIZE_EVENT, this.handleResize.bind(this));
         }
         this.state.isMounted = false;
+        this.contentState.setHasCheckColumnMassSelection(this.hasCheckColumnChildren());
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -144,7 +146,7 @@ export class Table extends HornetComponent<TableProps, any> {
 
     componentDidMount(): void {
         super.componentDidMount();
-        this.setState({isMounted: true});
+        this.setState({ isMounted: true });
     }
 
     /**
@@ -167,11 +169,11 @@ export class Table extends HornetComponent<TableProps, any> {
 
         if (this.state.isVisible) {
             return componentContent ?
-                <div><Notification id={notifId}/> {this.renderTable(myContents)}</div> :
+                <div><Notification id={notifId} /> {this.renderTable(myContents)}</div> :
                 <div> {this.renderTable(myContents)} </div>;
         }
 
-        return <div/>;
+        return <div />;
     }
 
     /**
@@ -179,14 +181,14 @@ export class Table extends HornetComponent<TableProps, any> {
      * @param width
      */
     handleResize(width: number) {
-        this.setState({width: width});
+        this.setState({ width: width });
     }
 
     /**
      * rendu du composant table
      * @returns {any}
      */
-    private renderTable(myContents): JSX.Element {
+    protected renderTable(myContents): JSX.Element {
         let myHeader: any = this.getComponentBy(Header);
         return (
             <div className="datatable-container">
@@ -224,7 +226,7 @@ export class Table extends HornetComponent<TableProps, any> {
                     });
                 }
 
-                infoColumns = {columns: keyColumns, id: id};
+                infoColumns = { columns: keyColumns, id: id };
             });
         }
         return infoColumns;
@@ -234,7 +236,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * fonction qui retourne la liste des PaginateDataSource de tous les contents du composant table
      * @returns {PaginateDataSource<any>[]}
      */
-    private getContentsDataSources(myContents): PaginateDataSource<any>[] {
+    protected getContentsDataSources(myContents): PaginateDataSource<any>[] {
         let listPaginateDataSource: PaginateDataSource<any>[] = [];
         myContents.map((myContent) => {
             listPaginateDataSource.push(myContent.props.dataSource);
@@ -247,7 +249,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * Création d'un composant React
      * @returns {any}
      */
-    private renderHeader(myComponent, myContents): JSX.Element {
+    protected renderHeader(myComponent, myContents): JSX.Element {
 
         if (myComponent) {
             let key = "header-" + this.props.id + "-wrapped";
@@ -265,9 +267,9 @@ export class Table extends HornetComponent<TableProps, any> {
                     hiddenColumns: this.getHiddenColumns(myComponent)
                 }
             );
-            return <Wrapped key={"wc-" + key}/>;
+            return <Wrapped key={"wc-" + key} />;
         } else {
-            return <div tabIndex={-1}/>;
+            return <div tabIndex={-1} />;
         }
     }
 
@@ -275,12 +277,12 @@ export class Table extends HornetComponent<TableProps, any> {
      * Création d'un composant React
      * @returns {any}
      */
-    private renderFooter(): JSX.Element {
+    protected renderFooter(): JSX.Element {
         let myComponent: any = this.getComponentBy(Footer);
         if (myComponent) {
-            return <Footer {...myComponent.props} contentState={this.contentState}/>;
+            return <Footer {...myComponent.props} contentState={this.contentState} />;
         } else {
-            return <div/>;
+            return <div />;
         }
     }
 
@@ -290,7 +292,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * @param myContents
      * @returns {any}
      */
-    private renderContent(myHeader, myContents) {
+    protected renderContent(myHeader, myContents) {
 
         let Contents = [];
         if (myContents && myContents.length > 0) {
@@ -317,12 +319,12 @@ export class Table extends HornetComponent<TableProps, any> {
                             title: (myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : null
                         }
                     );
-                    Contents.push(<Wrapped key={"wc-" + key}/>);
+                    Contents.push(<Wrapped key={"wc-" + key} />);
                 }
             });
             return Contents;
         } else {
-            return <div tabIndex={-1}/>;
+            return <div tabIndex={-1} />;
         }
     }
 
@@ -331,20 +333,57 @@ export class Table extends HornetComponent<TableProps, any> {
      * @param myHeader
      * @returns {any}
      */
-    private getHiddenColumns(myHeader) {
+    protected getHiddenColumns(myHeader) {
         let myToggleColumnsButton = null;
-        React.Children.map(myHeader.props.children, (child: React.ReactChild) => {
-            if ((child as React.ReactElement<any>).type === ToggleColumnsButton) {
-                myToggleColumnsButton = child;
-            }
-        }) || null;
+        if (myHeader) {
+            React.Children.map(myHeader.props.children, (child: React.ReactChild) => {
+                if ((child as React.ReactElement<any>).type === ToggleColumnsButton) {
+                    myToggleColumnsButton = child;
+                }
+            }) || null;
 
-        if (myToggleColumnsButton
-            && (myToggleColumnsButton as React.ReactElement<any>).props
-            && (myToggleColumnsButton as React.ReactElement<any>).props["hiddenColumns"]) {
-            return (myToggleColumnsButton as React.ReactElement<any>).props["hiddenColumns"];
+            if (myToggleColumnsButton
+                && (myToggleColumnsButton as React.ReactElement<any>).props
+                && (myToggleColumnsButton as React.ReactElement<any>).props[ "hiddenColumns" ]) {
+                return (myToggleColumnsButton as React.ReactElement<any>).props[ "hiddenColumns" ];
+            }
         }
 
         return {};
+    }
+
+    protected hasCheckColumnChildren(): boolean {
+        let res: boolean;
+        let children = this.getCheckColumnChildrenDeep(this);
+        res = (children && children.length > 0);
+
+        if(res) {
+            if(children[0].props && children[0].props.keyColumn) {
+                this.contentState.setKeycolumnMassSelection(children[0].props.keyColumn);
+            }
+        }
+
+        return res;
+    }
+
+    protected getCheckColumnChildrenDeep(startElement: any, childrenList?: any[]): any[] {
+        let children: any[] = childrenList ? childrenList : [];
+
+        React.Children.map(startElement.props.children, (child: React.ReactChild) => {
+            let reactElement = (child as React.ReactElement<any>);
+            if(reactElement) {
+                if (reactElement.type === CheckColumn) {
+                    children.push(child);
+                    children = this.getCheckColumnChildrenDeep(child, children);
+                } else if (Array.isArray(reactElement.props.children)) {
+                    React.Children.map(startElement.props.children, (subChild: React.ReactChild) => {
+                        children = this.getCheckColumnChildrenDeep(subChild, children);
+                    });
+                } else {
+                    children = this.getCheckColumnChildrenDeep(child, children);
+                }
+            }
+        });
+        return children.filter((element) => (element != null && element));
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,22 +91,24 @@ export class DropdownItem extends HornetComponent<any, any> {
         super(props, context);
     }
 
+    onClickEvent = (e) => {
+        if (!this.props.disabled) {
+            if (this.state.url) {
+                window.location.href = this.state.url;
+            }
+            else {
+                this.state.action(this.props.valueCurrent, e);
+            }
+        }
+    };
+
     /**
      * @inheritDoc
      */
     render() {
         let image;
         let checked = "";
-        let onClickEvent = (e) => {
-            if (!this.props.disabled) {
-                if (this.state.url) {
-                    window.location.href = this.state.url;
-                }
-                else {
-                    this.state.action(this.props.valueCurrent);
-                }
-            }
-        };
+        let rendu;
 
         /* Si une image existe */
         if (this.props.srcImg) {
@@ -115,7 +117,7 @@ export class DropdownItem extends HornetComponent<any, any> {
                 image = <img
                     src={this.props.srcImg}
                     className={"imgItem"}
-                    alt={this.props.label}/>
+                    alt={this.props.label} />
             } else {
 
                 image = this.props.srcImg;
@@ -124,17 +126,23 @@ export class DropdownItem extends HornetComponent<any, any> {
         if (this.props.disabled) {
             checked = " checked";
         }
+        if (this.props.label.props && "toggle-column-item-content" === this.props.label.props.className) {
+            rendu = this.props.label
+        } else {
+            let aHtmlProps = {
+                lang: this.props.disabled ? null : this.props.lang,
+                tabIndex: 0,
+                onClick: this.onClickEvent,
+                className: this.props.className + checked,
+                ref: (link) => this.props.getRef(link),
+                onKeyDown: (e) => this.props.handleKeyDown(e, this.props.action, this.state.url)
+            }
+
+            rendu = <a  {...aHtmlProps} >{image} {this.props.label}  </a>;
+        }
+
         return (
-            <li><a
-                tabIndex={0}
-                onClick={onClickEvent}
-                className={this.props.className + checked}
-                ref={ link => this.props.getRef(link) }
-                role="listitem"
-                onKeyDown={ (e) => this.props.handleKeyDown(e, this.props.action, this.state.url) }
-            >{image}
-                {this.props.label}
-            </a></li>
+            <li> {rendu} </li>
         )
     }
 }

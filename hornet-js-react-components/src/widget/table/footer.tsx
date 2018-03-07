@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -139,9 +139,14 @@ export class Footer extends HornetComponent<FooterProps, any> {
     render(): JSX.Element {
         logger.trace("render");
 
+        let divProps: any = {
+            className: this.state.className,
+            disabled: this.state.disabled
+        };
+
         return (
-            <div className={this.state.className} disabled={this.state.disabled}>
-                {this.state.disabled ? this.setChildrenDisabled() : this.props.children}
+            <div {...divProps}>
+                {this.setChildrenDisabled()}
             </div> );
     }
 

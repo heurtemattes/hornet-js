@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,7 +89,7 @@ import * as _ from "lodash";
 * @class
 */
 export class DataSourceMaster<T> extends DataSource<T>{
-    private _datasources: DataSource<any>[] = [];
+    protected _datasources: DataSource<any>[] = [];
 
     constructor(config: DataSourceConfig | DataSourceConfigPage | Array<T>, public keysMap: DataSourceMap, public options?: any[]) {
         super(config, keysMap, options)
@@ -116,7 +116,7 @@ export class DataSourceMaster<T> extends DataSource<T>{
      * Retourne les datasources slaves du master
      * @return slaves
      */
-    public getSlaves(): DataSource<any>[]{
+    public getSlaves(): DataSource<any>[] {
         return this._datasources;
     }
 

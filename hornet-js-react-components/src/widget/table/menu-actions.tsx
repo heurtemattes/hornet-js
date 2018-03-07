@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -125,8 +125,8 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
         return (
             <div className="datatable-header-menu flex-container fr">
                 {(actions.priorityActions.length > 0) ? MenuActions.renderPriorityActions(actions.priorityActions) :
-                    <div className="menu-priority-container"/>}
-                {(actions.dropdownItems.length > 0) ? this.renderDropDownActions(actions.dropdownItems) : <div/>}
+                    <div className="menu-priority-container" />}
+                {(actions.dropdownItems.length > 0) ? this.renderDropDownActions(actions.dropdownItems) : <div />}
             </div>
         );
     }
@@ -138,17 +138,17 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
     getMenuActions() {
         let priorityActions = [];
         let dropdownItems = [];
-        let item = this.props.selectedItems ? this.props.selectedItems[0] : {};
+        let item = this.props.selectedItems ? this.props.selectedItems[ 0 ] : {};
         let self = this;
 
         if (this.props.showIconInfo) {
             priorityActions.push(<TableButtonInfoAccessibilite srcImg={Picto.white.info}
-                                                               key={this.props.id + "-icon-info"}/>);
+                key={this.props.id + "-icon-info"} />);
         }
 
         if (this.props.toggleColumnsButton) {
             let WrappedToggleColumnsButton = this.props.toggleColumnsButton;
-            priorityActions.push(<WrappedToggleColumnsButton/>);
+            priorityActions.push(<WrappedToggleColumnsButton />);
         }
 
         if (this.props.actions && this.props.actions.length > 0) {
@@ -161,13 +161,13 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                     propsButtons.showAlert = this.props.showAlert;
                     propsButtons.selectedItems = this.props.selectedItems;
                     propsButtons.items = this.props.items;
-                    propsButtons["key"] = self.props.id + "-menuAction-" + index;
-                    propsButtons["value"] = item;
+                    propsButtons[ "key" ] = self.props.id + "-menuAction-" + index;
+                    propsButtons[ "value" ] = item;
 
 
-                    let isVisible:boolean = propsButtons.items.length > 0 || propsButtons.displayedWithoutResult;
+                    let isVisible: boolean = propsButtons.items.length > 0 || propsButtons.displayedWithoutResult;
 
-                    if(isVisible && (!propsButtons.visible || propsButtons.visible && propsButtons.visible())) {
+                    if (isVisible && (!propsButtons.visible || propsButtons.visible && propsButtons.visible())) {
 
                         if (!propsButtons.priority) {
                             dropdownItems.push({
@@ -182,7 +182,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                         } else {
                             let newProps = _.cloneDeep(propsButtons);
                             newProps.label = null;
-                            let actionButton = <ActionButton {...newProps}/>;
+                            let actionButton = <ActionButton {...newProps} />;
                             priorityActions.push(actionButton);
                         }
                     }
@@ -203,9 +203,9 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
     renderDropDownActions(actions): JSX.Element {
         return (
             <div className="fr menu-contextuel-container">
-                <Dropdown id={this.props.id} icon="more-actions" className="menu-contextuel" items={actions}
-                          title={this.state.title}
-                          position={Position.BOTTOMRIGHT}/>
+                <Dropdown id={this.props.id} icon="more-actions" className="menu-contextuel" type="button" items={actions}
+                    title={this.state.title}
+                    position={Position.BOTTOMRIGHT} />
             </div>
         );
     }

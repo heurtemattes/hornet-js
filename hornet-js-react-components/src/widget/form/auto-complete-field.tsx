@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -283,7 +283,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @inheritDoc
      */
     shouldComponentUpdate(nextProps: AutoCompleteFieldProps, nextState: any, nextContext: any) {
-        super.componentWillUpdate(nextProps, nextState, nextContext);
         if (this.state.shouldShowChoices != nextState.shouldShowChoices
             || this.state.listDefaultValue !== nextState.listDefaultValue
             || ((nextState.choices && !this.state.choices)
@@ -343,7 +342,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
                 <input {...htmlProps}
                     ref={this.registerTextInput}
                     readOnly={!this.props.writable} data-writable={this.props.writable}
-                    />
+                />
                 <AutoCompleteSelector
                     ref="selector"
                     choices={this.state.choices}
@@ -353,9 +352,9 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
                     showComponent={shouldShow}
                     choicesSelected={this.state.listDefaultValue}
                     autoCompleteState={this.autoCompleteState}
-                    disabled={this.state.disabled || this.state.readOnly}
+                    disabled={this.state.disabled || this.state.readOnly}
                     noResultLabel={this.state.noResultLabel}
-                    />
+                />
             </div>
         );
     }
@@ -553,7 +552,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param {boolean} shouldShow
      * @param {boolean} preventDefault
      */
-    private tabHandlerForValueChange(e: __React.KeyboardEvent<HTMLElement>, shouldShow: boolean) {
+    protected tabHandlerForValueChange(e: __React.KeyboardEvent<HTMLElement>, shouldShow: boolean) {
         if (this.isUpdated) {
             this.validateSelectedValue(shouldShow);
             this.isUpdated = false;
@@ -582,10 +581,10 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
 
             if (selection != null) {
                 this.setCurrentValue(selection.value);
-                this.props.dataSource.select(selection.value);
+                this.props.dataSource.select(selection);
             } else {
-                this.setCurrentValue(null);
-                this.props.dataSource.select(null);
+                this.setCurrentValue(undefined);
+                this.props.dataSource.select(undefined);
             }
 
             this.selectCurrentIndex();
@@ -614,11 +613,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
                 if (!this.props.dataSource.status) {
                     this.props.dataSource.init();
                 } else {
-                    if ((!this.props.writable) ||this.state.choices.length == 0 && this.hiddenInput.value) {
+                    if ((!this.props.writable) || this.state.choices.length == 0 && this.hiddenInput.value) {
                         this.setChoices(this.state.allChoices, () => { //setState
                             if (this.state.allChoices.length > 0) {
                                 let index = _.findIndex(this.state.allChoices, { text: this.typedValueOnFocus });
-                                this.state.selectedIndex = index===undefined? -1: index;
+                                this.state.selectedIndex = index === undefined ? -1 : index;
                                 this.showChoices();
                                 this.changeSelectedChoiceWhenOneChoice(this.typedValueOnFocus);
                             }
@@ -675,9 +674,9 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
 
         if (!this.hiddenInput || !this.hiddenInput.value || this.hiddenInput.value.length == 0) {
             this.clearFilterData();
-            if (!this.state.isShiftTab) this.props.dataSource.select(null);
+            if (!this.state.isShiftTab) this.props.dataSource.select(undefined);
         } else {
-            this.props.dataSource.select(this.hiddenInput.value);
+            this.props.dataSource.select(_.find(this.state.allChoices, { value: this.hiddenInput.value }));
         }
 
         this.hideChoices();
@@ -747,7 +746,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         if (this.state.choices && this.state.choices[ 0 ] && this.state.choices.length === 1
             && _.deburr(newText).toLowerCase() == _.deburr(this.state.choices[ 0 ].text).toLowerCase()) {
             this.changeSelectedChoice(this.state.choices[ 0 ]);
-            this.props.dataSource.select(this.state.choices[ 0 ].value);
+            this.props.dataSource.select(this.state.choices[ 0 ]);
             this.autoCompleteState.setFocusOn(0, this.state.choices[ 0 ].value, 0)
         }
     }
@@ -895,20 +894,16 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Fonction appelée lorsque l'utilisateur clique sur un item de la liste des valeurs possibles
      * @param event
      */
-    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>): void {
-        let selectedText = event.currentTarget[ "getAttribute" ]("data-real-text");
-        let selectedValue = event.currentTarget[ "getAttribute" ]("data-real-value");
-
-        /* On n'utilise pas la syntaxe getAttribute dataset.realText car la propriété dataset n'est pas définie sous IE10 */
-        if (selectedValue) {
-            logger.trace("Selection click [", selectedValue, "]:", selectedText);
-            let index = _.findIndex(this.state.choices, { text: selectedText });
+    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
+        if (choice) {
+            logger.trace("Selection click [", choice.value, "]:", choice.text);
+            let index = _.findIndex(this.state.choices, choice);
             this.state.selectedIndex = index;
             this.autoCompleteState.choiceFocused = index;
-            this.changeSelectedChoice({ text: selectedText, value: selectedValue });
-            this.hiddenInput.value = selectedValue;
-            this.selectedChoice(selectedValue);
-            this.props.dataSource.select(selectedValue);
+            this.changeSelectedChoice(choice);
+            this.hiddenInput.value = choice.value;
+            this.selectedChoice(choice.value);
+            this.props.dataSource.select(choice);
         }
         this.state.onListWidgetSelected = true;
         this.hideChoices();

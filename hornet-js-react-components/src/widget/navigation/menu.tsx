@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -149,7 +149,7 @@ export interface MenuProps extends HornetComponentProps {
 
 export class Menu extends HornetComponent<MenuProps, any> {
 
-    private burgerIcon: HTMLElement;
+    protected burgerIcon: HTMLElement;
 
     static defaultProps = {
         closeOnLinkClick: true,
@@ -176,7 +176,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      */
     handleResize() {
         let show = window.innerWidth > showIconSize;
-        this.setState({shouldShowIconInfo: show});
+        this.setState({ shouldShowIconInfo: show });
     }
 
     /**
@@ -199,7 +199,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * Gestion du clic clavier
      * @param event
      */
-    private handleKeyDown(event: KeyboardEvent): void {
+    protected handleKeyDown(event: KeyboardEvent): void {
         /*echap*/
         let keyCode = event.keyCode;
         switch (keyCode) {
@@ -247,7 +247,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         menuAttributes.className = classNames(classname);
 
         return (
-            <nav id="menu-main" aria-label={this.i18n("menu.mainMenu")} data-title="Menu" {...menuAttributes}>
+            <nav id="menu-main" role="navigation" aria-label={this.i18n("menu.mainMenu")} data-title="Menu" {...menuAttributes}>
                 {this.state.items.length > 0 ? this.renderMenuButton() : null}
                 {this.state.isMenuActive ? this.renderNavigationMenu() : this.renderEmptyNavigationMenu()}
             </nav>
@@ -258,7 +258,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * Rendu du bouton burger du menu
      * @returns {any}
      */
-    private renderMenuButton(): JSX.Element {
+    protected renderMenuButton(): JSX.Element {
 
         let buttonClasses = {
             toggler: true,
@@ -267,13 +267,13 @@ export class Menu extends HornetComponent<MenuProps, any> {
 
         return (
             <button className={classnames(buttonClasses)}
-                    onClick={this.handleToggleMenu.bind(this)}
-                    aria-controls="menu-container"
-                    aria-expanded={this.state.isMenuActive}
-                    aria-haspopup={true}
-                    ref={(button) => {
-                        this.burgerIcon = button;
-                    }}
+                onClick={this.handleToggleMenu.bind(this)}
+                aria-controls="menu-container"
+                aria-expanded={this.state.isMenuActive}
+                aria-haspopup={true}
+                ref={(button) => {
+                    this.burgerIcon = button;
+                }}
             >
                 <span>{this.state.isMenuActive ? this.i18n("menu.closeMenu") : this.i18n("menu.openMenu")}</span>
             </button>
@@ -284,12 +284,12 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * Rendu du menu vide (permet de gérer des transition css sur le menu)
      * @returns {any}
      */
-    private renderEmptyNavigationMenu(): JSX.Element {
+    protected renderEmptyNavigationMenu(): JSX.Element {
         return (
             <div className="menu-container" id="menu-container">
                 <div className={"menuEmpty"}></div>
                 <div className={"menu-content " + this.state.classNameExpanded}
-                     style={{maxWidth: this.state.currentWorkingZoneWidth}}>
+                    style={{ maxWidth: this.state.currentWorkingZoneWidth }}>
                 </div>
             </div>
         );
@@ -299,7 +299,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * Rendu du menu
      * @returns {any}
      */
-    private renderNavigationMenu(): JSX.Element {
+    protected renderNavigationMenu(): JSX.Element {
 
         if (this.state.isMenuActive) {
             let body = document.body;
@@ -314,16 +314,16 @@ export class Menu extends HornetComponent<MenuProps, any> {
         return (
             <div className="menu-container" id="menu-container">
                 {this.props.closeOnClickOutside ? <div className="menu-overlay"
-                                                       onClick={this.handleToggleMenu.bind(this)}></div> : null}
+                    onClick={this.handleToggleMenu.bind(this)}></div> : null}
 
                 <div className={"menu-content " + this.state.classNameExpanded}
-                     style={{maxWidth: this.state.currentWorkingZoneWidth}}>
-                    {this.state.showIconInfo && shouldShowIconInfo ? <MenuInfoAccessibilite/> : null}
+                    style={{ maxWidth: this.state.currentWorkingZoneWidth }}>
+                    {this.state.showIconInfo && shouldShowIconInfo ? <MenuInfoAccessibilite /> : null}
                     <MenuNavigation items={this.state.items}
-                                    isVisible={this.state.isMenuActive}
-                                    closeMenu={this.handleToggleMenu.bind(this)}
-                                    dataPassThru={this.props.dataPassThru}
-                                    closeOnLinkClick={this.props.closeOnLinkClick}/>
+                        isVisible={this.state.isMenuActive}
+                        closeMenu={this.handleToggleMenu.bind(this)}
+                        dataPassThru={this.props.dataPassThru}
+                        closeOnLinkClick={this.props.closeOnLinkClick} />
                 </div>
             </div>
         );
@@ -346,7 +346,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         if (this.state.onToggleClick) {
             this.state.onToggleClick();
         }
-        this.setState({isMenuActive: active});
+        this.setState({ isMenuActive: active });
     }
 
 
@@ -371,7 +371,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         return false;
     }
 
-    private handleLayoutExpand() {
+    protected handleLayoutExpand() {
         // préparation de la taille pour le layout expanding
         let maxWidth;
         let classNameExpanded = "mainLayoutClassNameExpanded";
@@ -383,11 +383,11 @@ export class Menu extends HornetComponent<MenuProps, any> {
         this.state.classNameExpanded = classNameExpanded;
     }
 
-    private handleMajLink() {
+    protected handleMajLink() {
         this.setState({ majlink: true });
     }
 
-    private handleUpatePageMenuExpand() {
+    protected handleUpatePageMenuExpand() {
         this.handleLayoutExpand();
         this.setState({ maj: true });
     }

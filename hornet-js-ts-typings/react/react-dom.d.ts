@@ -1,52 +1,81 @@
-// Type definitions for React v0.14 (react-dom)
+// Type definitions for React (react-dom) 16.0
 // Project: http://facebook.github.io/react/
-// Definitions by: Asana <https://asana.com>, AssureSign <http://www.assuresign.com>, Microsoft <https://microsoft.com>
+// Definitions by: Asana <https://asana.com>
+//                 AssureSign <http://www.assuresign.com>
+//                 Microsoft <https://microsoft.com>
+//                 MartynasZilinskas <https://github.com/MartynasZilinskas>
+//                 Josh Rutherford <https://github.com/theruther4d>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+// TypeScript Version: 2.3
 
 /// <reference path="react.d.ts" />
 
 declare namespace __React {
     namespace __DOM {
-        function findDOMNode<E extends Element>(instance: ReactInstance): E;
-        function findDOMNode(instance: ReactInstance): Element;
 
-        function render<P extends DOMAttributes<T>, T extends Element>(element: DOMElement<P, T>,
-                                                                       container: Element | null,
-                                                                       callback?: (element: T) => any): T;
-        function render<P>(element: SFCElement<P>,
-                           container: Element | null,
-                           callback?: () => any): void;
-        function render<P, T extends Component<P, ComponentState>>(element: CElement<P, T>,
-                                                                   container: Element | null,
-                                                                   callback?: (component: T) => any): T;
-        function render<P>(element: ReactElement<P>,
-                           container: Element | null,
-                           callback?: (component?: Component<P, ComponentState> | Element) => any): Component<P, ComponentState> | Element | void;
-        function render<P>(parentComponent: Component<any>,
-                           element: SFCElement<P>,
-                           container: Element,
-                           callback?: () => any): void;
+        function findDOMNode(instance: __React.ReactInstance): Element;
 
         function unmountComponentAtNode(container: Element): boolean;
 
+        function createPortal(children:  __React.ReactNode, container: Element):  __React.ReactPortal;
+
         const version: string;
+        const render: Renderer;
+        const hydrate: Renderer;
 
         function unstable_batchedUpdates<A, B>(callback: (a: A, b: B) => any, a: A, b: B): void;
         function unstable_batchedUpdates<A>(callback: (a: A) => any, a: A): void;
         function unstable_batchedUpdates(callback: () => any): void;
 
-        function unstable_renderSubtreeIntoContainer<P extends DOMAttributes<T>, T extends Element>(parentComponent: Component<any>,
-                                                                                                    element: DOMElement<P, T>,
-                                                                                                    container: Element,
-                                                                                                    callback?: (element: T) => any): T;
-        function unstable_renderSubtreeIntoContainer<P, T extends Component<P, ComponentState>>(parentComponent: Component<any>,
-                                                                                                element: CElement<P, T>,
-                                                                                                container: Element,
-                                                                                                callback?: (component: T) => any): T;
-        function unstable_renderSubtreeIntoContainer<P>(parentComponent: Component<any>,
-                                                        element: ReactElement<P>,
-                                                        container: Element,
-                                                        callback?: (component?: Component<P, ComponentState> | Element) => any): Component<P, ComponentState> | Element | void;
+        function unstable_renderSubtreeIntoContainer<T extends Element>(parentComponent:  __React.Component<any>,
+                                                                               element:  __React.DOMElement<DOMAttributes<T>, T>,
+                                                                               container: Element,
+                                                                               callback?: (element: T) => any): T;
+        function unstable_renderSubtreeIntoContainer<P, T extends  __React.Component<P,  __React.ComponentState>>(parentComponent: Component<any>,
+                                                                                                       element: CElement<P, T>,
+                                                                                                       container: Element,
+                                                                                                       callback?: (component: T) => any): T;
+        function unstable_renderSubtreeIntoContainer<P>(parentComponent:  __React.Component<any>,
+                                                               element:  __React.ReactElement<P>,
+                                                               container: Element,
+                                                               callback?: (component?:  __React.Component<P, ComponentState> | Element) => any): Component<P, ComponentState> | Element | void;
+
+        interface Renderer {
+            // Deprecated(render): The return value is deprecated.
+            // In future releases the render function's return type will be void.
+            <T extends Element>(element:  __React.DOMElement< __React.DOMAttributes<T>, T>,
+                                container: Element | null,
+                                callback?: () => void): T;
+
+            (element: Array< __React.DOMElement< __React.DOMAttributes<any>, any>>,
+             container: Element | null,
+             callback?: () => void): Element;
+
+            (element:  __React.SFCElement<any> | Array< __React.SFCElement<any>>,
+             container: Element | null,
+             callback?: () => void): void;
+
+            <P, T extends  __React.Component<P,  __React.ComponentState>>(element:  __React.CElement<P, T>,
+                                                        container: Element | null,
+                                                        callback?: () => void): T;
+
+            (element: Array< __React.CElement<any,  __React.Component<any,  __React.ComponentState>>>,
+             container: Element | null,
+             callback?: () => void):  __React.Component<any,  __React.ComponentState>;
+
+            <P>(element:  __React.ReactElement<P>,
+                container: Element | null,
+                callback?: () => void):  __React.Component<P,  __React.ComponentState> | Element | void;
+
+            (element: Array< __React.ReactElement<any>>,
+             container: Element | null,
+             callback?: () => void):  __React.Component<any,  __React.ComponentState> | Element | void;
+
+            (parentComponent:  __React.Component<any> | Array< __React.Component<any>>,
+             element: SFCElement<any>,
+             container: Element,
+             callback?: () => void): void;
+        }
     }
 
     namespace __DOMServer {

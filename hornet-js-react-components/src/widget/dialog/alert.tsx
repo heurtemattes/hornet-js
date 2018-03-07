@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,17 +87,16 @@ import { Modal } from "src/widget/dialog/modal";
 import { Notification } from "src/widget/notification/notification";
 
 export interface AlertProps extends HornetComponentProps {
-    isVisible ?: boolean;
-    onClickOk ?: React.MouseEventHandler<HTMLInputElement>; // L'utilisateur valide le message
-    onClickCancel ?: React.MouseEventHandler<HTMLInputElement>; // L'utilisateur annule ou appui sur la croix fermer en haut à droite
-    onClickClose ?: React.MouseEventHandler<HTMLInputElement>;
-    title ?: string;
+    isVisible?: boolean;
+    onClickOk?: React.MouseEventHandler<HTMLInputElement>; // L'utilisateur valide le message
+    onClickClose?: React.MouseEventHandler<HTMLInputElement>;
+    title?: string;
     message: string;
-    valid ?: string;
-    cancel ?: string;
-    validTitle ?: string;
-    cancelTitle ?: string;
-    underlayClickExits ?: boolean;
+    valid?: string;
+    cancel?: string;
+    validTitle?: string;
+    cancelTitle?: string;
+    underlayClickExits?: boolean;
     escapeKeyExits?: boolean;
     notificationId?: string;
     dialogId?: string;
@@ -169,23 +168,33 @@ export class Alert extends HornetComponent<AlertProps, any> {
                    dialogId={this.state.dialogId}
             >
                 <Notification id={notificationId}/>
-                <div className="widget-alert-body">
+                <div className="widget-alert-body" aria-labelledby="dialogue-title">
                     {this.state.message}
                 </div>
                 <div className="widget-dialogue-footer">
-                    <div className="grid has-gutter hornet-alert-buttons button-group">
-                        <Button {...this.configOKButton()}/>
-                        <Button {...this.configCancelButton()}/>
-                    </div>
+                    {this.renderButtons()}
                 </div>
             </Modal>);
+    }
+
+
+    /**
+     * Renvoie le/les buttons
+     * @returns {any}
+     */
+    protected renderButtons(): JSX.Element {
+        return (
+            <div className="txtcenter">
+                <Button {...this.configOKButton()} />
+            </div>
+        );
     }
 
     /**
      * Configuration du bouton OK
      * @returns {{type: string, id: string, name: string, value: string, className: string, label: (boolean|string), onClick: (*|defaultFunction)}}
      */
-    private configOKButton(): ButtonProps {
+    protected configOKButton(): ButtonProps {
         return {
             type: "button",
             id: "alertOK",
@@ -195,60 +204,25 @@ export class Alert extends HornetComponent<AlertProps, any> {
             label: this.getValid(),
             title: this.getValidTitle(),
             onClick: this.state.onClickOk
-        }
+        };
     }
 
-    /**
-     * Configuration du bouton ANNULER
-     * @returns {{type: string, id: string, name: string, value: string, className: string, label: (*|string|cancel), onClick: (*|defaultFunction)}}
-     */
-    private configCancelButton(): ButtonProps {
-        return {
-            type: "button",
-            id: "alertCancel",
-            name: "action:annulerMessage",
-            value: "Annuler",
-            className: "hornet-button hornet-alert-button-cancel",
-            label: this.getCancel(),
-            title: this.getCancelTitle(),
-            onClick: this.state.onClickCancel
-        }
-    }
 
     /**
      * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
-    private getValid(): string {
+    protected getValid(): string {
         return this.state.valid || this.i18n("form.valid");
     }
 
     /**
-     * Extrait le libelle cancel passé dans les propriétés du composant ou indique un libellé par défaut
-     * @returns Titre
-     * @private
-     */
-    private getCancel(): string {
-        return this.state.cancel || this.i18n("form.cancel");
-
-    }
-
-    /**
      * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
-    private getValidTitle(): string {
+    protected getValidTitle(): string {
         return this.state.validTitle || this.i18n("form.validTitle");
-    }
-
-    /**
-     * Extrait le libelle cancel passé dans les propriétés du composant ou indique un libellé par défaut
-     * @returns Titre
-     * @private
-     */
-    private getCancelTitle(): string {
-        return this.state.cancelTitle || this.i18n("form.cancelTitle");
     }
 }

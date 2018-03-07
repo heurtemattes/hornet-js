@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -173,12 +173,12 @@ export class ActionButton<P extends ActionButtonProps, S extends ActionButtonSta
                 <a href={this.props.url || "#"}
                    className={classNames(classes)}
                    title={this.props.title}
-                   aria-label={this.props.title}
                    onClick={this.props.onClick || this.onClick}
                    onKeyDown={keyDownFunction}
                    aria-haspopup={this.props.hasPopUp}
                 >
                     {img}
+                    <span className="hidden-label">{this.props.title}</span>
                     <span className="label-button-action">{this.props.label}</span>
                 </a>
                 : null

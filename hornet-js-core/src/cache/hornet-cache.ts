@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,21 +92,21 @@ const logger: Logger = Utils.getLogger("hornet-js-core.cache.hornet-cache");
  * */
 export class HornetCache {
 
-    private static _instance:HornetCache = new HornetCache();
+    protected static _instance: HornetCache = new HornetCache();
 
-    private pool:any;
+    protected pool: any;
 
     constructor() {
         if (HornetCache._instance) {
             throw new Error("Error: Instantiation failed: Use HornetCache.getInstance() instead of new.");
         }
         var ephemeral = new OnionSkin.Drivers.Ephemeral();
-        this.pool = new OnionSkin([ephemeral]);
+        this.pool = new OnionSkin([ ephemeral ]);
 
         HornetCache._instance = this;
     }
 
-    public static getInstance():HornetCache {
+    public static getInstance(): HornetCache {
         return HornetCache._instance;
     }
 
@@ -115,7 +115,7 @@ export class HornetCache {
      * @param key clé de l'item
      * @returns {any} Item comme définis dans l'API de Onion Skin
      */
-    getItem(key:string):Promise<any> {
+    getItem(key: string): Promise<any> {
         return this.pool.get(key);
     }
 
@@ -125,7 +125,7 @@ export class HornetCache {
      * @param data données à mettre en cache
      * @param timetoliveInCache temps de sauvegarde de la données
      */
-    setCacheAsynchrone(key:string, data:any, timetoliveInCache?:number):Promise<any> {
+    setCacheAsynchrone(key: string, data: any, timetoliveInCache?: number): Promise<any> {
         return this.pool.getItem(key).set(data, timetoliveInCache);
     }
 
@@ -133,7 +133,7 @@ export class HornetCache {
      * Supprime du cache de la donnée passée en paramètre. Methode Asynchrone: Promise.
      * @param key clé de la valeur en cache
      */
-    clearCacheAsynchrone(key:string):Promise<any> {
+    clearCacheAsynchrone(key: string): Promise<any> {
         return this.pool.getItem(key).clear();
     }
 }

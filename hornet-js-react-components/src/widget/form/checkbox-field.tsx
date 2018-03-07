@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,7 +106,7 @@ export interface CheckBoxFieldProps extends HornetClickableProps,
  */
 export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
-    public readonly props:Readonly<CheckBoxFieldProps>;
+    public readonly props: Readonly<CheckBoxFieldProps>;
     public state: any;
 
     static defaultProps = _.assign(AbstractField.defaultProps, {
@@ -119,7 +119,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         if (props.readOnly) {
             // permet de désactiver le click lorsqu'uniquement readOnly par défaut
-            this.copyInitialPropsToState({readOnly: true, disabled: true} as any, this.state);
+            this.copyInitialPropsToState({ readOnly: true, disabled: true } as any, this.state);
         }
 
         if (!this.props.labelOnOff) {
@@ -148,16 +148,16 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         let htmlProps = this.getHtmlProps();
         if (this.state.currentChecked != null) {
-            _.assign(htmlProps, {"defaultChecked": this.state.currentChecked});
+            _.assign(htmlProps, { "defaultChecked": this.state.currentChecked });
         }
 
-        if(this.state.readOnly && !this.state.disabled) {
+        if (this.state.readOnly && !this.state.disabled) {
             htmlProps.disabled = true;
         }
 
         let element: JSX.Element;
         if (this.state.readOnly) {
-            delete htmlProps["onChange"];
+            delete htmlProps[ "onChange" ];
         }
         if (this.state.switch) {
             element = this.renderSwitch(htmlProps);
@@ -166,9 +166,9 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
         }
 
         return (
-            <section className={cx}>
+            <div className={cx}>
                 {element}
-            </section>
+            </div>
         );
     }
 
@@ -183,7 +183,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
             <div className="switch-content">
                 <label className="switch" onKeyDown={this.handleKeyDown}>
                     <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"
-                           className="switch-input" {...htmlProps} value="true"/>
+                        className="switch-input" {...htmlProps} value="true" />
                     <span data-off={labelOff} data-on={labelOn} className="switch-label"></span>
                     <span className="switch-handle"></span>
                 </label>
@@ -205,7 +205,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
         return (
             <div className="checkbox-container">
                 <label className="checkbox-content" onKeyDown={this.handleKeyDown}>
-                    <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"  {...htmlProps} value="true"/>
+                    <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"  {...htmlProps} value="true" />
                     <span className="checkbox-material">
                         <span className={classNames(classNamesSpan)}></span>
                     </span>
@@ -218,7 +218,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      * prise en compte de la navigation clavier pour les touches entrée et espace
      * @param e
      */
-    private handleKeyDown(e) {
+    protected handleKeyDown(e) {
         if (e.keyCode == KeyCodes.ENTER) {
             this.setCurrentChecked(!this.getCurrentValue());
             e.preventDefault();

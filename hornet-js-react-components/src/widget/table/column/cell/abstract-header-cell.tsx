@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,6 +110,7 @@ export interface AbstractHeaderCellProps extends AbstractCellProps {
     sortable?: boolean;
     sortByTitle?: boolean;
     className?: string;
+    compareMethod?:(sortData:SortData, a, b) => void;
 }
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-header-cell");
@@ -148,7 +149,7 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
         logger.trace("render AbstractHeaderCell -> column:", this.props.coordinates.column, " - line:",
             this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
         return (
-            <th {...this.getDefaultThProps(-1)}>
+            <th {...this.getDefaultThProps(-1) }>
                 {this.renderCell()}
             </th>
         );
@@ -168,10 +169,10 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
 
         logger.trace("Rendu Header column Tableau");
 
-        let classes: ClassDictionary = {"datatable-header": true, "fixed": (this.props.headerFixed)};
+        let classes: ClassDictionary = { "datatable-header": true, "fixed": (this.props.headerFixed) };
 
         if (this.props.className) {
-            classes[this.props.className] = true;
+            classes[ this.props.className ] = true;
         }
 
         let ariasort: string = "none";
@@ -181,28 +182,28 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
             let isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
 
             // Gestion de la classe de l'entête th
-            classes["datatable-header-sortable-column"] = true;
+            classes[ "datatable-header-sortable-column" ] = true;
             if (isTriActifSurColonne) {
-                classes["datatable-header-sorted"] = true;
+                classes[ "datatable-header-sorted" ] = true;
 
                 if (this.props.sortData.dir == SortDirection.DESC) {
-                    classes["datatable-header-sorted-desc"] = true;
+                    classes[ "datatable-header-sorted-desc" ] = true;
                 } else {
-                    classes["datatable-header-sorted-asc"] = true;
+                    classes[ "datatable-header-sorted-asc" ] = true;
                 }
             }
 
-            classes["datatable-cell-custom"] = true;
-            classes["datatable-cell-custom-" + this.props.keyColumn] = true;
+            classes[ "datatable-cell-custom" ] = true;
+            classes[ "datatable-cell-custom-" + this.props.keyColumn ] = true;
 
             let titleObject: SortTitleInformations = this.handleSortTitle(isTriActifSurColonne, ariasort);
             ariasort = titleObject.ariasort;
             title = titleObject.title;
         }
 
-        classes[this.props.id + "-" + this.props.keyColumn] = true;
+        classes[ this.props.id + "-" + this.props.keyColumn ] = true;
 
-        classes["is_disabled"] = this.props.contentState.itemInEdition !== undefined && this.props.contentState.itemInEdition !== null;
+        classes[ "is_disabled" ] = this.props.contentState.itemInEdition !== undefined && this.props.contentState.itemInEdition !== null;
         let key = this.props.id + "-colHeader-0-" + this.props.coordinates.column;
         let tabIndex = this.getTabIndexFullKind();
 
@@ -243,7 +244,7 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
             /* Pas de tri actif : on ne doit pas valoriser l'attribut aria-sort */
         }
         let title = this.getSortByTitle(this.props.title, sortDirection);
-        return {ariasort: ariasort, title: title};
+        return { ariasort: ariasort, title: title };
     }
 
     /**
@@ -308,9 +309,9 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
      */
     public handleEditionQuit(lineIndex: number) {
         if (lineIndex) {
-            this.setState({edition: true});
+            this.setState({ edition: true });
         } else {
-            this.setState({edition: false});
+            this.setState({ edition: false });
         }
     }
 }

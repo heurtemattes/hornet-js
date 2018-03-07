@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -101,7 +101,6 @@ export class CustomStoreEngine implements multer.StorageEngine {
      * @param {HttpRequest} req la requête
      * @param {File} file le fichier à transférer
      * @param {Function} cb la callback
-     * @private
      */
     _handleFile = (req, file, cb) => {
         new ClientAntivirusConnexion().scan(file.stream)
@@ -120,7 +119,6 @@ export class CustomStoreEngine implements multer.StorageEngine {
     * @param {HttpRequest} req la requête
     * @param {File} file le fichier à transférer
     * @param {Function} cb la callback
-    * @private
     */
     _removeFile = (req, file, cb) => {
         delete file.buffer;

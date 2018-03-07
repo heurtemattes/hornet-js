@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -94,7 +94,7 @@ export class SamlConfiguration {
     /* Clé d'identification applicatif défini dans le metadata SP */
     issuer: string;
     /* separateur des profils saml */
-    profilSeparator: String;
+    profilSeparator: string;
     /* Format d'identifiant */
     identifierFormat: string;
     /* Description clé privée Service Provider */
@@ -118,6 +118,7 @@ export class SamlConfiguration {
     passReqToCallback: boolean;
     authnRequestBinding: string;
     connexionComponent: any;
+    isMetadataAccessible: boolean;
 
 
     /**
@@ -129,7 +130,7 @@ export class SamlConfiguration {
      * @param privateCert
      * @param availableIdp
      */
-    constructor(appLoginPath: string, appLogoutPath: string, hostUrlReturnTo: string, issuer: string, certSignature: string, privateCert: string, availableIdp: IdentityProviderProps[], verifyFunction?: Function) {
+    constructor(appLoginPath: string, appLogoutPath: string, hostUrlReturnTo: string, issuer: string, certSignature: string, privateCert: string, availableIdp: IdentityProviderProps[], isMetadataAccessible?: boolean, verifyFunction?: Function) {
 
         this.appLoginPath = appLoginPath;
         this.appLogoutPath = appLogoutPath;
@@ -139,6 +140,7 @@ export class SamlConfiguration {
         this.privateCert = this.decryptionPvk = privateCert;
         this.availableIdp = availableIdp;
         this.verifyFunction = verifyFunction;
+        this.isMetadataAccessible = isMetadataAccessible || false;
 
 
         this.identifierFormat = this.identifierFormat || null;
@@ -151,9 +153,7 @@ export class SamlConfiguration {
         if(Array.isArray(this.availableIdp) && this.availableIdp.length === 1) {
             this.idp = this.availableIdp[0];
         }
-
     }
-
 }
 
 /**

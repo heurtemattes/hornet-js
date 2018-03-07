@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,6 +87,7 @@ import {
     RouteInfos,
     Routes,
     LazyRoutes,
+    SubRoutes,
     LazyRoutesClassResolver,
     RouteAuthorization,
     RouteType
@@ -99,19 +100,19 @@ import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 
 const logger: Logger = Utils.getLogger("hornet-js-core.routes.router-server");
 
-type DirectorRoutesDesc = { [ key: string ]: { [ key: string ]: (...arg) => void } };
+export type DirectorRoutesDesc = { [ key: string ]: { [ key: string ]: (...arg) => void } };
 
 export class RouterServer {
-    private dataRoutes: DirectorRoutesDesc = {};
-    private pageRoutes: DirectorRoutesDesc = {};
-    private appRoutes: AbstractRoutes;
+    protected dataRoutes: DirectorRoutesDesc = {};
+    protected pageRoutes: DirectorRoutesDesc = {};
+    protected appRoutes: AbstractRoutes;
 
-    private directorData: DirectorRouter;
-    private directorPage: DirectorRouter;
+    protected directorData: DirectorRouter;
+    protected directorPage: DirectorRouter;
 
-    private lazyRoutesClassResolver: LazyRoutesClassResolver;
+    protected lazyRoutesClassResolver: LazyRoutesClassResolver;
 
-    private dataContext: String = "/services";
+    protected dataContext: String = "/services";
 
     constructor(appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesClassResolver, routesPaths: Array<string>, routesDataContext: String = "/services") {
         this.appRoutes = appRoutes;
@@ -200,16 +201,17 @@ export class RouterServer {
         };
     }
 
-    private computeRoutes(routesObj = this.appRoutes, prefix: string = ""): void {
+    protected computeRoutes(routesObj = this.appRoutes, prefix: string = ""): void {
         this.parseRoutes(routesObj.getPageRoutes(), this.pageRoutes, prefix);
         this.parseRoutes(routesObj.getDataRoutes(), this.dataRoutes, prefix);
         this.parseLazyRoutes(routesObj.getLazyRoutes(), prefix);
+        this.parseSubRoutes(routesObj.getSubRoutes(), prefix);
 
         this.computeAuthorizationsRoutes(routesObj.getPageRoutes(), routesObj.getDataRoutes(), prefix);
     }
 
 
-    private computeAuthorizationsRoutes(pageRoutes, dataRoutes, prefix: string) {
+    protected computeAuthorizationsRoutes(pageRoutes, dataRoutes, prefix: string) {
         let objPage = {}, objData = {};
         for (let key in pageRoutes) {
             objPage[ prefix + key ] = pageRoutes[ key ];
@@ -238,7 +240,7 @@ export class RouterServer {
         }
     }
 
-    private buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string) {
+    protected buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string) {
         return (...params: Array<any>) => {
             var done = params.pop();
 
@@ -252,7 +254,7 @@ export class RouterServer {
         }
     }
 
-    private parseLazyRoutes(lazyRoutes: LazyRoutes, prefix: string) {
+    protected parseLazyRoutes(lazyRoutes: LazyRoutes, prefix: string) {
         for (let lazy in lazyRoutes) {
             let lazyClass = this.lazyRoutesClassResolver(lazyRoutes[ lazy ]);
             let routesClass = LazyClassLoader.load(lazyClass);
@@ -263,5 +265,12 @@ export class RouterServer {
     protected handleRoute<T extends RouteInfos>(authorization: RouteAuthorization, handler: RouteHandler<T>, method, params: Array<string>) {
         Utils.setCls("hornet.routeAuthorization", authorization);
         Utils.setCls("hornet.routeInfos", handler.apply(null, params));
+    }
+
+    protected parseSubRoutes(subRoutes: SubRoutes, prefix: string) {
+        for (let sub in subRoutes) {
+            let routesClass = LazyClassLoader.load(subRoutes[sub]);
+            this.computeRoutes(new routesClass(), prefix + sub);
+        }
     }
 }

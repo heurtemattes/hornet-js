@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,7 @@ import { Register } from "src/common-register";
 var logger = Register.getLogger("hornet-js-utils.template");
 
 
-interface Key {
+export interface Key {
     key: string;
     index: number;
     keys: Array<string>;
@@ -94,8 +94,8 @@ interface Key {
  */
 export class Template {
 
-    private template: string;
-    private stringKey: Array<Key>;
+    protected template: string;
+    protected stringKey: Array<Key>;
 
     /**
      * @class
@@ -109,9 +109,9 @@ export class Template {
 
         while (corresp) {
             this.stringKey.push({
-                key: corresp[0],
+                key: corresp[ 0 ],
                 index: corresp.index,
-                keys: corresp[0].substring(2, corresp[0].length - 1).split(/[\.\[\]]/)
+                keys: corresp[ 0 ].substring(2, corresp[ 0 ].length - 1).split(/[\.\[\]]/)
             });
             corresp = regex.exec(this.template);
         }
@@ -127,12 +127,12 @@ export class Template {
     process(obj: any, remplaceUndef: string) {
         let returnValue = this.template;
         for (let part in this.stringKey) {
-            let partKey: Key = this.stringKey[part];
+            let partKey: Key = this.stringKey[ part ];
             let value = obj;
             for (let attr in partKey.keys) {
-                attr = partKey.keys[attr];
+                attr = partKey.keys[ attr ];
                 if (attr) {
-                    value = value[attr];
+                    value = value[ attr ];
                     if (!value) {
                         value = remplaceUndef;
                         break;

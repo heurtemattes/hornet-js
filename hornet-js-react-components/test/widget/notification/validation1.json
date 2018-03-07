@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Formulaire 1",
+  "description": "Validation des données de formulaire 1",
+  "type": "object",
+  "definitions": {
+    "noWhiteSpace": {
+      "pattern": ".*\\S.*"
+    }
+  },
+  "required": [
+    "input1",
+    "input2",
+    "input3",
+    "input4",
+    "input5"
+  ],
+  "properties": {
+    "input1": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "$ref": "#/definitions/noWhiteSpace"
+    },
+    "input2": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "$ref": "#/definitions/noWhiteSpace"
+    },
+    "input3": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "$ref": "#/definitions/noWhiteSpace"
+    },
+    "input4": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "$ref": "#/definitions/noWhiteSpace"
+    },
+    "input5": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "$ref": "#/definitions/noWhiteSpace"
+    }
+  }
+}

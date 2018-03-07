@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,7 @@ import { Session } from "src/session/session";
 
 export class Store extends events.EventEmitter {
 
-    private ready:boolean = true;
+    protected ready: boolean = true;
 
     constructor() {
         super();
@@ -95,30 +95,30 @@ export class Store extends events.EventEmitter {
         });
     }
 
-    isReady():boolean {
+    isReady(): boolean {
         return this.ready;
     }
 
-    get(sid:string, fn:Function) {
+    get(sid: string, fn: Function) {
         throw new Error("This method is abstract");
     }
 
-    set(session:Session, fn:Function) {
+    set(session: Session, fn: Function) {
         throw new Error("This method is abstract");
     }
 
-    destroy(session:Session, fn:Function) {
+    destroy(session: Session, fn: Function) {
         throw new Error("This method is abstract");
     }
 
-    touch(session:Session, fn:Function) {
+    touch(session: Session, fn: Function) {
         throw new Error("This method is abstract");
     }
 
     getName() {
         var funcNameRegex = /function (.{1,})\(/;
-        var results = (funcNameRegex).exec((<any> this).constructor.toString());
-        return (results && results.length > 1) ? results[1] : "";
+        var results = (funcNameRegex).exec((<any>this).constructor.toString());
+        return (results && results.length > 1) ? results[ 1 ] : "";
     }
 
     /**
@@ -126,7 +126,7 @@ export class Store extends events.EventEmitter {
      *
      * @returns {boolean}
      */
-    isTouchImplemented():boolean {
+    isTouchImplemented(): boolean {
         throw new Error("This method is abstract");
     }
 }

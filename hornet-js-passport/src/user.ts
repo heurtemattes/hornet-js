@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -81,55 +81,55 @@
 "use strict";
 
 export interface IUSer {
-    getName() : string;
-    setName(name : string) : void;
-    getRoles() : Array<IRole>;
-    setRoles(roles : Array<IRole>) : void;
+    getName(): string;
+    setName(name: string): void;
+    getRoles(): Array<IRole>;
+    setRoles(roles: Array<IRole>): void;
 }
 
 export interface IRole {
-    getName() : string;
-    setName(name : string) : void;
+    getName(): string;
+    setName(name: string): void;
 }
 
 export class User implements IUSer {
 
-    private name:string;
-    private roles:Array<IRole>;
+    protected name: string;
+    protected roles: Array<IRole>;
 
-    constructor (name?:string, roles?:Array<IRole>) {
+    constructor(name?: string, roles?: Array<IRole>) {
         this.name = name;
         this.roles = roles;
     }
 
-    getName():string {
+    getName(): string {
         return this.name;
     }
 
-    setName(name:string):void {
+    setName(name: string): void {
         this.name = name;
     }
 
-    getRoles() : Array<IRole> {
+    getRoles(): Array<IRole> {
         return this.roles;
     }
-    setRoles(roles : Array<IRole>) : void {
+    setRoles(roles: Array<IRole>): void {
         this.roles = roles;
     }
 }
 export class Role implements IRole {
 
-    private name:string;
+    protected name: string;
 
-    constructor (name?:string) {
+    constructor(name?: string) {
         this.name = name;
     }
 
-    getName():string {
+    getName(): string {
         return this.name;
     }
 
-    setName(name:string):void {
+    setName(name: string): void {
         this.name = name;
     }
 }

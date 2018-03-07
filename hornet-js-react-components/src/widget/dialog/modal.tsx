@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-import  { HornetComponent } from "src/widget/component/hornet-component";
+import { HornetComponent } from "src/widget/component/hornet-component";
 import { ReactAriaModal } from "src/widget/dialog/react-aria-modal";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 
@@ -91,16 +91,16 @@ import ReactNode = __React.ReactNode;
 import MouseEvent = __React.MouseEvent;
 
 export interface ModalProps extends HornetComponentProps {
-    onClickClose ?: __React.MouseEventHandler<HTMLInputElement>;
+    onClickClose?: __React.MouseEventHandler<HTMLInputElement>;
     isVisible?: boolean;
     title?: string;
-    hideTitleBar ?: boolean;
+    hideTitleBar?: boolean;
     hideCloseBar?: boolean;
-    closeLabel ?: string;
-    closeSymbole ?: string;
-    className ?: string;
-    underlayClass ?: string;
-    initialFocus ?: string;
+    closeLabel?: string;
+    closeSymbole?: string;
+    className?: string;
+    underlayClass?: string;
+    initialFocus?: string;
     alert?: boolean;
     underlayClickExits?: boolean;
     escapeKeyExits?: boolean;
@@ -132,32 +132,34 @@ export class Modal extends HornetComponent<ModalProps, any> {
     }
 
     setTitle(title: string, cb?) {
-        this.setState({title: title}, cb);
+        this.setState({ title: title }, cb);
         return this;
     }
 
     setCloseLabel(closeLabel: string, cb?) {
-        this.setState({closeLabel: closeLabel}, cb);
+        this.setState({ closeLabel: closeLabel }, cb);
         return this;
     }
 
     setCloseSymbole(closeSymbole: string, cb?) {
-        this.setState({closeSymbole: closeSymbole}, cb);
+        this.setState({ closeSymbole: closeSymbole }, cb);
         return this;
     }
 
     setChildren(children: ReactNode, cb?) {
-        this.setState({children: children}, cb);
+        this.setState({ children: children }, cb);
         return this;
     }
 
     open(cb?) {
-        this.setState({isVisible: true}, cb);
+        this.setState({ isVisible: true }, cb);
+        document.addEventListener("keydown", this.handleKeyDown, false);
         return this;
     }
 
     close(cb?) {
-        this.setState({isVisible: false}, cb);
+        this.setState({ isVisible: false }, cb);
+        document.removeEventListener("keydown", this.handleKeyDown, false);
         return this;
     }
 
@@ -165,7 +167,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
      * Gestion par défaut du clic sur le bouton de fermeture
      * @param event
      */
-    private onClickClose(event: MouseEvent<HTMLInputElement>): void {
+    protected onClickClose(event: MouseEvent<HTMLInputElement>): void {
         this.close();
     }
 
@@ -173,7 +175,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
      * Gestion par défaut du clic sur echap
      * @param event
      */
-    private handleKeyDown(event: KeyboardEvent): void {
+    protected handleKeyDown(event: KeyboardEvent): void {
         if (event.keyCode == KeyCodes.ESCAPE) {
             if (this.state.onClickClose) {
                 this.state.onClickClose(event);
@@ -187,7 +189,6 @@ export class Modal extends HornetComponent<ModalProps, any> {
      * @inheritDoc
      */
     componentDidMount() {
-        document.addEventListener("keydown", this.handleKeyDown, false);
     }
 
     /**
@@ -213,15 +214,15 @@ export class Modal extends HornetComponent<ModalProps, any> {
         let closeBarRender = null;
 
         let titleClasses: ClassDictionary = {};
-        titleClasses["widget-dialogue-title"] = true;
-        titleClasses["react-draggable-cursor"] = this.state.isDraggable;
+        titleClasses[ "widget-dialogue-title" ] = true;
+        titleClasses[ "react-draggable-cursor" ] = this.state.isDraggable;
 
         let titleClassName = classNames(titleClasses);
 
         if (!this.state.hideTitleBar) {
             titleBarRender = (
                 <div className="widget-dialogue-header">
-                    <div className={titleClassName}>{title}</div>
+                    <div className={titleClassName} id="dialogue-title" aria-describedby="dialogue-body-content">{title}</div>
                 </div>);
         }
 
@@ -229,9 +230,9 @@ export class Modal extends HornetComponent<ModalProps, any> {
             closeBarRender = (
                 <div className="widget-dialogue-close">
                     <button type="button" className="hornet-button hornet-dialogue-croix"
-                            onClick={this.state.onClickClose || this.onClickClose}
-                            title={closeLabel}
-                            aria-label={closeLabel}
+                        onClick={this.state.onClickClose || this.onClickClose}
+                        title={closeLabel}
+                        aria-label={closeLabel}
                     >{closeSymbole}
                     </button>
                 </div>);
@@ -264,7 +265,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
                     id={this.state.dialogId}
                 >
                     {titleBarRender}
-                    <div className={classNames(bodyClasses)}>
+                    <div id="dialogue-body-content" className={classNames(bodyClasses)} >
                         {this.state.children}
                     </div>
                     {closeBarRender}
@@ -277,27 +278,27 @@ export class Modal extends HornetComponent<ModalProps, any> {
     /**
      * Extrait le titre passé dans les propriétés du composant ou indique un titre par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
-    private getTitle() {
+    protected getTitle() {
         return this.state.title || this.i18n("dialog.title");
     }
 
     /**
      * Extrait le label de fermeture passé dans les propriétés du composant ou indique un label par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
-    private getCloseLabel() {
+    protected getCloseLabel() {
         return this.state.closeLabel || this.i18n("dialog.closeLabel");
     }
 
     /**
      * Extrait le symbole de fermeture dans les propriétés du composant ou indique un symbole par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
-    private getCloseSymbole() {
+    protected getCloseSymbole() {
         return this.state.closeSymbole || this.i18n("dialog.closeSymbole");
     }
 }

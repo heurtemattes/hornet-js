@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,8 +92,8 @@ import { BaseError } from "src/exception/base-error";
  *            selon le client ou le serveur, c'est pour cette raison quelle doit être injectée
  */
 export class Logger {
-    private category: any;
-    private log4jsLogger: any;
+    protected category: any;
+    protected log4jsLogger: any;
 
     constructor(category: any) {
         if (!(this instanceof Logger)) {
@@ -163,7 +163,7 @@ export class Logger {
         let functionName: string = "";
         if (typeof notTyppedError.captureStackTrace === "function") {
             // Chrome/Node
-            notTyppedError.prepareStackTrace = function(_, stack) {
+            notTyppedError.prepareStackTrace = function (_, stack) {
                 return stack;
             };
             err = new notTyppedError();
@@ -174,13 +174,13 @@ export class Logger {
                 // Remonter la stack jusqu'a la fonction appellante du logger
 
                 // D'abord, on cherche le premier appel au logger dans la stack (en partant du haut)
-                let lastLoggerStackIndex: number = _.findLastIndex(err.stack, function(o: any) {
+                let lastLoggerStackIndex: number = _.findLastIndex(err.stack, function (o: any) {
                     return o.getTypeName && o.getTypeName() === "Logger";
                 });
                 // si on a trouvé l'appel au logger dans la stack :
                 if (lastLoggerStackIndex > 0 && err.stack.length > lastLoggerStackIndex + 1) {
                     // on remonte d'un cran pour avoir le nom de la fonction appelante
-                    let hornetCall: any = err.stack[lastLoggerStackIndex + 1];
+                    let hornetCall: any = err.stack[ lastLoggerStackIndex + 1 ];
                     functionName = hornetCall.getFunctionName();
                     // parfois, le nom de la fonction est vide (cas des fonctions déclarées dynamiquement)
                     if (!functionName) {
@@ -193,7 +193,7 @@ export class Logger {
                         .concat(":").concat(hornetCall.getColumnNumber());
                 } else if (err.stack.length >= callStackSize) {
                     // traitement par défaut : on va chercher dans la pile avec l'index fourni en paramètre (callStackSize)
-                    functionName = err.stack[callStackSize - 1].getFunctionName();
+                    functionName = err.stack[ callStackSize - 1 ].getFunctionName();
                 }
             }
             notTyppedError.prepareStackTrace = orig;
@@ -203,7 +203,7 @@ export class Logger {
             if (e) {
                 let callstack = e.split("\n");
                 if (callstack.length > callStackSize) {
-                    functionName = callstack[callStackSize];
+                    functionName = callstack[ callStackSize ];
                 }
             }
         }
@@ -226,17 +226,6 @@ export class Logger {
         this.logInternal.call(this, level, args);
     }
 
-
-    /**
-     * Appelle la fonction de log de manière asynchrone
-     *
-     * @param niveau de log
-     * @param logArguments: Un tableau des objets (string, error ou object) à logguer
-     */
-    // private logInternalAsync(level:string, logArguments:IArguments) {
-    //    setTimeout(this.logInternal.bind(this), 0, level, logArguments);
-    // }
-
     /**
      * Appelle la fonction de journalisation du logger en ajoutant le nom de la fonction appelant et si
      * disponible l'id de traitement
@@ -244,7 +233,7 @@ export class Logger {
      * @param niveau de log
      * @param logArguments: Un tableau des objets (string, error ou object) à logguer
      */
-    private logInternal(level: string, logArguments: IArguments) {
+    protected logInternal(level: string, logArguments: IArguments) {
 
         if (!this.log4jsLogger) {
             this.buildLogger(this.category);
@@ -311,17 +300,17 @@ export class Logger {
      * @param args
      * @returns {{}}
      */
-    private searchStack(args) {
+    protected searchStack(args) {
         let stack = {};
         if (args) {
-            Object.keys(args).map(function(key) {
-                stack = args[key] && args[key].error && args[key].error.stack || args[key] && args[key].stack || null;
+            Object.keys(args).map(function (key) {
+                stack = args[ key ] && args[ key ].error && args[ key ].error.stack || args[ key ] && args[ key ].stack || null;
             });
         }
         return stack;
     }
 
-    private mappingObjectToString(arg: any) {
+    protected mappingObjectToString(arg: any) {
         if (_.isString(arg)) {
             return arg;
 
@@ -346,19 +335,19 @@ export class Logger {
             let errors = arg.getErrors();
             let errStr: string = "\n";
             for (let i = 0; i < errors.length; i++) {
-                errStr += ("Erreur #" + (i + 1) + " [" + errors[i].code + "] :\n" + errors[i].toString());
+                errStr += ("Erreur #" + (i + 1) + " [" + errors[ i ].code + "] :\n" + errors[ i ].toString());
 
                 let infoSupp;
                 try {
-                    infoSupp = JSON.stringify(errors[i]);
+                    infoSupp = JSON.stringify(errors[ i ]);
                 }
                 catch (err) {
                     infoSupp = "<stringifyErr>";
                 }
 
-                let stacks = errors[i].backend ? "" : errors[i].stack;
-                if (errors[i].cause()) {
-                    stacks = stacks + "\nCaused by:\n" + this.mappingObjectToString(errors[i].cause());
+                let stacks = errors[ i ].backend ? "" : errors[ i ].stack;
+                if (errors[ i ].cause()) {
+                    stacks = stacks + "\nCaused by:\n" + this.mappingObjectToString(errors[ i ].cause());
                 }
                 errStr += "\nInformations supplémentaires :\n" + infoSupp + "\n" + stacks + "\n";
             }
@@ -410,7 +399,7 @@ export class Logger {
         } else {
             try {
                 // return JSON.stringify(arg);
-                return JSON.stringify(arg, function(key, value) {
+                return JSON.stringify(arg, function (key, value) {
                     if (_.isFunction(value)) {
                         return "[Function" + (value.name ? ": " + value.name : "") + "]";
                     } else if (value instanceof RegExp) {

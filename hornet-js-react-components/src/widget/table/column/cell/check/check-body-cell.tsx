@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,7 +95,7 @@ export interface CheckBodyCellProps extends AbstractBodyCellProps {
 
 export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBodyCell<P, any> {
 
-    private checkBoxBodyRef;
+    protected checkBoxBodyRef;
 
     constructor(props: P, context?: any) {
         super(props, context);
@@ -107,8 +107,9 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
      * @inheritDoc
      */
     shouldComponentUpdate(nextProps: CheckBodyCellProps, nextState: any) {
-        super.shouldComponentUpdate(nextProps, nextState);
-        return (true);
+        return super.shouldComponentUpdate(nextProps, nextState)
+            || nextState.isSelected != this.state.isSelected
+            || nextState.isEditing != this.state.isEditing
     }
 
     /**
@@ -133,6 +134,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
                 this.checkBoxBodyRef = instance;
             },
             onChange: this.handleToggleCheckBox,
+            key: this.props.keyColumn + "-" + this.state.isSelected,
             checked: this.state.isSelected,
             name: "selectedItems-" + this.props.keyColumn,
             tabIndex: -1,
@@ -141,7 +143,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
         };
 
         return (
-            <CheckBox {...checkBoxProps}/>
+            <CheckBox {...checkBoxProps} />
         );
     }
 
@@ -179,7 +181,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
         if (tableCellRef instanceof HTMLInputElement) {
             (tableCellRef as HTMLElement).tabIndex = -1;
         } else if (tableCellRef.children) {
-            this.blurActions(tableCellRef.children[0]);
+            this.blurActions(tableCellRef.children[ 0 ]);
         }
     }
 
@@ -192,7 +194,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
                 (tableCellRef as HTMLElement).focus();
                 (tableCellRef as HTMLElement).tabIndex = 0;
             } else if (tableCellRef.children) {
-                this.handleCellFocus(tableCellRef.children[0]);
+                this.handleCellFocus(tableCellRef.children[ 0 ]);
             }
         }
 
@@ -206,9 +208,9 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
         logger.trace("checkbodycell => handlChange", this.props.cellCoordinate);
         if (this.checkBoxBodyRef) {
             if (ArrayUtils.getIndexById(selectedItems, this.props.value) !== -1) {
-                this.setState({isSelected: true});
+                this.setState({ isSelected: true });
             } else {
-                this.setState({isSelected: false});
+                this.setState({ isSelected: false });
             }
         }
     };

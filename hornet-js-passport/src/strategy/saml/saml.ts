@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -594,7 +594,7 @@ export class Saml {
             if (this.options.certSignature && !validSignature && !this.validateSignature(xml, assertions[0], this.options.certChiff)) {
                 logger.error("Signature invalide");
             }
-            return this.processValidlySignedAssertion(assertions[0].toString(), callback);
+            return this.processValidlySignedAssertion(assertions[0].toString(), callback, container.SAMLResponse);
         }
 
         if (encryptedAssertions.length == 1) {
@@ -617,7 +617,7 @@ export class Saml {
                     if (this.options.certSignature && !validSignature && !this.validateSignature(decryptedXml, decryptedAssertions[0], this.options.certSignature))
                         logger.error("Signature invalide");
 
-                    this.processValidlySignedAssertion(decryptedAssertions[0].toString(), callback);
+                    this.processValidlySignedAssertion(decryptedAssertions[0].toString(), callback, container.SAMLResponse);
                 });
         }
 
@@ -735,7 +735,7 @@ export class Saml {
      * @param xml
      * @param callback
      */
-    protected processValidlySignedAssertion(xml: string, callback) {
+    protected processValidlySignedAssertion(xml: string, callback, SAMLResponse) {
         let msg;
         let parserConfig = {
             explicitRoot: true,
@@ -848,7 +848,7 @@ export class Saml {
                 return xml;
             };
 
-            callback(null, profile, false);
+            callback(null, profile, false, SAMLResponse);
         })
             .catch((err) => callback(err))
     }

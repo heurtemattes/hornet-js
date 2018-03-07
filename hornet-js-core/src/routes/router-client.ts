@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,6 +87,7 @@ import {
     RouteHandler,
     RouteInfos,
     Routes,
+    SubRoutes,
     LazyRoutes,
     LazyRoutesAsyncClassResolver,
     RouteAuthorization
@@ -112,18 +113,18 @@ declare global {
     }
 }
 
-export type DirectorClientRoutesDesc = {[key: string]: (...arg) => void};
+export type DirectorClientRoutesDesc = { [ key: string ]: (...arg) => void };
 
 export class RouterClient {
-    private appComponent;
-    private errorComponent;
-    private pageRoutes: DirectorClientRoutesDesc = {};
-    private appRoutes: AbstractRoutes;
+    protected appComponent;
+    protected errorComponent;
+    protected pageRoutes: DirectorClientRoutesDesc = {};
+    protected appRoutes: AbstractRoutes;
 
-    private directorPage: DirectorRouter;
+    protected directorPage: DirectorRouter;
 
-    private directorClientConfiguration: DirectorRouterConfiguration;
-    private lazyRoutesClassResolver: LazyRoutesAsyncClassResolver;
+    protected directorClientConfiguration: DirectorRouterConfiguration;
+    protected lazyRoutesClassResolver: LazyRoutesAsyncClassResolver;
 
     constructor(appComponent, errorComponent, appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesAsyncClassResolver, directorClientConfiguration?: DirectorRouterConfiguration) {
         this.appComponent = appComponent;
@@ -135,47 +136,48 @@ export class RouterClient {
         this.computeRoutes();
 
         logger.trace("routes chargées (PAGE) :", this.pageRoutes);
-        this.directorPage = new Router(this.pageRoutes).configure({recurse: false, async: true});
+        this.directorPage = new Router(this.pageRoutes).configure({ recurse: false, async: true });
     }
 
-    private computeRoutes(routesObj = this.appRoutes, prefix: string = Utils.getContextPath(), directorRoutes = this.pageRoutes): void {
+    protected computeRoutes(routesObj = this.appRoutes, prefix: string = Utils.getContextPath(), directorRoutes = this.pageRoutes): void {
         this.parseRoutes(routesObj.getPageRoutes(), directorRoutes, prefix);
+        this.parseSubRoutes(routesObj.getSubRoutes(), directorRoutes, prefix);
 
         var lazyRoutes = routesObj.getLazyRoutes();
         for (let lazy in lazyRoutes) {
-            this.parseLazyRoute(this.pageRoutes, prefix + lazy, lazyRoutes[lazy]);
+            this.parseLazyRoute(this.pageRoutes, prefix + lazy, lazyRoutes[ lazy ]);
         }
     }
 
-    private parseRoutes<T extends RouteInfos>(declaredRoutes: Routes<T>, internalObj: DirectorClientRoutesDesc, prefix: string) {
+    protected parseRoutes<T extends RouteInfos>(declaredRoutes: Routes<T>, internalObj: DirectorClientRoutesDesc, prefix: string) {
         for (var path in declaredRoutes) {
-            for (var method in declaredRoutes[path]) {
+            for (var method in declaredRoutes[ path ]) {
                 var uri = prefix + path;
 
-                if (internalObj[uri]) {
+                if (internalObj[ uri ]) {
                     throw new Error("Route duppliquée : ('" + uri + "' <" + method + ">)");
                 }
 
-                internalObj[uri] = this.buildRouteHandler(declaredRoutes, path, method);
+                internalObj[ uri ] = this.buildRouteHandler(declaredRoutes, path, method);
             }
         }
     }
 
-    private buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string) {
+    protected buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string) {
         return (...params: Array<any>) => {
             var done = params.pop();
-            this.handleRoute(done, declaredRoutes[path][method].authorization, declaredRoutes[path][method].handler, params);
+            this.handleRoute(done, declaredRoutes[ path ][ method ].authorization, declaredRoutes[ path ][ method ].handler, params);
             done();
         }
     }
 
-    private parseLazyRoute(internalObj: DirectorClientRoutesDesc, prefix: string, routesClassPath: string) {
+    protected parseLazyRoute(internalObj: DirectorClientRoutesDesc, prefix: string, routesClassPath: string) {
         var regPrefix = prefix + "/?((\w|.)*)";
-        if (internalObj[regPrefix]) {
+        if (internalObj[ regPrefix ]) {
             throw new Error("Route duppliquée : ('" + regPrefix + "' <" + "get" + ">)");
         }
 
-        internalObj[regPrefix] = (...params: Array<any>) => {
+        internalObj[ regPrefix ] = (...params: Array<any>) => {
             var done = params.pop();
 
             try {
@@ -193,7 +195,7 @@ export class RouterClient {
         }
     }
 
-    private loadLazyRoutes(originalRoute: string, prefix: string, routesClassPath: string, done) {
+    protected loadLazyRoutes(originalRoute: string, prefix: string, routesClassPath: string, done) {
         this.lazyRoutesClassResolver(routesClassPath, (lazyClass: Class<AbstractRoutes>) => {
             let newRoutes: DirectorClientRoutesDesc = {};
             let routesClass = LazyClassLoader.load(lazyClass);
@@ -230,6 +232,14 @@ export class RouterClient {
                 }
             }, 200);
         });
+    }
+
+
+    protected parseSubRoutes(subRoutes: SubRoutes, internalObj: DirectorClientRoutesDesc, prefix: string) {
+        for (let sub in subRoutes) {
+            let routesClass = LazyClassLoader.load(subRoutes[sub]);
+            this.computeRoutes(new routesClass(), prefix + sub, internalObj);
+        }
     }
 
     protected handleRoute<T extends RouteInfos>(done, authorization: RouteAuthorization, handler: RouteHandler<T>, params: Array<string>) {
@@ -284,7 +294,7 @@ export class RouterClient {
                     //TODO: Gérer les exports
 
                     // Gestion des ancres
-                    if (link.indexOf('#') === 0)return;//startsWith('#')
+                    if (link.indexOf('#') === 0) return;//startsWith('#')
                     var dataset = el && el.getAttribute('data-pass-thru');
                     if (dataset !== 'true') {
                         this.directorPage.setRoute(link);
@@ -302,12 +312,12 @@ export class RouterClient {
             strict: false,
             convert_hash_in_init: false,
             recurse: false,
-            notfound: function() {
+            notfound: function () {
                 alert("Erreur. Cette route n'existe pas: '" + this.path + "'");
             }
         }, this.directorClientConfiguration, {
-            async: true // on force l'async à true
-        }));
+                async: true // on force l'async à true
+            }));
 
         /**
          * Démarrage du routeur
@@ -358,10 +368,10 @@ export class RouterClient {
 
         var a = url.split('&');
         for (var i = 0; i < a.length; ++i) {
-            var p = a[i].split('=');
+            var p = a[ i ].split('=');
             if (p.length != 2)
                 continue;
-            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            b[ p[ 0 ] ] = decodeURIComponent(p[ 1 ].replace(/\+/g, " "));
         }
         return b;
     }
@@ -384,7 +394,7 @@ export class RouterClient {
     static setHornetJsGenerationServer(): void {
         if (window.localStorage) {
             if (!window.setHornetJsGenerationServer) {
-                window.setHornetJsGenerationServer = function(enableValue: string) {
+                window.setHornetJsGenerationServer = function (enableValue: string) {
                     var enableGenerationServer: string = (!enableValue || enableValue === "null" || enableValue === "undefined") ? RouterClient.defaultGenerationServerEnabled : enableValue;
                     logger.trace("New value for setHornetJsGenerationServer :", enableValue, ". Reload page (F5) to activate");
                     window.localStorage.setItem(RouterClient.LOCAL_STORAGE_ENABLE_GENERATION_SERVER_KEY, enableGenerationServer);

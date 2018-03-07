@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -126,25 +126,10 @@ export class ServerLog {
      * @returns {function(any): undefined}
      */
     static getLoggerBuilder(logConfig) {
-        logConfig.appenders.forEach((appender) => {
-                appender.layout.tokens = ServerLog.appenderLayoutTokens;
-
-                // creation du repertoire de log si non existant
-                if (appender.filename && path.dirname(appender.filename)) {
-                    if (appender.createDir) {
-                        let dirLogs = path.dirname(appender.filename);
-                        let dirToCreate = [];
-                        while (!fs.existsSync(dirLogs)) {
-                            dirToCreate.unshift(dirLogs);
-                            dirLogs = path.dirname(dirLogs);
-                        }
-
-                        dirToCreate.forEach(dir => {
-                            fs.mkdirSync(dir);
-                        });
-                    } else if (!fs.existsSync(path.dirname(appender.filename))) {
-                        throw new Error("You must specify a existing directory filename, " + path.dirname(appender.filename));
-                    }
+        Object.keys(logConfig.appenders).forEach((keyAppender) => {
+                let appender = logConfig.appenders[keyAppender];
+                if(appender.layout){
+                    appender.layout.tokens = ServerLog.appenderLayoutTokens;
                 }
             }
         );

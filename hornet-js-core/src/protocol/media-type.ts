@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -154,9 +154,9 @@ export class MediaTypes {
     // Attention à ne pas déclarer le DEFAUT avant sa valeur
     static DEFAULT = MediaTypes.JSON;
 
-    private static _fromShortValue(parameter: string): MediaType {
+    protected static _fromShortValue(parameter: string): MediaType {
         let mediaType: MediaType = null;
-        _.forOwn(MediaTypes, function(value) {
+        _.forOwn(MediaTypes, function (value) {
             if (value && value.SHORT && value.SHORT === parameter) {
                 mediaType = value;
                 return false;
@@ -165,9 +165,9 @@ export class MediaTypes {
         return mediaType;
     }
 
-    private static _fromMime(mimeType: string): MediaType {
+    protected static _fromMime(mimeType: string): MediaType {
         let mediaType: MediaType = null;
-        _.forOwn(MediaTypes, function(value) {
+        _.forOwn(MediaTypes, function (value) {
             if (value && value.MIME && value.MIME === mimeType) {
                 mediaType = value;
                 return false;

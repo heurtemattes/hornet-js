@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -128,8 +128,9 @@ export class ClientLog {
         if (logConfig && Object.keys(logConfig).length) {
             ClientLog.defaultRemote = ClientLog.getLoggerKeyValue("LOG remote", logConfig.remote, ClientLog.defaultRemote);
             ClientLog.defaultLogLevel = ClientLog.getLoggerKeyValue("LOG level", logConfig.level, ClientLog.defaultLogLevel);
-            if (logConfig.appenders && logConfig.appenders.length) {
-                logConfig.appenders.forEach((appender) => {
+            if (logConfig.appenders && Object.keys(logConfig.appenders).length) {
+                Object.keys(logConfig.appenders).forEach((keyAppender) => {
+                    let appender = logConfig.appenders[ keyAppender ];
                     if (appender.type === "BrowserConsole") {
                         appenders.push(ClientLog.configureBrowserConsole(appender));
                     } else if (appender.type === "Ajax") {
@@ -168,7 +169,7 @@ export class ClientLog {
         };
     }
 
-    private static configureAjaxConsole(appender) {
+    protected static configureAjaxConsole(appender) {
         if (appender.layout) {
             if (appender.layout.type === "pattern" && appender.layout.pattern) {
                 ClientLog.defaultRemoteLogLayout = ClientLog.getLoggerKeyValue(
@@ -205,7 +206,7 @@ export class ClientLog {
         return ajaxAppender;
     }
 
-    private static configureBrowserConsole(appender) {
+    protected static configureBrowserConsole(appender) {
         if (appender.layout) {
             if (appender.layout.type === "pattern" && appender.layout.pattern) {
                 ClientLog.defaultLogLayout = ClientLog.getLoggerKeyValue(

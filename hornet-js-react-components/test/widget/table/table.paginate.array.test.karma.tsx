@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -164,8 +164,8 @@ class tableTest extends BaseTest {
         table = this.renderIntoDocument(tableElement, "main2");
         dataSource.on("pagination", (value) => {
             expect(value.list.length).to.equal(9);
-            expect(value.list[0].id).to.equal(41);
-            expect(document.querySelector('#main2 .datatable-data #lite-0-colBody-0-1').innerHTML, value.list[0].label);
+            expect(value.list[ 0 ].id).to.equal(41);
+            expect(document.querySelector('#main2 .datatable-data #lite-0-colBody-0-1').innerHTML, value.list[ 0 ].label);
             this.end();
         });
         this.triggerMouseEvent(document.querySelector('#main2 .datatable-pagination-button-lastpage'), "click");
@@ -176,12 +176,12 @@ class tableTest extends BaseTest {
     @Decorators.it('supprimer la selection')
     deleteSelectedItem() {
         table = this.renderIntoDocument(tableElement, "main3");
-        dataSource.on("delete", ()=>{
-            expect(dataSource.selected.length).to.equal(0);
+        dataSource.on("delete", () => {
+            expect(dataSource.selected === undefined).to.true;
             this.end();
         })
-        dataSource.on("select", (value)=>{
-            if (value.length>0) dataSource.deleteAll();
+        dataSource.on("select", (value) => {
+            if (value.length > 0) dataSource.deleteAll();
 
         });
         this.triggerMouseEvent(document.querySelector('#main3 .datatable-data #lite-0-colBody-0-0 input'), "click");
@@ -191,8 +191,8 @@ class tableTest extends BaseTest {
     @Decorators.it('test d\'un appel de pagination programmatiquement')
     goToPageCall() {
         table = this.renderIntoDocument(tableElement, "main4");
-        dataSource.on("pagination", (value)=>{
-            expect(document.querySelector('#main4 .datatable-pagination-input')["value"]).to.equal("2");
+        dataSource.on("pagination", (value) => {
+            expect(document.querySelector('#main4 .datatable-pagination-input')[ "value" ]).to.equal("2");
             this.end();
         })
         dataSource.goToPage(2);

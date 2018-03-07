@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,7 @@ import { Class } from "hornet-js-utils/src/typescript-utils";
 import { ServerConfiguration } from "src/server-conf";
 import ErrorObject = ajv.ErrorObject;
 
-const isEnvProduction: boolean = (process.env["NODE_ENV"] === "production");
+const isEnvProduction: boolean = (process.env[ "NODE_ENV" ] === "production");
 
 function isSecurityEnabled(envProduction: boolean, logger): boolean {
     let enabled: boolean = false;
@@ -124,8 +124,8 @@ function checkSecurityConfiguration(key: string, enabledKey: boolean, middleware
 
 function sanitizeErrorThrownInDomain(error) {
     if (error) {
-        delete error["error@context"];
-        delete error["domain"];
+        delete error[ "error@context" ];
+        delete error[ "domain" ];
     }
 }
 
@@ -154,16 +154,19 @@ export class AbstractHornetMiddleware {
     static APP_CONFIG: ServerConfiguration;
     protected prefix: string;
     protected middlewareFunction: ErrorRequestHandler | RequestHandler;
+    protected config: ServerConfiguration;
 
     /**
      * Constructeur
      *
      * @param middlewareFunction
      * @param prefix
+     * @param config server configuration
      */
-    constructor(middlewareFunction?: ErrorRequestHandler | RequestHandler, prefix?: string) {
+    constructor(middlewareFunction?: ErrorRequestHandler | RequestHandler, prefix?: string, config?: ServerConfiguration) {
         this.prefix = prefix;
         this.middlewareFunction = middlewareFunction;
+        this.config = config;
     }
 
     /**
@@ -176,6 +179,17 @@ export class AbstractHornetMiddleware {
             app.use(this.prefix, this.middlewareFunction);
         } else {
             app.use(this.middlewareFunction);
+        }
+    }
+}
+
+export class AbstractHornetSubMiddleware extends AbstractHornetMiddleware {
+
+    public insertRouterMiddleware(router: express.Router){
+        if (this.prefix !== null && this.prefix !== undefined) {
+            router.use(this.prefix, this.middlewareFunction as any);
+        } else {
+            router.use(this.middlewareFunction as any);
         }
     }
 }
@@ -211,6 +225,19 @@ export class HornetContextInitializerMiddleware extends AbstractHornetMiddleware
     }
 }
 
+export class HornetContextInitializerSubMiddleware extends AbstractHornetSubMiddleware {
+    constructor(config: ServerConfiguration, prefix) {
+        let dataPathPrefix: string = Utils.buildContextPath("/" + prefix + (config || AbstractHornetMiddleware.APP_CONFIG).routesDataContext);
+        super((req, res, next) => {
+            
+            Utils.setCls("hornet.routeType",
+            parseUrl.original(req).pathname.indexOf(dataPathPrefix) === 0 ? RouteType.DATA : RouteType.PAGE);
+            next();
+        }, null, config);
+    }
+
+}
+
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      LoggerTIDMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
@@ -229,7 +256,7 @@ export class LoggerTIDMiddleware extends AbstractHornetMiddleware {
 //                                      LoggerUserMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class LoggerUserMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.LoggerUserMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.LoggerUserMiddleware");
 
     constructor() {
         super((req, res, next) => {
@@ -245,7 +272,7 @@ export class LoggerUserMiddleware extends AbstractHornetMiddleware {
 const parseUrl = require("parseurl");
 
 export class WelcomePageRedirectMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.WelcomePageRedirectMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.WelcomePageRedirectMiddleware");
 
     constructor() {
         let contextPath = Utils.buildContextPath("/").replace(/(^.*)([^\/]+)\/+$/g, "$1$2");
@@ -283,7 +310,7 @@ export class WithoutSlashPageRedirectMiddleware extends AbstractHornetMiddleware
 //                                      StaticNodeHttpHeaderMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class StaticNodeHttpHeaderMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticNodeHttpHeaderMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticNodeHttpHeaderMiddleware");
 
     constructor() {
         let staticUrl = Utils.buildStaticPath("/").replace(Utils.getContextPath(), "");
@@ -301,7 +328,7 @@ export class StaticNodeHttpHeaderMiddleware extends AbstractHornetMiddleware {
 import * as express from "express";
 
 export class StaticPathMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticPathMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticPathMiddleware");
 
     constructor() {
         let appConfig = AbstractHornetMiddleware.APP_CONFIG;
@@ -311,7 +338,7 @@ export class StaticPathMiddleware extends AbstractHornetMiddleware {
 
         StaticPathMiddleware.logger.trace("Emplacement des ressources statiques '" + staticUrl + "' :", staticPath);
 
-        super(express.static(staticPath, (<any>{fallthrough: false})), staticUrl);
+        super(express.static(staticPath, (<any>{ fallthrough: false })), staticUrl);
     }
 }
 
@@ -319,7 +346,7 @@ export class StaticPathMiddleware extends AbstractHornetMiddleware {
 //                                      StaticPathErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class StaticPathErrorMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticPathErrorMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticPathErrorMiddleware");
 
     constructor() {
 
@@ -339,7 +366,7 @@ import * as bodyParser from "body-parser";
 
 export class BodyParserJsonMiddleware extends AbstractHornetMiddleware {
     constructor() {
-        super(bodyParser.json({limit: Utils.config.getOrDefault("server.bodyParserLimit", "50mb")}));
+        super(bodyParser.json({ limit: Utils.config.getOrDefault("server.bodyParserLimit", "50mb") }));
     }
 }
 
@@ -410,7 +437,7 @@ import hpp = require("hpp");
 const helmet = require("helmet");
 
 export class SecurityMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SecurityMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SecurityMiddleware");
 
     public insertMiddleware(app) {
         if (isSecurityEnabled(isEnvProduction, SecurityMiddleware.logger)) {
@@ -429,54 +456,54 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
         }
     }
 
-    private hppConfiguration(app) {
+    protected hppConfiguration(app) {
         // Suppression des doublons de paramètres GET
         if (checkSecurityConfiguration("security.hpp", false,
-                "HPP 'HTTP Parameter Pollution'", SecurityMiddleware.logger)) {
+            "HPP 'HTTP Parameter Pollution'", SecurityMiddleware.logger)) {
             app.use(hpp());
         }
     }
 
-    private ieNoOpenConfiguration(app) {
+    protected ieNoOpenConfiguration(app) {
 
         if (checkSecurityConfiguration("security.ieNoOpen", false,
-                "ienoopen 'IE, restrict untrusted HTML: ieNoOpen'", SecurityMiddleware.logger)) {
+            "ienoopen 'IE, restrict untrusted HTML: ieNoOpen'", SecurityMiddleware.logger)) {
             // Pour IE8+: ajout le header X-Download-Options
             app.use(helmet.ieNoOpen());
         }
     }
 
-    private noSniffConfiguration(app) {
+    protected noSniffConfiguration(app) {
 
         if (checkSecurityConfiguration("security.noSniff", false,
-                "noSniff 'Don't infer the MIME type: noSniff'", SecurityMiddleware.logger)) {
+            "noSniff 'Don't infer the MIME type: noSniff'", SecurityMiddleware.logger)) {
             // Pour IE8+: ajout le header X-Download-Options
             app.use(helmet.noSniff());
         }
     }
 
-    private cspConfiguration(app) {
+    protected cspConfiguration(app) {
         // Ajout des headers "content security" pour empêcher le chargement de scripts venant d'autres domaines
         if (checkSecurityConfiguration("security.csp", true, "CSP 'Content Security Policy'", SecurityMiddleware.logger)) {
             let directives: any = {
                 // defaultSrc: Utils.config.getOrDefault("security.csp.defaultSrc", ["'self'", "'unsafe-inline'", "'unsafe-eval'"]),
-                baseUri: Utils.config.getOrDefault("security.csp.baseUri", ["'self'"]),
-                childSrc: Utils.config.getOrDefault("security.csp.childSrc", ["'self'"]),
-                connectSrc: Utils.config.getOrDefault("security.csp.connectSrc", ["'self'"]),
-                fontSrc: Utils.config.getOrDefault("security.csp.fontSrc", ["'self'"]),
-                formAction: Utils.config.getOrDefault("security.csp.formAction", ["'self'"]),
-                frameAncestors: Utils.config.getOrDefault("security.csp.frameAncestors", ["'self'"]),
-                frameSrc: Utils.config.getOrDefault("security.csp.childSrc", ["'self'"]), // deprecated gestion ancien navigateur
-                imgSrc: Utils.config.getOrDefault("security.csp.imgSrc", ["'self'"]),
-                manifestSrc: Utils.config.getOrDefault("security.csp.manifestSrc", ["'self'"]),
-                mediaSrc: Utils.config.getOrDefault("security.csp.mediaSrc", ["'self'"]),
-                objectSrc: Utils.config.getOrDefault("security.csp.objectSrc", ["'self'"]),
+                baseUri: Utils.config.getOrDefault("security.csp.baseUri", [ "'self'" ]),
+                childSrc: Utils.config.getOrDefault("security.csp.childSrc", [ "'self'" ]),
+                connectSrc: Utils.config.getOrDefault("security.csp.connectSrc", [ "'self'" ]),
+                fontSrc: Utils.config.getOrDefault("security.csp.fontSrc", [ "'self'" ]),
+                formAction: Utils.config.getOrDefault("security.csp.formAction", [ "'self'" ]),
+                frameAncestors: Utils.config.getOrDefault("security.csp.frameAncestors", [ "'self'" ]),
+                frameSrc: Utils.config.getOrDefault("security.csp.frameSrc", [ "'self'" ]), // deprecated gestion ancien navigateur
+                imgSrc: Utils.config.getOrDefault("security.csp.imgSrc", [ "'self'" ]),
+                manifestSrc: Utils.config.getOrDefault("security.csp.manifestSrc", [ "'self'" ]),
+                mediaSrc: Utils.config.getOrDefault("security.csp.mediaSrc", [ "'self'" ]),
+                objectSrc: Utils.config.getOrDefault("security.csp.objectSrc", [ "'self'" ]),
                 // todo deal with missing directives
                 // reflectedXss: Utils.config.getOrDefault("security.csp.reflectedXss", "block"),
                 // todo create post route to report policy failures
                 // reportUri: Utils.config.getOrDefault("security.csp.reportUri", ""),
-                scriptSrc: Utils.config.getOrDefault("security.csp.scriptSrc", ["'self'", "'unsafe-inline'", "'unsafe-eval'"]),
-                styleSrc: Utils.config.getOrDefault("security.csp.styleSrc", ["'self'", "'unsafe-inline'"])
+                scriptSrc: Utils.config.getOrDefault("security.csp.scriptSrc", [ "'self'", "'unsafe-inline'", "'unsafe-eval'" ]),
+                styleSrc: Utils.config.getOrDefault("security.csp.styleSrc", [ "'self'", "'unsafe-inline'" ])
             };
             let sandbox = Utils.config.getOrDefault("security.csp.sandbox", false); // TODO A traiter spécifiquement
             if (sandbox) {
@@ -503,34 +530,39 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
         }
     }
 
-    private referrerPolicyConfiguration(app) {
+    protected referrerPolicyConfiguration(app) {
         app.use(helmet.referrerPolicy({
             policy: Utils.config.getOrDefault("security.csp.referrer", "origin-when-cross-origin")
         }));
     }
 
-    private frameguardConfiguration(app) {
+    protected frameguardConfiguration(app) {
         // Pour empêcher la mise en itiframe
         if (checkSecurityConfiguration("security.frameguard", true, "frameguard", SecurityMiddleware.logger)) {
+            let action = Utils.config.getOrDefault("security.frameguard.action", "deny");
+            let domain = undefined;
+
+            if (action == "allow-from") {
+                domain = Utils.config.getOrDefault("security.frameguard.domain", "'self'");
+            }
+
             app.use(helmet.frameguard({
-                action: Utils.config.getOrDefault("security.frameguard.mode", "deny")
-                // todo deal with allow-from and domain conf
-                // domain: Utils.config.getOrDefault("security.frameguard.allowFromPattern", "")
-                // domain: ''
+                action: action,
+                domain: domain
             }));
         }
     }
 
-    private xssFilterConfiguration(app) {
+    protected xssFilterConfiguration(app) {
 
         if (checkSecurityConfiguration("security.xss", true, "XssFilter 'Cross-site scripting Filter'", SecurityMiddleware.logger)) {
             // Ajoute le header X-XSS-Protection pour essayer de protéger contre des attaques XSS simples
             // This has some security problems for old IE!
-            app.use(helmet.xssFilter({setOnOldIE: Utils.config.getOrDefault("security.xss.setOnOldIE", true)}));
+            app.use(helmet.xssFilter({ setOnOldIE: Utils.config.getOrDefault("security.xss.setOnOldIE", true) }));
         }
     }
 
-    private hpkpConfiguration(app) {
+    protected hpkpConfiguration(app) {
         // Ajoute les headers HTTP Public Key Pinning pour sécuriser les connexions SSL
         if (checkSecurityConfiguration("security.hpkp", true, "HPKP 'HTTP Public Key Pinning'", SecurityMiddleware.logger)) {
             app.use(helmet.hpkp({
@@ -543,7 +575,7 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
         }
     }
 
-    private hstsConfiguration(app) {
+    protected hstsConfiguration(app) {
         if (checkSecurityConfiguration("security.hsts", true, "HSTS 'HTTP Strict-Transport-Security'", SecurityMiddleware.logger)) {
             // Ajoute le header Strict-Transport-Security pour demander au navigateur client un accès au site en https
             app.use(helmet.hsts({
@@ -564,7 +596,7 @@ import * as _ from "lodash";
 import director = require("director");
 
 export class CsrfMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.CsrfMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.CsrfMiddleware");
     static HEADER_CSRF_NAME = "x-csrf-token";
     static CSRF_SESSION_KEY = "security.csrf";
 
@@ -574,7 +606,7 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
         }
     }
 
-    private csrfConfiguration(app) {
+    protected csrfConfiguration(app) {
         if (checkSecurityConfiguration("security.csrf", true, "CSRF 'Cross-Site Request Forgery'", CsrfMiddleware.logger)) {
             app.use(CsrfMiddleware.middleware);
         }
@@ -598,10 +630,10 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
      */
     static middleware(req, res: director.DirectorResponse, next) {
         if (req.method === "PUT" || req.method === "POST" || req.method === "PATCH" || req.method === "DELETE") {
-            let incomingCsrf = req.headers[CsrfMiddleware.HEADER_CSRF_NAME];
+            let incomingCsrf = req.headers[ CsrfMiddleware.HEADER_CSRF_NAME ];
             if (_.isUndefined(incomingCsrf)) {
                 CsrfMiddleware.logger.trace(CsrfMiddleware.HEADER_CSRF_NAME, "non present, recherche dans le body de la requête");
-                incomingCsrf = req.body && req.body[CsrfMiddleware.HEADER_CSRF_NAME];
+                incomingCsrf = req.body && req.body[ CsrfMiddleware.HEADER_CSRF_NAME ];
             }
             let sessionCsrf = req.getSession().getAttribute(CsrfMiddleware.CSRF_SESSION_KEY);
 
@@ -637,7 +669,6 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
      * @param incomingCsrf
      * @param sessionCsrf
      * @return {boolean}
-     * @private
      */
     static isTokenValid(incomingCsrf: string, sessionCsrf: string) {
         CsrfMiddleware.logger.trace("incomingCsrf =", incomingCsrf, "sessionCsrf =", sessionCsrf);
@@ -651,17 +682,17 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
 //                                      InternationalizationMiddleware                                                 //
 // ------------------------------------------------------------------------------------------------------------------- //
 
-import { I18nLoader, II18n } from "src/i18n/i18n-loader";
+import { II18n, AbstractI18nLoader } from "src/i18n/abstract-i18n-loader";
 import { CookieManager } from "src/session/cookie-manager";
 
 export class InternationalizationMiddleware extends AbstractHornetMiddleware {
 
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.InternationalizationMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.InternationalizationMiddleware");
 
-    constructor() {
+    constructor(config?: ServerConfiguration) {
 
         super((req, res, next: Function) => {
-            let appConfig = AbstractHornetMiddleware.APP_CONFIG;
+            let appConfig = this.config || AbstractHornetMiddleware.APP_CONFIG;
 
             let isI18nInSession: boolean = req.session && req.session.i18n;
             let localeI18n: II18n = (isI18nInSession) ? req.session.i18n : Utils.config.getOrDefault("localeI18n", {});
@@ -670,11 +701,11 @@ export class InternationalizationMiddleware extends AbstractHornetMiddleware {
                 let cookLocaleI18n = CookieManager.getCookie(req, "internationalization");
                 if (cookLocaleI18n != undefined) {
                     let shortLang = cookLocaleI18n.split("-");
-                    localeI18n = {locale: cookLocaleI18n, lang: shortLang[1]};
+                    localeI18n = { locale: cookLocaleI18n, lang: shortLang[ 1 ] };
                 }
             }
 
-            if (appConfig.internationalization instanceof I18nLoader) {
+            if (appConfig.internationalization instanceof AbstractI18nLoader) {
                 Utils.setCls("hornet.internationalization", appConfig.internationalization.getMessages(localeI18n));
             }
 
@@ -684,7 +715,7 @@ export class InternationalizationMiddleware extends AbstractHornetMiddleware {
             }
 
             next();
-        });
+        }, null, config);
     }
 }
 
@@ -693,31 +724,27 @@ export class InternationalizationMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
 
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.ChangeI18nLocaleMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.ChangeI18nLocaleMiddleware");
 
     constructor() {
         let appConfig = AbstractHornetMiddleware.APP_CONFIG;
-        let i18n = Utils.getCls("hornet.internationalization");
 
-        if (!i18n) {
-
-            let listLang = appConfig.internationalization.getLocales();
-            Utils.appSharedProps.set("listLanguage", listLang);
+        if (!Utils.appSharedProps.get("listLanguage") && appConfig.internationalization) {
+            Utils.appSharedProps.set("listLanguage", appConfig.internationalization.getLocales());
         }
 
         super((req, res, next: Function) => {
-            if (_.some(appConfig.internationalization.getLocales(), {"locale": req.params.i18n})) {
+            if (_.some(appConfig.internationalization.getLocales(), { "locale": req.params.i18n })) {
 
                 ChangeI18nLocaleMiddleware.logger.trace("ChangeI18nLocaleMiddleware :  Changement de la locale " + req.params.i18n);
                 let shortLang = req.params.i18n.split("-");
-                req.session.i18n = {locale: req.params.i18n, lang: shortLang[1]};
+                req.session.i18n = { locale: req.params.i18n, lang: shortLang[ 1 ] };
                 let i18n = appConfig.internationalization.getMessages(req.session.i18n);
                 Utils.setCls("hornet.internationalization", i18n);
                 CookieManager.setCookie(res, "internationalization", req.params.i18n);
                 res.type("application/json");
                 res.status(200).send(i18n);
                 res.end();
-
             } else {
                 ChangeI18nLocaleMiddleware.logger.trace("ChangeI18nLocaleMiddleware :  La locale demandée " + req.params.i18n + "n'existe pas");
                 let err = new TechnicalError("ERR_TECH_UNKNOWN", {
@@ -738,7 +765,7 @@ export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SetExpandedLayoutMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SetExpandedLayoutMiddleware");
 
     constructor() {
 
@@ -746,7 +773,7 @@ export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
             SetExpandedLayoutMiddleware.logger.trace("SetLayoutMiddleware : set isExpandedLayout appSharedProps with value:", req.body.isExpandedLayout);
             Utils.appSharedProps.set("isExpandedLayout", req.body.isExpandedLayout);
             res.type("application/json");
-            res.status(200).send({isExpandedLayout: req.body.isExpandedLayout});
+            res.status(200).send({ isExpandedLayout: req.body.isExpandedLayout });
             res.end();
         });
 
@@ -759,7 +786,7 @@ export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.IsExpandedLayoutMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.IsExpandedLayoutMiddleware");
 
     constructor() {
 
@@ -767,7 +794,8 @@ export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
             let isExpandedLayout = Utils.appSharedProps.get("isExpandedLayout");
             IsExpandedLayoutMiddleware.logger.trace("IsExpandedLayoutMiddleware : get isExpandedLayout appSharedProps: ", isExpandedLayout);
             res.type("application/json");
-            res.status(200).send({isExpandedLayout: isExpandedLayout});
+            res.set("Cache-Control", "no-cache");
+            res.status(200).send({ isExpandedLayout: isExpandedLayout });
             res.end();
         });
 
@@ -776,22 +804,60 @@ export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 }
 
 // ------------------------------------------------------------------------------------------------------------------- //
+//                                      SetExpandedLayoutMiddleware
+// ------------------------------------------------------------------------------------------------------------------- //
+export class wakeUpNodeSessionMiddleware extends AbstractHornetMiddleware {
+
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.wakeUpNodeSessionMiddleware");
+
+    constructor() {
+
+        super((req, res, next: Function) => {
+            wakeUpNodeSessionMiddleware.logger.trace("sollicitation du nodeJs suite à notification fin de session node");
+            res.type("application/json");
+            res.set("Cache-Control", "no-cache");
+            res.status(200).send({});
+            res.end();
+        });
+
+        this.prefix = "/wakeUpNodeSession";
+    }
+}
+
+
+// ------------------------------------------------------------------------------------------------------------------- //
 //                                      RouterServerMiddleware                                                         //
 // ------------------------------------------------------------------------------------------------------------------- //
 import { RouterServer } from "src/routes/router-server";
 
 export class RouterServerMiddleware extends AbstractHornetMiddleware {
-    private router: RouterServer;
+    protected router: RouterServer;
 
-    constructor() {
-        super();
-        let appConfig = AbstractHornetMiddleware.APP_CONFIG;
+    constructor(config?: ServerConfiguration) {
+        super(null, null, config);
+        let appConfig = this.config || AbstractHornetMiddleware.APP_CONFIG;
         this.router = new RouterServer(appConfig.defaultRoutesClass, appConfig.routesLoaderfn, appConfig.routesLoaderPaths, appConfig.routesDataContext);
     }
 
     public insertMiddleware(app) {
         app.use(this.router.pageMiddleware());
         app.use(Utils.config.getOrDefault("fullSpa.name", AbstractHornetMiddleware.APP_CONFIG.routesDataContext), this.router.dataMiddleware());
+    }
+}
+
+export class RouterServerSubMiddleware extends AbstractHornetSubMiddleware {
+
+    private router: RouterServer;
+
+    constructor(config: ServerConfiguration) {
+        super(null, null, config);
+        let appConfig = this.config || AbstractHornetMiddleware.APP_CONFIG;
+        this.router = new RouterServer(appConfig.defaultRoutesClass, appConfig.routesLoaderfn, appConfig.routesLoaderPaths, appConfig.routesDataContext);
+    }
+
+    public insertRouterMiddleware(router: express.Router) {
+        router.use(this.router.pageMiddleware());
+        router.use(Utils.config.getOrDefault("fullSpa.name", (this.config || AbstractHornetMiddleware.APP_CONFIG).routesDataContext), this.router.dataMiddleware());
     }
 }
 
@@ -803,7 +869,7 @@ import { SecurityError } from "hornet-js-utils/src/exception/security-error";
 import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 
 export class UserAccessSecurityMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.UserAccessSecurityMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.UserAccessSecurityMiddleware");
 
     constructor() {
         super((req, res, next) => {
@@ -847,7 +913,7 @@ import { HornetResult } from "src/result/hornet-result";
 import { ResultJSON } from "src/result/result-json";
 
 export class DataRenderingMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
 
     constructor() {
         super((req: Request, res: Response, next: Function) => {
@@ -862,7 +928,7 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
                     if (!dataRouteInfos) {
                         let mess = "DataRouteInfos inexistant pour l'url : " + req.originalUrl;
                         DataRenderingMiddleware.logger.warn(mess);
-                        throw new TechnicalError("ERR_TECH_UNKNOWN", {errorMessage: mess, httpStatus: 200});
+                        throw new TechnicalError("ERR_TECH_UNKNOWN", { errorMessage: mess, httpStatus: 200 });
 
                     } else {
 
@@ -891,7 +957,7 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
                             let exec: Promise<any> = action.execute();
 
                             exec.then((result: any | HornetResult) => {
-                                let newResult: HornetResult = (result instanceof HornetResult) ? result : new ResultJSON({data: result});
+                                let newResult: HornetResult = (result instanceof HornetResult) ? result : new ResultJSON({ data: result });
                                 return newResult.manageResponse(res);
                             }).then((send) => {
                                 if (send) {
@@ -919,6 +985,80 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
     }
 }
 
+export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
+        private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
+    
+        constructor() {
+            super((req: Request, res: Response, next: Function) => {
+                try {
+                    let routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
+    
+                    // route de type 'DATA' uniquement
+                    if (Utils.getCls("hornet.routeType") === RouteType.DATA) {
+    
+                        let dataRouteInfos = routeInfos as DataRouteInfos;
+    
+                        if (!dataRouteInfos) {
+                            let mess = "DataRouteInfos inexistant pour l'url : " + req.originalUrl;
+                            DataRenderingSubMiddleware.logger.warn(mess);
+                            throw new TechnicalError("ERR_TECH_UNKNOWN", {errorMessage: mess, httpStatus: 200});
+    
+                        } else {
+    
+                            let executor = new AsyncExecutor();
+                            executor.addElement(new AsyncElement((next: (err?: any, data?: any) => void) => {
+                                let action = new (dataRouteInfos.getAction())();
+                                action.req = req;
+                                action.res = res;
+                                action.attributes = routeInfos.getAttributes();
+                                if (dataRouteInfos.getService()) {
+                                    action.service = new (dataRouteInfos.getService() as Class<any>)();
+                                }
+    
+                                let validator = action.getDataValidator();
+                                if (validator) {
+                                    let data = _.cloneDeep(action.getPayload());
+    
+                                    let validationRes = validator.validate(data);
+    
+                                    if (!validationRes.valid) {
+                                        DataRenderingSubMiddleware.logger.warn("Données invalides (la validation aurait dû être effectuée côté client) : ", validationRes.errors);
+                                        throw new ValidationError();
+                                    }
+                                }
+    
+                                let exec: Promise<any> = action.execute();
+    
+                                exec.then((result: any | HornetResult) => {
+                                    let newResult: HornetResult = (result instanceof HornetResult) ? result : new ResultJSON({data: result});
+                                    return newResult.manageResponse(res);
+                                }).then((send) => {
+                                    if (send) {
+                                        res.end();
+                                    }
+                                }).catch((error) => {
+                                    DataRenderingSubMiddleware.logger.error("Erreur de service..." + error);
+                                    next(error);
+                                });
+                            }));
+    
+                            executor.on("end", (err) => {
+                                if (err) {
+                                    next(err);
+                                }
+                            });
+                            executor.execute();
+                        }
+                    }
+    
+                } catch (e) {
+                    next(e);
+                }
+            });
+        }
+    }
+    
+
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 import { BusinessError } from "hornet-js-utils/src/exception/business-error";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
@@ -931,7 +1071,7 @@ import { ErrorRequestHandler } from "express";
 //                                      UnmanagedDataErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.UnmanagedDataErrorMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.UnmanagedDataErrorMiddleware");
 
     constructor() {
         super((err, req, res, next: any) => {
@@ -940,7 +1080,7 @@ export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
                 sanitizeErrorThrownInDomain(err);
 
                 if (!(err instanceof BaseError)) {
-                    err = new TechnicalError("ERR_TECH_UNKNOWN", {errorMessage: err.message, httpStatus: 200}, err);
+                    err = new TechnicalError("ERR_TECH_UNKNOWN", { errorMessage: err.message }, err);
                 }
 
                 if (err instanceof TechnicalError) {
@@ -951,16 +1091,24 @@ export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
                     UnmanagedDataErrorMiddleware.logger.error("ERREUR [" + err.code + "] - : ", err);
                 }
 
-                // res.status(500);
                 res.json(NodeApiResultBuilder.buildError(err));
-                res.end();
-                if (err.status && typeof err.status === "number") {
-                    res.status(err.status);
+                res.status(200);
+                if (Utils.config.getOrDefault("server.rethrow", false)) {
+                    if (err.status && typeof err.status === "number") {
+                        res.status(err.status);
+                    } else if (err.args && err.args.httpStatus && typeof err.args.httpStatus === "number") { // gestion avec les NodeApiError
+                        res.status(err.args.httpStatus);
+                    } else {
+                        res.status(500);
+                    }
                 }
+                res.end();
             } else {
                 UnmanagedDataErrorMiddleware.logger.error("ERREUR technique [" + err.code + "] - reportId [" + err.reportId + "] : ", err);
                 if (err.status && typeof err.status === "number") {
                     res.status(err.status);
+                } else if (err.args && err.args.httpStatus && typeof err.args.httpStatus === "number") { // gestion avec les NodeApiError
+                    res.status(err.args.httpStatus);
                 } else {
                     res.status(500);
                 }
@@ -987,6 +1135,7 @@ export const DEFAULT_HORNET_MIDDLEWARES: Array<Class<AbstractHornetMiddleware>> 
     SessionMiddleware,
     InternationalizationMiddleware,
     ChangeI18nLocaleMiddleware,
+    wakeUpNodeSessionMiddleware,
     LoggerUserMiddleware,
     CsrfMiddleware,
     MulterMiddleware,
@@ -1000,6 +1149,13 @@ export const DEFAULT_HORNET_MIDDLEWARES: Array<Class<AbstractHornetMiddleware>> 
 
     UnmanagedDataErrorMiddleware
 ];
+
+export const DEFAULT_HORNET_MODULE_MIDDLEWARES: Array<Class<AbstractHornetSubMiddleware>> = [
+    HornetContextInitializerSubMiddleware,
+    RouterServerSubMiddleware,
+    DataRenderingSubMiddleware
+];
+    
 
 export class HornetMiddlewareList {
 
@@ -1021,6 +1177,17 @@ export class HornetMiddlewareList {
         return this;
     }
 
+    addRouterBefore(router: HornetRouter, middleware: Class<AbstractHornetMiddleware>) {
+
+        let idx = this.list.indexOf(middleware);
+        if (idx === -1) {
+            throw new Error("Le middleware de base n'a pas été trouvé dans le tableau de middlewares " +
+                ">> impossible d'insérer le nouveau middleware avant.");
+        }
+        this.list.splice(idx, 0, router);
+        return this;
+    }
+
     addAfter(newMiddleware: Class<AbstractHornetMiddleware>, middleware: Class<AbstractHornetMiddleware>) {
         let idx = this.list.indexOf(middleware);
         if (idx === -1) {
@@ -1039,5 +1206,10 @@ export class HornetMiddlewareList {
         }
         this.list.splice(idx, 1);
         return this;
+    }
+}
+
+export class HornetRouter {
+    constructor(public prefix: string, public router:express.Router) {
     }
 }

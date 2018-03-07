@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,79 +82,99 @@ import * as fs from "fs";
 import * as path from "path";
 import { JSONLoader } from "hornet-js-utils/src/json-loader";
 import * as _ from "lodash";
-
+import { II18n, AbstractI18nLoader } from "src/i18n/abstract-i18n-loader";
 /**
  * Classe utilisée uniquement côté serveur.
  */
-export class I18nLoader {
+export class I18nLoader extends AbstractI18nLoader {
+    
+    messagesLang = {};
+    allLocales: Array<{langShort: string, locale: string, langLabel:string}>;
 
     constructor(public pathLang?: string) {
+        super();
         if (!pathLang) {
-            this.pathLang = path.join(require.main.paths[require.main.paths.length - 2], "src", "resources");
+            this.pathLang = path.join(path.parse(require.main.filename).dir, "src", "resources");
         }
+        this.loadMessages();
+    }
+
+        /** Méthode qui retourne la langue selectionné
+     * @returns {string[]}
+     */
+    loadMessages(): any {
+        /**
+         *  Extraits les messages de fichiers, de base de données....
+         *  Doit retourner un flux JSON conforme au module react-intl.
+         */
+        // par défaut on charge le fichier hornet-messages
+        this.messagesLang["default"] = {locale: undefined, lang: "", messages: require("./hornet-messages-components.json")};
+
+        /** chargement des fichiers 'message.json' */
+        if (fs.existsSync(path.join(this.pathLang, "messages.json"))) {
+            _.merge(this.messagesLang["default"].messages, require(path.join(this.pathLang, "messages.json")));
+        }
+
     }
 
     /** Méthode qui retourne la langue selectionné
      * @returns {string[]}
      */
-    getMessages(locales?: II18n): any {
-        const path = require("path");
+    getMessages(locales?: II18n): {locale: string, lang: string, messages: any} {
+
         /**
          *  Extraits les messages de fichiers, de base de données....
          *  Doit retourner un flux JSON conform au module react-intl.
          */
-        let messages: string;
-        let messages2: string;
-        let messages3: string;
 
-        // par défaut on charge le fichier hornet-messages
-        messages = require("./hornet-messages-components.json");
-
-        /** le message.json existe */
-        if (fs.existsSync(path.join(this.pathLang, "messages.json"))) {
-            messages2 = require(path.join(this.pathLang, "messages.json"));
-            _.merge(messages, messages2);
+        if(!locales) {
+            return this.messagesLang["default"];
+        }
+        
+        if(this.messagesLang[locales.locale]) {
+            return this.messagesLang[locales.locale];
         }
 
+        let messages = _.merge({}, this.messagesLang["default"].messages);
+        
         /** verifier sur localeI18n dans defaut.json existe */
         if (locales) {
             /** la variable localeI18n.locale existe */
             if (locales.locale) {
                 /** si le fichier de langue correspondant existe */
                 if (fs.existsSync(path.join(this.pathLang, "messages-" + locales.locale + ".json"))) {
-                    messages3 = require(path.join(this.pathLang, "messages-" + locales.locale + ".json"));
-                    _.merge(messages, messages3);
+                    _.merge(messages, require(path.join(this.pathLang, "messages-" + locales.locale + ".json")));
                 }
             }
+            return {locale: locales.locale, lang: locales.lang, messages: messages};
         }
-        return {locale: locales.locale, lang: locales.lang, messages: messages};
     }
 
     /** Méthode qui liste les langues disponibles dans le dossier resources
      * @returns {string[]}
      */
-    getLocales(): Array<string> {
+    getLocales(): Array<{langShort: string, locale: string, langLabel: string}> {
 
-        let listFiles = fs.readdirSync(this.pathLang);
-        let testarray = [];
-        for (let file of listFiles) {
-            let regx = /-[a-zA-Z\-]*/;
-            let array = file.match(regx);
-            if (array != null) {
-                let jsonMessage = JSONLoader.load(path.join(this.pathLang, file), "UTF-8");
-                let listShort = array[0].substring(1, array[0].length).split("-");
-                testarray.push({
-                    langShort: listShort[1],
-                    locale: array[0].substring(1, array[0].length),
-                    langLabel: jsonMessage.labelLanguage || listShort[1]
-                });
+        if(!this.allLocales) {
+
+            this.allLocales = [];
+
+            let listFiles = fs.readdirSync(this.pathLang);
+            let testarray = [];
+            for (let file of listFiles) {
+                let regx = /-[a-zA-Z\-]*/;
+                let array = file.match(regx);
+                if (array != null) {
+                    let jsonMessage = JSONLoader.load(path.join(this.pathLang, file), "UTF-8");
+                    let listShort = array[0].substring(1, array[0].length).split("-");
+                    this.allLocales.push({
+                        langShort: listShort[1],
+                        locale: array[0].substring(1, array[0].length),
+                        langLabel: jsonMessage.labelLanguage || listShort[1]
+                    });
+                }
             }
         }
-        return testarray;
+        return this.allLocales;
     }
-}
-
-export interface II18n {
-    lang: string;
-    locale: string;
 }

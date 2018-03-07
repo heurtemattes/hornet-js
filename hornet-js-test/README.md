@@ -2,6 +2,45 @@
 
 Projet d'externalisation des outils de test de `Hornet.js`
 
+## Prérequis #
+
+* NodeJS 8.X
+* hornet-js-builder 1.X installé en global:
+
+```shell
+npm install -g hornet-js-builder
+```
+
+## Initialisation #
+
+Récupérer les sources sur projet.
+
+Compiler les sources typescript de `hornet-js-test`
+
+```shell
+hb compile
+```
+
+## Utilisation dans un projet #
+
+Ajouter au package.json
+
+```shell
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
+  "testDependencies": {
+    "hornet-js-test": "5.1.X"
+  }
+  
+```
+
+Puis lancer la commande :
+
+```shell
+hb install
+```
+
 # Tests unitaires Karma
 
 ## Outils
@@ -107,18 +146,18 @@ runTest(new clickTest());
 import { Logger } from "hornet-js-utils/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "levels": {
-        "[all]": "INFO"
-    },
-    "appenders": [
-        {
-            "type": "console",
-            "layout": {
-                "type": "pattern",
-                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-            }
+    "appenders": {
+        "console": {
+        "type": "console",
+        "layout": {
+            "type": "pattern",
+            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
         }
-    ]
+        }
+    },
+    "categories": {
+        "default": { "appenders": ["console"], "level": "INFO" }
+    }
 });
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({

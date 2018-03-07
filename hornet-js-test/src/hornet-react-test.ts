@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -101,7 +101,7 @@ export class HornetReactTest extends BaseTest {
         node.dispatchEvent(clickEvent);
     }
 
-    private handleChangeValueOnElement(changeValue: boolean, element: any, valueKey: string) {
+    protected handleChangeValueOnElement(changeValue: boolean, element: any, valueKey: string) {
         if (changeValue) {
             element.value = element.value + valueKey;
             ReactTestUtils.Simulate.change(element);
@@ -116,7 +116,7 @@ export class HornetReactTest extends BaseTest {
      * @param changeValue
      */
     protected triggerKeydownEvent(element: any, valueKey: string, keyCode: number, changeValue?: boolean): void {
-        ReactTestUtils.Simulate.keyDown(element, {key: valueKey, keyCode: keyCode, which: keyCode});
+        ReactTestUtils.Simulate.keyDown(element, { key: valueKey, keyCode: keyCode, which: keyCode });
         this.handleChangeValueOnElement(changeValue, element, valueKey);
     }
 

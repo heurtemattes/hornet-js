@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,11 +86,13 @@ import {
     HTMLStandardConfigAttributes,
     ReactBasicMouseDOMAttributes
 } from "src/widget/form/abstract-field";
-
+var ReactDOM = require('react-dom');
 
 export interface CheckboxProps {
     label?: string;
     title?: string;
+    id?: string;
+    checked?: boolean;
 }
 
 /**
@@ -98,23 +100,81 @@ export interface CheckboxProps {
  */
 export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttributes & HTMLStandardConfigAttributes & ReactBasicMouseDOMAttributes, any> {
 
+    protected inputRef:any;
+    protected checked;
 
     constructor(props?: CheckboxProps, context?: any) {
         super(props, context);
+        this.checked = this.props.checked;
     }
 
     /**
      * @inheritDoc
      */
-    render() {
+    componentDidMount(){
+        super.componentDidMount();
+        let checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
+        checkbox.checked = this.checked;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    componentWillReceiveProps(nextProps, nextState) {
+        this.checked = nextProps.checked;
+        let checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
+        if (checkbox) {
+            checkbox.checked = this.checked;
+        }
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    render(): React.ReactElement<CheckboxProps> {
+
+        let labelProps: any = {
+            className: "checkbox-content",
+            disabled: this.props.disabled,
+            title: this.props.title
+        };
+
+        let inputProps = {
+            onChange: this.onChange,
+            title: this.props.title,
+            name: this.props.name,
+            id: this.props.id
+        }
+
         return (
-            <label className="checkbox-content" disabled={this.props.disabled} title={this.props.title}>
-                <input type="checkbox" value="true" {...this.props}/>
+            <label {...labelProps} onKeyDown={this.onClick}>
+                <input type="checkbox" value="true" {...inputProps} ref={(ref)=>{this.inputRef = ref}} />
                 <span className="checkbox-material">
-                            <span className="check"></span>
-                        </span>
+                    <span className="check"></span>
+                </span>
                 {(this.state.label) ? this.state.label : ""}
             </label>
         );
     }
+
+    /**
+     * fonction appelée au clic sur la checkbox
+     * @param e
+     */
+    onClick(e) {
+        let checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
+        checkbox.checked = !checkbox.checked;
+    }
+
+    /**
+     * fonction appelée au changement de valeur de la checkbox
+     * @param e
+     */
+    onChange(e) {
+        if(this.props.onChange){
+            this.props.onChange(e)
+        }
+    }
+
 }

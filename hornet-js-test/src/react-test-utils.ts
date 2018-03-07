@@ -6,7 +6,7 @@
  * Ce logiciel est un programme informatique servant à faciliter la création
  * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
  * <p/>
- * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+ * Ce logiciel hornet-js-test.d.tsest régi par la licence CeCILL soumise au droit français et
  * respectant les principes de diffusion des logiciels libres. Vous pouvez
  * utiliser, modifier et/ou redistribuer ce programme sous les conditions
  * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,8 +95,8 @@ export class ReactTestUtils {
      * @param $
      * @returns {*|jQuery|HTMLElement}
      */
-    private static prepare($: CheerioStatic): CheerioStatic {
-        $["fn"] = {};
+    protected static prepare($: CheerioStatic): CheerioStatic {
+        $[ "fn" ] = {};
         /**
          * jQuery.each
          *
@@ -105,7 +105,7 @@ export class ReactTestUtils {
          * @param args
          * @returns {*}
          */
-        $["each"] = function <T extends {}>(obj: T, callback, args): T {
+        $[ "each" ] = function <T extends {}>(obj: T, callback, args): T {
             _.forIn(obj, callback);
 
             return obj;
@@ -117,7 +117,7 @@ export class ReactTestUtils {
         return $;
     }
 
-    private static renderInternal(elementToRender: React.ReactElement<any>): CheerioStatic {
+    protected static renderInternal(elementToRender: React.ReactElement<any>): CheerioStatic {
 
         var result: string = ReactDOMServer.renderToStaticMarkup(elementToRender);
 
@@ -130,7 +130,7 @@ export class ReactTestUtils {
      * @param context contexte React
      * @returns {CheerioStatic} le rendu sous forme d'un objet Cheerio
      */
-    static render(renderToTest: () => JSX.Element): CheerioStatic {
+    static render(renderToTest: () => React.ReactElement<any>): CheerioStatic {
         // L'élément à rendre doit être créé dans la callback courante ("reactWithContextCb"),
         // sinon il n'aura pas le contexte passé en paramètre
         // Il n'est donc pas possible de le créer dans le TU directement

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -121,7 +121,7 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                 valueKey="id"
                 noResultLabel="test"
 
-                />)
+            />)
     };
 
     @Decorators.it("Test OK")
@@ -137,8 +137,10 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
         dataSource.on("select", (result) => {
             if (result && result.length > 0) {
                 index++;
-                items.push("" + index);
-                expect(_.isEqual(dataSource.selected, items)).to.be.true;
+                items.push(index);
+                items.forEach((item, ind) => {
+                    expect(_.isEqual(dataSource.selected[ ind ].value, item)).to.be.true;
+                })
                 if (index == dataSource.results.length - 1) this.end();
             }
         });

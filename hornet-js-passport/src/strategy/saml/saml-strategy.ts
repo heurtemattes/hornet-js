@@ -73,14 +73,14 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
 import { AuthenticationStrategy } from "src/strategy/authentication-strategy";
 import { AuthenticationUtils } from "src/authentication-utils";
-import { Saml } from "hornet-js-passport/src/strategy/saml/saml";
+import { Saml } from "src/strategy/saml/saml";
 import { SamlConfiguration, IdentityProviderProps } from "hornet-js-passport/src/strategy/saml/saml-configuration";
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
@@ -104,15 +104,15 @@ export class SamlStrategy implements AuthenticationStrategy {
     public entryPoint: string;
     public certChiffrement: string;
     public certSignature: string;
-    private connexionComponent;
-    private appCert: string;
+    protected connexionComponent;
+    protected appCert: string;
     protected configuration: SamlConfiguration;
 
     constructor(options: SamlConfiguration, valid?: Function) {
 
         this.configuration = options;
 
-        this._verify = valid || options.verifyFunction || this.getUserInfo;
+        this._verify = valid && valid.bind(this) || options.verifyFunction || this.getUserInfo;
 
         this.name = 'saml';
         this._saml = new Saml(options);
@@ -124,7 +124,7 @@ export class SamlStrategy implements AuthenticationStrategy {
         this.entryPoint = options.entryPoint;
         this.appCert = options.appCert;
 
-        this.configuration.profilSeparator = options.profilSeparator || "; ";
+        this.configuration.profilSeparator = options.profilSeparator || ";";
 
         this.connexionComponent = options.connexionComponent || ConnexionPage;
     }
@@ -148,26 +148,36 @@ export class SamlStrategy implements AuthenticationStrategy {
      * @returns {Array}
      */
     formateRoles(profils) {
+        return SamlStrategy.formateRoles(profils, this.configuration.profilSeparator)
+    }
+
+    /**
+     * Formattage de la chaine de caractère des profils => transformation en tableau d'objets
+     * Suppression des ' ', '[', ']' et split avec le separateur.
+     * @param profils
+     * @param separator 
+     * @returns {Array}
+     */
+    static formateRoles(profils: string, separator: string) {
         let profilsTmp = [];
-        if(profils) {
-            profilsTmp = profils.replace('[', "").replace(']', "").replace(/ /gi, "").split(this.configuration.profilSeparator);
+        if (profils) {
+            profilsTmp = profils.replace('[', "").replace(']', "").replace(/ /gi, "").split(separator);
         }
 
         let roles = [];
         profilsTmp.map((role) => {
-            roles.push({name: role});
+            roles.push({ name: role });
         });
 
         return roles;
     }
-
 
     authenticate(req, options): any {
         let self: any = this;
 
         options.samlFallback = options.samlFallback || 'login-request';
 
-        let validateCallback = (err, profile, loggedOut) => {
+        let validateCallback = (err, profile, loggedOut, fluxSAML) => {
             if (err) {
                 return self.error(err);
             }
@@ -180,6 +190,8 @@ export class SamlStrategy implements AuthenticationStrategy {
                 }
                 return self.pass();
             }
+
+            self.fluxSAML = fluxSAML;            
 
             let verified = (err, user, info) => {
                 if (err) {
@@ -196,6 +208,7 @@ export class SamlStrategy implements AuthenticationStrategy {
             if (self._passReqToCallback) {
                 self._verify(req, profile, verified);
             } else {
+                self._verify = self._verify.bind(self);
                 self._verify(profile, verified);
             }
         };
@@ -206,7 +219,7 @@ export class SamlStrategy implements AuthenticationStrategy {
                 self.error(err);
             } else {
                 logger.debug("SAML: redirection", url);
-                if(req.headers["x-requested-with"] == "XMLHttpRequest") {
+                if (req.headers[ "x-requested-with" ] == "XMLHttpRequest") {
                     req.res.setHeader("x-is-login-page", "true");
                     req.res.status(200).send("redirection SAML");
                 } else {
@@ -215,8 +228,10 @@ export class SamlStrategy implements AuthenticationStrategy {
             }
         };
 
+        validateCallback = validateCallback.bind(self);
+
         // GÉNÉRATION DU METADATA
-        if ((process.env.NODE_ENV !== "production") && AuthenticationUtils.isUrl(req, Utils.buildContextPath("/metadata-saml"))) {
+        if (this.configuration.isMetadataAccessible && AuthenticationUtils.isUrl(req, Utils.buildContextPath("/metadata-saml"))) {
             req.res.type('application/xml');
             req.res.status(200).send(this.generateServiceProviderMetadata(this.appCert));
             return;
@@ -228,16 +243,16 @@ export class SamlStrategy implements AuthenticationStrategy {
             this._saml.validatePostRequest(req.body, validateCallback);
 
             // AFFICHAGE DE LA PAGE DE SELECTION DU MULTI IDP
-        } else if ((!req.body.idp && this.availableIdp && this.availableIdp.length > 1 ) && AuthenticationUtils.isUrl(req, Utils.buildContextPath(this.configuration.appLoginPath))) {
+        } else if ((!req.body.idp && this.availableIdp && this.availableIdp.length > 1) && AuthenticationUtils.isUrl(req, Utils.buildContextPath(this.configuration.appLoginPath))) {
             logger.debug("rendu multi-idp.");
-            
+
             let component = this.renderMultiIdpPage();
 
             req.res.setHeader("x-is-login-page", "true");
             req.res.send(component);
 
             // APRES SELECTION DE L'IDP (cas du multiIdp) / mode single IDP
-        } else if ((req.body.idp || this.idp ) && AuthenticationUtils.isUrl(req, Utils.buildContextPath(this.configuration.appLoginPath))) {
+        } else if ((req.body.idp || this.idp) && AuthenticationUtils.isUrl(req, Utils.buildContextPath(this.configuration.appLoginPath))) {
             logger.debug("connexion pour un idp.");
             if (req.body.idp) {
                 this.idp = JSON.parse(req.body.idp);
@@ -250,7 +265,7 @@ export class SamlStrategy implements AuthenticationStrategy {
 
             this.getIDPInformations(req, this.idp, () => {
                 let requestHandler = {
-                    'login-request': function() {
+                    'login-request': function () {
                         logger.debug("SAML login-request");
                         if (self._authnRequestBinding === 'HTTP-POST') {
                             this._saml.getAuthorizeForm(req, (err, data) => {
@@ -265,12 +280,12 @@ export class SamlStrategy implements AuthenticationStrategy {
                             this._saml.getAuthorizeUrl(req, redirectIfSuccess);
                         }
                     }.bind(self),
-                    'logout-request': function() {
+                    'logout-request': function () {
                         logger.debug("SAML logout-request");
                         this._saml.getLogoutUrl(req, redirectIfSuccess);
                         req.logout();
                     }.bind(self)
-                }[options.samlFallback];
+                }[ options.samlFallback ];
 
                 if (typeof requestHandler !== 'function') {
                     return self.fail();
@@ -278,7 +293,7 @@ export class SamlStrategy implements AuthenticationStrategy {
 
                 requestHandler();
             });
-        } else if (!req.unknowedRoute  && !req.user) { // la route est connu et est contrainte à des droits d'accès
+        } else if (!req.unknowedRoute && !req.user) { // la route est connu et est contrainte à des droits d'accès
             logger.debug("route connue, mais aucun user -> redirection vers la page de connexion.");
             self.redirect(this._saml.options.hostUrlReturnTo + Utils.buildContextPath(this.configuration.appLoginPath));
         } else {
@@ -310,9 +325,9 @@ export class SamlStrategy implements AuthenticationStrategy {
      * Permet de faire le rendu HTML de l'écran de sélection d'un IDP
      * @returns {string}
      */
-    private renderMultiIdpPage() {
+    protected renderMultiIdpPage() {
 
-        let props = _.merge(this.connexionComponent.defaultProps || {}, {idps: this.availableIdp});
+        let props = _.merge(this.connexionComponent.defaultProps || {}, { idps: this.availableIdp });
 
         let htmlApp = ReactDOMServer.renderToStaticMarkup(new this.connexionComponent(props).render());
         let docTypeHtml: string = "<!DOCTYPE html>";
@@ -368,7 +383,7 @@ export class SamlStrategy implements AuthenticationStrategy {
             returnUrl = (<any>req).headers.referer;
             res.header("x-is-login-page", "true");
             res.status(200).end();
-            req.query["previousUrl"] = (<any>req).headers.referer;
+            req.query[ "previousUrl" ] = (<any>req).headers.referer;
         }
 
         if (req.query.previousUrl) {
@@ -376,7 +391,7 @@ export class SamlStrategy implements AuthenticationStrategy {
         }
         (<any>req).session.returnTo = returnUrl;
 
-        return passport.authenticate(this.name, {successReturnToOrRedirect: returnUrl})(req, res, next);
+        return passport.authenticate(this.name, { successReturnToOrRedirect: returnUrl })(req, res, next);
     }
 
     /**
@@ -390,7 +405,7 @@ export class SamlStrategy implements AuthenticationStrategy {
     /**
      * @override
      */
-    public connect(passport: any, req: Request, res: Response, next: (err?: Error)=>void) {
+    public connect(passport: any, req: Request, res: Response, next: (err?: Error) => void) {
         this.manageRedirectTo(passport, req, res, next);
         /*if (!req.isAuthenticated()) {
             this.manageRedirectTo(passport, req, res, next);
@@ -402,14 +417,14 @@ export class SamlStrategy implements AuthenticationStrategy {
     /**
      * @override
      */
-    public disconnect(passport: any, req: Request, res: Response, next: (err?: Error)=>void) {
+    public disconnect(passport: any, req: Request, res: Response, next: (err?: Error) => void) {
 
         let idp: IdentityProviderProps = ((<any>req).session.strategy && (<any>req).session.strategy.idp) ? (<any>req).session.strategy.idp : {};
 
         this.certChiffrement = idp.certChiffrement;
         this.certSignature = idp.certSignature;
 
-        if(req.user && req.user.nameID) {
+        if (req.user && req.user.nameID) {
             this._saml.getLogoutUrl(req, (err, url) => {
                 req.logout(); // suppression du user dans la session s'il est déjà présent
                 req.getSession().invalidate(() => {

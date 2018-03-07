@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -141,9 +141,9 @@ class tableTest extends BaseTest {
 
     @Decorators.it('selectionner un element dans le tableau')
     selectionUnElement() {
-        table = this.renderIntoDocument(tableElement, "main1");
+        table = this.renderIntoDocument(tableElement, "main1111111");
         dataSource.on("fetch", () => {
-            this.triggerMouseEvent(document.querySelector('#main1 #lite-0-colBody-1-0 input'), "click");
+            this.triggerMouseEvent(document.querySelector('#main1111111 #lite-0-colBody-1-0 input'), "click");
         });
         dataSource.on("select", () => {
             expect(_.isEqual(dataSource.selected[ 0 ], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
@@ -156,14 +156,14 @@ class tableTest extends BaseTest {
     @Decorators.it('afficher un tableau avec des elements déjà sélectionnés')
     affichageElementSelectionne() {
 
-        table = this.renderIntoDocument(tableElement, "main2");
+        table = this.renderIntoDocument(tableElement, "main11111112");
         dataSource.select([ { id: 2, label: "libelle2" }, { id: 4, label: "libelle4" }]);
 
 
         dataSource.on("fetch", (value) => {
 
-            expect(document.querySelector('#main2 #lite-0-colBody-1-0 input:checked')).to.exist;
-            expect(document.querySelector('#main2 #lite-0-colBody-3-0 input:checked')).to.exist;
+            expect(document.querySelector('#main11111112 #lite-0-colBody-1-0 input:checked')).to.exist;
+            expect(document.querySelector('#main11111112 #lite-0-colBody-3-0 input:checked')).to.exist;
             this.end();
 
         });
@@ -172,43 +172,43 @@ class tableTest extends BaseTest {
 
     @Decorators.it('trier un tableau sur une colonne')
     triSimple() {
-        table = this.renderIntoDocument(tableElement, "main3");
+        table = this.renderIntoDocument(tableElement, "main11111113");
         dataSource.on("sort", () => {
 
-            expect((document.querySelector("#main3 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle9");
+            expect((document.querySelector("#main11111113 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle9");
             this.end();
 
         });
 
-        dataSource.sort([ new SortData('label', SortDirection.DESC) ]);
+        dataSource.sort({sortDatas:[new SortData('label', SortDirection.DESC)]});
     };
 
     @Decorators.it('trier un tableau sur plusieurs colonnes part1')
     triMultiple1() {
-        table = this.renderIntoDocument(tableElement, "main4");
+        table = this.renderIntoDocument(tableElement, "main44444");
         dataSource.on("sort", () => {
 
-            expect((document.querySelector("#main4 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle3");
-            expect((document.querySelector("#main4 #lite-0-colBody-6-1") as any).innerText).to.be.equal("libelle9");
-            expect((document.querySelector("#main4 #lite-0-colBody-7-1") as any).innerText).to.be.equal("libelle1");
-            expect((document.querySelector("#main4 #lite-0-colBody-8-1") as any).innerText).to.be.equal("libelle2");
+            expect((document.querySelector("#main44444 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle3");
+            expect((document.querySelector("#main44444 #lite-0-colBody-6-1") as any).innerText).to.be.equal("libelle9");
+            expect((document.querySelector("#main44444 #lite-0-colBody-7-1") as any).innerText).to.be.equal("libelle1");
+            expect((document.querySelector("#main44444 #lite-0-colBody-8-1") as any).innerText).to.be.equal("libelle2");
             this.end();
 
         });
-        dataSource.sort([ new SortData('desc', SortDirection.ASC), new SortData('label', SortDirection.ASC) ]);
+        dataSource.sort({sortDatas:[new SortData('desc', SortDirection.ASC), new SortData('label', SortDirection.ASC)]});
     };
 
     @Decorators.it('trier un tableau sur plusieurs colonnes part2')
     triMultiple2() {
-        table = this.renderIntoDocument(tableElement, "main5");
+        table = this.renderIntoDocument(tableElement, "main55555");
         dataSource.on("sort", () => {
-            expect((document.querySelector("#main5 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle2");
-            expect((document.querySelector("#main5 #lite-0-colBody-1-1") as any).innerText).to.be.equal("libelle1");
-            expect((document.querySelector("#main5 #lite-0-colBody-2-1") as any).innerText).to.be.equal("libelle9");
-            expect((document.querySelector("#main5 #lite-0-colBody-8-1") as any).innerText).to.be.equal("libelle3");
+            expect((document.querySelector("#main55555 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle2");
+            expect((document.querySelector("#main55555 #lite-0-colBody-1-1") as any).innerText).to.be.equal("libelle1");
+            expect((document.querySelector("#main55555 #lite-0-colBody-2-1") as any).innerText).to.be.equal("libelle9");
+            expect((document.querySelector("#main55555 #lite-0-colBody-8-1") as any).innerText).to.be.equal("libelle3");
             this.end();
         });
-        dataSource.sort([ new SortData('desc', SortDirection.DESC), new SortData('label', SortDirection.DESC) ]);
+        dataSource.sort({sortDatas:[new SortData('desc', SortDirection.DESC), new SortData('label', SortDirection.DESC)]});
     };
 
 }

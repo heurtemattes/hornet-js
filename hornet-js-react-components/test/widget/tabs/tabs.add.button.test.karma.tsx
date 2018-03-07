@@ -70,38 +70,130 @@
  */
 
 /**
- * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+ * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import { ServiceRequest } from "src/services/service-request";
-import { SpinnerType } from "src/services/hornet-superagent-request";
+'use strict';
+var chai = require('chai');
+const expect = chai.expect;
+import * as React from "react";
 
-const logger: Logger = Utils.getLogger("hornet-js-core.services.layout-through-session-request");
+import { BaseTest } from "hornet-js-test/src/base-test";
+import { runTest } from "hornet-js-test/src/test-run";
+import { Decorators } from "hornet-js-test/src/decorators";
+import * as assert from "assert";
 
-export class ExpandingLayoutRequest extends ServiceRequest {
+import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
+import { Table } from "hornet-js-react-components/src/widget/table/table";
+import { Header } from "hornet-js-react-components/src/widget/table/header";
+/* Composant Content */
+import { Content } from "hornet-js-react-components/src/widget/table/content";
+/*  Colonne du tableau */
+import { Column } from "hornet-js-react-components/src/widget/table/column";
+import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { CheckColumn } from "src/widget/table/column/check-column";
 
-    setExpandedLayout(layoutObject: any): Promise<any> {
-        return this.fetch({
-            spinnerType: SpinnerType.Default,
-            method: "post",
-            url: Utils.buildContextPath("/setExpandedLayout"),
-            data: layoutObject
-        });
+
+import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
+import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
+import { TabContent } from "src/widget/tab/tab-content";
+
+import { TabHeader } from "src/widget/tab/tab-header";
+
+
+let dataSource: DataSource<any>;
+let tabsElement: JSX.Element;
+let tabs;
+let data;
+let fnt;
+let beforeHideTabCount = 0;
+let afterShowTabCount = 0;
+let onSelectCount = 0;
+let addDiv;
+
+@Decorators.describe('Test Karma tabs add button')
+class tabsAddButtonTest extends BaseTest {
+
+    @Decorators.beforeEach
+    beforeEach() {
+        data = [];
+        tabs = null;
+
+        beforeHideTabCount = 0;
+        afterShowTabCount = 0;
+        onSelectCount = 0;
+
+        let step = 1;
+        for (let i: number = 1; i < 10; i++) {
+            data.push({id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++});
+        }
+        dataSource = new DataSource(data);
+        fnt = () => {
+            if (!dataSource.status) {
+                dataSource.init();
+            }
+        };
+        tabsElement = (
+            <Tabs id="tabs" selectedTabIndex={0} beforeHideTab={() => {
+                beforeHideTabCount++
+            }} afterShowTab={() => {
+                afterShowTabCount++
+            }}
+                  addTabFunction={this.addFunction.bind(this)}
+                  addButtonTtitle={"test"}
+            >
+                <Tab title="tab1">
+                    <div>TabContent1</div>
+                </Tab>
+                <Tab title="tab2">
+                    <div>TabContent2</div>
+                </Tab>
+            </Tabs>
+        );
+
+        addDiv = <div id={"testAdd"}></div>
+    };
+
+    addFunction() {
+        this.renderIntoDocument(addDiv, "main851");
     }
 
-    isExpandedLayout(): Promise<any> {
-        return this.fetch({
-            spinnerType: SpinnerType.Default,
-            noCached: true,
-            method: "get",
-            url: Utils.buildContextPath("/isExpandedLayout")
-        });
-    }
+    @Decorators.it('Test OK')
+    testOk() {
+        assert.equal(1, 1);
+        this.end();
+    };
+
+    @Decorators.it('affichage du bouton add')
+    testAddButtonExist() {
+        tabs = this.renderIntoDocument(tabsElement, "main850");
+        expect(document.querySelector('#main850 #tabs-add-button')).to.exist;
+        this.end();
+    };
+
+    @Decorators.it('affichage du title')
+    testTitleAddButtonExist() {
+        tabs = this.renderIntoDocument(tabsElement, "main852");
+        expect(document.querySelector('#main852 #tabs-add-button[title="test"]')).to.exist;
+        this.end();
+    };
+
+    @Decorators.it('click sur le bouton d\'ajout')
+    clickOnAddButton() {
+        tabs = this.renderIntoDocument(tabsElement, "main851");
+        this.triggerMouseEvent(document.querySelector('#main851 #tabs-add-button'), "click");
+        setTimeout(() => {
+            expect(document.querySelector('#main851 #testAdd')).to.exist;
+            this.end();
+        }, 500);
+    };
+
 }
+
+//lancement des Tests
+runTest(new tabsAddButtonTest());

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,7 +90,7 @@ import { DataSourceOption, DefaultSort, InitAsync } from "src/component/datasour
 import { DataSourceMap } from "src/component/datasource/config/datasource-map";
 import { DataSourceConfig } from "src/component/datasource/config/service/datasource-config";
 import { DataSourceConfigPage } from "src/component/datasource/config/service/datasource-config-page";
-import { Class } from "hornet-js-utils/src/typescript-utils";
+import { DatasourceSortOption } from "src/component/datasource/options/datasource-sort-option";
 
 export enum DataSourceStatus {
     Dummy,
@@ -117,10 +117,10 @@ export enum DataSourceStatus {
 export class DataSource<T> extends events.EventEmitter {
 
     /***
-     * tableau d'item selectionné du datasource
+     * attribut de la selection du datasource
      * @instance
      */
-    protected _selected: Array<any> = [];
+    protected _selected: any;
 
     /***
      * scope utilisé pour réaliser un fetch de type méthode de service.
@@ -138,7 +138,7 @@ export class DataSource<T> extends events.EventEmitter {
      * tableau de résultats du datasource
      * @instance
      */
-    protected _results: Array<any> = [];
+    protected datasourceResults: Array<any> = [];
 
     /***
      * backup des résultats du datasource
@@ -183,12 +183,14 @@ export class DataSource<T> extends events.EventEmitter {
     protected _status;
 
     /***
-     * @param {DataSourceConfig|DataSourceConfigPage|Array<T>} config : accepte soit une liste de l'éléments Array<T>, soit un service DataSourceConfig | DataSourceConfigPage
+     * @param {DataSourceConfig|DataSourceConfigPage|Array<T>}
+     *        config : accepte soit une liste de l'éléments Array<T>, soit un service DataSourceConfig | DataSourceConfigPage
      * @param {DataSourceMap} keysMap  : utilisée pour la transformation des resultats du fetch.
      * @param {DataSourceOption[]} options : liste de paramètres supplémentaires à transmettre au fetch
      * Pour un config de type
      */
-    constructor(protected config: DataSourceConfig | DataSourceConfigPage | Array<T>, public keysMap: DataSourceMap = {}, public options?: DataSourceOption[]) {
+    constructor(protected config: DataSourceConfig | DataSourceConfigPage | Array<T>,
+        public keysMap: DataSourceMap = {}, public options?: DataSourceOption[]) {
         super();
         this._status = DataSourceStatus.Dummy;
         this.config = config;
@@ -209,11 +211,11 @@ export class DataSource<T> extends events.EventEmitter {
             this.isDataSourceArray = true;
             this.init();
         }
-        let init = _.find(options, (option: DataSourceOption) => {
-            return option instanceof InitAsync
+        const init = _.find(options, (option: DataSourceOption) => {
+            return option instanceof InitAsync;
         });
-        let sort = _.find(options, (option: DataSourceOption) => {
-            return option instanceof DefaultSort
+        const sort = _.find(options, (option: DataSourceOption) => {
+            return option instanceof DefaultSort;
         });
 
         this.defaultSort = sort ? sort as DefaultSort : null;
@@ -290,8 +292,18 @@ export class DataSource<T> extends events.EventEmitter {
         return this._selected;
     }
 
-    set selected(value : any) {
+    set selected(value: any) {
         this._selected = value;
+    }
+
+    /***
+    * Méthode qui retourne des items du result d'un datasource.
+    * {@link https://lodash.com/docs/#every}
+    * @param criteria
+    * @return renvoie les éléments trouvés
+    */
+    public findAll(criteria: any): any {
+        return _.filter(this.results, criteria);
     }
 
     /**
@@ -299,9 +311,13 @@ export class DataSource<T> extends events.EventEmitter {
      * @param item
      */
     public removeUnSelectedItem(item: any) {
-        let indexOf = ArrayUtils.getIndexById(this._selected, item);
-        if (indexOf !== -1) {
-            this._selected.splice(indexOf, 1);
+        if (!item) return;
+        if (this._selected instanceof Array) {
+            _.remove(this._selected, item)
+        } else {
+            if (item === this._selected) {
+                this._selected = undefined;
+            }
         }
     }
 
@@ -309,7 +325,7 @@ export class DataSource<T> extends events.EventEmitter {
      * renvoie le tableau des résultats.
      */
     get results() {
-        return this._results;
+        return this.datasourceResults;
     }
 
     get status() {
@@ -328,7 +344,7 @@ export class DataSource<T> extends events.EventEmitter {
      * @param {any[]} results les données du data source (post-transformation {@link DataSource#transformData}).
      */
     set results(results: Array<any>) {
-        this._results = results;
+        this.datasourceResults = results;
     }
 
     /***
@@ -388,10 +404,11 @@ export class DataSource<T> extends events.EventEmitter {
             //déclenchement de l'event fetch (si demandé) avec le result du data source en datasourceArray
             Promise.resolve().then(() => {
                 if (triggerFetch) {
-                    this.emit("fetch", this.results);
                     if (this.defaultSort && !(args && args[ "sort" ])) {
-                        this.sortData(this.defaultSort.sort, this.defaultSort);
+                        let options: DatasourceSortOption = { sortDatas: this.defaultSort.sort, compare: this.defaultSort };
+                        this.sortData(options);
                     }
+                    this.emit("fetch", this.results);
                 } else {
                     return false;
                 }
@@ -405,14 +422,14 @@ export class DataSource<T> extends events.EventEmitter {
                         this.results = res;
                         let args = fetchArgs[ 0 ];
                         if (this.defaultSort && !(args && args[ "sort" ])) {
-                            this.sortData(this.defaultSort.sort, this.defaultSort);
+                            let options: DatasourceSortOption = { sortDatas: this.defaultSort.sort, compare: this.defaultSort };
+                            this.sortData(options);
                         }
                         triggerFetch ? this.emit("fetch", this.results) : null;
                         return this.results;
                     }).catch((e) => {
                         let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_FETCH_ERROR, null, e);
                         this.emit("error", error);
-                        throw error;
                     });
                 });
         return p.finally(() => {
@@ -436,6 +453,9 @@ export class DataSource<T> extends events.EventEmitter {
         this.addData(triggerFetch, ...items).then((result) => {
             this.emit("add", result);
             return this.results;
+        }).catch((e) => {
+            let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_ADD_ERROR, null, e);
+            this.emit("error", error);
         })
     }
 
@@ -450,16 +470,16 @@ export class DataSource<T> extends events.EventEmitter {
         return Promise.resolve().then(() => {
             return this.transformData(items).then((result) => {
                 try {
-                    this._results = this._results.concat(result);
+                    this.datasourceResults = this.datasourceResults.concat(result);
                     if (this.defaultSort) {
-                        this.sortData(this.defaultSort.sort, this.defaultSort);
+                        let options: DatasourceSortOption = { sortDatas: this.defaultSort.sort, compare: this.defaultSort };
+                        this.sortData(options);
                     }
                     if (triggerFetch) this.emit("fetch", this.results);
-                    return this._results;
+                    return this.datasourceResults;
                 } catch (e) {
                     let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_ADD_ERROR, null, e);
                     this.emit("error", error);
-                    throw error;
                 }
             })
         }).finally(() => {
@@ -478,16 +498,16 @@ export class DataSource<T> extends events.EventEmitter {
         let res = null;
         try {
             let result = this.transformDataSync(items);
-            this._results = this._results.concat(result);
+            this.datasourceResults = this.datasourceResults.concat(result);
             if (this.defaultSort) {
-                this.sortData(this.defaultSort.sort, this.defaultSort);
+                let options: DatasourceSortOption = { sortDatas: this.defaultSort.sort, compare: this.defaultSort };
+                this.sortData(options);
             }
             if (triggerFetch) this.emit("fetch", this.results);
-            res = this._results;
+            res = this.datasourceResults;
         } catch (e) {
             let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_ADD_ERROR, null, e);
             this.emit("error", error);
-            throw error;
         }
         this.emit("loadingData", false);
         return res;
@@ -504,6 +524,9 @@ export class DataSource<T> extends events.EventEmitter {
         this.deleteData(triggerFetch, ...items).then((result) => {
             this.emit("delete", result);
             return this.results;
+        }).catch((e) => {
+            let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_DELETE_ERROR, null, e);
+            this.emit("error", error);
         })
     }
 
@@ -519,7 +542,7 @@ export class DataSource<T> extends events.EventEmitter {
     /***
      * enlève un élément ou des éléments au result du datasource
      * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
-     * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
+     * @param {(T|T[])[]} items correspond aux données à supprimer, un appel à la méthode {@link DataSource#transformData} sera effectué
      * @return {Promise<Array<<any>>} une promise du result modifié
      */
     protected deleteData(triggerFetch: Boolean = false, ...items: (T | T[])[]): Promise<Array<any>> {
@@ -527,14 +550,13 @@ export class DataSource<T> extends events.EventEmitter {
         return Promise.resolve().then(() => {
             return this.transformData(items).then((result: Array<T>) => {
                 _.map(result, (item) => {
-                    _.remove(this._results, item);
+                    _.remove(this.datasourceResults, item);
                 });
                 if (triggerFetch) this.emit("fetch", this.results);
                 return this.results;
             }).catch((e) => {
                 let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_DELETE_ERROR, null, e);
                 this.emit("error", error);
-                throw error;
             });
         }).finally(() => {
             this.emitEvent("loadingData", false);
@@ -592,6 +614,7 @@ export class DataSource<T> extends events.EventEmitter {
                 return resultKeys;
             }
         });
+
     }
 
 
@@ -600,24 +623,32 @@ export class DataSource<T> extends events.EventEmitter {
      * @param {SortData[]} sort  données de tri
      * @param {(a: any, b: any) => number} Fonction de comparaison.
      */
-    protected sortData(sort: SortData[], compare?: any) {
-        if (compare) {
-            (compare as any).sortDatas = sort;
-            this.results.sort((compare as any).compare);
+    protected sortData(options: DatasourceSortOption) {
+        if (options.compare) {
+            let exec = (options.compare as any);
+
+            if ((options.compare as any).compare) {
+                exec = (options.compare as any).compare;
+            }
+
+            if ((options.compare as any).initCompare) {
+                if (typeof (options.compare as any).initCompare == "function") {
+                    exec = (options.compare as any).initCompare;
+                } else {
+                    exec = (options.compare as any).getCompareFunction((options.compare as any).initCompare)
+                }
+            }
+
+            this.results = this.results.sort(exec.bind(options.sortDatas, options.sortDatas));
         } else {
             let keys = [];
             let directions = [];
-            for (let i = 0; i < sort.length; i++) {
-                keys.push(sort[ i ].key);
-                directions.push(sort[ i ].dir ? "desc" : "asc");
+            for (let i = 0; i < options.sortDatas.length; i++) {
+                keys.push(options.sortDatas[ i ].key);
+                directions.push(options.sortDatas[ i ].dir ? "desc" : "asc");
             }
             this.results = _.orderBy(this.results, keys, directions);
         }
-
-        /*this.results = _.sortBy(this.results, sort.key instanceof Array ? sort.key : [ sort.key ]); // seulement ascendant
-         if (sort.dir == SortDirection.DESC) {
-         this.results = this.results.reverse();
-         }*/
     }
 
     /***
@@ -631,27 +662,27 @@ export class DataSource<T> extends events.EventEmitter {
      * dataSource.sort(sortData);
      * @void
      */
-    public sort(sortDatas: SortData[], compare?: (a: any, b: any) => number): void {
+    public sort(options: DatasourceSortOption): void {
         this.emit("loadingData", true);
         Promise.resolve().then(() => {
             try {
                 if (this.isDataSourceArray) {
-                    if (this.defaultSort) this.defaultSort.sort = sortDatas;
+                    if (this.defaultSort) this.defaultSort.sort = options.sortDatas;
 
-                    this.sortData(sortDatas, compare || this.defaultSort);
-                    this.emitEvent("sort", this.results, sortDatas);
+                    options.compare = options.compare || this.defaultSort;
+                    this.sortData(options);
+                    this.emitEvent("sort", this.results, options.sortDatas);
                     return this.results;
                 } else {
-                    return this.fetchData(false, this.getFetchArgs("sort", sortDatas))
+                    return this.fetchData(false, this.getFetchArgs("sort", options.sortDatas))
                         .then((results: Array<T>) => {
-                            this.emitEvent("sort", this.results, sortDatas);
+                            this.emitEvent("sort", this.results, options.sortDatas);
                             return results;
                         });
                 }
             } catch (e) {
                 let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ERROR, null, e);
                 this.emit("error", error);
-                throw error;
             }
 
         }).finally(() => {
@@ -676,18 +707,18 @@ export class DataSource<T> extends events.EventEmitter {
             if (cancelFilterHistory) {
                 if (!this._filtering_flag) {
                     //backup
-                    this._results_backup = this._results;
+                    this._results_backup = this.datasourceResults;
                     this._filtering_flag = true;
                 } else {
                     //restore
-                    this._results = this._results_backup;
+                    this.datasourceResults = this._results_backup;
                 }
             }
         }
         Promise.resolve().then(() => {
             try {
                 if (this.isDataSourceArray) {
-                    this._results = _.filter(this.results, config);
+                    this.datasourceResults = _.filter(this.results, config);
                     this.emitEvent("filter", this.results);
                 } else {
                     this.fetchData(false, this.getFetchArgs("filter", config)).then(() => {
@@ -697,7 +728,6 @@ export class DataSource<T> extends events.EventEmitter {
             } catch (e) {
                 let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_FILTER_ERROR, null, e);
                 this.emit("error", error);
-                throw error;
             }
         }).finally(() => {
             this.emitEvent("loadingData", false);
@@ -711,7 +741,7 @@ export class DataSource<T> extends events.EventEmitter {
      */
     public cancelFilter(): void {
         if (this._filtering_flag) {
-            this._results = this._results_backup;
+            this.datasourceResults = this._results_backup;
         }
     }
 
@@ -739,9 +769,9 @@ export class DataSource<T> extends events.EventEmitter {
      */
     public selectClean(flag: boolean) {
         if (flag) {
-            this.select([]);
+            this.select(undefined);
         }
-        this._selected = [];
+        this._selected = undefined;
     }
 
     /**

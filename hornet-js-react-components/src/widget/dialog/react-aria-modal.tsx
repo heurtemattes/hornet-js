@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -138,7 +138,7 @@ class ModalManager {
             }
 
             if (!focusNode) {
-                focusNode = tabbableNodes[0];
+                focusNode = tabbableNodes[ 0 ];
                 if (!focusNode) logger.warn("Impossible de donner le focus à un élément de la modale, aucun élément tabulable trouvé");
             }
 
@@ -160,14 +160,14 @@ class ModalManager {
             let modalPos = _.findIndex(ModalManager.modals, (mObj) => {
                 return mObj.idx === maxIdx;
             });
-            ModalManager.active = ModalManager.modals[modalPos];
+            ModalManager.active = ModalManager.modals[ modalPos ];
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             /* L'attribut prevFocusedNode n'est pas forcément valorisé : en particulier sous IE, au moment de l'appel à
              * register(), document.activeElement peut être indéfini */
-            if (oModal[0].prevFocusedNode) {
-                oModal[0].prevFocusedNode.focus();
+            if (oModal[ 0 ].prevFocusedNode) {
+                oModal[ 0 ].prevFocusedNode.focus();
             }
         }, 0);
     }
@@ -176,7 +176,7 @@ class ModalManager {
         if (!ModalManager.active.manageFocus) return;
         let tabbableNodes = tabbable(ModalManager.active.node);
         if (ModalManager.active.node.contains(e.target)) return;
-        tabbableNodes[0].focus();
+        tabbableNodes[ 0 ].focus();
     }
 
     static checkClick(e) {
@@ -192,21 +192,21 @@ class ModalManager {
             e.preventDefault();
             let tabbableNodes = tabbable(ModalManager.active.node);
             let currentFocusIndex = tabbableNodes.indexOf(e.target);
-            let lastTabbableNode = tabbableNodes[tabbableNodes.length - 1];
-            let firstTabbableNode = tabbableNodes[0];
+            let lastTabbableNode = tabbableNodes[ tabbableNodes.length - 1 ];
+            let firstTabbableNode = tabbableNodes[ 0 ];
             if (e.shiftKey) {
                 if (e.target === firstTabbableNode) {
                     lastTabbableNode.focus();
                     return;
                 }
-                tabbableNodes[currentFocusIndex - 1].focus(0);
+                tabbableNodes[ currentFocusIndex - 1 ].focus(0);
                 return;
             }
             if (e.target === lastTabbableNode) {
                 firstTabbableNode.focus();
                 return;
             }
-            tabbableNodes[currentFocusIndex + 1].focus();
+            tabbableNodes[ currentFocusIndex + 1 ].focus();
         }
 
         if (e.key === "Escape" || e.key === "Esc" || e.keyCode === KeyCodes.ESCAPE) {
@@ -228,12 +228,12 @@ class ReactAriaModalUnderlay extends HornetComponent<any, any> {
             overflowY: "auto",
             WebkitOverflowScrolling: "touch"
         };
-        if (this.state.underlayColor) style["background"] = this.state.underlayColor;
-        if (this.state.underlayClickExits) style["cursor"] = "pointer";
+        if (this.state.underlayColor) style[ "background" ] = this.state.underlayColor;
+        if (this.state.underlayClickExits) style[ "cursor" ] = "pointer";
 
         return (
             <div className={this.state.underlayClass} style={style}>
-                { React.cloneElement(this.state.children, {ref: "dialog"}) }
+                {React.cloneElement(this.state.children, { ref: "dialog" })}
             </div>
         );
     }
@@ -278,10 +278,11 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
 
         let modal = (
             <div role={this.state.alert ? "alertdialog" : "dialog"}
-                 aria-labelledby={this.state.titleId}
+                 aria-labelledby={"dialogue-title"}
+                 aria-describedby={"dialogue-body-content"}
                  aria-label={this.state.titleText}
                  id={this.state.dialogId}
-                 className={this.state.dialogClass}
+                 className={this.state.dialogClass + " dialog-content-alert"}
                  style={style}
                  onClick={this.onClick}
                  tabIndex={this.state.focusDialog ? -1 : undefined}>
@@ -341,10 +342,10 @@ export class ReactAriaModal extends HornetComponent<any, any> {
         if (!this.state.idx) this.state.idx = ++ReactAriaModal.number;
         let nProps = {};
         for (let prop in this.props) {
-            nProps[prop] = this.props[prop];
+            nProps[ prop ] = this.props[ prop ];
         }
         //this.state.idx = this.state.idx;
-        nProps["idx"] = this.state.idx;
+        nProps[ "idx" ] = this.state.idx;
         if (!this.state.firstRender) {
             document.body.appendChild(this.state.container);
             this.state.firstRender = true;

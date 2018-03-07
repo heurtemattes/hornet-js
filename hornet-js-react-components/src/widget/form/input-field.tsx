@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,6 +86,8 @@ import {
 import { Picto } from "src/img/picto";
 import * as _ from "lodash";
 import * as classNames from "classnames";
+import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
+import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 
 /**
  * Composant champ de formulaire : input html de type texte par défaut
@@ -100,9 +102,9 @@ export interface InputFieldProps extends HornetWrittableProps,
 
 export class InputField<P extends InputFieldProps, S> extends AbstractField<InputFieldProps, S> {
 
-    static defaultProps = _.assign({type: "text", resettable: true}, AbstractField.defaultProps);
+    static defaultProps = _.assign({ type: "text", resettable: true }, AbstractField.defaultProps);
 
-    public readonly props:Readonly<InputFieldProps>;
+    public readonly props: Readonly<InputFieldProps>;
 
     /**
      * Génère le rendu spécifique du champ
@@ -113,7 +115,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
         let htmlProps = _.cloneDeep(this.getHtmlProps());
 
         if (this.state.currentValue != null) {
-            _.assign(htmlProps, {"defaultValue": this.props.currentValue});
+            _.assign(htmlProps, { "defaultValue": this.props.currentValue });
         }
 
         let inputClasses: ClassDictionary = {
@@ -121,22 +123,22 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
             "input": true
         };
 
-        if (htmlProps["className"]) {
-            inputClasses[htmlProps["className"]] = true;
+        if (htmlProps[ "className" ]) {
+            inputClasses[ htmlProps[ "className" ] ] = true;
         }
 
         if (this.state.alignment) {
-            inputClasses[this.state.alignment] = true;
+            inputClasses[ this.state.alignment ] = true;
         }
 
-        htmlProps["onChange"] = this.state.resettable ? this.handleChangeInput : htmlProps["onChange"];
-        htmlProps["className"] = classNames(inputClasses);
+        htmlProps[ "onChange" ] = this.state.resettable ? this.handleChangeInput : htmlProps[ "onChange" ];
+        htmlProps[ "className" ] = classNames(inputClasses);
 
         return (
             <div>
                 <input ref={(elt) => this.registerHtmlElement(elt)} {...htmlProps} />
                 {this.state.resettable && this.state.valued && !this.state.readOnly && !this.state.disabled ? this.renderResetButton() :
-                    <div/>}
+                    <div />}
             </div>
         );
     }
@@ -149,7 +151,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
 
-        this.setState({valued: (value !== "" && value)});
+        this.setState({ valued: (value !== "" && value) });
         return this;
     }
 
@@ -165,7 +167,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         let htmlProps = _.cloneDeep(this.getHtmlProps());
 
-        let hidden = htmlProps["type"] === "hidden";
+        let hidden = htmlProps[ "type" ] === "hidden";
 
         let classList: ClassDictionary = {
             "input-reset": true,
@@ -174,19 +176,19 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         let aProps: any = {};
         if (this.isValued()) {
-            aProps["onClick"] = this.resetValue;
+            aProps[ "onClick" ] = this.resetValue;
         }
 
         let prefixID: string = this.props.id || this.props.name;
 
         return (
             <span className={classNames(classList)}
-                  role="button"
-                  aria-hidden={!this.state.valued}
-                  id={prefixID + "ResetButton"}
+                role="button"
+                aria-hidden={!this.state.valued}
+                id={prefixID + "ResetButton"}
             >
                 <a {...aProps}>
-                    <img src={Picto.grey.close}/>
+                    <img src={Picto.grey.close} alt={this.i18n("inputField.messageBtn")} title={this.i18n("inputField.messageBtn")} />
                 </a>
             </span>
         );
@@ -197,8 +199,9 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      */
     resetValue(): void {
         this.htmlElement.value = null;
-        if(this.htmlElement && this.htmlElement.onchange) this.htmlElement.onchange();
-        this.setState({valued: false});
+        if (this.htmlElement && this.htmlElement.onchange) this.htmlElement.onchange();
+        fireHornetEvent(VALUE_CHANGED_EVENT.withData(this.htmlElement));
+        this.setState({ valued: false });
     }
 
     /**
@@ -208,16 +211,16 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
     handleChangeInput(e): void {
         if (this.htmlElement && this.htmlElement.value) {
             if (!this.state.valued) {
-                this.setState({valued: true});
+                this.setState({ valued: true });
             }
         } else if (this.state.valued) {
-            this.setState({valued: false});
+            this.setState({ valued: false });
         }
 
         let htmlProps = this.getHtmlProps();
 
-        if (_.isFunction(htmlProps["onChange"])) {
-            htmlProps["onChange"](e);
+        if (_.isFunction(htmlProps[ "onChange" ])) {
+            htmlProps[ "onChange" ](e);
         }
     }
 }

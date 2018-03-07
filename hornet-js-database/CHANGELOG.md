@@ -1,3 +1,10 @@
+# hornet-js-database 5.1.1
+
+-	EVOL: peram class dao sequelize
+-	[S76-199] : creation de hornet sequelize entity dao
+-	EVOL[S16-158] : Ajout d'une option targetKey pour les relations dans SequelizeUtils
+
+
 # hornet-js-database-5.1.0
 
 -	213191	-	Maj regex tsconfig

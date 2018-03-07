@@ -1,5 +1,5 @@
 {
-  "contextPath": "applitutoriel-5.0.0",
+  "contextPath": "applitutoriel-5.1.1",
   "server": {
     "port": 8888,
     "keepAlive": true,
@@ -7,7 +7,6 @@
     "timeout": 300000,
     "uploadFileSize": 1000000
   },
-  "themeUrl": "http://localhost:7777/5.1.0/intranet",
   "security": {
     "enabled": false,
     "hpp": true,
@@ -64,30 +63,6 @@
     //        "preload": false
     //      }
   },
-  "log": {
-    "levels": {
-      "[all]": "INFO"
-      //        "hornet-js.core": "DEBUG"
-    },
-    "appenders": [
-      {
-        "type": "console",
-        "layout": {
-          "type": "pattern",
-          "pattern": "%[%d{yyyy:MM:dd:hh:mm:ss,SSS}|%p|%c|%h|%m%]"
-        }
-      }
-      //        {
-      //          "type": "dateFile",
-      //          "filename": "log/app.log",
-      //          "pattern": "-yyyy-MM-dd",
-      //          "layout": {
-      //            "type": "pattern",
-      //            "pattern": "%d{yyyy:MM:dd:hh:mm:ss,SSS}|%p|%c|%h|%m%"
-      //          }
-      //        }
-    ]
-  },
   "defaultServices": {
     "host": "http://localhost:8080/",
     "name": "applitutoriel-service/"
@@ -115,8 +90,10 @@
   "authentication": {
     "loginUrl": "/login"
   },
-  "cache": {
-    "enabled": true,
-    "timetolive": 60
+  "request": {
+    "cache": {
+      "enabled": true,
+      "timetolive": 60
+    }
   }
 }

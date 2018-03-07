@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-import {HornetComponent} from "src/widget/component/hornet-component";
+import { HornetComponent } from "src/widget/component/hornet-component";
 
 const logger = Utils.getLogger("hornet-js-react-components.widget.icon.icon");
 
@@ -122,7 +122,7 @@ export const EMPTY_URL: string = "#";
 /**
  * Composant Icône
  */
-export class Icon extends HornetComponent<IconProps,any> {
+export class Icon extends HornetComponent<IconProps, any> {
 
     static defaultProps = {
         url: EMPTY_URL
@@ -132,9 +132,9 @@ export class Icon extends HornetComponent<IconProps,any> {
      * Retire le focus de l'élément une fois cliqué de façon à permettre de scroller ou mettre le focus sur les
      * notifications éventuellement présentées suite à l'action.
      * @param event évènement
-     * @private
+     * @protected
      */
-    private iconOnClick(event: React.MouseEvent<HTMLElement>): void {
+    protected iconOnClick(event: React.MouseEvent<HTMLElement>): void {
         if (event.currentTarget && (event.currentTarget as HTMLElement).blur) {
             (event.currentTarget as HTMLElement).blur();
         } else {
@@ -155,21 +155,21 @@ export class Icon extends HornetComponent<IconProps,any> {
             /* L'URL n'est pas valorisée : le comportement est celui d'un bouton (raccourci clavier : Entrée OU Espace )
              * (cf. https://www.w3.org/TR/wai-aria-practices/#button > "Keyboard Interaction")  */
             result = <button type="button" title={this.state.title} id={this.state.idLink}
-                             className={this.props.classLink}
-                             onClick={this.iconOnClick}
-                             tabIndex={this.props.tabIndex}
-                             aria-haspopup={this.props.hasPopUp}>
+                className={this.props.classLink}
+                onClick={this.iconOnClick}
+                tabIndex={this.props.tabIndex}
+                aria-haspopup={this.props.hasPopUp}>
                 <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
-                     className={this.state.classImg}/>
+                    className={this.state.classImg} />
             </button>
         } else {
             /* L'URL est valorisée : le comportement est celui d'un lien (raccourci clavier : Entrée uniquement )*/
             result = <a href={this.state.url} title={this.state.title} id={this.state.idLink}
-                        className={this.props.classLink}
-                        onClick={this.iconOnClick} target={this.state.target}
-                        tabIndex={this.props.tabIndex}>
+                className={this.props.classLink}
+                onClick={this.iconOnClick} target={this.state.target}
+                tabIndex={this.props.tabIndex}>
                 <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
-                     className={this.state.classImg}/>
+                    className={this.state.classImg} />
             </a>
         }
         return result;

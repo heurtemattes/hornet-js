@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,10 +92,12 @@ import KeyboardEvent = __React.KeyboardEvent;
  * Propriétés ChangeLanguage
  */
 export interface ChangeLanguageProps extends HornetComponentProps {
+    /** id du composant */
+    id?: string;
     /** Boolean permettant de savoir si la liste deroulante est affiché */
     isOpen?: boolean;
     /** Méthode appelé après un changement de langue */
-    handleChangeLanguage?: (locale: string,) => void;
+    handleChangeLanguage?: (locale: string, ) => void;
     /** détermine la position du arrow */
     position?: Position;
     switchTitle?: string;
@@ -123,7 +125,7 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
 
     componentDidMount() {
         super.componentDidMount();
-        this.setState({isMounted: true});
+        this.setState({ isMounted: true });
     }
 
     componentDidUpdate() {
@@ -144,13 +146,14 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
                 label: item.langLabel,
                 action: this.selectLanguage.bind(this, item.locale, item.langShort),
                 className: "material-dropdown-menu__link",
-                disabled: disabled
+                disabled: disabled,
+                lang: item.locale
             });
         });
         return (
             <Dropdown
                 className={"language"}
-                id={"Change-Language"}
+                id={this.props.id || "Change-Language"}
                 title={this.state.switchTitle}
                 items={dropdownItems}
                 icon="language-arrow-down"
@@ -166,8 +169,8 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
      * @param shortLabel bigramme de la nouvelle langue ( ex : 'en' , 'fr' )
      */
     selectLanguage(locale: string, shortLabel: string) {
-        this.setState({currentLanguage: shortLabel}, () => logger.trace("Changement affichage"));
-        this.setState({isOpen: false}, () => logger.trace("Cacher la liste des langues"));
+        this.setState({ currentLanguage: shortLabel }, () => logger.trace("Changement affichage"));
+        this.setState({ isOpen: false }, () => logger.trace("Cacher la liste des langues"));
 
         if (this.props.handleChangeLanguage) {
             this.props.handleChangeLanguage(locale);

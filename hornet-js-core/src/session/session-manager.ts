@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,12 +102,12 @@ declare module "express" {
 
 /**
  * Node.js 0.8+ async implementation.
- * @private
+ * 
  */
 /* istanbul ignore next */
 var defer = typeof setImmediate === "function" ?
     setImmediate :
-    function(fn, a?, b?) {
+    function (fn, a?, b?) {
         process.nextTick(fn.bind.apply(fn, arguments))
     };
 
@@ -115,7 +115,7 @@ var defer = typeof setImmediate === "function" ?
  * Generate a session ID for a new session.
  *
  * @return {String}
- * @private
+ * 
  */
 function generateSessionId(req) {
     return uid(24);
@@ -125,7 +125,7 @@ function generateSessionId(req) {
  * Get the session ID cookie from request.
  *
  * @return {string}
- * @private
+ * 
  */
 function getcookie(req, name, secret, route) {
     var header = req.headers.cookie;
@@ -137,7 +137,7 @@ function getcookie(req, name, secret, route) {
     if (header) {
         var cookies = cookie.parse(header);
 
-        raw = cookies[name];
+        raw = cookies[ name ];
         // sticky session management
         if (cookieRoute && raw && raw.indexOf(cookieRoute, raw.length - cookieRoute.length) > -1) {
             raw = raw.substr(0, raw.length - cookieRoute.length);
@@ -165,7 +165,7 @@ function getcookie(req, name, secret, route) {
  *
  * @param {Session} session
  * @return {String}
- * @private
+ * 
  */
 function hash(session: Session) {
     return crc(JSON.stringify(session.getData()));
@@ -177,7 +177,7 @@ function hash(session: Session) {
  * @param {Object} req
  * @param {Boolean} [trustProxy]
  * @return {Boolean}
- * @private
+ * 
  */
 function isSecure(req, trustProxy) {
     // socket is https server
@@ -199,7 +199,7 @@ function isSecure(req, trustProxy) {
     }
 
     // read the proto from x-forwarded-proto header
-    var header = req.headers["x-forwarded-proto"] || "";
+    var header = req.headers[ "x-forwarded-proto" ] || "";
     var index = header.indexOf(",");
     var proto = index !== -1
         ? header.substr(0, index).toLowerCase().trim()
@@ -211,7 +211,6 @@ function isSecure(req, trustProxy) {
 /**
  * Set cookie on response.
  *
- * @private
  */
 function setcookie(res, name, val, secret, options, route) {
     var cookieValue = secret.length > 0 ? "s:" + signature.sign(val, secret) : val;
@@ -226,14 +225,14 @@ function setcookie(res, name, val, secret, options, route) {
 
     var prev = res.getHeader("set-cookie") || [];
     var header = Array.isArray(prev) ? prev.concat(data)
-        : Array.isArray(data) ? [prev].concat(data)
-        : [prev, data];
+        : Array.isArray(data) ? [ prev ].concat(data)
+            : [ prev, data ];
 
     res.setHeader("set-cookie", header)
 }
 
 export class SessionManager {
-    private static STORE: Store;
+    protected static STORE: Store;
 
     static invalidate(session: Session, fn: Function) {
     }
@@ -276,8 +275,8 @@ export class SessionManager {
         };
 
         // implementation dynamique pour accès à la conf
-        SessionManager.invalidate = function(session: Session, fn: Function) {
-            var res = session["currentResponse"];
+        SessionManager.invalidate = function (session: Session, fn: Function) {
+            var res = session[ "currentResponse" ];
             onHeaders(res, () => {
                 setcookie(res, name, "", "", cookieDestroy, null);
             });
@@ -322,7 +321,7 @@ export class SessionManager {
             var sessionId = getcookie(req, name, secret, route);
 
             // set-cookie listener
-            onHeaders(res, function() {
+            onHeaders(res, function () {
                 if (!req.getSession()) {
                     logger.debug("no session");
                     return;
@@ -376,7 +375,7 @@ export class SessionManager {
 
             // prevent writing to closed response
             var error = false;
-            ["close", "abort", "end"].forEach((event) => {
+            [ "close", "abort", "end" ].forEach((event) => {
                 res.once(event, () => {
                     error = true;
                 });
@@ -444,7 +443,7 @@ export class SessionManager {
             }
 
             // get the session from the store if exists
-            store.get(sessionId, function(err, session: Session) {
+            store.get(sessionId, function (err, session: Session) {
                 if (err) {
                     logger.trace("error trying to get session in the store : %j", err);
                     if (err.code !== "ENOENT") {

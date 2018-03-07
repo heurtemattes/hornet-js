@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,8 +92,8 @@ export class DateUtils {
     /**
      * Formats de date en année, mois, jour
      */
-        // TODO tetaudf améliorer en enum
-    static YMD_Formats: Array<string> = ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY/MM/DD", "YYYY-MM-DD"];
+    // TODO tetaudf améliorer en enum
+    static YMD_Formats: Array<string> = [ "DD/MM/YYYY", "MM/DD/YYYY", "YYYY/MM/DD", "YYYY-MM-DD" ];
 
     /**
      *  On s'assure que le fuseau horaire utilisé est le même que dans l'interpréteur javascript
@@ -114,7 +114,7 @@ export class DateUtils {
      * @returns {Moment} un objet Moment correspondant à dateStr ou undefined en cas d'erreur
      */
 
-    private static parseWithFormat(dateStr: string, dateFormat: string, locale?: any, exact?: boolean): any {
+    protected static parseWithFormat(dateStr: string, dateFormat: string, locale?: any, exact?: boolean): any {
         let calendar: any;
         if (dateStr && dateFormat) {
             calendar = moment(dateStr, dateFormat, exact);
@@ -173,9 +173,9 @@ export class DateUtils {
                 let index: string;
                 for (index in dateFormats) {
                     try {
-                        calendar = DateUtils.parseWithFormat(dateStr, dateFormats[index], locale, true);
+                        calendar = DateUtils.parseWithFormat(dateStr, dateFormats[ index ], locale, true);
                     } catch (err) {
-                        logger.debug("Erreur pour parser la date avec le format : ", dateFormats[index]);
+                        logger.debug("Erreur pour parser la date avec le format : ", dateFormats[ index ]);
                     }
                     if (calendar) {
                         break;

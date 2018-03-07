@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -124,9 +124,9 @@ describe.skip("hornet-agent-spec", () => {
 
         it("should deactivate cache if global cache deactivated", () => {
             // Arrange
-            Utils.setConfigObj({
+            Utils.setConfigObj({request : {
                 cache: {enabled: false}
-            });
+            }});
 
             // Act
             var instance = new HornetSuperAgent();
@@ -138,9 +138,9 @@ describe.skip("hornet-agent-spec", () => {
 
         it("should activate cache with default ttl if global cache activate", () => {
             // Arrange
-            Utils.setConfigObj({
+            Utils.setConfigObj({request: {
                 cache: {enabled: true, timetolive: 45}
-            });
+            }});
 
             // Act
             var instance = new HornetSuperAgent();

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,7 +90,7 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { MenuActions } from "src/widget/table/menu-actions";
 import { ToggleColumnsButton } from "src/widget/table/toggle-columns-button";
 import { TableState, ContentState } from "src/widget/table/table-state";
-import { Alert } from "src/widget/dialog/alert";
+import { Confirm } from "src/widget/dialog/confirm";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 
@@ -133,8 +133,8 @@ export interface HeaderProps extends HornetComponentProps {
  */
 export class Header extends HornetComponent<HeaderProps, any> {
 
-    private headerRef: any;
-    private hiddenColumns: any;
+    protected headerRef: any;
+    protected hiddenColumns: any;
 
     constructor(props: HeaderProps, context?: any) {
         super(props, context);
@@ -163,7 +163,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
         this.props.contentState.removeListener(ContentState.EDITION_CLIC_EVENT, this.handleEdition);
         if (this.props.dataSourcesList) {
             this.props.dataSourcesList.map((dataSource, index) => {
-                this.props.dataSourcesList[index].removeListener("select", this.handleChangeDataTable);
+                this.props.dataSourcesList[ index ].removeListener("select", this.handleChangeDataTable);
             });
         }
     }
@@ -173,8 +173,8 @@ export class Header extends HornetComponent<HeaderProps, any> {
         // on s'abonne au select du dataSource de chaque content
         if (this.props.dataSourcesList && Array.isArray(this.props.dataSourcesList) && this.props.dataSourcesList.length > 0) {
             this.props.dataSourcesList.map((dataSource, index) => {
-                this.props.dataSourcesList[index].setMaxListeners(Infinity);
-                this.props.dataSourcesList[index].on("select", this.handleChangeDataTable);
+                this.props.dataSourcesList[ index ].setMaxListeners(Infinity);
+                this.props.dataSourcesList[ index ].on("select", this.handleChangeDataTable);
             });
         }
         this.props.tableState.emit(TableState.RESIZE_EVENT, this.headerRef.clientWidth);
@@ -191,7 +191,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
             className: classNames({
                 "datatable-header-title": true,
                 "flex-container": true,
-                "badge-selected-items-before": this.getTotalSelectedItemsForAllDataSource() != 0
+                "badge-selected-items-before": this.state.contentState.hasCheckColumnMassSelection && this.getTotalSelectedItemsForAllDataSource() != 0
             }),
             "data-badge": this.getTotalSelectedItemsForAllDataSource(),
             tabIndex: this.state.tabIndex
@@ -203,13 +203,13 @@ export class Header extends HornetComponent<HeaderProps, any> {
                 <div className="datatable-title">
                     <span className="datatable-title-span">
                         {this.state.title + " " + this.i18n(this.state.libelleNombreTotalItem,
-                            {count: this.getTotalItemsForAllDataSource()})}
+                            { count: this.getTotalItemsForAllDataSource() })}
                     </span>
                 </div>
                 {(!this.state.hideMenuActions) ? this.renderMenuActions() : null}
-                <Alert ref="alert" message={""}
-                       onClickCancel={this.closeAlert}
-                       onClickClose={this.closeAlert}/>
+                <Confirm ref="alert" message={""}
+                    onClickCancel={this.closeAlert}
+                    onClickClose={this.closeAlert} />
             </div>);
     }
 
@@ -280,7 +280,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * @param lineIndex
      */
     handleEdition(lineIndex: number): void {
-        this.setState({hideMenuActions: lineIndex !== undefined && lineIndex !== null});
+        this.setState({ hideMenuActions: lineIndex !== undefined && lineIndex !== null });
     }
 
     /**
@@ -289,21 +289,21 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * @param items
      */
     handleChangeDataTable(selectedItems: any[], items?: any[]) {
-        this.setState({selectedItems: selectedItems, items: items ? items : this.state.items});
+        this.setState({ selectedItems: selectedItems, items: items ? items : this.state.items });
     }
 
     /**
      * Méthode déclenchant la fermeture de la fenêtre modale de suppresion d'un partenaire
      */
-    private closeAlert(): void {
-        (this.refs.alert as Alert).close();
+    protected closeAlert(): void {
+        (this.refs.alert as Confirm).close();
     }
 
     /**
      * Méthode déclenchant la fermeture de la fenêtre modale de suppresion d'un partenaire
      */
-    private validateAlert(fct?: Function): void {
-        (this.refs.alert as Alert).close(fct);
+    protected validateAlert(fct?: Function): void {
+        (this.refs.alert as Confirm).close(fct);
     }
 
     /***
@@ -312,10 +312,10 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * @param title
      * @param {Function} fct fonction exécutée sur la validation
      */
-    private showAlert(message: string, title: string, fct: Function): void {
-        (this.refs.alert as Alert).setMessage(message);
-        (this.refs.alert as Alert).setTitle(title);
-        (this.refs.alert as Alert).setOnClickOk(() => {
+    protected showAlert(message: string, title: string, fct: Function): void {
+        (this.refs.alert as Confirm).setMessage(message);
+        (this.refs.alert as Confirm).setTitle(title);
+        (this.refs.alert as Confirm).setOnClickOk(() => {
             this.validateAlert(fct);
         }).open();
     }
@@ -324,15 +324,15 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * fonction qui retourne la liste des items selectionés sur l'ihm lors de la pagination
      * @returns {any[]}
      */
-    private getSelectedItemsForAllContent(): any[] {
+    protected getSelectedItemsForAllContent(): any[] {
         logger.trace("getSelectedItemsForAllContent");
         let resultList: any[] = [];
         // recupere la liste de tous les items selectionés dans les dataSources des contents
         this.props.dataSourcesList.map((dataSource, index) => {
-            resultList = ArrayUtils.unionWith(this.props.dataSourcesList[index].selected, resultList);
+            resultList = ArrayUtils.unionWith(this.props.dataSourcesList[ index ].selected, resultList, this.state.contentState.keyColumnMassSelection);
         });
         // intersection des items affichés avec les items selectionés dans le dataSource
-        resultList = ArrayUtils.intersectionWith(resultList, this.state.items);
+        resultList = ArrayUtils.intersectionWith(resultList, this.state.items, this.state.contentState.keyColumnMassSelection);
         return resultList;
     }
 
@@ -340,7 +340,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * Retourne la somme totale des items de tous les dataSource de tous les contents
      * @returns {number}
      */
-    private getTotalItemsForAllDataSource(): number {
+    protected getTotalItemsForAllDataSource(): number {
         logger.trace("getTotalItemsForAllDataSource");
         let result: number = 0;
         this.props.dataSourcesList.map((dataSource: DataSource<any>) => {
@@ -365,7 +365,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * Retourne la somme totale des items de tous les dataSource de tous les contents
      * @returns {number}
      */
-    private getTotalSelectedItemsForAllDataSource(): number {
+    protected getTotalSelectedItemsForAllDataSource(): number {
         logger.trace("getTotalSelectedItemsForAllDataSource");
         let result: number = 0;
         this.props.dataSourcesList.map((dataSource: DataSource<any>) => {

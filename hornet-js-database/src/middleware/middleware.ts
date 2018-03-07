@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,7 @@ var sequelizeErrors = require("sequelize/lib/errors");
 //                                      DataBaseErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class DataBaseErrorMiddleware extends AbstractHornetMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-database.middlewares.DataBaseErrorMiddleware");
+    protected static logger: Logger = Utils.getLogger("hornet-js-database.middlewares.DataBaseErrorMiddleware");
 
     constructor() {
         super((err, req, res, next: any) => {

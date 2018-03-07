@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,12 +91,14 @@ import { Form } from "src/widget/form/form";
 
 let elementBase, elementWithValue: JSX.Element;
 let $element;
+let count: number = 0;
 
 @Decorators.describe('Test Karma InputField')
 class InputFieldTest extends HornetReactTest {
 
     @Decorators.beforeEach
     beforeEach() {
+        count++;
         elementBase = (
             <InputField name="prenom"
                         id="prenom"
@@ -109,7 +111,7 @@ class InputFieldTest extends HornetReactTest {
         );
 
         elementWithValue = (
-            <Form defaultValues={{prenom: "test"}}>
+            <Form id={"id-form-"+count} defaultValues={{prenom: "test"}}>
                 <InputField name="prenom"
                             id="prenom"
                             label={"prénom"}

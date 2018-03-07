@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -93,17 +93,17 @@ const logger: Logger = Utils.getLogger("authentication.passport-authentication")
 
 export class PassportAuthentication {
 
-    protected passport:any;
-    protected configuration:AuthenticationtConfiguration;
+    protected passport: any;
+    protected configuration: AuthenticationtConfiguration;
     protected strategies = {};
-    
-    constructor(configuration:AuthenticationtConfiguration) {
+
+    constructor(configuration: AuthenticationtConfiguration) {
         this.passport = require("passport");
         this.initSerialize();
         this.configuration = configuration;
     }
 
-    public getMiddleware():Class<AbstractHornetMiddleware> {
+    public getMiddleware(): Class<AbstractHornetMiddleware> {
         var passport = this.passport;
         var createMiddleware = this.createMiddleware.bind(this);
 
@@ -121,7 +121,7 @@ export class PassportAuthentication {
      * Initialisation de Passport.Js.
      * @return instancePassport
      */
-    protected initSerialize():any {
+    protected initSerialize(): any {
         // Aucune serialisation, l'objet est complet
         this.passport.serializeUser((user, done) => {
             done(null, user);
@@ -138,11 +138,11 @@ export class PassportAuthentication {
      * @param passportInstance instance de Passport.Js  sur laquelle lancer l'autentification de la stratégie
      * @returns middleware express {function(express.Request, express.Response, any)}
      */
-    protected createMiddleware():any {
+    protected createMiddleware(): any {
         var _self = this;
 
         /* Renvoie d'un middleware gèrent la deconnexion, la connexion et la verification */
-        return function ensureAuthenticated(req, res:Response, next:any) {
+        return function ensureAuthenticated(req, res: Response, next: any) {
 
             // vérification si c'est une déconnexion est demandée
             if (AuthenticationUtils.isUrl(req, Utils.buildContextPath(_self.configuration.appLogoutPath))) {
@@ -153,9 +153,9 @@ export class PassportAuthentication {
 
             if (!req.isAuthenticated()) {
                 if (Object.keys(_self.strategies).length == 1) {
-                    _self.strategies[Object.keys(_self.strategies)[0]].connect(_self.passport, req, res, next);
+                    _self.strategies[ Object.keys(_self.strategies)[ 0 ] ].connect(_self.passport, req, res, next);
                 } else if (Object.keys(_self.strategies).length >= 1 && req.query.strategy) {
-                    _self.strategies[req.query.strategy].connect(_self.passport, req, res, next);
+                    _self.strategies[ req.query.strategy ].connect(_self.passport, req, res, next);
                 } else {
                     next(Object.keys(_self.strategies).length == 0 ? new Error("No strategy defined") : new Error("No strategy passed for authentication"));
                 }
@@ -165,8 +165,8 @@ export class PassportAuthentication {
                 // alors, lors de la reconnexion au CAS, quand le nouveau ticket arrive (requête = login?ticket=xxx)
                 // il faut relancer tout le processus d'authentification (afin d'effacer/re-créer la session applicative existante)
                 let user = _self.getUser(req);
-                if (AuthenticationUtils.isUrl(req, Utils.buildContextPath(_self.configuration.appLoginPath)) && user && user.strategy && _self.strategies[user.strategy].isRequestForStrategie(req)) {
-                    _self.strategies[user.strategy].connect(_self.passport, req, res, next);
+                if (AuthenticationUtils.isUrl(req, Utils.buildContextPath(_self.configuration.appLoginPath)) && user && user.strategy && _self.strategies[ user.strategy ].isRequestForStrategie(req)) {
+                    _self.strategies[ user.strategy ].connect(_self.passport, req, res, next);
                 } else {
                     next();
                 }
@@ -174,19 +174,19 @@ export class PassportAuthentication {
         }
     }
 
-    
+
     /**
      * Retourne le Middleware Express qui gère la déconnexion de l'utilisateur et la redirection.
      * @param disconnectRedirectUrl (optionnel) url de redirection après connexion
      * @return Middleware Express
      */
-    protected disconnectMiddleware():any {
+    protected disconnectMiddleware(): any {
         var _self = this;
 
         return function disconnect(req: Request, res: Response, next): void {
 
             // appel de la deconnexion sur lal strategie
-            _self.strategies[Object.keys(_self.strategies)[0]].disconnect(_self.passport, req, res, next);
+            _self.strategies[ Object.keys(_self.strategies)[ 0 ] ].disconnect(_self.passport, req, res, next);
         };
     }
 
@@ -194,12 +194,12 @@ export class PassportAuthentication {
      * Initialisation de Passport.Js avec une stratégie CAS générique
      * @param passportInstance
      */
-    public initStrategy(strategy:AuthenticationStrategy):void {
+    public initStrategy(strategy: AuthenticationStrategy): void {
         /**
          * Insertion de la stratégie
          */
         this.passport.use(strategy);
-        this.strategies[strategy.name]=strategy;
+        this.strategies[ strategy.name ] = strategy;
     }
 
     /**
@@ -207,14 +207,14 @@ export class PassportAuthentication {
      * @param {Request} req requete http eténdu par passport
      * @return l'utilisateur
      */
-    private getUser(req:Request) {
+    protected getUser(req: Request) {
 
         let user = undefined;
-        
+
         if (this.passport) {
-            user = req[this.passport._userProperty || 'user'];
+            user = req[ this.passport._userProperty || 'user' ];
         }
-  
+
         return user;
     }
 }

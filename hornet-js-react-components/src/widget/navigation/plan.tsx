@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -127,7 +127,7 @@ export class Plan extends HornetComponent<PlanProps, any> {
      * @param depth profondeur de l'élément
      * @returns l'élément rendu
      */
-    private generateItem(item: MenuItemConfig, depth: number): JSX.Element {
+    protected generateItem(item: MenuItemConfig, depth: number): JSX.Element {
 
         let childrenItems: JSX.Element[] = [],
             key = this.i18n(item.text) || this.i18n(item.title) + "-" + depth;
@@ -135,7 +135,7 @@ export class Plan extends HornetComponent<PlanProps, any> {
             let max: number = item.submenu.length;
             depth = depth + 1;
             for (var i = 0; i < max; i++) {
-                childrenItems.push(this.generateItem(item.submenu[i], depth));
+                childrenItems.push(this.generateItem(item.submenu[ i ], depth));
             }
 
             var element = (item.url) ? this.generateLink(item, depth) : this.i18n(item.text);
@@ -159,7 +159,7 @@ export class Plan extends HornetComponent<PlanProps, any> {
      * @param depth profondeur de l'élément
      * @returns l'élément rendu
      */
-    private generateLink(item: MenuItemConfig, depth: number): JSX.Element {
+    protected generateLink(item: MenuItemConfig, depth: number): JSX.Element {
         let text = this.i18n(item.text);
         let title = this.i18n(item.text);
         if (item.title) {

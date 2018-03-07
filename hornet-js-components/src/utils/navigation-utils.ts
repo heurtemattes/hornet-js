@@ -73,7 +73,7 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,14 +81,14 @@
 import { Utils } from "hornet-js-utils";
 import * as MenuConstants from "src/utils/menu-constantes";
 import { AuthUtils, UserInformations } from "hornet-js-utils/src/authentication-utils";
-import {IMenuItem} from "src/component/imenu-item";
+import { IMenuItem } from "src/component/imenu-item";
 import * as _ from "lodash";
 
 const logger = Utils.getLogger("hornet-js-component.navigation.utils.navigation-utils");
 
 export interface NavigationItem {
-    submenu:Array<NavigationItem>;
-    text:string;
+    submenu: Array<NavigationItem>;
+    text: string;
     url: string;
     visibleDansMenu: boolean;
     visibleDansPlan: boolean;
@@ -117,22 +117,22 @@ export class NavigationUtils {
      * @param level
      * @returns {IMenuItem[]}
      */
-    public static getFilteredConfigNavigation(items:IMenuItem[], user:UserInformations, isForPlan?:boolean, itemParent?:IMenuItem, level?:number):IMenuItem[] {
-        let currentItems:IMenuItem[] = [];
-        let idParent:string = MenuConstants.MENU_ROOT.substring(0, MenuConstants.MENU_ROOT.length - 1);
+    public static getFilteredConfigNavigation(items: IMenuItem[], user: UserInformations, isForPlan?: boolean, itemParent?: IMenuItem, level?: number): IMenuItem[] {
+        let currentItems: IMenuItem[] = [];
+        let idParent: string = MenuConstants.MENU_ROOT.substring(0, MenuConstants.MENU_ROOT.length - 1);
         if (itemParent) {
             idParent = itemParent.id;
         }
-        if(!level) {
+        if (!level) {
             level = 0;
         }
 
         for (let i = 0; i < items.length; i++) {
-            let item:IMenuItem = items[i];
-            if (!item.rolesAutorises || (item.rolesAutorises && AuthUtils.isAllowed(user, _.isArray(item.rolesAutorises) ? item.rolesAutorises as any : [item.rolesAutorises]))) {
+            let item: IMenuItem = items[ i ];
+            if (!item.rolesAutorises || (item.rolesAutorises && AuthUtils.isAllowed(user, _.isArray(item.rolesAutorises) ? item.rolesAutorises as any : [ item.rolesAutorises ]))) {
                 let typeNavigation = (isForPlan) ? "visibleDansPlan" : "visibleDansMenu";
-                if (item[typeNavigation]) {
-                    logger.trace("L'utilisateur a accès au menu:", item.text);
+                if (item[ typeNavigation ]) {
+                    logger.debug("L'utilisateur a accès au menu:", item.text);
                     //item.index = indexParent + currentItems.length;
                     item.id = idParent + MenuConstants.LVL_SEPARATOR + currentItems.length;
                     item.level = level;
@@ -157,12 +157,12 @@ export class NavigationUtils {
      * @param currentUrl
      * @return {NavigationItem|string}
      */
-    static retrievePageTextKey(navigationData:Array<NavigationItem>, currentUrl:string):string {
+    static retrievePageTextKey(navigationData: Array<NavigationItem>, currentUrl: string): string {
         let retour = NavigationUtils.retrievePageTextItem(navigationData, currentUrl);
         return retour && retour.text;
     }
 
-    static getCurrentItem(navigationData:Array<NavigationItem>, currentUrl:string):NavigationItem {
+    static getCurrentItem(navigationData: Array<NavigationItem>, currentUrl: string): NavigationItem {
         return this.retrievePageTextItem(navigationData, currentUrl);
     }
 
@@ -172,13 +172,13 @@ export class NavigationUtils {
      * @param currentUrl
      * @return {NavigationItem}
      */
-    private static retrievePageTextItem(navigationData:Array<NavigationItem>, currentUrl:string):NavigationItem {
-        let currentNavigationItem:NavigationItem = undefined;
+    protected static retrievePageTextItem(navigationData: Array<NavigationItem>, currentUrl: string): NavigationItem {
+        let currentNavigationItem: NavigationItem = undefined;
         logger.trace("current début:", currentUrl);
 
-        if(navigationData && navigationData.length > 0) {
+        if (navigationData && navigationData.length > 0) {
             for (let i = 0; i < navigationData.length; i++) {
-                let navigationItem = navigationData[i];
+                let navigationItem = navigationData[ i ];
 
                 logger.trace(navigationItem);
                 /* test pour voir si l'Url ne se finit pas par un nombre si c'est le cas on supprimer pour avoir le fil d'arianne *
@@ -207,7 +207,7 @@ export class NavigationUtils {
      * @param right
      * @return {NavigationItem}
      */
-    private static getItemWithLongerUrl(left:NavigationItem, right:NavigationItem):NavigationItem {
+    protected static getItemWithLongerUrl(left: NavigationItem, right: NavigationItem): NavigationItem {
         if (!left) {
             return right;
         }
@@ -224,7 +224,7 @@ export class NavigationUtils {
      * Change le titre de la page côté client
      * @param titlePage
      */
-    static applyTitlePageOnClient(titlePage:string):void {
+    static applyTitlePageOnClient(titlePage: string): void {
         if (!Utils.isServer && titlePage) {
             //côté client
             document.title = titlePage;
@@ -235,7 +235,7 @@ export class NavigationUtils {
      * Permet d'afficher un élément en lui ajoutant la classe MASKED_CLASSNAME (par défaut "masked")
      * @param element
      */
-    public static hideElement(element):void {
+    public static hideElement(element): void {
         if (!element.classList.contains(MenuConstants.MASKED_CLASSNAME)) {
             element.classList.add(MenuConstants.MASKED_CLASSNAME);
         }
@@ -246,15 +246,15 @@ export class NavigationUtils {
      * @param element
      * @returns {boolean}
      */
-    public static isVisible(element):boolean {
-       return !(element.classList.contains(MenuConstants.MASKED_CLASSNAME));
+    public static isVisible(element): boolean {
+        return !(element.classList.contains(MenuConstants.MASKED_CLASSNAME));
     }
 
     /**
      * Permet de masquer un élément en lui ôtant la classe MASKED_CLASSNAME (par défaut "masked")
      * @param element
      */
-    public static showElement(element):void {
+    public static showElement(element): void {
         element.classList.remove(MenuConstants.MASKED_CLASSNAME);
     }
 
@@ -263,7 +263,7 @@ export class NavigationUtils {
      * @param element
      * @returns {boolean}
      */
-    public static haveSubMenu(element):boolean {
+    public static haveSubMenu(element): boolean {
         return element.classList.contains(MenuConstants.HAVING_SUBMENU_CLASSNAME);
     }
 
@@ -273,22 +273,22 @@ export class NavigationUtils {
      * @param hideElement
      * @param hideOthersNodesElements
      */
-    public static rideDownElementAndToggle(element:HTMLElement, hideElement?:boolean, hideOthersNodesElements?:boolean):void {
-        let depth:number = element.id.replace(/[^0-9]/g, "").length;
-        let familyElementId:number = parseInt(element.id.replace(MenuConstants.MENU_ROOT, "").substr(0, 1));
-        let selector:string = MenuConstants.MENU_ROOT + familyElementId;
+    public static rideDownElementAndToggle(element: HTMLElement, hideElement?: boolean, hideOthersNodesElements?: boolean): void {
+        let depth: number = element.id.replace(/[^0-9]/g, "").length;
+        let familyElementId: number = parseInt(element.id.replace(MenuConstants.MENU_ROOT, "").substr(0, 1));
+        let selector: string = MenuConstants.MENU_ROOT + familyElementId;
 
         /* Fermeture de tous les éléments autres que la branche sur laquelle on est positionné */
-        if(hideOthersNodesElements) {
-            let configMenu:any = NavigationUtils.getConfigMenu(),
-                user:any = Utils.getCls("hornet.user"),
+        if (hideOthersNodesElements) {
+            let configMenu: any = NavigationUtils.getConfigMenu(),
+                user: any = Utils.getCls("hornet.user"),
                 items = NavigationUtils.getFilteredConfigNavigation(configMenu, user),
                 nbMax = items.length + 1; // ajoute 1 pour infosComplémentaires
 
-            for(let i = 0; i < nbMax; i++) {
-                if(i != familyElementId) {
+            for (let i = 0; i < nbMax; i++) {
+                if (i != familyElementId) {
                     let elementToHide = document.getElementById(MenuConstants.MENU_ROOT + i);
-                    if(elementToHide) {
+                    if (elementToHide) {
                         NavigationUtils.rideDownElementAndToggle(elementToHide, true);
                     }
                 }
@@ -296,7 +296,7 @@ export class NavigationUtils {
         }
 
         let myElement = document.getElementById(selector);
-        if(myElement) {
+        if (myElement) {
             for (let i = 0; i < depth; i++) {
                 if (myElement.classList && myElement.classList.contains(MenuConstants.HAVING_SUBMENU_CLASSNAME)) {
                     if (myElement.nextSibling && myElement.nextSibling.localName == "li") {
@@ -317,12 +317,12 @@ export class NavigationUtils {
      * @param item
      * @returns {boolean} true lorsqu'au moins un sous-menu est visible
      */
-    public static hasVisibleSubMenu(item):boolean {
-        let isVisible:boolean = false;
+    public static hasVisibleSubMenu(item): boolean {
+        let isVisible: boolean = false;
         if (item.submenu) {
             isVisible = false;
             for (let i = 0; i < item.submenu.length && !isVisible; i++) {
-                isVisible = item.submenu[i].visibleDansMenu;
+                isVisible = item.submenu[ i ].visibleDansMenu;
             }
         }
         return isVisible;

@@ -88,20 +88,16 @@ declare module "hornet-js-batch/src/core/batch-executor" {
 	    private static _instance;
 	    private constructor();
 	    static readonly Instance: BatchExecutor;
-	    /**
-	     *
-	     * @param {Batch} batch
-	     */
 	    addToSummary(batch: Batch): void;
 	    /***
 	     * Renvoie le batch associé au BatchUnit qu'il soit en cours de traitement ou dans la file d'attente.
 	     * S'il ne le trouve pas il en crée un qu'il place dans la file d'attente.
-	     * @param unit {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
+	     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
 	     * @return un batch trouvé ou un nouveau.
 	     */
 	    getBatch(unit: BatchUnit): Batch;
 	    /***
-	     * @param route une route.
+	     * @param une route.
 	     * @returns {boolean} true si une action de type batch est en cours d'execution
 	     */
 	    isBatchActionExist(route: string): any;
@@ -112,7 +108,7 @@ declare module "hornet-js-batch/src/core/batch-executor" {
 	    removeBatch(batch: Batch): void;
 	    /***
 	     * Lance un Batch
-	     * @param unit un BatchUnit see{@link BatchUnit}
+	     * @param un BatchUnit see{@link BatchUnit}
 	     * @return renvoie une promesse du BatchUnit traité
 	     */
 	    runBatch(unit: BatchUnit): Promise<any>;
@@ -195,7 +191,7 @@ declare module "hornet-js-batch/src/core/batch-options" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -407,7 +403,7 @@ declare module "hornet-js-batch/src/core/batch-status" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -610,7 +606,7 @@ declare module "hornet-js-batch/src/middleware/middlewares" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -716,7 +712,7 @@ declare module "hornet-js-batch/src/routes/abstract-batch-routes" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -808,7 +804,7 @@ declare module "hornet-js-batch/src/core/filter/batch-filter" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -913,7 +909,7 @@ declare module "hornet-js-batch/src/core/mapper/batch-mapper" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1002,7 +998,7 @@ declare module "hornet-js-batch/src/core/parameters/parameters" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1091,7 +1087,7 @@ declare module "hornet-js-batch/src/core/reader/batch-reader" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1235,7 +1231,7 @@ declare module "hornet-js-batch/src/core/service/batch-service" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1355,7 +1351,7 @@ declare module "hornet-js-batch/src/core/transform/batch-transform" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1460,7 +1456,7 @@ declare module "hornet-js-batch/src/core/writer/batch-writer" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

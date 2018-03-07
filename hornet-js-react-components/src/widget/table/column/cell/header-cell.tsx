@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -171,14 +171,14 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
         };
 
         let functionOnSortData: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
-            this.state.onSort(nextTableSort);
+            this.state.onSort(nextTableSort, this.tableCellRef, this.props.compareMethod);
         };
 
         let handleOnKeyDown: React.KeyboardEventHandler<HTMLElement> = (e: React.KeyboardEvent<HTMLElement>) => {
             /* Le composant a le comportement d'un bouton : il doit prendre en compte les touches Entrée OU Espace
              * (cf. https://www.w3.org/TR/wai-aria-practices/#button > "Keyboard Interaction")  */
             if (e.keyCode == KeyCodes.SPACEBAR || e.keyCode == KeyCodes.ENTER) {
-                this.state.onSort(nextTableSort);
+                this.state.onSort(nextTableSort, this.tableCellRef);
             }
         };
 

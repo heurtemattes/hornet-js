@@ -73,7 +73,7 @@ declare module "hornet-js-passport/src/authentication-configuration" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.0-rc.4
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -199,7 +199,7 @@ declare module "hornet-js-passport/src/passport-authentication" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.0-rc.4
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -349,7 +349,7 @@ declare module "hornet-js-passport/src/strategy/authentication-strategy" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.0-rc.4
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -456,7 +456,7 @@ declare module "hornet-js-passport/src/strategy/cas/cas-configuration" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.0-rc.4
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -618,7 +618,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-configuration" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.0-rc.4
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -749,7 +749,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-strategy" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.0-rc.4
+	 * @version v5.1.1
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */

@@ -73,12 +73,13 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as _ from "lodash";
+import { Template } from "hornet-js-utils/src/template";
 
 /**
  * Classe utilitaire sur les arrays.
@@ -120,14 +121,20 @@ export class ArrayUtils {
 
     /**
      * fonction qui fait l'union de deux liste avec le predicat id different
-     * @param object
-     * @param other
-     *  @returns {any[]}
+     * @param {any[]} object
+     * @param {any[]} other
+     * @param {string} key
+     * @returns {any[]}
      */
-    static unionWith(object: any[], other: any[]): any[] {
+    static unionWith(object: any[], other: any[], key: string = "id"): any[] {
+
         let listResult: any[] = _.unionWith(object, other,
             (item1, item2) => {
-                return item1.id === item2.id;
+
+                let templateItem1 = new Template("${" + key + "}").process(item1, "id");
+                let templateItem2 = new Template("${" + key + "}").process(item2, "id");
+
+                return templateItem1 === templateItem2;
             });
 
         return listResult;
@@ -135,14 +142,20 @@ export class ArrayUtils {
 
     /**
      * retourne l'intersection de deux liste
-     * @param object
-     * @param other
+     * @param {any[]} object
+     * @param {any[]} other
+     * @param {string} key
      * @returns {any[]}
      */
-    static intersectionWith(object: any[], other: any[]): any[] {
+    static intersectionWith(object: any[], other: any[], key: string = "id"): any[] {
+
         let listResult: any[] = _.intersectionWith(object, other,
             (item1, item2) => {
-                return item1.id === item2.id;
+
+                let templateItem1 = new Template("${" + key + "}").process(item1, "id");
+                let templateItem2 = new Template("${" + key + "}").process(item2, "id");
+
+                return templateItem1 === templateItem2;
             });
 
         return listResult;

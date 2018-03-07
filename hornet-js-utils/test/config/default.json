@@ -38,7 +38,7 @@
     "secure": false
     //"alwaysSetCookie": false
   },
-  "themeUrl": "http://localhost:7777/5.1.0/intranet",
+  "themeUrl": "http://localhost:7777/5.1.1/intranet",
   "security": {
     "enabled": true,
     "hpp": true,
@@ -87,30 +87,6 @@
       "maxTokensPerSession": 10
     }
   },
-  "log": {
-    "levels": {
-      "[all]": "INFO"
-      //        "hornet-js": "DEBUG"
-    },
-    "appenders": [
-      {
-        "type": "console",
-        "layout": {
-          "type": "pattern",
-          "pattern": "%[%d{yyyy:MM:dd:hh:mm:ss,SSS}|%p|%c|%h|%m%]"
-        }
-      }
-      //        {
-      //          "type": "dateFile",
-      //          "filename": "log/app.log",
-      //          "pattern": "-yyyy-MM-dd",
-      //          "layout": {
-      //            "type": "pattern",
-      //            "pattern": "%d{yyyy:MM:dd:hh:mm:ss,SSS}|%p|%c|%h|%m%"
-      //          }
-      //        }
-    ]
-  },
   "defaultServices": {
     "host": "http://localhost:8080/",
     "name": "applitutoriel-service"
@@ -134,8 +110,10 @@
   "authentication": {
     "loginUrl": "/login"
   },
-  "cache": {
-    "enabled": true,
-    "timetolive": 60
+  "request": {
+    "cache": {
+      "enabled": true,
+      "timetolive": 60
+    }
   }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -194,7 +194,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
                 };
             }
         }
-        this.setState({style: style});
+        this.setState({ style: style });
     }
 
     /**
@@ -229,7 +229,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
         let item: MenuItemConfig = this.state.item;
         let isSubMenu: boolean = this.state.isSubMenu;
         if (item.visibleDansMenu) {
-            logger.trace("MenuItem.render item.id : ", item.id);
+            logger.debug("MenuItem.render item.id : ", item.id);
             let attributesLi: HTMLAttributes<HTMLElement> = {};
 
             let active = false;
@@ -239,7 +239,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
                 if (ind > -1) {
                     url = url.substring(this.getContextPath().length, url.length);
                 }
-                let activeMenu = NavigationUtils.getCurrentItem([this.state.item], url);
+                let activeMenu = NavigationUtils.getCurrentItem([ this.state.item ], url);
 
                 if (activeMenu) {
                     active = true;
@@ -270,20 +270,20 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
             let closeOnLinkClick = this.props.closeOnLinkClick;
             if (this.hasSubMenu()) {
                 subMenu = <MenuNavigation items={item.submenu}
-                                          level={item.level + 1}
-                                          idParent={item.id}
-                                          closeMenu={this.state.closeMenu}
-                                          dataPassThru={this.state.dataPassThru}
-                                          closeOnLinkClick={closeOnLinkClick}
+                    level={item.level + 1}
+                    idParent={item.id}
+                    closeMenu={this.state.closeMenu}
+                    dataPassThru={this.state.dataPassThru}
+                    closeOnLinkClick={closeOnLinkClick}
                 />;
             }
             return (
                 <li {...attributesLi} aria-expanded={expanded} onKeyDown={this.handleKeyDown} style={this.state.style}>
                     <MenuLink item={item}
-                              closeMenu={this.state.closeMenu}
-                              onClick={this.hideOrShowChildren}
-                              dataPassThru={this.props.dataPassThru}
-                              closeOnLinkClick={closeOnLinkClick}
+                        closeMenu={this.state.closeMenu}
+                        onClick={this.hideOrShowChildren}
+                        dataPassThru={this.props.dataPassThru}
+                        closeOnLinkClick={closeOnLinkClick}
                     />
                     {subMenu}
                 </li>
@@ -315,7 +315,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * teste si le sous menu est visible ou non
      * @returns {boolean|any} le sous menu est visible
      */
-    private isVisible(): boolean {
+    protected isVisible(): boolean {
         let liId = this.getLiId();
         let elem = document.getElementById(liId);
         if (elem) {
@@ -328,7 +328,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * test si le menu parent est visible
      * @returns {boolean} le menu parent est visible
      */
-    private isParentVisible(): boolean {
+    protected isParentVisible(): boolean {
         let liId = this.getLiId();
         let ind = liId.lastIndexOf(LVL_SEPARATOR);
         let parentLiId = liId.substring(0, ind);
@@ -343,7 +343,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * Retourne l'identiant de la balise li du menu item
      * @returns {string} identifiant de la balise li
      */
-    private getLiId() {
+    protected getLiId() {
         let item: MenuItemConfig = this.state.item;
         let liId: string = item.id.substring(MENU_ROOT.length - 1, item.id.length);
         return "li" + liId;
@@ -352,7 +352,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
     /**
      * Ferme le menu contenant le menu item
      */
-    private hideMenu() {
+    protected hideMenu() {
         let isSubMenu: boolean = this.state.isSubMenu;
         if (isSubMenu) {
             let item: MenuItemConfig = this.state.item;
@@ -377,7 +377,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * cache un menu et tous ses sous-menus
      * @param parentId identifiant de la balise li qui doit être cachée
      */
-    private hideAllMenu(parentId) {
+    protected hideAllMenu(parentId) {
 
         let elem = document.getElementById(parentId);
         if (elem) {
@@ -403,7 +403,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
     /**
      * ferme tous les menu parents et va au menu suivant
      */
-    private hideAllParentMenu() {
+    protected hideAllParentMenu() {
         let liId = this.getLiId();
         let ind = liId.indexOf(LVL_SEPARATOR, 3);
         liId = liId.substring(0, ind);
@@ -414,16 +414,16 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * teste si le menu a des sous menus
      * @returns {boolean} le menu a des sous menus
      */
-    private hasSubMenu() {
+    protected hasSubMenu() {
         return this.state.item.submenu && this.state.item.submenu.length > 0;
     }
 
     /**
      * Fonction appelée lors d'un appui de touche sur un élément de menu.
      * @param e évenèment déclencheur
-     * @private
+     * @protected
      */
-    private handleKeyDown(event) {
+    protected handleKeyDown(event) {
         let keyCode = event.keyCode;
         let isVisible = this.isVisible();
         let isSubMenu: boolean = this.state.isSubMenu;
@@ -497,7 +497,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
 
         let level: number = this.props.level;
         let isVisible: boolean = this.props.isVisible;
-        logger.trace("MenuNavigation.render idParent : ", this.state.idParent);
+        logger.debug("MenuNavigation.render idParent : ", this.state.idParent);
         let infoComplementaires: JSX.Element;
 
         // Menu de premier niveau
@@ -513,15 +513,15 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
         let dataPassThru = this.props.dataPassThru;
         let closeOnLinkClick = this.props.closeOnLinkClick;
 
-        let items: MenuItem[] = this.state.items.map(function(item: MenuItemConfig) {
+        let items: MenuItem[] = this.state.items.map(function (item: MenuItemConfig) {
             if (item.visibleDansMenu) {
                 indexKey++;
                 return <MenuItem item={item}
-                                 isSubMenu={isSubMenu}
-                                 key={indexKey + item.text + item.url}
-                                 closeMenu={closeMenu}
-                                 dataPassThru={dataPassThru}
-                                 closeOnLinkClick={closeOnLinkClick}/>;
+                    isSubMenu={isSubMenu}
+                    key={indexKey + item.text + item.url}
+                    closeMenu={closeMenu}
+                    dataPassThru={dataPassThru}
+                    closeOnLinkClick={closeOnLinkClick} />;
             }
         });
 
@@ -544,7 +544,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
             attributesUl.onKeyDown = this.onKeyDownVerticalMenu;
         }
         attributesUl.role = (level == 0) ? "menubar" : "menu";
-        attributesUl["aria-labelledby"] = (this.state.idParent) ? this.state.idParent : null;
+        attributesUl[ "aria-labelledby" ] = (this.state.idParent) ? this.state.idParent : null;
 
         return (
             <ul {...attributesUl}>
@@ -558,7 +558,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
      * @param id identifiant de l'élément de menu
      * @return {number} l'index de l'élément parent au niveau de menu zéro (0 pour le premier élément)
      */
-    private static getRootParentIndex(id: string): number {
+    protected static getRootParentIndex(id: string): number {
         let beginIndex: number = MENU_ROOT.length;
         let endIndex: number = id.indexOf(LVL_SEPARATOR, beginIndex);
         if (endIndex < 0) {
@@ -571,28 +571,28 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
      * @param e évènement clavier
      * @returns {boolean} true lorsque l'évènement clavier à au moins l'un des modificateurs actifs (tels que Alt, Ctrl, etc...)
      */
-    private hasKeyModifier(e: KeyboardEvent<HTMLElement>): boolean {
+    protected hasKeyModifier(e: KeyboardEvent<HTMLElement>): boolean {
         return (e != null && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey));
     }
 
     /**
      * Fonction appelée lors d'un appui de touche sur un élément de menu horizontal.
      * @param e évenèment déclencheur
-     * @private
+     * @protected
      */
-    private onKeyDownHorizontalMenu(e: KeyboardEvent<HTMLElement>): void {
+    protected onKeyDownHorizontalMenu(e: KeyboardEvent<HTMLElement>): void {
         if (!this.hasKeyModifier(e)) {
             /* On ne prend en compte que les évènements clavier sans modificateur, pour ne pas surcharger
              * des raccourcis standards tels Alt+ArrowLeft */
             let keyCode: number = e.keyCode;
-            let id: string = e.target["id"];
+            let id: string = e.target[ "id" ];
             if (id) {
                 let lastSeparatorIndex: number = id.lastIndexOf(LVL_SEPARATOR);
                 let itemHierarchy: string = id.substr(0, lastSeparatorIndex + 1);
                 let itemIndex: number = parseInt(id.substr(lastSeparatorIndex + 1, id.length));
                 let items: MenuItemConfig[] = this.state.items;
                 /* Element de menu courant : peut être null lorsqu'on est sur un élément MenuInfosComplementaires */
-                let item: MenuItemConfig = items[itemIndex];
+                let item: MenuItemConfig = items[ itemIndex ];
                 let idToFocus: string = id;
                 let preventDefault: boolean = true;
                 switch (keyCode) {
@@ -603,13 +603,13 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                             idToFocus = itemHierarchy + (itemIndex + 1);
                         } // sinon retour au premier item de même niveau
                         else {
-                            idToFocus = items[0].id;
+                            idToFocus = items[ 0 ].id;
                         }
                         break;
                     case KeyCodes.LEFT_ARROW:
                         // on n'est pas sur le premier item du niveau : vers item précédent de même niveau
                         if (itemIndex > 0) {
-                            idToFocus = items[itemIndex - 1].id;
+                            idToFocus = items[ itemIndex - 1 ].id;
                         } // sinon retour au dernier item de même niveau
                         else {
                             //indiceToFocus = items[items.length - 1].index;
@@ -630,9 +630,9 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                         break;
                     case KeyCodes.DOWN_ARROW:
                         /*  sous-menu existant : on va au premier élément du sou-menu */
-                        if (item && item.submenu && item.submenu[0]) {
+                        if (item && item.submenu && item.submenu[ 0 ]) {
                             //indiceToFocus = item.submenu[0].index;
-                            idToFocus = item.submenu[0].id;
+                            idToFocus = item.submenu[ 0 ].id;
                         }
 
                         break;
@@ -662,14 +662,14 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
     /**
      * Fonction appelée lors d'un appui de touche sur un élément de menu vertical
      * @param e
-     * @private
+     * @protected
      */
-    private onKeyDownVerticalMenu(e: KeyboardEvent<HTMLElement>): void {
+    protected onKeyDownVerticalMenu(e: KeyboardEvent<HTMLElement>): void {
         if (!this.hasKeyModifier(e)) {
             /* On ne prend en compte que les évènements clavier sans modificateur, pour ne pas surcharger
              * des raccourcis standards tels Alt+ArrowLeft */
             let key: number = e.keyCode;
-            let id: string = e.target["id"];
+            let id: string = e.target[ "id" ];
             if (id) {
                 let lastSeparatorIndex: number = id.lastIndexOf(LVL_SEPARATOR);
                 let itemHierarchy: string = id.substr(0, lastSeparatorIndex + 1);
@@ -682,10 +682,10 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                 switch (key) {
                     case KeyCodes.RIGHT_ARROW:
                         /* Element de menu courant : peut être null lorsqu'on est sur un élément MenuInfosComplementaires */
-                        let item: MenuItemConfig = items[itemIndex];
+                        let item: MenuItemConfig = items[ itemIndex ];
                         /*  sous-menu existant : on va au premier élément du sous-menu */
-                        if (item && item.submenu && item.submenu[0]) {
-                            idToFocus = item.submenu[0].id;
+                        if (item && item.submenu && item.submenu[ 0 ]) {
+                            idToFocus = item.submenu[ 0 ].id;
                         } else {
                             /* On va à l"élément de niveau 0 suivant */
                             let rootParentIndex: number = MenuNavigation.getRootParentIndex(id);
@@ -733,7 +733,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                             idToFocus = itemHierarchy + (itemIndex + 1);
                         } // sinon retour au premier item de même niveau
                         else {
-                            idToFocus = items[0].id;
+                            idToFocus = items[ 0 ].id;
                         }
 
                         break;
@@ -743,7 +743,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                             idToFocus = itemHierarchy + (itemIndex - 1);
                         }// sinon retour au dernier item de même niveau
                         else {
-                            idToFocus = items[items.length - 1].id;
+                            idToFocus = items[ items.length - 1 ].id;
                         }
                         break;
                     case KeyCodes.ENTER:
@@ -770,7 +770,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
      * Test si un element existe
      * @param id identifiant de l'élément à vérifier
      * @returns boolean
-     * @private
+     * @protected
      */
     static isElementExists(id: string): boolean {
         return (document.getElementById(id) && document.getElementById(id).focus != null);

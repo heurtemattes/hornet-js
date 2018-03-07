@@ -73,19 +73,17 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import events = require('events');
 import * as _ from "lodash";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { DataSource } from "src/component/datasource/datasource";
 import { DataSourceMap } from "src/component/datasource/config/datasource-map";
 import { DataSourceConfig } from "src/component/datasource/config/service/datasource-config";
 import { DataSourceConfigPage } from "src/component/datasource/config/service/datasource-config-page";
-import { SortData, SortDirection } from "src/component/sort-data";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 
@@ -93,6 +91,7 @@ import { Utils } from "hornet-js-utils";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import { DataSourceOption } from "src/component/datasource/options/datasource-option";
+import { DatasourceSortOption } from "src/component/datasource/options/datasource-sort-option";
 
 const logger: Logger = Utils.getLogger("hornet-js-core.component.datasource.paginate-datasource");
 
@@ -138,9 +137,9 @@ export interface ServiceResult<T> {
   */
 export class Paginator<T> {
 
-    private _pagination: Pagination;
-    private items: Array<Array<T>>;
-    private _sort;
+    protected _pagination: Pagination;
+    protected items: Array<Array<T>>;
+    protected _sort;
 
     /**
      * @constructs
@@ -163,7 +162,7 @@ export class Paginator<T> {
         return this._sort;
     }
 
-    private calculateNbPages(itemsTot?: number): number {
+    protected calculateNbPages(itemsTot?: number): number {
         let nbTot = itemsTot || this._pagination.totalItems;
         return _.round(nbTot / this._pagination.itemsPerPage) + ((nbTot % this._pagination.itemsPerPage) > 0 ? 1 : 0);
     }
@@ -201,7 +200,7 @@ export class Paginator<T> {
 
     /**
      * Extraction des données de la page de pagination
-     * @param {Array<T>} itemsTot liste pour vant servir pour l'extraction
+     * @param {Array<T>} itemsTot liste pouvant servir pour l'extraction
      * @param {boolean} forceUpdate force la mise a jour et va lire de itemsTot sinon prend dans la variable d'instance
      */
     public extractPage(itemsTot: Array<T>, forceUpdate: boolean = false): Array<T> {
@@ -233,10 +232,10 @@ export class Paginator<T> {
         this.items = [];
     }
 
-    public reset(){
+    public reset() {
         this._pagination.pageIndex = 1;
         this.items = [];
-        this._pagination.totalItems=0;
+        this._pagination.totalItems = 0;
         this._pagination.nbPages = 0;
     }
 
@@ -285,7 +284,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
      * composant de pagination
      * @instance 
      */
-    private _paginator: Paginator<T>;
+    protected _paginator: Paginator<T>;
 
 
 
@@ -305,9 +304,9 @@ export class PaginateDataSource<T> extends DataSource<T>{
         });
     }
 
-    private initPaginateDataSource() {
+    protected initPaginateDataSource() {
         if (this.isDataSourceArray) {
-            (this.initAsync && this.initAsync.isAsync) ? this.initData() : this.initDataSync() && this.updatePaginator(this._results)
+            (this.initAsync && this.initAsync.isAsync) ? this.initData() : this.initDataSync() && this.updatePaginator(this.datasourceResults)
         }
     }
     /***
@@ -326,7 +325,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
     set pagination(pagination) {
         this._paginator = new Paginator<T>(pagination);
     }
-    private updatePaginator(items: Array<T>, totalItems?: number) {
+    protected updatePaginator(items: Array<T>, totalItems?: number) {
         if (this.isDataSourceArray) {
             this._paginator.preparePagination(items, totalItems);
         } else {
@@ -391,7 +390,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
         return super.fetchData(triggerFetch, this._paginator.sort ? _.extend(this.getFetchArgs("sort", this._paginator.sort), args) : args)
             .then((results: Array<T>) => {
                 this.pagination.pageIndex = this.pagination.pageIndex || 1;
-                this.updatePaginator(this._results, this._paginator.pagination.totalItems);
+                this.updatePaginator(this.datasourceResults, this._paginator.pagination.totalItems);
                 //this.emit('pagination', {list: results, pagination: this._paginator.pagination});
                 return results;
             });
@@ -404,10 +403,10 @@ export class PaginateDataSource<T> extends DataSource<T>{
      */
     protected transformData(result: any): Promise<Array<any>> {
         let data = result[ 0 ];
-        if (data[ "errors" ]) {
+        if (data && data[ "errors" ]) {
             let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_RESPONSE_ERROR, data[ "errors" ]);
             this.emit("error", error);
-            throw error;
+            return Promise.reject(error);
         }
         if (!this.isDataSourceArray) {
             if (!data) {
@@ -420,7 +419,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
                 return super.transformData(data[ "liste" ]);
             }
         } else {
-            return super.transformData(data);
+            return super.transformData(data instanceof Array ? data : [ data ]);
         }
 
     }
@@ -428,28 +427,29 @@ export class PaginateDataSource<T> extends DataSource<T>{
     /***
      * @inheritdoc
      */
-    sort(sort: SortData[], compare?: (a: any, b: any) => number): void {
+    sort(options: DatasourceSortOption): void {
         this.emit("loadingData", true);
-        this._paginator.sort = sort;
+        this._paginator.sort = options.sortDatas;
         Promise.resolve().then(() => {
             try {
                 if (this.isDataSourceArray) {
-                    super.sortData(sort, compare || this.defaultSort);
-                    this.updatePaginator(this._results);
-                    let firstPage = this._paginator.paginate(1);
-                    this.emit("sort", firstPage, sort);
-                    return firstPage;
+                    options.compare = options.compare || this.defaultSort;
+                    super.sortData(options);
+                    let currentPageIdx = this.pagination.pageIndex;
+                    this.updatePaginator(this.datasourceResults);
+                    let currentPage = this._paginator.paginate(currentPageIdx);
+                    this.emit("sort", currentPage, options.sortDatas);
+                    return currentPage;
                 } else {
                     return this.fetchData(false, this.getFetchArgs("pagination", this.pagination))
                         .then((results: Array<T>) => {
-                            this.emit("sort", results, sort);
+                            this.emit("sort", results, options.sortDatas);
                             return results;
                         });
                 }
             } catch (e) {
                 let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ERROR, null, e);
                 this.emit("error", error);
-                throw error;
             }
 
         }).finally(() => {
@@ -474,19 +474,19 @@ export class PaginateDataSource<T> extends DataSource<T>{
             if (cancelFilterHistory) {
                 if (!this._filtering_flag) {
                     //backup
-                    this._results_backup = this._results;
+                    this._results_backup = this.datasourceResults;
                     this._filtering_flag = true;
                 } else {
                     //restore
-                    this._results = this._results_backup;
+                    this.datasourceResults = this._results_backup;
                 }
             }
         }
         Promise.resolve().then(() => {
             try {
                 if (this.isDataSourceArray) {
-                    this._results = _.filter(this.results, config);
-                    this.updatePaginator(this._results);
+                    this.datasourceResults = _.filter(this.results, config);
+                    this.updatePaginator(this.datasourceResults);
                     this.goToPage(Direction.FIRST);
                 } else {
                     this.fetchData(false, this.getFetchArgs("filter", config)).then(() => {
@@ -496,7 +496,6 @@ export class PaginateDataSource<T> extends DataSource<T>{
             } catch (e) {
                 let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_FILTER_ERROR, null, e);
                 this.emit("error", error);
-                throw error;
             }
         }).finally(() => {
             this.emitEvent("loadingData", false);
@@ -506,8 +505,8 @@ export class PaginateDataSource<T> extends DataSource<T>{
 
     /***
      * Ajout un élément ou des éléments au result du datasource
-     * cette action déclenche l'évènement pagination.
-     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
+     * cette action déclenche l'évènement add.
+     * @param {Boolean} triggerFetch param inutilisé, cette fonction déclenchera un évènement "pagination" .
      * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
      * @example
      * dataSource.on("add", (IncreasedResult)=>{
@@ -516,8 +515,11 @@ export class PaginateDataSource<T> extends DataSource<T>{
      * dataSource.add();
      * @void
      */
-    public add(triggerFetch: Boolean, ...items: (T | T[])[]): void {
-        this.addData(false, ...items);
+    public add(triggerFetch: Boolean = false, ...items: (T | T[])[]): void {
+        this.addData(false, ...items).catch((e) => {
+            let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_DELETE_ERROR, null, e);
+            this.emit("error", error);
+        })
     }
 
     /***
@@ -525,8 +527,8 @@ export class PaginateDataSource<T> extends DataSource<T>{
      */
     protected addData(triggerFetch: boolean = false, ...items: (T | T[])[]): Promise<Array<any>> {
         return super.addData(false, ...items).then((result: Array<any>) => {
-            if (result.length != 0) {
-                this.updatePaginator(this._results);
+            if (result && result.length != 0) {
+                this.updatePaginator(this.datasourceResults);
                 this.goToPage(Direction.FIRST);
             }
             return result;
@@ -536,9 +538,9 @@ export class PaginateDataSource<T> extends DataSource<T>{
     /***
      * @inheritdoc
      */
-    protected deleteData(triggerFetch: boolean = false, ...items: (T | T[])[]): Promise<Array<any>> {
-        return super.deleteData(false, ...items).then((result: Array<any>) => {
-            this.updatePaginator(this._results);
+    protected deleteData(triggerFetch: Boolean = false, ...items: (T | T[])[]): Promise<Array<any>> {
+        return super.deleteData(triggerFetch, ...items).then((result: Array<any>) => {
+            this.updatePaginator(this.datasourceResults);
             this.goToPage(Direction.FIRST);
             return result;
         });
@@ -546,13 +548,15 @@ export class PaginateDataSource<T> extends DataSource<T>{
 
     /***
      * enlève un élément ou des éléments au result du datasource
-     * cette action déclenche l'évènement pagination
-     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
+     * cette action déclenche l'évènement delete
+     * @param {Boolean} triggerFetch param inutilisé, cette fonction déclenchera un évènement "pagination" .
      * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
      * @void
      */
     public delete(triggerFetch: Boolean, ...items: (T | T[])[]): void {
-        this.deleteData(false, ...items);
+        this.deleteData(triggerFetch, ...items).then((results) => {
+            this.emit("delete", results);
+        });
     }
 
     /**
@@ -588,7 +592,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
         if (forceUpdate) {
             this.goToPage(this.pagination.pageIndex || Direction.FIRST);
         } else {
-            this.emit("pagination", { list: this._results, pagination: this._paginator.pagination });
+            this.emit("pagination", { list: this.datasourceResults, pagination: this._paginator.pagination });
         }
     }
 
@@ -599,7 +603,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
     public updatePerPage(itemsPerPage: number): void {
         if (this.isDataSourceArray) {
             this.pagination.itemsPerPage = itemsPerPage;
-            this.updatePaginator(this._results);
+            this.updatePaginator(this.datasourceResults);
             this.emit("pagination", { list: this._paginator.paginate(Direction.FIRST), pagination: this._paginator.pagination });
         } else { // pagination serveur
             this.pagination.itemsPerPage = itemsPerPage;
@@ -667,7 +671,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
      */
     protected saveSelected() {
         this._selected = this.getAllSelected();
-        this._currentItemSelected = null;
+        this._currentItemSelected = undefined;
     }
 
 

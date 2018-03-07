@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,12 +112,12 @@ class AutoCompleteFieldTest extends BaseTest {
 
         element = (
             <AutoCompleteField dataSource={dataSource}
-                               maxHeight={200}
-                               name="civilite"
-                               label="civilite"
-                               required={true}
-                               labelKey="libelle"
-                               valueKey="id"
+                maxHeight={200}
+                name="civilite"
+                label="civilite"
+                required={true}
+                labelKey="libelle"
+                valueKey="id"
 
             />)
     };
@@ -133,7 +133,7 @@ class AutoCompleteFieldTest extends BaseTest {
         let index = 0;
         dataSource.on("select", () => {
             index++;
-            expect(_.isEqual(dataSource.selected, index.toString()), ("L'élément sélectionner dans le datasource " + dataSource.selected + " doit être identique à l'element suivant : " + index.toString())).to.be.true;
+            expect(_.isEqual(dataSource.selected.value, index), ("L'élément sélectionner dans le datasource " + dataSource.selected.value + " doit être identique à l'element suivant : " + index)).to.be.true;
             if (index == dataSource.results.length - 1) this.end();
         });
 
@@ -143,7 +143,7 @@ class AutoCompleteFieldTest extends BaseTest {
             (document.querySelector("#civilite") as any).click();
             let elts = document.querySelectorAll("#main1 .autocomplete-item");
             dataSource.results.forEach((value, index) => {
-                this.triggerMouseEvent(elts[index], "mousedown");
+                this.triggerMouseEvent(elts[ index ], "mousedown");
             })
         });
 

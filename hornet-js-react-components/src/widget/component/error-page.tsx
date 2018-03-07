@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,13 +109,13 @@ export class ErrorPage extends HornetPage<any, HornetComponentProps, any> {
             if (error instanceof BusinessErrorList) {
                 exceptions = (error as BusinessErrorList).getErrors();
             } else {
-                exceptions = [error];
+                exceptions = [ error ];
             }
         }
         return (
             <div>
                 <h2>{this.i18n("errorsTitle")}</h2>
-                <Notification id="errorPage" exceptions={exceptions}/>
+                <Notification id="errorPage" exceptions={exceptions} />
             </div>
         );
     }

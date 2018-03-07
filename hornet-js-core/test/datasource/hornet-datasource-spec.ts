@@ -73,22 +73,61 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
-var expect:any = TestUtils.chai.expect;
-import * as _ from "lodash";
-import {TechnicalError} from "hornet-js-utils/src/exception/technical-error";
+import { DataSource } from "src/component/datasource/datasource";
+import { SortData, SortDirection } from "src/component/sort-data";
+
+var expect: any = TestUtils.chai.expect;
 
 export class Test {
     constructor(public attr1: number, public attr2: string, public attr3: any[], public attr4: {}) {
     }
 }
 
-var instance1 = new Test(1, "1", ["1"], {1:1});
+var instance1 = new Test(1, "1", ["1"], {1: 1});
+
+let data: any[] = [
+    {
+        key: 4,
+        value: "d"
+    }, {
+        key: 5,
+        value: "e"
+    }, {
+        key: 2,
+        value: "b"
+    }, {
+        key: 1,
+        value: "a"
+    }, {
+        key: 3,
+        value: "c"
+    }
+];
+
+let dataForCustomSort: any[] = [
+    {
+        key: 402,
+        value: "d"
+    }, {
+        key: 54,
+        value: "e"
+    }, {
+        key: 2018,
+        value: "b"
+    }, {
+        key: 100,
+        value: "a"
+    }, {
+        key: 37,
+        value: "c"
+    }
+];
 
 describe("Test of datasource : ", () => {
 
@@ -127,30 +166,30 @@ describe("Test of datasource : ", () => {
         this.dataSource.delElts(false, new Test(15,"Allemagnjkhjke","allemahjkghjnde"), new Test(13,"Marsghjkghjhall","marshallhjkghjlaise"))
         this.dataSource3.insert(false, new Test(5,"Allemagne","allemande"));
         */
-       /* BeanUtils.serializeObject(User, array).then((result)=> {
-            expect(result).not.empty;
-            expect(result.length).to.be.eq(array.length);
-            _.map(result, function (item) {
-                expect(item).to.be.an.instanceOf(User)
-            });
-            for (var i = 0; i < result.length; i++) {
-                expect(result[i].id).to.be.undefined;
-                expect(array[i].id).to.be.exist;
-                expect(result[i].name).to.be.eq(array[i].name);
-                expect(result[i].password).to.be.eq(array[i].password);
-                expect(result[i].adress.label).to.be.eq(array[i].adress.label);
+        /* BeanUtils.serializeObject(User, array).then((result)=> {
+             expect(result).not.empty;
+             expect(result.length).to.be.eq(array.length);
+             _.map(result, function (item) {
+                 expect(item).to.be.an.instanceOf(User)
+             });
+             for (var i = 0; i < result.length; i++) {
+                 expect(result[i].id).to.be.undefined;
+                 expect(array[i].id).to.be.exist;
+                 expect(result[i].name).to.be.eq(array[i].name);
+                 expect(result[i].password).to.be.eq(array[i].password);
+                 expect(result[i].adress.label).to.be.eq(array[i].adress.label);
 
-                expect(result[i].list.length).to.be.eq(array[i].list.length);
-                for (var j = 0; j < result[i].list.length; j++) {
-                    expect(result[i].list[j].id).to.be.undefined;
-                    expect(array[i].list[j].id).to.be.exist;
-                    expect(result[i].list[j].label).to.be.eq(array[i].list[j].label);
-                }
-            }
-            done();
-        }).catch((error)=> {
-            done(error);
-        });*/
+                 expect(result[i].list.length).to.be.eq(array[i].list.length);
+                 for (var j = 0; j < result[i].list.length; j++) {
+                     expect(result[i].list[j].id).to.be.undefined;
+                     expect(array[i].list[j].id).to.be.exist;
+                     expect(result[i].list[j].label).to.be.eq(array[i].list[j].label);
+                 }
+             }
+             done();
+         }).catch((error)=> {
+             done(error);
+         });*/
     });
 
 })

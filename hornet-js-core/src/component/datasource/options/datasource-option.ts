@@ -73,13 +73,20 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { SortData, SortDirection } from "src/component/sort-data";
 import { SpinnerType } from "src/services/hornet-superagent-request";
+import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
+import { DatasourceSortOption } from "src/component/datasource/options/datasource-sort-option";
+import { CodesError } from "hornet-js-utils/src/exception/codes-error";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+const logger: Logger = Utils.getLogger("hornet-js-core.component.datasource.options.datasource-option");
+
 export interface DataSourceOption {
     sendToFetch(): boolean;
 }
@@ -91,12 +98,12 @@ export enum CompareMethod {
     COMPARE_WITH_UPPERCASE = 3
 }
 
-export type CompareFn = (a: any, b:any) => number
+export type CompareFn = (sortData, a: any, b: any) => number
 
 /**
  * Option de tri par defaut dans un datasourcede
  */
-export class DefaultSort implements DataSourceOption {
+export class DefaultSort implements DatasourceSortOption {
 
     /***
      * @param {SortData[]} sort  données de tri
@@ -105,7 +112,6 @@ export class DefaultSort implements DataSourceOption {
      * 
      */
     constructor(public sort: SortData[], public initCompare: CompareMethod | CompareFn = CompareMethod.COMPARE_DEFAULT, public sendFetch: boolean = false) {
-
     }
 
     /**
@@ -115,31 +121,32 @@ export class DefaultSort implements DataSourceOption {
     public sendToFetch(): boolean {
         return this.sendFetch;
     }
+    public getCompareFunction(number: number): Function {
+        switch (number) {
+            case CompareMethod.COMPARE_WITH_LOWERCASE:
+                return this.compareLowerCase;
+            case CompareMethod.COMPARE_WITH_UPPERCASE:
+                return this.compareUpperCase;
+            default:
+                return this.compare;
+        }
+    }
+    public compare = function (sort, a, b): number {
+        if (arguments.length < 3) {
+            let msg: string = "3 arguments sont necessaires [sortData, a, b]";
+            logger.error(msg);
+            throw new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ARGS_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, null);
 
-    public compare = (a, b):number => {
-
-        if(this.initCompare && typeof this.initCompare == "function") {
+        }
+        if (this.initCompare && typeof this.initCompare == "function") {
             return this.initCompare(a, b);
         } else {
-
-
-            let sortDatas = (this.sort && this.sort.length > 0) ? this.sort : (this as any).sortDatas;
+            let sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
             let result: number;
             sortDatas.every((sortData) => {
 
-                let aValue = a[sortData["key"]];
-                let bValue = b[sortData["key"]];
-
-                if (this.initCompare == CompareMethod.COMPARE_WITH_LOWERCASE) {
-
-                    aValue = (typeof a[sortData["key"]] == "string") ? a[sortData["key"]].toLowerCase() : (typeof a[sortData["key"]] == "undefined") ? "" : a[sortData["key"]];
-                    bValue = (typeof b[sortData["key"]] == "string") ? b[sortData["key"]].toLowerCase() : (typeof b[sortData["key"]] == "undefined") ? "" : b[sortData["key"]];
-
-                } else if (this.initCompare == CompareMethod.COMPARE_WITH_UPPERCASE) {
-
-                    aValue = (typeof a[sortData["key"]] == "string") ? a[sortData["key"]].toUpperCase() : (typeof a[sortData["key"]] == "undefined") ? "" : a[sortData["key"]];
-                    bValue = (typeof b[sortData["key"]] == "string") ? b[sortData["key"]].toUpperCase() : (typeof b[sortData["key"]] == "undefined") ? "" : b[sortData["key"]];
-                }
+                let aValue = a[ sortData[ "key" ] ];
+                let bValue = b[ sortData[ "key" ] ];
 
                 if (aValue < bValue) {
                     result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
@@ -157,6 +164,80 @@ export class DefaultSort implements DataSourceOption {
             });
             return result;
         }
+    }
+
+    public compareUpperCase = function (sort, a, b): number {
+        if (arguments.length < 3) {
+            let msg: string = "3 arguments sont necessaires [sortData, a, b]";
+            logger.error(msg);
+            throw new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ARGS_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, null);
+
+        }
+
+        let sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+        let result: number;
+        sortDatas.every((sortData) => {
+
+            let aValue = a[ sortData[ "key" ] ];
+            let bValue = b[ sortData[ "key" ] ];
+
+
+            aValue = (typeof a[ sortData[ "key" ] ] == "string") ? a[ sortData[ "key" ] ].toUpperCase() : (typeof a[ sortData[ "key" ] ] == "undefined") ? "" : a[ sortData[ "key" ] ];
+            bValue = (typeof b[ sortData[ "key" ] ] == "string") ? b[ sortData[ "key" ] ].toUpperCase() : (typeof b[ sortData[ "key" ] ] == "undefined") ? "" : b[ sortData[ "key" ] ];
+
+
+            if (aValue < bValue) {
+                result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
+                return false
+            }
+
+            if (aValue == bValue) {
+                return true;
+            }
+
+            if (aValue > bValue) {
+                result = (sortData.dir == SortDirection.ASC) ? 1 : -1;
+                return false;
+            }
+        });
+        return result;
+    }
+
+    public compareLowerCase = function (sort, a, b): number {
+        if (arguments.length < 3) {
+            let msg: string = "3 arguments sont necessaires [sortData, a, b]";
+            logger.error(msg);
+            throw new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ARGS_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, null);
+
+        }
+
+        let sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+        let result: number;
+        sortDatas.every((sortData) => {
+
+            let aValue = a[ sortData[ "key" ] ];
+            let bValue = b[ sortData[ "key" ] ];
+
+            aValue = (typeof a[ sortData[ "key" ] ] == "string") ? a[ sortData[ "key" ] ].toLowerCase() : (typeof a[ sortData[ "key" ] ] == "undefined") ? "" : a[ sortData[ "key" ] ];
+            bValue = (typeof b[ sortData[ "key" ] ] == "string") ? b[ sortData[ "key" ] ].toLowerCase() : (typeof b[ sortData[ "key" ] ] == "undefined") ? "" : b[ sortData[ "key" ] ];
+
+
+
+            if (aValue < bValue) {
+                result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
+                return false
+            }
+
+            if (aValue == bValue) {
+                return true;
+            }
+
+            if (aValue > bValue) {
+                result = (sortData.dir == SortDirection.ASC) ? 1 : -1;
+                return false;
+            }
+        });
+        return result;
     }
 }
 

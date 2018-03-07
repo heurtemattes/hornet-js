@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,6 +82,7 @@ import { BaseError } from "hornet-js-utils/src/exception/base-error";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { BusinessError } from "hornet-js-utils/src/exception/business-error";
 import { BusinessErrorList } from "hornet-js-utils/src/exception/business-error-list";
+import { HttpError } from "hornet-js-utils/src/exception/http-error";
 import * as _ from "lodash";
 
 export interface BackendApiResult {
@@ -238,6 +239,8 @@ export class NodeApiError {
             // Error type
             if (this.name == "BusinessError") {
                 error = new BusinessError(this.code, args);
+            } else if (this.httpStatus && (this.httpStatus < 200 || this.httpStatus > 299)) {
+                error = new HttpError(this.httpStatus, this.code, args, this.details ? new BaseError("", this.details) : null)
             } else {
                 error = new TechnicalError(this.code, args, this.details ? new BaseError("", this.details) : null);
             }

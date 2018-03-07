@@ -4,11 +4,11 @@ hornet-js-database fournit un module pour la gestion des connexions à une base 
 
 ## Prérequis #
 
-* NodeJS 6.X
+* NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -18,7 +18,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet.js`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -26,6 +26,9 @@ Compiler les sources typescript de `hornet.js`
 Ajouter au package.json
 
 ```shell
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
     "hornet-js-database": "5.1.X"
   }
@@ -34,7 +37,7 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-    $ hb install
+hb install
 ```
 
 ## Définition d'un service transactionel
@@ -44,7 +47,7 @@ via les différents DAO, sont encapsulées dans une même transaction. Si un inc
 transaction annule toutes les actions précédentes. Si aucun incident ne survient, toutes les actions sont validées
 grâce à un commit en fin de transaction.
 
-voici un exemple de service transactionel :
+Voici un exemple de service transactionnel :
 La méthode "service" est annotée avec le descriptor @Transactional()
 
 

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -179,13 +179,13 @@ export class RedirectToLoginPagePlugin extends HornetPlugin{
  * @constructor
  */
 export class AddParamFromLocalStorage extends HornetPlugin{
-    static getPlugin(param:string, localStorageName?:string)  : (request:HornetSuperAgentRequest) => void {
+    static getPlugin(param:string, propNameName?:string, localStorageName?:string)  : (request:HornetSuperAgentRequest) => void {
         return  (request:HornetSuperAgentRequest) => {
             logger.trace("Ajout Param request from local storage.");
             if (Utils.isServer) {
                 var callbacksStorage = Utils.getContinuationStorage(localStorageName);
                 // var callbacksStorage = require("hornet-js-utils/src/callbacks-local-storage").getStorage(localStorageName);
-                var paramValue = callbacksStorage.get(param);
+                var paramValue = callbacksStorage.get(propNameName || param);
                 var query = request.query;
                 query[param] = paramValue;
 

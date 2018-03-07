@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Formulaire 2",
+  "description": "Validation des données de formulaire 2",
+  "type": "object",
+  "definitions": {
+    "noWhiteSpace": {
+      "pattern": ".*\\S.*"
+    }
+  },
+  "required": [
+    "input6"
+  ],
+  "properties": {
+    "input6": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250,
+      "$ref": "#/definitions/noWhiteSpace"
+    }
+  }
+}

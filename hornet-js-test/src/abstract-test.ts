@@ -73,13 +73,16 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import * as React from "react";
 import * as ReactDom from "react-dom";
 
+import * as http from "http";
+import * as https from "https";
 /**
  * classe abstraite de Test
  */
@@ -94,6 +97,15 @@ export class AbstractTest {
      * @param {Error} err : err s'il en existe une
      **/
     public end(err?: Error) {
+       
+        if (http[ "__old_http_request" ] != undefined) {
+            (http as any).request = http[ "__old_http_request" ];
+            (https as any).request = https[ "__old_https_reques" ];
+            delete http[ "__old_http_request" ];
+            delete https[ "__old_https_reques" ];
+        }
+
+
         this.endft(err);
     }
 
@@ -102,7 +114,7 @@ export class AbstractTest {
      * @param {JSX.Element} element le composant react à insérer
      * @param {string} id l'identifiant du conteneur html dans lequel sera placé cet element
      **/
-    public renderIntoDocument(element: JSX.Element, id: string) {
+    public renderIntoDocument(element: React.ReactElement<any> , id: string) {
         if (typeof document !== "undefined"){
             let div = document.querySelector("#" + id);
             if (!div) {

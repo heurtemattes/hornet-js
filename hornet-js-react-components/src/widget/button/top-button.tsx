@@ -73,13 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetComponent } from "src/widget/component/hornet-component";
 
 /**
@@ -104,34 +105,35 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
     static defaultProps = ({
         offset: 0,
         header: "header-container",
-        footer: "footer-container"
+        footer: "footer-container",
+        notificationSession: "notification-session"
     });
 
-    constructor(props, context?:any) {
+    constructor(props, context?: any) {
         super(props, context);
 
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', this.handleScroll);
+        window.addEventListener("scroll", this.handleScroll);
     }
 
-    componentWillUnmount(){
-        window.removeEventListener('scroll', this.handleScroll);
+    componentWillUnmount() {
+        window.removeEventListener("scroll", this.handleScroll);
     }
 
     /**
      * Calcule si un élément est présent ou non a l'écran
      * @param {Element} elm - l'élément a rechercher
      * @return {boolean} true si l'élément est présent
-    */
-    private checkvisible(elm) {
+     */
+    protected checkvisible(elm) {
         let rect = elm.getBoundingClientRect();
         let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
 
         //sauvegarde la la taille visible du footer
         let height = -(rect.top - viewHeight) + 16;
-        this.setState({size : height});
+        this.setState({ size: height });
 
         return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
     }
@@ -140,31 +142,39 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
      * Métohde de gestion du scroll à l'écran
      * @param event - evenement scroll
      */
-    private handleScroll(event) {
+    protected handleScroll(event) {
         let header = document.getElementById(this.state.header);
         let footer = document.getElementById(this.state.footer);
+        let notificationSession = document.getElementById(this.state.notificationSession);
 
         /* récupération de la hauteur du header : le composant ne s'affichera qu'au dela de cette hauteur */
-        let height:number = 0;
-        if(header){
-            height  = header.getBoundingClientRect().height;
+        let height: number = 0;
+        if (header) {
+            height = header.getBoundingClientRect().height;
         }
 
-        /*si le footer est visible, le composant s'affichera au dessus de celui-ci*/
+        if (notificationSession) {
+            height += notificationSession.getBoundingClientRect().height;
+        }
+
+        /*si le notificationSession est visible, le composant s'affichera au dessus de celui-ci*/
         let visible: boolean = false;
-        if(footer) {
+        if (footer && notificationSession) {
+            visible = this.checkvisible(notificationSession);
+        } else if (footer) {
             visible = this.checkvisible(footer);
         }
 
         this.setState({
-            offset: height, visible: visible
+            offset: height,
+            visible: visible
         });
     }
 
     /**
      * Méthode de retour en haut de la page
      */
-    private scrolltop(){
+    protected scrolltop() {
         window.scrollTo(0, 0);
     }
 
@@ -173,46 +183,66 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
      * @returns {any}
      * @override
      */
-    render():JSX.Element {
+    render(): JSX.Element {
 
         /* calcul de la position du scroll*/
-        let scroll : number = 0;
-        if(typeof window !== 'undefined') {
+        let scroll: number = 0;
+        if (typeof window !== "undefined") {
             scroll = window.scrollY || window.pageYOffset;
         }
 
         /*si le footer est visible, le composant s'affichera au dessus de celui-ci*/
         let style = {};
-        if(this.state.visible){
-            style = {bottom : this.state.size};
+        if (this.state.visible) {
+            style = { bottom: this.state.size };
         }
 
         let shouldShow = scroll > this.state.offset;
 
         let contentButton = this.state.children || this.renderDefaultTopButtonContent();
+        let tabIndex = 0; //Permet d'avoir le focus sur le champs lorsqu'on navigue au clavier
 
-        if(shouldShow) {
+        let aProps: any = {
+            className: this.state.className || "top-button",
+            style: style,
+            onClick: this.scrolltop,
+            id: this.state.id,
+            name: this.state.name,
+            title: this.state.title,
+            tabIndex: tabIndex,
+            onKeyDown: this.handleKeyDown,
+            role: "button"
+        };
+
+        if (shouldShow) {
             return (
-                <a className= {this.state.className || "top-button"}
-                   style={style}
-                   onClick={this.scrolltop}
-                   id={this.state.id}
-                   name={this.state.name}
-                   title={this.state.title}
+                <div {...aProps}
                 >
                     {contentButton}
-                </a>
+                </div>
             );
         }
         return null;
     }
 
     /**
+ * Gestion du clic sur entrer ou espace
+ * @param event
+ */
+    protected handleKeyDown(event): void {
+        if (event.keyCode == KeyCodes.ENTER) {
+            this.scrolltop();
+        }
+    }
+
+
+
+    /**
      * Génére le contenu du bouton
      * @returns {any}
      */
-    private renderDefaultTopButtonContent(): JSX.Element {
-        return(
+    protected renderDefaultTopButtonContent(): JSX.Element {
+        return (
             <div className="top-button-content">
             </div>
         );

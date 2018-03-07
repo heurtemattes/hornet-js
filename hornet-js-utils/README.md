@@ -15,11 +15,11 @@ Les utilitaires  :
 
 ## Prérequis #
 
-- `nodejs` 6.X
+- `nodejs` 8.X
 - `hornet-js-builder` 1.X installé en global
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -29,7 +29,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet.js`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -37,9 +37,10 @@ Compiler les sources typescript de `hornet.js`
 Ajouter au package.json
 
 ```shell
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
-    "hornet-js-core": "5.1.X",
-    "hornet-js-ts-typings": "5.1.X",
     "hornet-js-utils": "5.1.X"
   }
 ```
@@ -47,7 +48,7 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-    $ hb install
+hb install
 ```
 
 ## Licence

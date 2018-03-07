@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -124,8 +124,8 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
     constructor(props, context?: any) {
         super(props, context);
 
-        this.state.effect= false;
-        this.state.css= {dislay: "none"};
+        this.state.effect = false;
+        this.state.css = { dislay: "none" };
 
     }
 
@@ -142,13 +142,13 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
     /**
      * Rendu type Button
      * @returns {any}
-     * @private
+     * @protected
      */
-    private renderButton(): JSX.Element {
+    protected renderButton(): JSX.Element {
 
         let classes: ClassDictionary = {};
         if (this.state.className) {
-            classes[this.state.className] = true;
+            classes[ this.state.className ] = true;
         }
 
         return (
@@ -163,7 +163,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
                 disabled={this.state.disabled}
                 aria-haspopup={this.props.hasPopUp}>
                 {this.state.label}
-                {this.state.effect ? <div className="ripple-effect" style={this.state.css}/> : null}
+                {this.state.effect ? <div className="ripple-effect" style={this.state.css} /> : null}
             </button>
         );
     }
@@ -171,24 +171,28 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
     /**
      * Rendu Type Link
      * @returns {any}
-     * @private
+     * @protected
      */
-    private renderLink(): JSX.Element {
+    protected renderLink(): JSX.Element {
 
         let classes: ClassDictionary = {};
         if (this.state.className) {
-            classes[this.state.className] = true;
+            classes[ this.state.className ] = true;
         }
 
+        let aProps: any = {
+            href: this.state.url,
+            className: classNames(classes),
+            title: this.state.title,
+            onClick: this.handleClick,
+            disabled: this.state.disabled
+        };
+
         return (
-            <a href={this.state.url}
-               className={classNames(classes)}
-               title={this.state.title}
-               onClick={this.linkHandleClick}
-               disabled={this.state.disabled}
+            <a {...aProps}
             >
                 {this.state.label}
-                {this.state.effect ? <div className="ripple-effect" style={this.state.css}/> : null}
+                {this.state.effect ? <div className="ripple-effect" style={this.state.css} /> : null}
             </a>
         );
     }
@@ -196,18 +200,14 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
     /**
      * Evènement déclenché lors du clic sur le bouton
      * @param e
-     * @private
+     * @protected
      */
-    private handleClick(e): void {
+    protected handleClick(e): void {
         if (this.state.onClick != null) {
             this.state.onClick(e);
         }
         this.rippleEffect(e);
 
-    }
-
-    private linkHandleClick(e): void {
-        this.rippleEffect(e);
     }
 
     /**
@@ -225,10 +225,10 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
             width: size + "px"
         });
 
-        this.setState({effect: true, css: css});
+        this.setState({ effect: true, css: css });
         setTimeout(() => {
             if (this.mounted) {
-                this.setState({effect: false});
+                this.setState({ effect: false });
             }
         }, 1500);
     }

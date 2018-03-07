@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -177,29 +177,27 @@ class tableTest extends BaseTest {
 
     @Decorators.it('Valider modification cellule editable avec erreur')
     validerElement() {
-        table = this.renderIntoDocument(tableElement, "main1");
+        table = this.renderIntoDocument(tableElement, "main99999");
 
-        this.triggerMouseEvent(document.querySelector('#main1 #lite-0-colBody-0-2 .edition-button-action'), "click");
+        this.triggerMouseEvent(document.querySelector('#main99999 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
 
-        expect(document.querySelector("#main1 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
+        expect(document.querySelector("#main99999 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
 
-        document.querySelector('#main1 #lite-0-colBody-0-0 input#label')["value"] = "";
+         document.querySelector('#main99999 #lite-0-colBody-0-0 input#label')["value"] = "";
 
-        this.triggerMouseEvent(document.querySelector("#main1 #lite-0-colBody-0-2 button[title='Enregistrer'"), "click");
+        this.triggerMouseEvent(document.querySelector("#main99999 #lite-0-colBody-0-2 button[title='Enregistrer']"), "click");
         setTimeout(() => {
-            //
-            expect(document.querySelector("#main1 .error-message-list")).to.exist;
-            expect(document.querySelectorAll("#main1 .error-message-list li").length).to.equal(1);
-            expect((document.querySelector("#main1 a.error-message-text") as any ).text).to.equal("should have required property 'label'");
+            expect(document.querySelector("#main99999 .error-message-list")).to.exist;
+            expect(document.querySelectorAll("#main99999 .error-message-list li").length).to.equal(1);
+            expect((document.querySelector("#main99999 a.error-message-text") as any ).text).to.equal("should have required property 'label'");
             this.end();
         }, 500)
-
 
     };
 
     submitLineForm = (item) => {
 
-        NotificationManager.notify(null, null, Notifications.makeSingleNotification("", "Modification effectuée"));
+        NotificationManager.notify(null, null, null, Notifications.makeSingleNotification("", "Modification effectuée"));
 
     }
 

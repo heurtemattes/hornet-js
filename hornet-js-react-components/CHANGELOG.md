@@ -1,3 +1,223 @@
+# hornet-js-react-components 5.1.1
+
+-	65965	-	Problème de mise à jour de pagination lors du tri sur une colonne
+-	65978	-	Tableau paginé : accès direct numéro de page et navigation flêches haut/bas KO
+-	66109	-	Suppression des lignes dans une DataSource lors du décoche d'une CheckBoxColumn dans une Table
+-	66400	-	Lorsqu'un tableau est inclus dans un formulaire, l'activation de la pagination soumet le formulaire
+-	65968	-	Dropdown 2 probs
+-	66197	-	[sauvegarde] autocomplete multiple
+-	64609	-	Mélange des notifications de formualire dans le cas d'une page contenant au moins 2 formulaires
+-	66108	-	Impossible de saisir le caractere "A" dans une colonne en édition
+-	66125	-	[Modal]handleKeyDown
+-	66242	-	[Tableau] Problème de réinitialisation de la pagination lors du tri sur colonne
+-	EVOL[s117] - Composant Aller au contenu
+-	FIX: accessibilité - correction checkbox & autocomplete
+-	FIX: Correction export
+-	FIX(S98-246): RadioField - prise en compte des booléens comme value
+-	FIX(S98-304): RadioField - ajouter DEPRECATED SUR l'usage du data pour RadioFields et SelectField
+-	FIX(S98-246): RadioField - prise en compte des booléens comme value
+-	FIX: accessibilité - navigation clavier tabs
+-	EVOL:[s118] Picto: enrichir la classe avec les pictos de CROCUS (lot 2)
+-	EVOL[s319] MaJ react.d.ts fragments
+-	FIX: accessibilité - dropdown
+-	FIX(S98-246): RadioField - prise en compte des booléens comme value
+-	FIX: accessibilité - gestion tabulation tableau édition
+-	EVOL[s16]: Ajout composant Confirm
+-	EVOL[s16]: composant Confirm
+-	FIX[S315] correctif checkbox dans tableau editable inline
+-	FIX: accessibilité - gestion role banner
+-	EVOL:[s118] Picto: enrichir la class avec les picto de CROCUS (lot 1)
+-	[FIX] findAll utilisation de la fonction _.filter en lieu et place de la fonction _.every
+-	FIX[s315] : correctif checkbox dans tableau editable inline EVOL[s16]: composant Confirm
+-	FIX: accessibilité - indication de changement de langue dans le texte du form
+-	FIX: accessibilité - indication du changement de langue dans le dropdown de choix de langue
+-	[EVO] montée de version de chai
+-	[FIX] : gestion des erreurs - status de la request
+-	FIX: accessibilité - correction de la navigation clavier action body-cell
+-	[FIX] : gestion des erreurs - evo suite à la montée de version de bluebird
+-	EVOL[s92]NOTIFICATION: Correction titile exception error
+-	EVOL[s105] Array-utils: intersectionWith - ajout nouvel argument plutot que d'avoir "id" en guise de clé par défaut
+-	FIX: accessibilité - suppr aria-label en trop
+-	EVOL[s92] : NOTIFICATION: ajout d'un title et du texte sur le bouton
+-	[EVO] RGAA3 - Footer (6.5.1-12.11.4)
+-	[s106] - Tri tableau: methode compare portée par Column
+-	Correction affichage notification exception
+-	[EVO] Ajout d'un id aux props du composant change-language
+-	correction pour exception cote browser
+-	[EVO] RGAA3 - Secteurs-liste - 3.1.4 - dropdown - Revert
+-	[EVO] RGAA3 - Secteurs-liste - 3.1.4 - dropdown
+-	Evol[ s92 ]: NOTIFICATION: ajouter croix suppression + hide/show button
+-	[EVO] RGAA3 - Secteurs-liste - 7.1.3 - modal
+-	EVOL: modif gestion des erreurs
+-	FIX: problème de rendu serveur
+-	EVOL: passage de méthode en statiques pour appel projet
+-	EVOL: nouvelle gestion des erreurs
+-	EVOL: evolution pour nommage des parametres et de la recup dans le CLS
+-	EVOL: Correction param plugins
+-	EVOL: Nouvelle gestion des erreurs (gestion des status HTTP)
+-	EVOL: Reprise pour visualisation iframe
+-	Evol[ s92 ]: NOTIFICATION: ajouter croix suppression + hide/show button
+-	FIX: [M0066253]: correction du disabled sur le footer
+-	[s69] - mise en place composant Notification de déconnexion imminente
+-	EVOL[S85-259]: textarea: ajout de l'affichage du nombre de caractère et de l'autosizing
+-	EVOL : gestion de la selection dans les datasources et le composant selectField
+-	EVOL : gestion de la select dans les datasources et composants autocomplete et autocompletemultiple
+-	EVOL: optimisation submit et render
+-	EVOl[s105]: Array-utils: intersectionWith : on rend dynamique la récupération de la keyColumn à matcher
+-	EVOL: I18N loader avec sous repertoire
+-	EVOL[S34-266]: évolution des ids des tabs
+-	FIX: mise en commentaire du test qui ne fonctionne pas
+-	FIX : la touche entrer valide le choix dans le dropdown
+-	EVOL[S34-238]: ajout de la suppression et de l'ajout d'onglet
+-	FIX[m66109]: correction 0066109: Suppression des lignes dans une DataSource lors du décoche d'une CheckBoxColumn dans une Table
+-	FIX : Mantis 0066125 - handle Modal
+-	FIX(S98-246): RadioField - prise en compte des booléens comme value
+-	EVO : Ajout d'un système notification d'expiration de session
+-	FIX:move builder
+-	FIX(S98-235): RadioField - unicité des composants par l'id
+-	FIX(M0065955): Déclenchement onFormChange
+-	[FIX] : Fix du mantis 0066108
+-	FIX[ s78 ]: DropDown moreActions: documentation + MaJ showroom - ajout picto more action
+-	[EVOL]: retour arrière sur la surcharge de l'attribut state
+-	JUnit report
+-	ajout remontée JUnit dans Jenkins
+-	EVOL[S82-215]: upgrade librairies chai
+-	EVOL[S82-215]: upgrade librairies
+-	FIX[m0065978]:
+-	FIX(SUPPORT): Datasource gestion de l'order à partir d'une méthode de comparaison
+-	FIX[m0065978]:
+-	EVOL:maj sonar rules
+-	[FIX] ts +^> 2.7.1
+-	[EVO] surcharge de l'attribut state de react
+-	FIX[ s59 ]: UnmanagedDataErrorMiddleware: problème de récupération de status
+-	[S76-199] : creation de hornet sequelize entity dao
+-	FIX: Correction des TU's (pb selecteur css)
+-	FIX(SUPPORT): Gestion notification sur fermeture d'une modal
+-	FIX: Correction TU Karma
+-	FIX: Suppression surchage L4JS avec ActiveX
+-	test couverture
+-	test couverture plugin
+-	FIX: correction du fonctionnement des checkboxs
+-	EVOL: ajout configuration exlusion remap
+-	FIX: correction test table editable
+-	FIX: appender console pour test karma
+-	FIX: correction des TU's
+-	FIX: correction de TU sur les composants
+-	test couverture
+-	FIX: configuration console pour les test
+-	EVOL: eclude karma webpack
+-	FIX[M0065313]: ActionColumn : tooltip actif qu'importe la prop visible
+-	FIX[M0065700]: scrollToNotifications laisse une partie de la zone de notification masquée
+-	FIX[S15-100]: correction de l'autocomplete
+-	FIX[S15-100]: correction message d'erreur
+-	FIX[S15-100]: correction css add message sur les flèche des onglets
+-	FIX[S15-100]: correction de l'afficaheg en mode css désactivé
+-	FIX[S15-100]: correction code
+-	FIX[S15-100]: correction focus tableau editable
+-	FIX[S15-100]: correction navigation accordion
+-	FIX[S15-100]: correction focus après le tri du tableau
+-	test couverture
+-	FIX[S15-100]: correction accessibilité accordion et autocomplete
+-	test couverture
+-	FIX[S15-100]: 7.1.3: labelledby - describedby sur les alertes
+-	FIX[S15-100]: 6.5.1 : correction intitulé dans les liens toggle column
+-	EVOL:Version Snapshot
+-	FIX[S15-100]: 11.9.1 - correction action button column
+-	FIX[S15-100]: correction code
+-	test couverture
+-	test couverture
+-	FIX[S15-100]: Liens 6.5.1 : ajout intitulé de lien dans les tabs
+-	test couverture
+-	EVOL: ajout parametrage content-disposition pour les resultats
+-	FIX[S15-100]: 11.10.1
+-	FIX[S15-100]: 11.9.1
+-	EVOL: mise à niveau configuration frameguard
+-	FIX[S15-100]: correction code
+-	FIX[ s15 ]: correction audit accessibilité liste partenaire
+-	EVOL[S13-52] : fix timeout pour Hornet.js
+-	EVOL[S13-52] : Ajout d'un timeout aux requests + revu structure noeud pour configuration cache
+-	BUG: problème enchainement TU (surcharge de http et https dans hornet-super-agent)
+-	EVOl[S15]: gestion focus sur tri tableau
+-	FIX[ s15 ]: mode degradé sur les cases à coché
+-	EVOL[S28-147] : Application de la valorisation par défaut pour les radios boutons dans l'application + ajout de l'abonnement à la sélection des radioBoutons si pas de valeur par défaut
+-	FIX:Correction bug migration log4js pour le logclient
+-	EVOL[S19-148] : Relecture suppression méthodes privées + passage d'attributs de private à protected + export interface et type
+-	EVOL[S16-158] : Ajout d'une option targetKey pour les relations dans SequelizeUtils
+-	FIX: correctif middleware lié à la configuration CSP
+-	FIX[ s15 ]: - Ajout de l'attibut alt pour les images du composant action-column - Ajout attribut title et messsage associé sur l'image permettant de vider un champs input
+-	FIX[ s51 ]: Gestion token hornet-js
+-	EVOL[S29]:montée de version de React en 16.2.0 et MaJ des dts de React et ReactDom
+-	FIX[s:137 ]: bouton radio: revoir gestion des currentValue
+-	FIX[s136] Suppression méthodes privées en méthode protected
+-	FIX:tar systemd logc
+-	EVOL:Maj auto vers le dernier builder
+-	FIX:Correction pwd sonar
+-	FIX[SUPPORT] : Activation du scrollToNavigation également lorsqu'il y a des exceptions BusinessError
+-	FIX:Correction sur la clé sonar
+-	FIX[S27-113] : nettoyage debugger
+-	FIX[S27-113] : shift + space désactivé pour tableau sans sélection de masse
+-	[EVOL] evolution de la méthode de serialization
+-	Revert: FIX[S15-100]: ACCESSIBILITE:correctifs retour audit
+-	FIX[S27-87] : correction gestion selection et badge dans tableau secteur
+-	FIX[S15-100]: ACCESSIBILITE:correctifs retour audit
+-	utiliser la version latest dev du builder
+-	EVOL: Ajout cionfiguration rapport couverture Sonar
+-	FIX[S15-100]: ACCESSIBILITE:correctifs retour audit
+-	[EVO] fix de la pagination en mode tableau + amélioration de la doc. à tester
+-	Taches urgentes [US99] : correction paginateDatasource
+-	FIX[RGA ]: Top-button navigation clavier
+-	EVOL[S32-95] : EVOL: montée de version log4json 5.0.2 & 5.1.1
+-	Evol[Table: pouvoir masquer le thead - s:98 ]: Ajouter propriété React sur le Table afin de pouvoir masquer le Thead d'un Table
+-	DOC[]: Fichier de montée de version vers la 5.1.1
+-	correction accessibilité -  en-tête
+-	FIX[S22-97]: checkbox/switch: suppression padding-bottom
+-	EVOL[S32-95] : EVOL: montée de version log4json 5.0.2 & 5.1.1
+-	EVOL[S14-53]: Tests unitaires
+-	EVOL[S32-95] : EVOL: montée de version log4json 5.0.2 & 5.1.1
+-	EVOL(US14-53): Tests unitaires
+-	EVOL: Mise en place merge rapports test
+-	EVOL(US14-53): Tests unitaires
+-	[FIX] Message de démarrage du serveur
+-	[SAML:generation-metadata]: ajout d'une propriété dans la configuration SAML afin de pouvoir accéder à la route de génération du metdata de l'application + mise à jour de la documentation
+-	EVOL(US14-53): Tests unitaires
+-	EVOL(US14-53): Tests unitaires
+-	FIX: pb surcharge globale des fonctions utilisées par le builder(NPM)
+-	FIX: réduction des niveaux de log du menu
+-	EVO: compléments gestion des erreurs datasource
+-	FIX [s86]: APPLITUTORIEL: consultation partenaire puis création - correction dom-adapter
+-	FIX(BUILD_ERROR): correction notify() dans tests karma
+-	EVO: deuxième fois que je le fais car ca été sauté....amélioration gestion des erreurs des datasource
+-	FIX(US14-53): Clic sur accordion avec erreur de validation
+-	EVOL(US14-53): Gestion notifcation form et accordion
+-	[MaJ dts React]: modification du dts afin d'intégrer les nouveaux types de render (string
+-	modification de la version de hornet.js en 5.1.1
+-	[SAML:generation-metadata]: ajout d'une propriété dans la configuration SAML afin de pouvoir accéder à la route de génération du metdata de l'application
+-	FIX: surcharge de require seulement pour l'exécution du test
+-	ajout test_report
+-	test builder
+-	debug test
+-	utilisation du derniere version builder
+-	[EVOL] Amélioration de la gestion des erreurs datasource
+-	[FIX] Ajout de la jsdocs
+-	[EVOL] ajout d'un fichier .gitignore
+-	[FIX] problème lié au montage/démondage des composants react - quoi qu'il arrive on vérifie maintenantl'existance du htmlElement.
+-	Retour sur les messages de log info
+-	Fix[S39]: Fomulaire: messages d'erreur paramétrés
+-	EVOL(Urgent tasks-38): Retrait de l'import Accordion dans notification
+-	FIX(SupportCrocus): Test unitaire de vérification saisi input du pager
+-	FIX: Gestion de la pagination dans le pager
+-	FIX(support crocus): ajout documentation méthode onChange pour pageIndex
+-	FIX(support crocus): Fix gestion prop value sur input pageIndex du pager (React controlled component)
+-	FIX : reste sur l'index de page actuelle sur le tri
+-	correct : tri sur les sortDatas ou sinon par défaut
+-	correction autocomplete multi (les valeurs ne se cochaient pas)
+-	evol : ajout d'un indicateur pour un lien fort entre la notif et le form et non seulement la dernière notif enregistrée
+-	evol : possibilite de specifier une cle i18n pour le label dans les props
+-	correct : protection si pas de header
+-	correction autocomplete
+-	correction button
+
+
 # hornet-js-react-components-5.1.0
 -	213330	-	Suppression des getCellTitle sur le datebodycell et yesnobodycell Err:510 inutile niveau accessibilité
 -	213329	-	Complement à la méthode select des tabs

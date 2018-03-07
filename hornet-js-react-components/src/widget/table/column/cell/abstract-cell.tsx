@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -170,41 +170,41 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
                     logger.trace("Focus sur la cellule suivante de la même ligne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.RIGHT);
                     break;
-                case KeyCodes.LEFT_ARROW :
+                case KeyCodes.LEFT_ARROW:
                     logger.trace("Focus sur la cellule précédente de la même ligne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.LEFT);
                     break;
-                case KeyCodes.DOWN_ARROW :
+                case KeyCodes.DOWN_ARROW:
                     logger.trace("Focus sur la cellule suivante de la même colonne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.BOTOM);
                     break;
-                case KeyCodes.UP_ARROW :
+                case KeyCodes.UP_ARROW:
                     logger.trace("Focus sur la cellule précédente de la même colonne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.TOP);
                     break;
-                case KeyCodes.HOME :
+                case KeyCodes.HOME:
                     logger.trace("Focus sur la première cellule de la ligne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.HOME_COL);
                     break;
-                case KeyCodes.END :
+                case KeyCodes.END:
                     logger.trace("Focus sur la dernière cellule de la ligne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.END_COL);
                     break;
-                case KeyCodes.PAGE_UP :
+                case KeyCodes.PAGE_UP:
                     logger.trace("Focus sur la première cellule de la colonne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.HOME_LINE);
                     break;
-                case KeyCodes.PAGE_DOWN :
+                case KeyCodes.PAGE_DOWN:
                     logger.trace("Focus sur la dernière cellule de la colonne");
                     this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.END_LINE);
                     break;
-                case KeyCodes.ENTER :
+                case KeyCodes.ENTER:
                     /* Lorsque la cellule contient un lien ou un bouton, on la touche entrée sert à activer celui-ci */
-                    if (e.target != this.tableCellRef[this.props.cellCoordinate.row]) {
+                    if (e.target != this.tableCellRef[ this.props.cellCoordinate.row ]) {
                         preventDefault = false;
                         break;
                     }
-                default :
+                default:
                     preventDefault = false;
             }
             /* On supprime le comportement par défaut pour les touches utilisées pour la navigation :
@@ -233,11 +233,13 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
                 preventDefault = true;
                 break;
             case 65:
+                preventDefault = true;
                 if (e.ctrlKey) {
                     logger.trace("Ctrl + A : sélection/déselection de toutes les lignes");
-                    this.props.toggleSelectLines(null, !this.props.isSelected);
+                    this.props.toggleSelectLines(null);
+                } else if (e.shiftKey) {
+                    preventDefault = false;
                 }
-                preventDefault = true;
                 break;
 
             case 67: // Gestion de la copie de la cellule dans le presse-papier
@@ -277,10 +279,10 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
         if (node && node.children) {
             for (let i = 0; i < node.children.length; i++) {
                 if (!value) {
-                    if (node.children[i].localName != "input" && node.children[i].children) {
-                        value = this.getInputValue(node.children[i]);
-                    } else if (node.children[i].localName == "input") {
-                        value = node.children[i].value;
+                    if (node.children[ i ].localName != "input" && node.children[ i ].children) {
+                        value = this.getInputValue(node.children[ i ]);
+                    } else if (node.children[ i ].localName == "input") {
+                        value = node.children[ i ].value;
                     }
                 }
             }
@@ -296,12 +298,12 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
     handleEdition(lineIndex: number) {
         let nameClass: string = "default-body-cell";
         if (_.isNull(lineIndex)) {
-            this.setState({isEditing: false});
+            this.setState({ isEditing: false });
             this.tableCellRef.removeAttribute("disabled");
             this.tableCellRef.classList.remove("datatable-cell-in-edition");
 
         } else if (lineIndex === this.props.cellCoordinate.row) {
-            this.setState({isEditing: (lineIndex === this.props.cellCoordinate.row)});
+            this.setState({ isEditing: (lineIndex === this.props.cellCoordinate.row) });
             this.tableCellRef.classList.add("datatable-cell-in-edition");
         } else {
             if (this.tableCellRef.localName == "th") {
@@ -329,7 +331,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      * @param oldCell
      */
     protected blurActions(tableCellRef): void {
-        this.setCellTabIndex(tableCellRef, -1);
+        AbstractCell.setCellTabIndex(tableCellRef, -1);
     }
 
     /**
@@ -339,7 +341,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      * @param value valeur pour tabIndex de la cellule
      * @param isFocus indicateur si le focus doit aussi être appliqué
      */
-    protected setCellTabIndex(tableCellRef, value: number, isFocus?: boolean): void {
+    static setCellTabIndex(tableCellRef, value: number, isFocus?: boolean): void {
         if (tableCellRef && tableCellRef.firstChild && (tableCellRef.firstChild as HTMLElement).focus) {
             (tableCellRef.firstChild as HTMLElement).tabIndex = value;
             if (isFocus) {
@@ -365,10 +367,10 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
                 if (this.tableCellRef) {
                     this.tableCellRef.tabIndex = -1;
                 }
-                this.setState({isFocused: false});
+                this.setState({ isFocused: false });
             }
             if (this.props.cellCoordinate.isSame(newCell)) {
-                this.setState({isFocused: true}, this.handleCellFocus(this.tableCellRef));
+                this.setState({ isFocused: true }, this.handleCellFocus(this.tableCellRef));
             }
         }
     };
@@ -380,9 +382,19 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      */
     handleCellFocus(tableCellRef): any {
         if (tableCellRef) {
-            this.setCellTabIndex(this.tableCellRef, 0, true);
+            AbstractCell.setCellTabIndex(this.tableCellRef, 0, true);
         }
     }
+
+    /**
+     * Permet de selectionner la valeur dans la cellules 
+     */
+    handleDoubleClick(tableCellRef) {
+
+        console.log("je passe ici et je peux selectionner le text");
+
+    }
+
 
     /**
      * @inheritDoc

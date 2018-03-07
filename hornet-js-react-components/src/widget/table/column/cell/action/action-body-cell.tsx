@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -108,6 +108,8 @@ export interface ActionBodyCellProps extends AbstractBodyCellProps {
     titleAlert?: string;
     /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
     hasPopUp?: string;
+
+    label?: string;
 }
 
 export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
@@ -148,12 +150,12 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         };
 
         if (this.state.className) {
-            classes[this.state.className] = true;
+            classes[ this.state.className ] = true;
         }
 
         let img = null;
         if (typeof this.props.srcImg == "string") {
-            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title}/>;
+            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title} />;
         } else {
 
             img = this.props.srcImg;
@@ -161,19 +163,21 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
 
         let disabled: boolean = (typeof this.state.disabled == "function") ? this.state.disabled() : this.state.disabled;
 
+        let aProps: any = {
+            href: this.state.url || "#",
+            className: classNames(classes),
+            title: this.title,
+            onClick: this.onClick,
+            disabled: (this.props.contentState.itemInEdition && this.state.isEditing === false) || disabled,
+            tabIndex: -1,
+            onKeyDown: this.handleKeyDownButton,
+            "aria-haspopup": this.state.hasPopUp
+        };
+
         return (
             this.state.visible ?
 
-                <a href={this.state.url || "#"}
-                   className={classNames(classes)}
-                   title={this.title}
-                   aria-label={this.title}
-                   onClick={this.onClick}
-                   aria-haspopup={this.state.hasPopUp}
-                   disabled={(this.props.contentState.itemInEdition && this.state.isEditing === false) || disabled}
-                   tabIndex={-1}
-                   onKeyDown={this.handleKeyDownButton}
-                >
+                <a {...aProps}>
                     {img}
                     {this.state.label ? <span className="label-button-action">{this.state.label}</span> : null}
                 </a>
@@ -187,6 +191,8 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      */
     handleKeyDownButton(e: React.KeyboardEvent<HTMLElement>): void {
         if (e.keyCode === KeyCodes.ENTER || e.keyCode === KeyCodes.SPACEBAR) {
+            e.preventDefault();
+            e.stopPropagation();
             this.onClick(e);
         }
     }
@@ -228,12 +234,12 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
     handleEdition(lineIndex: number) {
         let nameClass: string = "default-body-cell";
         if (_.isNull(lineIndex)) {
-            this.setState({isEditing: false});
+            this.setState({ isEditing: false });
             this.tableCellRef.removeAttribute("disabled");
             this.tableCellRef.classList.remove("datatable-cell-in-edition");
 
         } else if (lineIndex === this.props.cellCoordinate.row) {
-            this.setState({isEditing: (lineIndex === this.props.cellCoordinate.row)});
+            this.setState({ isEditing: (lineIndex === this.props.cellCoordinate.row) });
             this.tableCellRef.classList.add("datatable-cell-in-edition");
             this.tableCellRef.setAttribute("disabled", "true");
         } else if (this.tableCellRef.localName == "th") {

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,14 +118,14 @@ export class Row extends HornetComponent<RowProps, any> {
      * @returns {Row} ce composant
      */
     setClassName(className: string, callback?: () => any): this {
-        this.setState({className: className}, callback);
+        this.setState({ className: className }, callback);
         return this;
     }
 
     /**
      * @returns {number} le diviseur de fraction à utiliser pour les noeuds enfants
      */
-    private getPureChildFraction(): number {
+    protected getPureChildFraction(): number {
         let fraction: number = 0;
         React.Children.forEach(this.state.children,
             (child: React.ReactChild) => {
@@ -133,8 +133,8 @@ export class Row extends HornetComponent<RowProps, any> {
                 if (child && (child as React.ReactElement<any>).props) {
                     if ((child as React.ReactElement<any>).props.groupClass) {
                         let classTab = (child as React.ReactElement<any>).props.groupClass.split("-");
-                        (classTab.length && (classTab.length - 1) && !isNaN(classTab[classTab.length - 1])) ?
-                            childSpan = classTab[classTab.length - 1] : 1;
+                        (classTab.length && (classTab.length - 1) && !isNaN(classTab[ classTab.length - 1 ])) ?
+                            childSpan = classTab[ classTab.length - 1 ] : 1;
                     }
                     fraction += Number(childSpan);
                 }
@@ -158,7 +158,7 @@ export class Row extends HornetComponent<RowProps, any> {
                 {React.Children.map(
                     this.state.children,
                     (child: React.ReactChild, i) => {
-                        if (child && (child as React.ReactElement<any>).props && ( child as React.ReactElement<any> ).props.name) {
+                        if (child && (child as React.ReactElement<any>).props && (child as React.ReactElement<any>).props.name) {
                             // définition des props des champs de formulaire enfants
                             let childPropsSetByParent = {
                                 groupClass: (child as React.ReactElement<any>).props.groupClass || ""

@@ -1,3 +1,11 @@
+# hornet-js-passport 5.1.1
+
+-	Ajout unauthorize event
+-	PassPort binf pour formatRole et recup flux SAML
+-	[SAML:generation-metadata]: ajout d'une propriété dans la configuration SAML afin de pouvoir accéder à la route de génération du metdata de l'application + mise à jour de la documentation
+
+
+
 # hornet-js-passport 5.1.0
 -	213418	-	correctif CSS
 -	213346	-	Mise à jour de l'écran de connexion multiIDP suite à migration React-16.0.0

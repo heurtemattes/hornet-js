@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,13 +109,16 @@ export interface SpinnerProps extends HornetComponentProps {
     /** visibilité */
     isVisible?: boolean;
 
+    /** méthode appelée lors de la fermeture du spinner **/
+    onHideSpinner?:Function;
+
 }
 
 /**
  * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
  * dans une fenêtre modale en attendant la fin d'une action longue.
  */
-export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  extends HornetComponent<SpinnerProps, SpinnerProps> {
+export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps> extends HornetComponent<SpinnerProps, SpinnerProps> {
 
     /** Décompte le nombre d'évènements en attente de terminaison */
     protected count: number = 0;
@@ -127,7 +130,7 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  e
 
     constructor(props?: P, context?: any) {
         super(props, context);
-        this.copyInitialPropsToState(({isVisible: props.isVisible ? props.isVisible : false} as P), this.state);
+        this.copyInitialPropsToState(({ isVisible: props.isVisible ? props.isVisible : false } as P), this.state);
     }
 
     /**
@@ -176,7 +179,7 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  e
      */
     openSpinner() {
         if (this.count > 0) {
-            this.setState({isVisible: true});
+            this.setState({ isVisible: true });
         }
     }
 
@@ -184,7 +187,7 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  e
      * Fermeture Spinner
      */
     closeSpinner() {
-        this.setState({isVisible: false});
+        this.setState({ isVisible: false });
     }
 
 
@@ -193,18 +196,18 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  e
      */
     render(): JSX.Element {
         return (
-            ( this.state.isVisible && this.count > 0) ?
+            (this.state.isVisible && this.count > 0) ?
                 <div className="component-spinner">
                     <div>{this.getLoadingText()}</div>
-                    <img src={this.getSpinnerImage()} alt={this.getLoadingTitle()}/>
-                </div> : <div/>
+                    <img src={this.getSpinnerImage()} alt={this.getLoadingTitle()} />
+                </div> : <div />
         );
     }
 
     /**
      * Return l'url de l'image spinner
      * @returns Url image spinner
-     * @private
+     * @protected
      */
     protected getSpinnerImage(): string {
         return this.props.imageLoadingUrl || HornetComponent.genUrlTheme("/components/img/spinner/spinner.gif");
@@ -213,7 +216,7 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  e
     /**
      * Extrait le libelle loadingText passé dans les propriétés du composant ou indique un libellé par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
     protected getLoadingText(): string {
         return this.props.loadingText || this.i18n("spinner.loadingText");
@@ -222,7 +225,7 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps>  e
     /**
      * Extrait le libelle loadingTitle passé dans les propriétés du composant ou indique un libellé par défaut
      * @returns Titre
-     * @private
+     * @protected
      */
     protected getLoadingTitle(): string {
         return this.props.loadingTitle || this.i18n("spinner.loadingTitle");

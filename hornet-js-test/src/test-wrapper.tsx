@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,7 @@ import * as React from "react";
  */
 export interface TestWrapperProps {
     /** Fonction de rendu à tester */
-    elements: () => JSX.Element;
+    elements: () => React.ReactElement<any>;
 }
 
 /**
@@ -97,7 +97,7 @@ export class TestWrapper extends React.Component<TestWrapperProps, any> {
     /**
      * @inheritDoc
      */
-    render(): JSX.Element {
+    render(): React.ReactElement<any> {
         return this.props.elements();
     }
 }

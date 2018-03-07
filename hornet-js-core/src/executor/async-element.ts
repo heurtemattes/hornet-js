@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ import { Logger } from "hornet-js-utils/src/logger";
 const logger: Logger = Utils.getLogger("hornet-js-core.executor.AsyncElement");
 
 export class AsyncElement {
-    private fn: (next: (err?: any, data?: any) => void) => void = null;
+    protected fn: (next: (err?: any, data?: any) => void) => void = null;
 
     constructor(fn?: (next: (err?: any, data?: any) => void) => void) {
         this.fn = fn;

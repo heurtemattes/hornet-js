@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,12 +89,12 @@ import { Response } from "superagent";
 
 export abstract class ServiceSecure extends ServiceRequest {
 
-    static HEADER_AUTH : string = "Authorization";
-    prefixeAuth:string;
+    static HEADER_AUTH: string = "Authorization";
+    prefixeAuth: string;
 
-    constructor(prefixeAuth?:string) {
+    constructor(prefixeAuth?: string) {
         super();
-        this.prefixeAuth = prefixeAuth == null ? "Bearer " : prefixeAuth ; // null or undefined
+        this.prefixeAuth = prefixeAuth == null ? "Bearer " : prefixeAuth; // null or undefined
     }
 
     /**
@@ -102,16 +102,16 @@ export abstract class ServiceSecure extends ServiceRequest {
      * @param {HornetRequest} request objet representant une requête (methode 'get' par defaut)
      * @returns {Promise<Response>}
      */
-    fetch(request:HornetRequest) : Promise<any> {
+    fetch(request: HornetRequest): Promise<any> {
         let fetcher = this.getFetcher();
         let token = this.getToken();
         if (token) {
             if (!request.headers) {
                 request.headers = {};
             }
-            request.headers[ServiceSecure.HEADER_AUTH] = this.prefixeAuth + token;
+            request.headers[ ServiceSecure.HEADER_AUTH ] = this.prefixeAuth + token;
         }
-        return fetcher.fetch(request).then((result:any) => {this.saveToken(fetcher.response); return result;});
+        return fetcher.fetch(request).then((result: any) => { this.saveToken(fetcher.response); return result; });
     }
 
     /**
@@ -120,37 +120,50 @@ export abstract class ServiceSecure extends ServiceRequest {
      * @param {NodeJS.WritableStream} pipedStream flux bindé sur la reponse superagent
      * @returns {Promise<Response>}
      */
-    fetchOnStream(request:HornetRequest, pipedStream:NodeJS.WritableStream) : Promise<any> {
+    fetchOnStream(request: HornetRequest, pipedStream: NodeJS.WritableStream): Promise<any> {
         let fetcher = this.getFetcher();
         let token = this.getToken();
         if (token) {
             if (!request.headers) {
                 request.headers = {};
             }
-            request.headers[ServiceSecure.HEADER_AUTH] = this.prefixeAuth + token;
+            request.headers[ ServiceSecure.HEADER_AUTH ] = this.prefixeAuth + token;
         }
-        return this.getFetcher().fetch(request, pipedStream).then((result:any) => {this.saveToken(fetcher.response); return result;});
+        return this.getFetcher().fetch(request, pipedStream).then((result: any) => { this.saveToken(fetcher.response); return result; });
     }
 
     /**
      * Récupère une instance de HornetSuperagent
      * @returns {HornetSuperAgent}
      */
-    public getFetcher() : HornetSuperAgent{
-        return new  HornetSuperAgent();
+    public getFetcher(): HornetSuperAgent {
+        return new HornetSuperAgent();
     }
 
     /**
      * methode à implementer retournant le token jwt
      * @return token JWT 
      */
-    abstract getToken():String ;
+    protected getToken(): String {
+        // Ajout du token à l'envoi
+        if (Utils.getContinuationStorage().get("hornet.request") &&
+            Utils.getContinuationStorage().get("hornet.request").getSession() &&
+            Utils.getContinuationStorage().get("hornet.request").getSession().authorizationToken) {
+            return Utils.getContinuationStorage().get("hornet.request").getSession().authorizationToken;
+        }
+    }
 
     /**
      * methode à implementer pour sauvegarder le token jwt
      * @param {Response} response response contenant l'header d'authentification
      * @return token JWT 
      */
-    abstract saveToken(response:Response):void ;
+    protected saveToken(response: Response) {
+        if (response && response.get && response.get(ServiceSecure.HEADER_AUTH)
+            && response.get(ServiceSecure.HEADER_AUTH).slice(0, "Bearer ".length) == "Bearer ") {
+            let token: string = response.get(ServiceSecure.HEADER_AUTH).substring("Bearer ".length);
+            Utils.getContinuationStorage().get("hornet.request").getSession().authorizationToken = token;
+        }
+    }
 }
 

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -133,8 +133,25 @@ export class SpinnerOverlay<P extends SpinnerTableProps, S extends SpinnerTableP
 
     readonly props: Readonly<SpinnerTableProps>;
 
+    protected visibilityChange : boolean = false;
+
     constructor(props?: P, context?: any) {
         super(props, context);
+    }
+
+    componentWillUpdate(nextProps: any, nextState: any, nextContext: any){
+        if(this.state.isVisible != nextState.isVisible && nextState.isVisible == false){
+            this.visibilityChange = true
+        }
+    }
+
+    componentDidUpdate(nextProps: any, nextState: any, nextContext: any){
+        if(this.visibilityChange){
+            if(this.props.onHideSpinner) {
+                this.props.onHideSpinner();
+            }
+            this.visibilityChange = false;
+        }
     }
 
     /**

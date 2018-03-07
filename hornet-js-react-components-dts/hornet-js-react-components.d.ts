@@ -117,6 +117,22 @@ declare module "hornet-js-react-components/src/img/picto" {
 	        add: string;
 	        user: string;
 	        userCircle: string;
+	        previous: string;
+	        next: string;
+	    };
+	    static darkBlue: {
+	        editer: string;
+	        consulter: string;
+	        supprimer: string;
+	        quickEdit: string;
+	        addCircle: string;
+	        settings: string;
+	        close: string;
+	        add: string;
+	        user: string;
+	        userCircle: string;
+	        previous: string;
+	        next: string;
 	    };
 	    static white: {
 	        editer: string;
@@ -129,6 +145,7 @@ declare module "hornet-js-react-components/src/img/picto" {
 	        add: string;
 	        user: string;
 	        userCircle: string;
+	        moreActions: string;
 	    };
 	    static grey: {
 	        close: string;
@@ -159,13 +176,14 @@ declare module "hornet-js-react-components/src/img/picto" {
 }
 
 declare module "hornet-js-react-components/src/middleware/component-middleware" {
+	import { Logger } from "hornet-js-utils/src/logger";
 	import { AbstractHornetMiddleware } from "hornet-js-core/src/middleware/middlewares";
 	export class PageRenderingMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class UnmanagedViewErrorMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	
@@ -183,9 +201,9 @@ declare module "hornet-js-react-components/src/react/react-client" {
 	 */
 	export class ReactClientInitializer implements IClientInitializer<HornetEvent<ComponentChangeEventDetail>> {
 	    /** Composant page correspondant à l'application */
-	    private appComponent;
+	    protected appComponent: Class<HornetPage<any, any, any>>;
 	    /** Fonction à appeler une fois le client initialisé */
-	    private readyCallback;
+	    protected readyCallback: () => void;
 	    /**
 	     * Constructeur
 	     * @param appComponent Composant page correspondant à l'application
@@ -267,16 +285,16 @@ declare module "hornet-js-react-components/src/widget/accordion/accordion" {
 	 * Composant Accordion
 	 */
 	export class Accordion extends HornetComponent<AccordionProps, any> {
-	    private errors;
+	    protected errors: number;
 	    constructor(props?: AccordionProps, context?: any);
 	    componentDidMount(): void;
 	    /**
 	     * @inheritDoc
 	     */
 	    componentWillUnmount(): void;
-	    private getAccordionPanelId();
-	    private getAccordionLiId();
-	    private trackInputFieldFromChildren(node);
+	    protected getAccordionPanelId(): string;
+	    protected getAccordionLiId(): string;
+	    protected trackInputFieldFromChildren(node: any): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -303,19 +321,28 @@ declare module "hornet-js-react-components/src/widget/accordion/accordion" {
 	     * teste si l'accordion a des erreurs
 	     * @param ev
 	     */
-	    private accordionHasError(ev);
+	    protected accordionHasError(ev: HornetEvent<any>): void;
 	    /**
 	     * teste si l'erreur se trouve dans l'enfant présent dans l'accordion
 	     * @param elem enfant de l'accordion
 	     * @param error erreur recherchée
 	     * @returns {number}
 	     */
-	    private isErrorInAccordion(elem, error);
+	    protected isErrorInAccordion(elem: any, error: any): number;
+	    /**
+	     * Recherche un lien de parenté entre le composant déclenchant la notification
+	     * et l'accordion
+	     * @param {string} idComponent
+	     * @returns {boolean}
+	     */
+	    protected isLinkedWithFormManager(idComponent: string): boolean;
+	    protected isHtmlElementFoundThroughChildren(element: Element, targetedId: string): boolean;
 	}
 	
 }
 
 declare module "hornet-js-react-components/src/widget/accordion/accordions" {
+	import * as React from "react";
 	import { Accordion }  from "hornet-js-react-components/src/widget/accordion/accordion";
 	import { GroupComponent, GroupComponentProps }  from "hornet-js-react-components/src/widget/group/abstract-group-component";
 	export interface AccordionsProps extends GroupComponentProps {
@@ -330,7 +357,7 @@ declare module "hornet-js-react-components/src/widget/accordion/accordions" {
 	    };
 	    protected oltTabIxFocused: number;
 	    /** liste des instances Accordion*/
-	    private accordionList;
+	    protected accordionList: Array<Accordion>;
 	    constructor(props?: P, context?: any);
 	    initializeAccordions(): any[];
 	    componentWillReceiveProps(nextProps: any, nextContext: any): void;
@@ -345,7 +372,7 @@ declare module "hornet-js-react-components/src/widget/accordion/accordions" {
 	     * @param callback function
 	     */
 	    handleClickAccordion(index: number, strDomId: string, callback: any): void;
-	    private handleBeforeHideAccordion(index);
+	    protected handleBeforeHideAccordion(index: number): void;
 	    scrollToFocus: (strDomId: any) => void;
 	    /**
 	     * Action sur le focus de l'accordion
@@ -357,7 +384,17 @@ declare module "hornet-js-react-components/src/widget/accordion/accordions" {
 	    /**
 	     * Rendu de l'acorodion
 	     */
-	    private renderAccordion();
+	    protected renderAccordion(): React.DetailedReactHTMLElement<{
+	        id: string;
+	        key: string;
+	        panelIndex: number;
+	        isOpen: any;
+	        tabIndex: any;
+	        handleClickAccordion: (index: number, strDomId: string, callback: any) => void;
+	        handleFocusAccordion: (index: number, event: any, targetEvent: any) => void;
+	        totalAccordion: any;
+	        ref: (accordion: any) => void;
+	    }, HTMLElement>[];
 	}
 	
 }
@@ -393,7 +430,8 @@ declare module "hornet-js-react-components/src/widget/button/button-info-accessi
 	 * Bouton et modale d'information sur l'accessibilité clavier du composant Table
 	 */
 	export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> extends HornetComponent<ButtonInfoAccessibiliteProps, any> {
-	    private shortcutsI18n;
+	    protected shortcutsI18n: any;
+	    protected htmlIcon: any;
 	    static defaultProps: {
 	        message: string;
 	        shortcutDescriptions: any[];
@@ -402,9 +440,10 @@ declare module "hornet-js-react-components/src/widget/button/button-info-accessi
 	     * @inheritDoc
 	     */
 	    render(): JSX.Element;
-	    private renderModal();
-	    private renderShortCut(item, index);
-	    private handleShowInfoModal();
+	    protected renderModal(): JSX.Element;
+	    protected renderShortCut(item: any, index: any): JSX.Element;
+	    protected handleShowInfoModal(): void;
+	    protected handleClickClose(t: any): void;
 	}
 	
 }
@@ -531,22 +570,21 @@ declare module "hornet-js-react-components/src/widget/button/button" {
 	    /**
 	     * Rendu type Button
 	     * @returns {any}
-	     * @private
+	     * @protected
 	     */
-	    private renderButton();
+	    protected renderButton(): JSX.Element;
 	    /**
 	     * Rendu Type Link
 	     * @returns {any}
-	     * @private
+	     * @protected
 	     */
-	    private renderLink();
+	    protected renderLink(): JSX.Element;
 	    /**
 	     * Evènement déclenché lors du clic sur le bouton
 	     * @param e
-	     * @private
+	     * @protected
 	     */
-	    private handleClick(e);
-	    private linkHandleClick(e);
+	    protected handleClick(e: any): void;
 	    /**
 	     * Effet activé lors d'un lcick sur un bouton
 	     * @param e
@@ -579,6 +617,7 @@ declare module "hornet-js-react-components/src/widget/button/top-button" {
 	        offset: number;
 	        header: string;
 	        footer: string;
+	        notificationSession: string;
 	    };
 	    constructor(props: any, context?: any);
 	    componentDidMount(): void;
@@ -587,17 +626,17 @@ declare module "hornet-js-react-components/src/widget/button/top-button" {
 	     * Calcule si un élément est présent ou non a l'écran
 	     * @param {Element} elm - l'élément a rechercher
 	     * @return {boolean} true si l'élément est présent
-	    */
-	    private checkvisible(elm);
+	     */
+	    protected checkvisible(elm: any): boolean;
 	    /**
 	     * Métohde de gestion du scroll à l'écran
 	     * @param event - evenement scroll
 	     */
-	    private handleScroll(event);
+	    protected handleScroll(event: any): void;
 	    /**
 	     * Méthode de retour en haut de la page
 	     */
-	    private scrolltop();
+	    protected scrolltop(): void;
 	    /**
 	     * Génère le rendu spécifique du champ
 	     * @returns {any}
@@ -608,7 +647,276 @@ declare module "hornet-js-react-components/src/widget/button/top-button" {
 	     * Génére le contenu du bouton
 	     * @returns {any}
 	     */
-	    private renderDefaultTopButtonContent();
+	    protected renderDefaultTopButtonContent(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/dialog/alert" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.1.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
+	import * as React from "react";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { ButtonProps }  from "hornet-js-react-components/src/widget/button/button";
+	export interface AlertProps extends HornetComponentProps {
+	    isVisible?: boolean;
+	    onClickOk?: React.MouseEventHandler<HTMLInputElement>;
+	    onClickCancel?: React.MouseEventHandler<HTMLInputElement>;
+	    onClickClose?: React.MouseEventHandler<HTMLInputElement>;
+	    title?: string;
+	    message: string;
+	    valid?: string;
+	    cancel?: string;
+	    validTitle?: string;
+	    cancelTitle?: string;
+	    underlayClickExits?: boolean;
+	    escapeKeyExits?: boolean;
+	    notificationId?: string;
+	    dialogId?: string;
+	}
+	export class Alert extends HornetComponent<AlertProps, any> {
+	    props: AlertProps;
+	    static defaultProps: {
+	        isVisible: boolean;
+	        underlayClickExits: boolean;
+	        escapeKeyExits: boolean;
+	    };
+	    constructor(props?: AlertProps, context?: any);
+	    setTitle(title: string, cb?: any): this;
+	    setMessage(message: string, cb?: any): this;
+	    setOnClickOk(onClickOk: React.MouseEventHandler<HTMLInputElement>, cb?: any): this;
+	    setOnClickCancel(onClickCancel: Function, cb?: any): this;
+	    setOnClickClose(onClickClose: Function, cb?: any): this;
+	    open(cb?: any): this;
+	    close(cb?: any): this;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Configuration du bouton OK
+	     * @returns {{type: string, id: string, name: string, value: string, className: string, label: (boolean|string), onClick: (*|defaultFunction)}}
+	     */
+	    protected configOKButton(): ButtonProps;
+	    /**
+	     * Configuration du bouton ANNULER
+	     * @returns {{type: string, id: string, name: string, value: string, className: string, label: (*|string|cancel), onClick: (*|defaultFunction)}}
+	     */
+	    protected configCancelButton(): ButtonProps;
+	    /**
+	     * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getValid(): string;
+	    /**
+	     * Extrait le libelle cancel passé dans les propriétés du composant ou indique un libellé par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getCancel(): string;
+	    /**
+	     * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getValidTitle(): string;
+	    /**
+	     * Extrait le libelle cancel passé dans les propriétés du composant ou indique un libellé par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getCancelTitle(): string;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/dialog/modal" {
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import ReactNode = __React.ReactNode;
+	import MouseEvent = __React.MouseEvent;
+	export interface ModalProps extends HornetComponentProps {
+	    onClickClose?: __React.MouseEventHandler<HTMLInputElement>;
+	    isVisible?: boolean;
+	    title?: string;
+	    hideTitleBar?: boolean;
+	    hideCloseBar?: boolean;
+	    closeLabel?: string;
+	    closeSymbole?: string;
+	    className?: string;
+	    underlayClass?: string;
+	    initialFocus?: string;
+	    alert?: boolean;
+	    underlayClickExits?: boolean;
+	    escapeKeyExits?: boolean;
+	    verticallyCenter?: boolean;
+	    focusDialog?: boolean;
+	    manageFocus?: boolean;
+	    onShow?: Function;
+	    context?: any;
+	    isDraggable?: boolean;
+	    withoutOverflow?: boolean;
+	    dialogId?: string;
+	}
+	export class Modal extends HornetComponent<ModalProps, any> {
+	    static defaultProps: {
+	        isVisible: boolean;
+	        hideTitleBar: boolean;
+	        hideCloseBar: boolean;
+	        alert: boolean;
+	        underlayClickExits: boolean;
+	        verticallyCenter: boolean;
+	        focusDialog: boolean;
+	        withoutOverflow: boolean;
+	    };
+	    constructor(props?: ModalProps, context?: any);
+	    setTitle(title: string, cb?: any): this;
+	    setCloseLabel(closeLabel: string, cb?: any): this;
+	    setCloseSymbole(closeSymbole: string, cb?: any): this;
+	    setChildren(children: ReactNode, cb?: any): this;
+	    open(cb?: any): this;
+	    close(cb?: any): this;
+	    /**
+	     * Gestion par défaut du clic sur le bouton de fermeture
+	     * @param event
+	     */
+	    protected onClickClose(event: MouseEvent<HTMLInputElement>): void;
+	    /**
+	     * Gestion par défaut du clic sur echap
+	     * @param event
+	     */
+	    protected handleKeyDown(event: KeyboardEvent): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentWillUnmount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Extrait le titre passé dans les propriétés du composant ou indique un titre par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getTitle(): any;
+	    /**
+	     * Extrait le label de fermeture passé dans les propriétés du composant ou indique un label par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getCloseLabel(): any;
+	    /**
+	     * Extrait le symbole de fermeture dans les propriétés du composant ou indique un symbole par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getCloseSymbole(): any;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/dialog/react-aria-modal" {
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	export class ReactAriaModal extends HornetComponent<any, any> {
+	    static defaultProps: {
+	        mounted: boolean;
+	        manageFocus: boolean;
+	        underlayClickExits: boolean;
+	        underlayColor: string;
+	        escapeKeyExits: boolean;
+	        isDraggable: boolean;
+	    };
+	    static number: number;
+	    renderModal(): void;
+	    removeModal(): void;
+	    render(): any;
+	    componentWillMount(): void;
+	    componentDidMount(): void;
+	    componentDidUpdate(prevProps: any, prevState: any, prevContext: any): void;
+	    componentWillUnmount(): void;
 	}
 	
 }
@@ -665,7 +973,7 @@ declare module "hornet-js-react-components/src/widget/component/hornet-component
 	    /** Page d'erreur à afficher en cas d'erreur technique */
 	    static ERROR_COMPONENT: Class<HornetPage<any, any, any>>;
 	    constructor(props?: P, context?: any);
-	    private rendering;
+	    protected rendering: boolean;
 	    protected hasError: boolean;
 	    protected mounted: boolean;
 	    protected user: UserInformations;
@@ -697,12 +1005,12 @@ declare module "hornet-js-react-components/src/widget/component/hornet-component
 	     */
 	    getErrorHandler(): HornetComponentErrorHandler;
 	    protected copyInitialPropsToState(props: P, state: any): void;
-	    private autobinding();
+	    protected autobinding(): void;
 	    /**
 	     * Si la gestion des erreurs est activée, encapsule toutes les fonctions de ce composant avec une gestion d'erreur
 	     * commune.
 	     */
-	    private errorManagement();
+	    protected errorManagement(): void;
 	    /**
 	     * Permet d'écouter un évènement
 	     * @param event
@@ -734,7 +1042,7 @@ declare module "hornet-js-react-components/src/widget/component/hornet-component
 	     * Méthode permettant d'enrober un composant
 	     * @param method
 	     */
-	    private wrapMethod(method);
+	    protected wrapMethod(method: any): void;
 	    /**
 	     * Retourne les éléments enfants d'un composant du type passé en paramètre
 	     * @param ComponentType
@@ -905,12 +1213,13 @@ declare module "hornet-js-react-components/src/widget/component/hornet-content" 
 }
 
 declare module "hornet-js-react-components/src/widget/component/hornet-page" {
+	import * as React from "react";
 	import { RouteInfos } from "hornet-js-core/src/routes/abstract-routes";
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
 	import { IService } from "hornet-js-core/src/services/service-api";
-	import { ExpandingLayoutRequest } from "hornet-js-core/src/services/expanding-layout-request";
+	import { ExpandingLayout } from "hornet-js-core/src/services/default/expanding-layout";
 	/**
 	 * Propriétés HornetPage
 	 */
@@ -956,7 +1265,7 @@ declare module "hornet-js-react-components/src/widget/component/hornet-page" {
 	    /**
 	     * Service middleware pour le layout
 	     */
-	    protected layoutService: ExpandingLayoutRequest;
+	    protected layoutService: ExpandingLayout;
 	    /**
 	     * @returns {any} les informations de routage associées à la page
 	     */
@@ -983,7 +1292,7 @@ declare module "hornet-js-react-components/src/widget/component/hornet-page" {
 	    componentWillUpdate(nextProps: P, nextState: S, nextContext: any): void;
 	    componentWillReceiveProps(nextProps: P, nextContext: any): void;
 	    componentDidCatch(error: any, info: any): void;
-	    render(): JSX.Element | false;
+	    render(): React.ReactNode;
 	    /**
 	     * renvoie le service de la page
 	     */
@@ -999,7 +1308,7 @@ declare module "hornet-js-react-components/src/widget/component/hornet-page" {
 	     * @param newClassName
 	     * @param specifiedMaxWidth
 	     */
-	    private fetchHtmlElementsToSetClassBy(currentClassName, newClassName, specifiedMaxWidth?);
+	    protected fetchHtmlElementsToSetClassBy(currentClassName: string, newClassName: string, specifiedMaxWidth?: string): void;
 	    /**
 	     *
 	     * @param htmlElements
@@ -1008,7 +1317,7 @@ declare module "hornet-js-react-components/src/widget/component/hornet-page" {
 	     * @param newClassName
 	     * @param specifiedMaxWidth
 	     */
-	    private majCssStyleExpand(htmlElements, i, currentClassName, newClassName, specifiedMaxWidth?);
+	    protected majCssStyleExpand(htmlElements: HTMLCollectionOf<Element>, i: number, currentClassName: string, newClassName: string, specifiedMaxWidth?: string): void;
 	    /**
 	     * Méthode permettant à l'écoute du changement d'Url afin de changer le titre de la page
 	     */
@@ -1017,14 +1326,14 @@ declare module "hornet-js-react-components/src/widget/component/hornet-page" {
 	     *
 	     * @param value
 	     */
-	    private setIsLayoutExpandedThroughService(value);
+	    protected setIsLayoutExpandedThroughService(value: boolean): void;
 	    /**
 	     * Définis le style à positionner dans le state classNameExpanded
 	     * et la taille max pour le state currentWorkingZoneWidth
 	     * Ces states sont utilisées par le composant LayoutSwitcher
 	     * pour étendre les composants
 	     */
-	    private handleStyleAndWidth();
+	    protected handleStyleAndWidth(): void;
 	    /**
 	     * permet de changer d'url en passant des données à la page suivante
 	     * @param {string} url - Url à charger
@@ -1040,273 +1349,6 @@ declare module "hornet-js-react-components/src/widget/component/hornet-page" {
 	
 }
 
-declare module "hornet-js-react-components/src/widget/dialog/alert" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
-	 *
-	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	import * as React from "react";
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	export interface AlertProps extends HornetComponentProps {
-	    isVisible?: boolean;
-	    onClickOk?: React.MouseEventHandler<HTMLInputElement>;
-	    onClickCancel?: React.MouseEventHandler<HTMLInputElement>;
-	    onClickClose?: React.MouseEventHandler<HTMLInputElement>;
-	    title?: string;
-	    message: string;
-	    valid?: string;
-	    cancel?: string;
-	    validTitle?: string;
-	    cancelTitle?: string;
-	    underlayClickExits?: boolean;
-	    escapeKeyExits?: boolean;
-	    notificationId?: string;
-	    dialogId?: string;
-	}
-	export class Alert extends HornetComponent<AlertProps, any> {
-	    props: AlertProps;
-	    static defaultProps: {
-	        isVisible: boolean;
-	        underlayClickExits: boolean;
-	        escapeKeyExits: boolean;
-	    };
-	    constructor(props?: AlertProps, context?: any);
-	    setTitle(title: string, cb?: any): this;
-	    setMessage(message: string, cb?: any): this;
-	    setOnClickOk(onClickOk: React.MouseEventHandler<HTMLInputElement>, cb?: any): this;
-	    setOnClickCancel(onClickCancel: Function, cb?: any): this;
-	    setOnClickClose(onClickClose: Function, cb?: any): this;
-	    open(cb?: any): this;
-	    close(cb?: any): this;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Configuration du bouton OK
-	     * @returns {{type: string, id: string, name: string, value: string, className: string, label: (boolean|string), onClick: (*|defaultFunction)}}
-	     */
-	    private configOKButton();
-	    /**
-	     * Configuration du bouton ANNULER
-	     * @returns {{type: string, id: string, name: string, value: string, className: string, label: (*|string|cancel), onClick: (*|defaultFunction)}}
-	     */
-	    private configCancelButton();
-	    /**
-	     * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getValid();
-	    /**
-	     * Extrait le libelle cancel passé dans les propriétés du composant ou indique un libellé par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getCancel();
-	    /**
-	     * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getValidTitle();
-	    /**
-	     * Extrait le libelle cancel passé dans les propriétés du composant ou indique un libellé par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getCancelTitle();
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/dialog/modal" {
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	import ReactNode = __React.ReactNode;
-	export interface ModalProps extends HornetComponentProps {
-	    onClickClose?: __React.MouseEventHandler<HTMLInputElement>;
-	    isVisible?: boolean;
-	    title?: string;
-	    hideTitleBar?: boolean;
-	    hideCloseBar?: boolean;
-	    closeLabel?: string;
-	    closeSymbole?: string;
-	    className?: string;
-	    underlayClass?: string;
-	    initialFocus?: string;
-	    alert?: boolean;
-	    underlayClickExits?: boolean;
-	    escapeKeyExits?: boolean;
-	    verticallyCenter?: boolean;
-	    focusDialog?: boolean;
-	    manageFocus?: boolean;
-	    onShow?: Function;
-	    context?: any;
-	    isDraggable?: boolean;
-	    withoutOverflow?: boolean;
-	    dialogId?: string;
-	}
-	export class Modal extends HornetComponent<ModalProps, any> {
-	    static defaultProps: {
-	        isVisible: boolean;
-	        hideTitleBar: boolean;
-	        hideCloseBar: boolean;
-	        alert: boolean;
-	        underlayClickExits: boolean;
-	        verticallyCenter: boolean;
-	        focusDialog: boolean;
-	        withoutOverflow: boolean;
-	    };
-	    constructor(props?: ModalProps, context?: any);
-	    setTitle(title: string, cb?: any): this;
-	    setCloseLabel(closeLabel: string, cb?: any): this;
-	    setCloseSymbole(closeSymbole: string, cb?: any): this;
-	    setChildren(children: ReactNode, cb?: any): this;
-	    open(cb?: any): this;
-	    close(cb?: any): this;
-	    /**
-	     * Gestion par défaut du clic sur le bouton de fermeture
-	     * @param event
-	     */
-	    private onClickClose(event);
-	    /**
-	     * Gestion par défaut du clic sur echap
-	     * @param event
-	     */
-	    private handleKeyDown(event);
-	    /**
-	     * @inheritDoc
-	     */
-	    componentDidMount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentWillUnmount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Extrait le titre passé dans les propriétés du composant ou indique un titre par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getTitle();
-	    /**
-	     * Extrait le label de fermeture passé dans les propriétés du composant ou indique un label par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getCloseLabel();
-	    /**
-	     * Extrait le symbole de fermeture dans les propriétés du composant ou indique un symbole par défaut
-	     * @returns Titre
-	     * @private
-	     */
-	    private getCloseSymbole();
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/dialog/react-aria-modal" {
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	export class ReactAriaModal extends HornetComponent<any, any> {
-	    static defaultProps: {
-	        mounted: boolean;
-	        manageFocus: boolean;
-	        underlayClickExits: boolean;
-	        underlayColor: string;
-	        escapeKeyExits: boolean;
-	        isDraggable: boolean;
-	    };
-	    static number: number;
-	    renderModal(): void;
-	    removeModal(): void;
-	    render(): any;
-	    componentWillMount(): void;
-	    componentDidMount(): void;
-	    componentDidUpdate(prevProps: any, prevState: any, prevContext: any): void;
-	    componentWillUnmount(): void;
-	}
-	
-}
-
 declare module "hornet-js-react-components/src/widget/dropdown/dropdown-item" {
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
 	/**
@@ -1314,6 +1356,7 @@ declare module "hornet-js-react-components/src/widget/dropdown/dropdown-item" {
 	 */
 	export class DropdownItem extends HornetComponent<any, any> {
 	    constructor(props: any, context?: any);
+	    onClickEvent: (e: any) => void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -1432,6 +1475,7 @@ declare module "hornet-js-react-components/src/widget/dropdown/dropdown" {
 	    /** boolean qui cache ou non le dropdown apres le click sur un item */
 	    closeClick?: boolean;
 	    title?: string;
+	    type?: string;
 	}
 	/**
 	 * Composant Dropdown
@@ -1460,10 +1504,12 @@ declare module "hornet-js-react-components/src/widget/dropdown/dropdown" {
 	     * @inheritDoc
 	     */
 	    render(): JSX.Element;
+	    renderLink(): JSX.Element;
+	    renderButton(): JSX.Element;
 	    /**
 	     * Rendu type Dropdown
 	     * @returns {any}
-	     * @private
+	     * @protected
 	     */
 	    renderDropDown(): JSX.Element;
 	    calculPositionBox(): void;
@@ -1518,6 +1564,236 @@ declare module "hornet-js-react-components/src/widget/footer/footer-page" {
 	     * @inheritDoc
 	     */
 	    render(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/group/abstract-group-component" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.1.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	export interface GroupComponentProps extends HornetComponentProps {
+	    id: any;
+	    key?: any;
+	}
+	export class GroupComponent<P extends GroupComponentProps, S extends GroupComponentProps> extends HornetComponent<P, S> {
+	    constructor(props?: P, context?: any);
+	    static generateKey(object: any, defaultKey?: string): string;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/header/header-page" {
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	export interface HeaderPageProps extends HornetComponentProps {
+	    /**
+	     * number
+	     * Hauteur en pixel du header en props pour afficher
+	     * la class css 'sticky'
+	     */
+	    scrollHeight?: number;
+	}
+	export class HeaderPage extends HornetComponent<HeaderPageProps, any> {
+	    /** ref */
+	    header?: any;
+	    height?: any;
+	    constructor(props: HeaderPageProps, context?: any);
+	    componentDidMount(): void;
+	    componentWillUnmount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     *
+	     * @param element
+	     * @returns {boolean}
+	     */
+	    isInView(element: any): boolean;
+	    /**
+	     *
+	     * @param e
+	     */
+	    handleScroll: (e: any) => void;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/icon/icon" {
+	import * as React from "react";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	/**
+	 * Propriétés d'une icône
+	 */
+	export interface IconProps extends HornetComponentProps {
+	    /** Url de l'image */
+	    src: string;
+	    /** Texte alternatif */
+	    alt: string;
+	    /** Identifiant HTML de l'image rendue */
+	    idImg?: string;
+	    /** Class CSS de l'image */
+	    classImg?: string;
+	    /** Url du lien */
+	    url?: string;
+	    /** Texte d'infobulle du lien */
+	    title: string;
+	    /** Identifiant HTML du lien */
+	    idLink?: string;
+	    /** Classe CSS du lien */
+	    classLink?: string;
+	    /** Cible du lien */
+	    target?: string;
+	    /** Fonction déclenchée lorsque le bouton correspondant à l'icône est pressé ou cliqué */
+	    action?: () => void;
+	    /** Valeur de l'attribut HTML tabIndex à affecter au lien ou bouton correspondant à l'icône*/
+	    tabIndex?: number;
+	    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
+	    hasPopUp?: boolean;
+	}
+	/** Valeur de l'url par défaut lorsque la propriété url est vide */
+	export const EMPTY_URL: string;
+	/**
+	 * Composant Icône
+	 */
+	export class Icon extends HornetComponent<IconProps, any> {
+	    static defaultProps: {
+	        url: string;
+	    };
+	    /**
+	     * Retire le focus de l'élément une fois cliqué de façon à permettre de scroller ou mettre le focus sur les
+	     * notifications éventuellement présentées suite à l'action.
+	     * @param event évènement
+	     * @protected
+	     */
+	    protected iconOnClick(event: React.MouseEvent<HTMLElement>): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/language/change-language" {
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { Position }  from "hornet-js-react-components/src/widget/dropdown/dropdown";
+	/**
+	 *
+	 * Propriétés ChangeLanguage
+	 */
+	export interface ChangeLanguageProps extends HornetComponentProps {
+	    /** Boolean permettant de savoir si la liste deroulante est affiché */
+	    isOpen?: boolean;
+	    /** Méthode appelé après un changement de langue */
+	    handleChangeLanguage?: (locale: string) => void;
+	    /** détermine la position du arrow */
+	    position?: Position;
+	    switchTitle?: string;
+	}
+	/**
+	 * Composant ChangeLanguage
+	 * Il permet de changer le langue sur le site via un menu deroulant
+	 */
+	export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
+	    /** Valeur de propriétés par défaut */
+	    static defaultProps: {
+	        isOpen: boolean;
+	        position: Position;
+	    };
+	    constructor(props: any, context?: any);
+	    componentDidMount(): void;
+	    componentDidUpdate(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Met à jour la la langue en fonction de la selection
+	     * @param locale de format Ii18n {locale:"fr-FR", lang:'fr'}
+	     * @param shortLabel bigramme de la nouvelle langue ( ex : 'en' , 'fr' )
+	     */
+	    selectLanguage(locale: string, shortLabel: string): void;
 	}
 	
 }
@@ -2051,13 +2327,13 @@ declare module "hornet-js-react-components/src/widget/form/abstract-form" {
 	     * @param isReadOnly valeur à assigner à la propriété 'readOnly'
 	     * @return cet objet
 	     */
-	    private updateReadOnlyFields(isReadOnly);
+	    protected updateReadOnlyFields(isReadOnly: boolean): this;
 	    /**
 	     * Met à jour la propriété disabled sur chacun des champs enfants
 	     * @param isDisabled valeur à assigner à la propriété 'disabled'
 	     * @return cet objet
 	     */
-	    private updateDisabledFields(isDisabled);
+	    protected updateDisabledFields(isDisabled: boolean): this;
 	    /**
 	     * Propage les propriétés devant être transmises aux champs enfants
 	     */
@@ -2225,7 +2501,7 @@ declare module "hornet-js-react-components/src/widget/form/auto-complete-field" 
 	     * @param {boolean} shouldShow
 	     * @param {boolean} preventDefault
 	     */
-	    private tabHandlerForValueChange(e, shouldShow);
+	    protected tabHandlerForValueChange(e: __React.KeyboardEvent<HTMLElement>, shouldShow: boolean): void;
 	    /**
 	     * valide le choix sélectionné
 	     * @param shouldShow indique si les résultats doivent être affichés
@@ -2547,7 +2823,7 @@ declare module "hornet-js-react-components/src/widget/form/auto-complete-selecto
 	    protected liElts: HTMLElement[];
 	    protected liReact: JSX.Element[];
 	    protected choicesSelected: string | string[];
-	    private noResultLabelDefault;
+	    protected noResultLabelDefault: string;
 	    constructor(props: any, context?: any);
 	    shouldComponentUpdate(nextProps: AutoCompleteSelectorProps, nextState: any, nextContext: any): boolean;
 	    setChoices(value: Array<any>, callback?: () => any): this;
@@ -2559,7 +2835,8 @@ declare module "hornet-js-react-components/src/widget/form/auto-complete-selecto
 	    /**
 	     * Fonction appelée lors du click sur un élément de la liste
 	     **/
-	    private onListClick(event);
+	    protected onListClick(event: __React.MouseEvent<HTMLElement>): any;
+	    protected onListClickMulti(event: __React.MouseEvent<HTMLElement>, index: number): any;
 	    /**
 	     * Fonction appelée pour scroller de un item vers le bas
 	     * @param {HTMLElement} element la liste déroulante
@@ -2633,15 +2910,15 @@ declare module "hornet-js-react-components/src/widget/form/auto-complete-selecto
 	    /**
 	     * Retourne le rendu de la liste de choix
 	     **/
-	    private renderOptionList();
+	    protected renderOptionList(): JSX.Element[];
 	    /**
 	     * indique un clic sur une checkbox
 	     **/
-	    multiClick(): void;
+	    multiClick(event: any): void;
 	    /**
 	     * Retourne le rendu de la liste de choix
 	     **/
-	    private renderOptionMultipleList();
+	    protected renderOptionMultipleList(): JSX.Element[];
 	    /**
 	     * @inheritDoc
 	     */
@@ -2787,6 +3064,7 @@ declare module "hornet-js-react-components/src/widget/form/buttons-area" {
 }
 
 declare module "hornet-js-react-components/src/widget/form/calendar-field" {
+	import * as React from "react";
 	import { InputField, InputFieldProps }  from "hornet-js-react-components/src/widget/form/input-field";
 	/**
 	 * Propriétés du composant calendrier.
@@ -2817,14 +3095,14 @@ declare module "hornet-js-react-components/src/widget/form/calendar-field" {
 	 * Composant Calendrier
 	 */
 	export class CalendarField<P extends CalendarFieldProps, S extends CalendarFieldState> extends InputField<CalendarFieldProps, CalendarFieldState> {
-	    private hasKeyPress;
+	    protected hasKeyPress: boolean;
 	    readonly props: Readonly<CalendarFieldProps>;
 	    static defaultProps: any;
 	    constructor(props?: P, context?: any);
 	    /**
 	     * Récupère le format d'affichage des dates
 	     */
-	    private getFormat();
+	    protected getFormat(): any;
 	    /**
 	     * Génère le rendu spécifique du champ : un datePicker
 	     * @returns {any}
@@ -2842,17 +3120,17 @@ declare module "hornet-js-react-components/src/widget/form/calendar-field" {
 	     * Méthode délenchée lors d'une intéraction avec le champ input du composant Calendar
 	     * @param e
 	     */
-	    private handleInputChange(e);
+	    protected handleInputChange(e: React.SyntheticEvent<HTMLElement>): void;
 	    /**
 	     * Méthode délenchée lorsque l'utilisateur quitte l'input du composant Calendar
 	     * @param e
 	     */
-	    private handleInputLeave(e);
+	    protected handleInputLeave(e: React.SyntheticEvent<HTMLElement>): void;
 	    /**
 	     * Controle des touches claviers
 	     * @param e
 	     */
-	    private handleInputKeyPress(e);
+	    protected handleInputKeyPress(e: React.KeyboardEvent<HTMLElement>): void;
 	    /**
 	     * @param time temps en millisecondes depuis Epoch
 	     * @param calendarLocale propriétés localisées du calendrier
@@ -2919,27 +3197,118 @@ declare module "hornet-js-react-components/src/widget/form/checkbox-field" {
 	     * prise en compte de la navigation clavier pour les touches entrée et espace
 	     * @param e
 	     */
-	    private handleKeyDown(e);
+	    protected handleKeyDown(e: any): void;
 	}
 	
 }
 
 declare module "hornet-js-react-components/src/widget/form/checkbox" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.1.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
+	import * as React from "react";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
 	import { ReactFormDOMAttributes, HTMLStandardConfigAttributes, ReactBasicMouseDOMAttributes }  from "hornet-js-react-components/src/widget/form/abstract-field";
 	export interface CheckboxProps {
 	    label?: string;
 	    title?: string;
+	    id?: string;
+	    checked?: boolean;
 	}
 	/**
 	 * Champ de formulaire Hornet de type Checkbox
 	 */
 	export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttributes & HTMLStandardConfigAttributes & ReactBasicMouseDOMAttributes, any> {
+	    protected inputRef: any;
 	    constructor(props?: CheckboxProps, context?: any);
 	    /**
 	     * @inheritDoc
 	     */
-	    render(): JSX.Element;
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentDidUpdate(prevProps: CheckboxProps, prevState: any, prevContext: any): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): React.ReactElement<CheckboxProps>;
+	    onChange(e: any): void;
 	}
 	
 }
@@ -2951,14 +3320,14 @@ declare module "hornet-js-react-components/src/widget/form/dom-adapter" {
 	 */
 	export class DomAdapter<P, S> extends HornetComponent<P, S> {
 	    /** Nom du champ */
-	    private name;
+	    protected name: any;
 	    /** Type HTML */
-	    private type;
+	    protected type: any;
 	    /** Référence vers l'élément react */
 	    protected htmlElement: any;
 	    protected multipleElement: Array<any>;
 	    constructor(props?: P, context?: any);
-	    private getElementType(elt);
+	    protected getElementType(elt: any): any;
 	    getHornetForm(): any;
 	    registerHtmlElement(elt: any): void;
 	    addHtmlElement(elt: any): void;
@@ -3005,6 +3374,12 @@ declare module "hornet-js-react-components/src/widget/form/dom-adapter" {
 	     */
 	    setDisabled(value: any): this;
 	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/form/event" {
+	import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
+	export const VALUE_CHANGED_EVENT: HornetEvent<any>;
 	
 }
 
@@ -3199,13 +3574,18 @@ declare module "hornet-js-react-components/src/widget/form/form-utils" {
 }
 
 declare module "hornet-js-react-components/src/widget/form/form" {
+	import * as React from "react";
 	import { AbstractForm, AbstractFormProps }  from "hornet-js-react-components/src/widget/form/abstract-form";
 	import { DomAdapter }  from "hornet-js-react-components/src/widget/form/dom-adapter";
+	import { Notifications } from "hornet-js-core/src/notification/notification-manager";
 	import { ICustomValidation } from "hornet-js-core/src/validation/data-validator";
+	import ErrorObject = ajv.ErrorObject;
 	/**
 	 * Propriétés du formulaire hornet.
 	 */
 	export interface FormProps extends AbstractFormProps {
+	    /** Identifiant du formulaire */
+	    id: string;
 	    /** Nom du formulaire */
 	    name?: string;
 	    /** Fonction déclenchée lors de la soumission du formulaire, lorsque celui-ci est valide */
@@ -3249,7 +3629,7 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	 */
 	export class Form extends AbstractForm<FormProps, any> {
 	    static idx: number;
-	    private debouncedValidateAndSubmit;
+	    protected debouncedValidateAndSubmit: any;
 	    /** Valeur de propriétés par défaut */
 	    static defaultProps: FormProps;
 	    constructor(props?: FormProps, context?: any);
@@ -3274,13 +3654,13 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	     * @param isMarkRequired valeur à assigner à la propriété 'markRequired'
 	     * @return ce formulaire
 	     */
-	    private updateMarkRequiredFields(isMarkRequired);
+	    protected updateMarkRequiredFields(isMarkRequired: boolean): this;
 	    /**
 	     * Met à jour la propriété imgFilePath sur chacun des champs héritant de AbstractField contenus dans le formulaire
 	     * @param imgFilePath valeur à assigner à la propriété 'imgFilePath'
 	     * @return ce formulaire
 	     */
-	    private updateImagFilePathFields(imgFilePath);
+	    protected updateImagFilePathFields(imgFilePath: string): this;
 	    /**
 	     * Met à jour les valeurs courantes des champs du formulaire
 	     * @param data données du formulaire (clé : nom du champ -> valeur du champ)
@@ -3291,12 +3671,14 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	     * @param fields champs du formulaire
 	     * @param notifs notifications d'erreurs de validation
 	     */
-	    private processAutocompleteErrors(fields, notifs);
+	    protected processAutocompleteErrors(fields: {
+	        [key: string]: DomAdapter<any, any>;
+	    }, notifs: Notifications): void;
 	    /**
 	     * Déclenche les notifications correspondant aux éventuelles erreurs de validation
 	     * @param errors erreurs de validation de formulaire, éventuellement vides
 	     */
-	    private notifyErrors(errors);
+	    protected notifyErrors(errors: Array<ErrorObject>): void;
 	    /**
 	     * Transforme les valeurs des champs déclarés avec le format "date-time" dans le schéma de validation :
 	     * effectue la conversion depuis la locale courante, vers le format ISO 8601. Ceci permet une validation isomorphique
@@ -3305,11 +3687,11 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	     * @param schema schéma de validation JSON-Schema
 	     * @param data données de formualaire
 	     */
-	    private transformDatesToISO(schema, data);
+	    protected transformDatesToISO(schema: any, data: any): void;
 	    /**
 	     * Déclenche la validation du formulaire, notifie les erreurs éventuelles et exécute la fonction
 	     * onSubmit présente dans les propriétés s'il n'y a pas d'erreurs
-	     * @private
+	     *
 	     */
 	    validateAndSubmit(): void;
 	    /**
@@ -3325,9 +3707,9 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	    /**
 	     * Méthode permettant d'alimenter le bloc Notifications d'erreurs puis de déléguer l'évent au composant parent
 	     * @param e
-	     * @private
+	     *
 	     */
-	    private _submitHornetForm(e);
+	    protected _submitHornetForm(e: React.SyntheticEvent<HTMLElement>): void;
 	    /** @override */
 	    protected propagateParentState(): void;
 	    /** @override */
@@ -3340,13 +3722,13 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	     * @param items
 	     * @returns {boolean}
 	     */
-	    private isMultiPartForm(items);
+	    protected isMultiPartForm(items: Array<React.ReactChild>): boolean;
 	    /**
 	     * Méthode permettant de déterminer s'il y a au moins un champ requis.
 	     * @param items
 	     * @returns {boolean}
 	     */
-	    private isOneRequired(items);
+	    protected isOneRequired(items: Array<React.ReactChild>): boolean;
 	    /**
 	     * @inheritDoc
 	     */
@@ -3356,7 +3738,7 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	     * @param children
 	     * @returns {Array<any>}
 	     */
-	    private getButtonsArea(children);
+	    protected getButtonsArea(children: any): Array<any>;
 	}
 	
 }
@@ -3635,7 +4017,9 @@ declare module "hornet-js-react-components/src/widget/form/radios-field" {
 	export interface RadiosFieldProps extends HornetClickableProps, HornetBasicFormFieldProps, HornetComponentDatasourceProps, HornetComponentChoicesProps {
 	    currentChecked?: boolean;
 	    data?: any;
+	    id?: string;
 	    name: string;
+	    defaultValue?: any;
 	}
 	/**
 	 * Composant groupe de boutons radio
@@ -3650,18 +4034,20 @@ declare module "hornet-js-react-components/src/widget/form/radios-field" {
 	     */
 	    protected setItem(): void;
 	    handleClick(event: any): void;
+	    handleChange(event: any): boolean;
 	    /**
 	     * Génère le rendu des radio boutons à partir d'un dataSource
 	     * @returns {any}
 	     */
-	    private renderRadioItemdataSource();
+	    protected renderRadioItemdataSource(): JSX.Element;
 	    /**
 	     * Génère le rendu d'un radio bouton et son libellé
 	     * @param choice choix sélectionnable
 	     * @param id number position in array
 	     * @returns {any}
 	     */
-	    private renderRadioItem(choice, id);
+	    protected renderRadioItem(choice: any, id: number): JSX.Element;
+	    protected shouldRadioBeChecked(choice: any): boolean;
 	    /**
 	     * @override
 	     * Génère le rendu du libellé pour le champ
@@ -3716,7 +4102,7 @@ declare module "hornet-js-react-components/src/widget/form/row" {
 	    /**
 	     * @returns {number} le diviseur de fraction à utiliser pour les noeuds enfants
 	     */
-	    private getPureChildFraction();
+	    protected getPureChildFraction(): number;
 	    /**
 	     * @inheritDoc
 	     */
@@ -3848,12 +4234,14 @@ declare module "hornet-js-react-components/src/widget/form/upload-file-field" {
 	    fileSelectedLabel?: string;
 	    /** permet de surcharger le css du bouton de suppression */
 	    classNameDelete?: string;
+	    /** clé i18n pour le label */
+	    i18nLabelKey?: string;
 	}
 	/**
 	 * Composant champ de formulaire de type envoi de fichier
 	 */
 	export class UploadFileField<P extends UploadFileFieldProps> extends AbstractField<UploadFileFieldProps, any> {
-	    private inputFileElement;
+	    protected inputFileElement: HTMLElement;
 	    readonly props: Readonly<UploadFileFieldProps>;
 	    static defaultProps: any;
 	    constructor(props?: P, context?: any);
@@ -3862,15 +4250,16 @@ declare module "hornet-js-react-components/src/widget/form/upload-file-field" {
 	     * Gestion du changement de fichier sélectionné
 	     * @param e évènement
 	     */
-	    private handleChange(e);
-	    /**setReadOnlyFile
+	    protected handleChange(e: __React.SyntheticEvent<HTMLElement>): void;
+	    /**
 	     * @returns {any} les propriétés du fichier en consultation converties en attributs html data
 	     */
-	    private getDataFileProps();
+	    protected getDataFileProps(): any;
 	    /**
 	     * @override
 	     */
 	    setCurrentValue(formData: any): this;
+	    registerUploadFieldElement(elt: any): void;
 	    /**
 	     * Génère le rendu spécifique du champ
 	     * @returns {any}
@@ -3892,238 +4281,10 @@ declare module "hornet-js-react-components/src/widget/form/upload-file-field" {
 	
 }
 
-declare module "hornet-js-react-components/src/widget/group/abstract-group-component" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
-	 *
-	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	export interface GroupComponentProps extends HornetComponentProps {
-	    id: any;
-	    key?: any;
-	}
-	export class GroupComponent<P extends GroupComponentProps, S extends GroupComponentProps> extends HornetComponent<P, S> {
-	    constructor(props?: P, context?: any);
-	    static generateKey(object: any, defaultKey?: string): string;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/header/header-page" {
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	export interface HeaderPageProps extends HornetComponentProps {
-	    /**
-	     * number
-	     * Hauteur en pixel du header en props pour afficher
-	     * la class css 'sticky'
-	     */
-	    scrollHeight?: number;
-	}
-	export class HeaderPage extends HornetComponent<HeaderPageProps, any> {
-	    /** ref */
-	    header?: any;
-	    height?: any;
-	    constructor(props: HeaderPageProps, context?: any);
-	    componentDidMount(): void;
-	    componentWillUnmount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     *
-	     * @param element
-	     * @returns {boolean}
-	     */
-	    isInView(element: any): boolean;
-	    /**
-	     *
-	     * @param e
-	     */
-	    handleScroll: (e: any) => void;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/icon/icon" {
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	/**
-	 * Propriétés d'une icône
-	 */
-	export interface IconProps extends HornetComponentProps {
-	    /** Url de l'image */
-	    src: string;
-	    /** Texte alternatif */
-	    alt: string;
-	    /** Identifiant HTML de l'image rendue */
-	    idImg?: string;
-	    /** Class CSS de l'image */
-	    classImg?: string;
-	    /** Url du lien */
-	    url?: string;
-	    /** Texte d'infobulle du lien */
-	    title: string;
-	    /** Identifiant HTML du lien */
-	    idLink?: string;
-	    /** Classe CSS du lien */
-	    classLink?: string;
-	    /** Cible du lien */
-	    target?: string;
-	    /** Fonction déclenchée lorsque le bouton correspondant à l'icône est pressé ou cliqué */
-	    action?: () => void;
-	    /** Valeur de l'attribut HTML tabIndex à affecter au lien ou bouton correspondant à l'icône*/
-	    tabIndex?: number;
-	    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
-	    hasPopUp?: boolean;
-	}
-	/** Valeur de l'url par défaut lorsque la propriété url est vide */
-	export const EMPTY_URL: string;
-	/**
-	 * Composant Icône
-	 */
-	export class Icon extends HornetComponent<IconProps, any> {
-	    static defaultProps: {
-	        url: string;
-	    };
-	    /**
-	     * Retire le focus de l'élément une fois cliqué de façon à permettre de scroller ou mettre le focus sur les
-	     * notifications éventuellement présentées suite à l'action.
-	     * @param event évènement
-	     * @private
-	     */
-	    private iconOnClick(event);
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/language/change-language" {
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	import { Position }  from "hornet-js-react-components/src/widget/dropdown/dropdown";
-	/**
-	 *
-	 * Propriétés ChangeLanguage
-	 */
-	export interface ChangeLanguageProps extends HornetComponentProps {
-	    /** Boolean permettant de savoir si la liste deroulante est affiché */
-	    isOpen?: boolean;
-	    /** Méthode appelé après un changement de langue */
-	    handleChangeLanguage?: (locale: string) => void;
-	    /** détermine la position du arrow */
-	    position?: Position;
-	    switchTitle?: string;
-	}
-	/**
-	 * Composant ChangeLanguage
-	 * Il permet de changer le langue sur le site via un menu deroulant
-	 */
-	export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
-	    /** Valeur de propriétés par défaut */
-	    static defaultProps: {
-	        isOpen: boolean;
-	        position: Position;
-	    };
-	    constructor(props: any, context?: any);
-	    componentDidMount(): void;
-	    componentDidUpdate(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Met à jour la la langue en fonction de la selection
-	     * @param locale de format Ii18n {locale:"fr-FR", lang:'fr'}
-	     * @param shortLabel bigramme de la nouvelle langue ( ex : 'en' , 'fr' )
-	     */
-	    selectLanguage(locale: string, shortLabel: string): void;
-	}
-	
-}
-
 declare module "hornet-js-react-components/src/widget/navigation/bread-crumb-item" {
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { MenuItemConfig }  from "hornet-js-react-components/src/widget/navigation/menu";
 	/**
 	 * Propriétés d'un item de breadcrumb
 	 */
@@ -4143,30 +4304,30 @@ declare module "hornet-js-react-components/src/widget/navigation/bread-crumb-ite
 	     * @param item
 	     * @param indice
 	     * @returns {ReactElement<{href: any}>}
-	     * @private
+	     * @protected
 	     */
-	    private makeLink(item, indice);
+	    protected makeLink(item: MenuItemConfig, indice: number): JSX.Element;
 	    /**
 	     * Méthode de génération d'une balise de type span
 	     * @param labelElement
 	     * @param htmlProps
 	     * @returns {React.ReactElement<null>}
-	     * @private
+	     * @protected
 	     */
-	    private static makeSpan(labelElement, htmlProps);
+	    protected static makeSpan(labelElement: any, htmlProps: any): JSX.Element;
 	    /**
 	     * Méthode de génération d'un chevron
 	     * @returns {string}
-	     * @private
+	     * @protected
 	     */
-	    private static makeChevron();
+	    protected static makeChevron(): JSX.Element;
 	    /**
 	     * Permet de mettre en gras du texte
 	     * @param text
 	     * @returns {React.ReactElement<null>}
-	     * @private
+	     * @protected
 	     */
-	    private static makeStrong(text);
+	    protected static makeStrong(text: string): JSX.Element;
 	}
 	
 }
@@ -4174,6 +4335,7 @@ declare module "hornet-js-react-components/src/widget/navigation/bread-crumb-ite
 declare module "hornet-js-react-components/src/widget/navigation/bread-crumb" {
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { MenuItemConfig }  from "hornet-js-react-components/src/widget/navigation/menu";
 	/**
 	 * Fil d'ariane
 	 */
@@ -4194,9 +4356,9 @@ declare module "hornet-js-react-components/src/widget/navigation/bread-crumb" {
 	     * Rtourne les éléments que constitueront le breadCrumb depuis l'url courante
 	     * @param currentPath
 	     * @returns {Array}
-	     * @private
+	     * @protected
 	     */
-	    private getItems(currentPath);
+	    protected getItems(currentPath: string): any[];
 	    /**
 	     * Boucle sur chacun des éléments
 	     * @param menuDatas
@@ -4204,15 +4366,15 @@ declare module "hornet-js-react-components/src/widget/navigation/bread-crumb" {
 	     * @param currentElement
 	     * @param currentItemSelected
 	     * @returns {Array}
-	     * @private
+	     * @protected
 	     */
-	    private loopElement(menuDatas, currentPath, currentElement, currentItemSelected);
+	    protected loopElement(menuDatas: MenuItemConfig[], currentPath: string, currentElement: MenuItemConfig, currentItemSelected: any): any[];
 	    /**
 	     * Rendu d'un élément du breadCrumb
 	     * @returns {any}
-	     * @private
+	     * @protected
 	     */
-	    private renderBreadCrumbElement();
+	    protected renderBreadCrumbElement(): any;
 	    /**
 	     * Méthode exécutée lors du Changement de currentPath
 	     * @param ev
@@ -4287,41 +4449,41 @@ declare module "hornet-js-react-components/src/widget/navigation/menu-link" {
 	     * Gestion du clic sur entrer ou espace
 	     * @param event
 	     */
-	    private handleKeyDown(event);
+	    protected handleKeyDown(event: any): void;
 	    /**
 	     * Méthode appelée lors du click sur le lien
 	     */
-	    private activateLink();
+	    protected activateLink(): void;
 	    /**
 	     * Méthode appelée pour femer le menu
 	     */
-	    private closeMenu();
+	    protected closeMenu(): void;
 	    /**
 	     * Gestion de l'évènement d'entrée de la souris sur l'élément
 	     */
-	    private handleMouseEnter();
+	    protected handleMouseEnter(): void;
 	    /**
 	     * Evènement lancé lorsque le pointer n'est plus sur le lien
-	     * @private
+	     * @protected
 	     */
-	    handleMouseLeave(): void;
+	    protected handleMouseLeave(): void;
 	    /**
 	     * Permet de générer l'image adéquate selon la profondeur
 	     * @param item
 	     * @param libelle
 	     * @param hover
 	     * @returns {string}
-	     * @private
+	     * @protected
 	     */
-	    private getImgSubMenu(item, libelle, hover?);
+	    protected getImgSubMenu(item: IMenuItem, libelle: string, hover?: boolean): JSX.Element;
 	    /**
 	     * Méthode renvoyant le chemin absolu de l'image à afficher
 	     * @param item
 	     * @param hover
 	     * @returns {string}
-	     * @private
+	     * @protected
 	     */
-	    private getFilePathImg(item, hover);
+	    protected getFilePathImg(item: IMenuItem, hover: boolean): string;
 	}
 	
 }
@@ -4331,6 +4493,7 @@ declare module "hornet-js-react-components/src/widget/navigation/menu-navigation
 	import { MenuItemConfig }  from "hornet-js-react-components/src/widget/navigation/menu";
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import KeyboardEvent = __React.KeyboardEvent;
 	/**
 	 * Propriétés MenuNavigation
 	 */
@@ -4395,37 +4558,37 @@ declare module "hornet-js-react-components/src/widget/navigation/menu-navigation
 	     * teste si le sous menu est visible ou non
 	     * @returns {boolean|any} le sous menu est visible
 	     */
-	    private isVisible();
+	    protected isVisible(): boolean;
 	    /**
 	     * test si le menu parent est visible
 	     * @returns {boolean} le menu parent est visible
 	     */
-	    private isParentVisible();
-	    private getLiId();
+	    protected isParentVisible(): boolean;
+	    protected getLiId(): string;
 	    /**
 	     * Ferme le menu contenant le menu item
 	     */
-	    private hideMenu();
+	    protected hideMenu(): void;
 	    /**
 	     * cache un menu et tous ses sous-menus
 	     * @param parentId identifiant de la balise li qui doit être cachée
 	     */
-	    private hideAllMenu(parentId);
+	    protected hideAllMenu(parentId: any): void;
 	    /**
 	     * ferme tous les menu parents et va au menu suivant
 	     */
-	    private hideAllParentMenu();
+	    protected hideAllParentMenu(): void;
 	    /**
 	     * teste si le menu a des sous menus
 	     * @returns {boolean} le menu a des sous menus
 	     */
-	    private hasSubMenu();
+	    protected hasSubMenu(): boolean;
 	    /**
 	     * Fonction appelée lors d'un appui de touche sur un élément de menu.
 	     * @param e évenèment déclencheur
-	     * @private
+	     * @protected
 	     */
-	    private handleKeyDown(event);
+	    protected handleKeyDown(event: any): void;
 	}
 	/**
 	 * Groupe d'éléments de menu
@@ -4445,29 +4608,29 @@ declare module "hornet-js-react-components/src/widget/navigation/menu-navigation
 	     * @param id identifiant de l'élément de menu
 	     * @return {number} l'index de l'élément parent au niveau de menu zéro (0 pour le premier élément)
 	     */
-	    private static getRootParentIndex(id);
+	    protected static getRootParentIndex(id: string): number;
 	    /**
 	     * @param e évènement clavier
 	     * @returns {boolean} true lorsque l'évènement clavier à au moins l'un des modificateurs actifs (tels que Alt, Ctrl, etc...)
 	     */
-	    private hasKeyModifier(e);
+	    protected hasKeyModifier(e: KeyboardEvent<HTMLElement>): boolean;
 	    /**
 	     * Fonction appelée lors d'un appui de touche sur un élément de menu horizontal.
 	     * @param e évenèment déclencheur
-	     * @private
+	     * @protected
 	     */
-	    private onKeyDownHorizontalMenu(e);
+	    protected onKeyDownHorizontalMenu(e: KeyboardEvent<HTMLElement>): void;
 	    /**
 	     * Fonction appelée lors d'un appui de touche sur un élément de menu vertical
 	     * @param e
-	     * @private
+	     * @protected
 	     */
-	    private onKeyDownVerticalMenu(e);
+	    protected onKeyDownVerticalMenu(e: KeyboardEvent<HTMLElement>): void;
 	    /**
 	     * Test si un element existe
 	     * @param id identifiant de l'élément à vérifier
 	     * @returns boolean
-	     * @private
+	     * @protected
 	     */
 	    static isElementExists(id: string): boolean;
 	}
@@ -4524,7 +4687,7 @@ declare module "hornet-js-react-components/src/widget/navigation/menu" {
 	    closeOnTabOutside?: boolean;
 	}
 	export class Menu extends HornetComponent<MenuProps, any> {
-	    private burgerIcon;
+	    protected burgerIcon: HTMLElement;
 	    static defaultProps: {
 	        closeOnLinkClick: boolean;
 	        closeOnClickOutside: boolean;
@@ -4547,7 +4710,7 @@ declare module "hornet-js-react-components/src/widget/navigation/menu" {
 	     * Gestion du clic clavier
 	     * @param event
 	     */
-	    private handleKeyDown(event);
+	    protected handleKeyDown(event: KeyboardEvent): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -4556,17 +4719,17 @@ declare module "hornet-js-react-components/src/widget/navigation/menu" {
 	     * Rendu du bouton burger du menu
 	     * @returns {any}
 	     */
-	    private renderMenuButton();
+	    protected renderMenuButton(): JSX.Element;
 	    /**
 	     * Rendu du menu vide (permet de gérer des transition css sur le menu)
 	     * @returns {any}
 	     */
-	    private renderEmptyNavigationMenu();
+	    protected renderEmptyNavigationMenu(): JSX.Element;
 	    /**
 	     * Rendu du menu
 	     * @returns {any}
 	     */
-	    private renderNavigationMenu();
+	    protected renderNavigationMenu(): JSX.Element;
 	    /**
 	     * Action permettant d'afficher/masquer le menu
 	     */
@@ -4577,9 +4740,9 @@ declare module "hornet-js-react-components/src/widget/navigation/menu" {
 	     * @param e Event
 	     */
 	    handleMenuOutsideClick(e: any): boolean;
-	    private handleLayoutExpand();
-	    private handleMajLink();
-	    private handleUpatePageMenuExpand();
+	    protected handleLayoutExpand(): void;
+	    protected handleMajLink(): void;
+	    protected handleUpatePageMenuExpand(): void;
 	}
 	
 }
@@ -4587,6 +4750,7 @@ declare module "hornet-js-react-components/src/widget/navigation/menu" {
 declare module "hornet-js-react-components/src/widget/navigation/plan" {
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { MenuItemConfig }  from "hornet-js-react-components/src/widget/navigation/menu";
 	/**
 	 * Propriétés du composant Plan
 	 */
@@ -4607,14 +4771,51 @@ declare module "hornet-js-react-components/src/widget/navigation/plan" {
 	     * @param depth profondeur de l'élément
 	     * @returns l'élément rendu
 	     */
-	    private generateItem(item, depth);
+	    protected generateItem(item: MenuItemConfig, depth: number): JSX.Element;
 	    /**
 	     * Génération d'un lien
 	     * @param item élément de configuration
 	     * @param depth profondeur de l'élément
 	     * @returns l'élément rendu
 	     */
-	    private generateLink(item, depth);
+	    protected generateLink(item: MenuItemConfig, depth: number): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/notification/count-down" {
+	import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	/**
+	 * Déclaration des prpriétés du CountDown
+	 */
+	export interface CountDownProps extends HornetComponentProps {
+	    secondsRemaining: number;
+	    countDownExpiredMesage?: string;
+	    countDownNormalMessage?: string;
+	}
+	/**
+	 *
+	 */
+	export class Countdown extends HornetComponent<CountDownProps, any> {
+	    protected interval: any;
+	    static defaultProps: {
+	        countDownExpiredMesage: string;
+	        countDownNormalMessage: string;
+	    };
+	    constructor(props: any, context?: any);
+	    componentDidMount(): void;
+	    componentWillUnmount(): void;
+	    /**
+	     * Génère le rendu spécifique du champ
+	     * @returns {any}
+	     * @override
+	     */
+	    render(): JSX.Element;
+	    /**
+	     *
+	     */
+	    tick(): void;
 	}
 	
 }
@@ -4631,6 +4832,7 @@ declare module "hornet-js-react-components/src/widget/notification/notification-
 	    text: string;
 	    anchor?: string;
 	    className?: string;
+	    id?: string;
 	}
 	/**
 	 * Composant MessageItem
@@ -4640,18 +4842,114 @@ declare module "hornet-js-react-components/src/widget/notification/notification-
 	    /**
 	     * Rendu Lien
 	     * @returns {any}
-	     * @private
+	     * @protected
 	     */
-	    renderLink(): JSX.Element;
+	    protected renderLink(): JSX.Element;
 	    /**
 	     * Rendu span
 	     * @returns {any}
-	     * @private
+	     * @protected
 	     */
-	    renderSpan(): JSX.Element;
+	    protected renderSpan(): JSX.Element;
 	    /**
 	     * @inheritDoc
 	     */
+	    render(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/notification/notification-session-footer" {
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { SessionEvent } from "hornet-js-core/src/services/hornet-superagent";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
+	import { WakeUpNode } from "hornet-js-core/src/services/default/wakeup-node";
+	/**
+	 * Déclaration des prpriétés du CountDown
+	 */
+	export interface NotificationSessionFooterProps extends HornetComponentProps {
+	    countDownExpiredMessage?: string;
+	    countDownNormalMessage?: string;
+	    displayDuration?: number;
+	    handlClickWakeUp?: any;
+	}
+	export class NotificationSessionFooter extends HornetComponent<NotificationSessionFooterProps, any> {
+	    /**
+	     * Service middleware pour le layout
+	     */
+	    protected wakeUpNodeService: WakeUpNode;
+	    static defaultProps: {
+	        offset: number;
+	        header: string;
+	        footer: string;
+	        countDownExpiredMessage: string;
+	        countDownNormalMessage: string;
+	        displayDuration: number;
+	    };
+	    constructor(props?: any, context?: any);
+	    componentDidMount(): void;
+	    componentWillUnmount(): void;
+	    render(): JSX.Element;
+	    /**
+	     * Méthode permettant de faire le rendu du bloc de notification
+	     * @returns {JSX.Element}
+	     */
+	    renderNotification(): JSX.Element;
+	    handlClickWakeUp(): void;
+	    /**
+	     * Méthode permettant de formater le message à afficher dans le bloc de notification
+	     * @returns {string}
+	     */
+	    formateMessage(): string;
+	    /**
+	     * Méthode permettant de formater le state expireIn au format Date
+	     * @returns {number}
+	     */
+	    formateTime(): number;
+	    /**
+	     * Méthode permettant de réduire la notification
+	     */
+	    handleToggleNotification(): void;
+	    /**
+	     * Méthode permettant de rafraichir la notification
+	     * @param {HornetEvent<SessionEvent>} ev
+	     */
+	    handleRefresh(ev?: HornetEvent<SessionEvent>): void;
+	    /**
+	     * Méthode permettant de rafraichir la notification
+	     * @param {HornetEvent<SessionEvent>} ev
+	     */
+	    handleWillExpireStart(ev: HornetEvent<SessionEvent>): void;
+	    /**
+	     * Méthode permettant d'avertir d'une fin de session
+	     * @param {HornetEvent<SessionEvent>} ev
+	     */
+	    handleWillExpire(ev: HornetEvent<SessionEvent>): void;
+	    /**
+	     * Métohde de gestion du scroll à l'écran
+	     */
+	    protected handleScroll(): void;
+	    /**
+	     * Calcule si un élément est présent ou non a l'écran
+	     * @param {Element} elm - l'élément a rechercher
+	     * @return {boolean} true si l'élément est présent
+	     */
+	    protected checkvisible(elm: any): boolean;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/notification/notification-session" {
+	import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { SessionEvent } from "hornet-js-core/src/services/hornet-superagent";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
+	export class SessionExpireNotification extends HornetComponent<HornetComponentProps, any> {
+	    constructor(props?: any, context?: any);
+	    handleRefresh(ev: HornetEvent<SessionEvent>): void;
+	    handleWillExpireStart(ev: HornetEvent<SessionEvent>): void;
+	    handleWillExpire(ev: HornetEvent<SessionEvent>): void;
 	    render(): JSX.Element;
 	}
 	
@@ -4725,10 +5023,11 @@ declare module "hornet-js-react-components/src/widget/notification/notification"
 }
 
 declare module "hornet-js-react-components/src/widget/pager/pager" {
+	import * as React from "react";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
-	import KeyboardEvent = __React.KeyboardEvent;
+	import KeyboardEvent = React.KeyboardEvent;
 	/**
 	 * Propriétés de pagination de tableau Hornet
 	 */
@@ -4786,12 +5085,12 @@ declare module "hornet-js-react-components/src/widget/pager/pager" {
 	 * Outils de pagination de tableau
 	 */
 	export class Pager extends HornetComponent<PagerProps, any> {
-	    private tableInputPager;
+	    protected tableInputPager: any;
 	    static defaultProps: {
 	        message: any;
 	        className: string;
 	    };
-	    private defaultPageSizeSelect;
+	    protected defaultPageSizeSelect: PageSizeItem[];
 	    constructor(props: PagerProps, context?: any);
 	    componentDidMount(): void;
 	    /**
@@ -4803,17 +5102,16 @@ declare module "hornet-js-react-components/src/widget/pager/pager" {
 	     * met a jour la pagination dans le state et la valeur de la page courante.
 	     * @param result (liste des resultats du dataSource)
 	     */
-	    private updateOnFetch(result);
+	    protected updateOnFetch(result: any): void;
 	    /**
 	     * @inheritDoc
 	     */
 	    render(): JSX.Element;
 	    /**
 	     * Génère la liste déroulante permettant de sélectionner le nombre d'éléments par page.
-	     * @param pageSizeSelect éléments de choix de taille de page
-	     * @returns {JSX.Element}
+	     * @returns {ReactElement}
 	     */
-	    private renderSelectItemsPerPage();
+	    protected renderSelectItemsPerPage(): React.ReactElement<PagerProps>;
 	    /**
 	     * @param totalItems nombre total d'éléments
 	     * @param itemsPerPage nombre d'éléments par page
@@ -4824,7 +5122,7 @@ declare module "hornet-js-react-components/src/widget/pager/pager" {
 	     * Méthode permettant de générer le code HTML lié aux boutons
 	     * @returns {JSX.Element[]}
 	     */
-	    private getButtons();
+	    protected getButtons(): JSX.Element[];
 	    /**
 	     * Génère le rendu d'un bouton de contrôle de pagination
 	     * @param infoTitle complement info title
@@ -4833,14 +5131,14 @@ declare module "hornet-js-react-components/src/widget/pager/pager" {
 	     * @param key clé de l'élément React
 	     * @returns l'élément React correspondant
 	     */
-	    private renderButton(infoTitle, page, enabled, key);
+	    protected renderButton(infoTitle: string, page: number, enabled: boolean, key: string): JSX.Element;
 	    /**
 	     * Rendu de l'input de saisie pour aller à une page précise
 	     * @param firstPage numéro de la première page
 	     * @param lastPage numéro de la dernière page
 	     * @returns rendu du composant
 	     */
-	    private renderPageInput(firstPage, lastPage);
+	    protected renderPageInput(firstPage: number, lastPage: number): JSX.Element;
 	    /**
 	     * Gestion de la validation clavier pour aller à la page saisie
 	     * dans l'input dédié
@@ -4848,11 +5146,17 @@ declare module "hornet-js-react-components/src/widget/pager/pager" {
 	     */
 	    protected handleInputKeyDown(e: KeyboardEvent<HTMLElement>): void;
 	    /**
+	     * L'index de page étant dans un input mappé par la prop value
+	     * React oblige l'utilisation d'un event sur onChange pour valider la modification
+	     * @param e
+	     */
+	    protected handleChangeValue(e: any): void;
+	    /**
 	     * Méthode déclenchée sur un changement d'état de du formulaire de pagination
 	     * @param value
 	     * @param pageChanged
 	     */
-	    private onFormChange(value, pageChanged);
+	    protected onFormChange(value: any, pageChanged: any): void;
 	    setClassName(className: string, callback?: () => any): this;
 	    setMessage(message: (PaginationProps) => void, callback?: () => any): this;
 	    setPageSizeSelect(pageSizeSelect: PageSizeItem[], callback?: () => any): this;
@@ -4951,6 +5255,8 @@ declare module "hornet-js-react-components/src/widget/spinner/spinner-component"
 	    imageLoadingUrl?: string;
 	    /** visibilité */
 	    isVisible?: boolean;
+	    /** méthode appelée lors de la fermeture du spinner **/
+	    onHideSpinner?: Function;
 	}
 	/**
 	 * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
@@ -4996,19 +5302,19 @@ declare module "hornet-js-react-components/src/widget/spinner/spinner-component"
 	    /**
 	     * Return l'url de l'image spinner
 	     * @returns Url image spinner
-	     * @private
+	     * @protected
 	     */
 	    protected getSpinnerImage(): string;
 	    /**
 	     * Extrait le libelle loadingText passé dans les propriétés du composant ou indique un libellé par défaut
 	     * @returns Titre
-	     * @private
+	     * @protected
 	     */
 	    protected getLoadingText(): string;
 	    /**
 	     * Extrait le libelle loadingTitle passé dans les propriétés du composant ou indique un libellé par défaut
 	     * @returns Titre
-	     * @private
+	     * @protected
 	     */
 	    protected getLoadingTitle(): string;
 	}
@@ -5253,6 +5559,9 @@ declare module "hornet-js-react-components/src/widget/tab/tab" {
 	    onSelect?: Function;
 	    onClick?: Function;
 	    mount?: boolean;
+	    isDeletable?: boolean;
+	    deleteButtonTitle?: string;
+	    deleteTabFunction?: void | Function;
 	}
 	/**
 	 * Composant Onglet
@@ -5306,6 +5615,10 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	    dataSource?: DataSource<any>;
 	    beforeHideTab?: (tabRef?: Tab, index?: number) => void;
 	    afterShowTab?: (tabRef?: Tab, index?: number) => void;
+	    addTabFunction?: void | Function;
+	    addButtonTtitle?: string;
+	    deleteTabFunction?: void | Function;
+	    deleteButtonTitle?: string;
 	}
 	export enum TabsButtonScrolling {
 	    RIGHT = 0,
@@ -5327,11 +5640,18 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	    castBooleanInNumber: Function;
 	    selected: boolean;
 	    isVisible?: boolean;
+	    isDeletable?: boolean;
+	    deleteTabFunction?: void | Function;
+	    deleteButtonTitle?: string;
 	}
 	export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
 	    constructor(props?: TabsHeaderTechProps, context?: any);
-	    private getTabHeader(children);
+	    protected getTabHeader(children: any): JSX.Element[];
 	    render(): JSX.Element;
+	    /**
+	     * appelle la fonciton de suppression du tab
+	     */
+	    protected deleteTabFunction(): any;
 	}
 	export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
 	    static defaultProps: {
@@ -5339,25 +5659,58 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	        selectedTabIndex: number;
 	    };
 	    /** liste des instances Tab*/
-	    private elementsTab;
+	    protected elementsTab: Array<Tab>;
 	    /** liste des JSX elements tab*/
-	    private elementsTabReact;
+	    protected elementsTabReact: Array<JSX.Element>;
 	    /** liste des instances HeaderTech*/
-	    private elementsHeaderTech;
+	    protected elementsHeaderTech: Array<TabsHeaderTech>;
 	    /** liste des JSX elements headerTech*/
-	    private elementsHeaderReact;
-	    private tabRightPicto;
-	    private tabLeftPicto;
-	    private scrollGap;
-	    private tabviewContentList;
-	    private tabviewPictoList;
-	    private isTouchScreen;
-	    private resizeListener;
+	    protected elementsHeaderReact: Array<JSX.Element>;
+	    protected tabRightPicto: any;
+	    protected tabLeftPicto: any;
+	    protected scrollGap: number;
+	    protected tabviewContentList: any;
+	    protected tabviewPictoList: any;
+	    protected isTouchScreen: boolean;
+	    protected resizeListener: EventListenerOrEventListenerObject;
+	    protected tabsHeaderIndex: number;
+	    protected tabsContentIndex: number;
 	    constructor(props?: P, context?: any);
+	    /**
+	     * @inheritDoc
+	     */
 	    componentWillReceiveProps(nextProps: any, nextContext: any): void;
+	    /**
+	     * @inheritDoc
+	     */
 	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
 	    componentWillUnmount(): void;
-	    private prefixWithId();
+	    /**
+	     * retourne l'id en tant que prefixe
+	     */
+	    protected prefixWithId(): string;
+	    /**
+	     * retourne le nombre d'onglet présent dans le tabs
+	     * @returns {number}
+	     */
+	    getTabsNumber(): number;
+	    /**
+	     * retourne la position de l'onglet dans la liste des onglets
+	     * @param {number} index
+	     * @returns {number}
+	     */
+	    getTabPosition(index: number): number;
+	    /**
+	     * retourne l'index de l'onglet à la position donnée
+	     * @param {number} position
+	     */
+	    getIndexAt(position: number): number;
+	    /**
+	     * rafraichit les onglets
+	     */
 	    refresh(): void;
 	    /**
 	     * Permet d'ajouter des onglets
@@ -5388,40 +5741,51 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	     */
 	    removeElementsById(...ids: string[]): void;
 	    /**
+	     * Permet de supprimer des onglets et de passer un callback
+	     * @param {string | string[]} ids
+	     * @param cb
+	     */
+	    removeElementsByIdWithCb(ids: string | string[], cb?: any): void;
+	    /**
 	     * @return renvoie l'indice de onglet courant
 	     */
 	    getCurrentIndexSelected(): any;
 	    /**
 	     * Permet de supprimer un TabsHeaderTech (instance + JSX.Element)
 	     */
-	    private removeHeaderTech(criteria);
+	    protected removeHeaderTech(criteria: any): void;
 	    /**
 	     * Permet de supprimer un Tab (instance + JSX.Element)
 	     */
-	    private removeTab(criteria);
+	    protected removeTab(criteria: any): void;
 	    /**
 	     * Création JSX.Element de TabsHeaderTech
 	     */
-	    private createTabsHeader(tab);
+	    protected createTabsHeader(tab: JSX.Element): JSX.Element;
 	    /**
 	     * Création d'un JSX.Element de Tab (Wrap)
 	     */
-	    private createWrap(tab);
+	    protected createWrap(tab: JSX.Element): JSX.Element;
 	    /**
 	     * @inheritDock
 	     */
 	    render(): JSX.Element;
-	    private handleTouchStart();
-	    private manageScrollButtonStyle(scroll?);
-	    private setScrollButtonsStyle(element);
-	    private detectScrollRequired();
-	    private scrollElement(scroll, element);
-	    private onClickRightPicto();
-	    private onClickLeftPicto();
-	    private getTabs(children);
+	    protected handleTouchStart(): void;
+	    protected manageScrollButtonStyle(scroll?: TabsButtonScrolling): void;
+	    protected setScrollButtonsStyle(element: HTMLElement): void;
+	    protected detectScrollRequired(): void;
+	    protected scrollElement(scroll: TabsButtonScrolling, element: HTMLElement): void;
+	    protected onClickRightPicto(): void;
+	    protected onClickLeftPicto(): void;
+	    protected getTabs(children: any): any[];
 	    protected castBooleanInNumber(bool: boolean): number;
+	    /**
+	     * change l'onglet actif
+	     * @param index index de l'onglet a activé
+	     * @param {boolean} forceShow force ou non l'activation de l'onglet (si l'index est le meme que le précédent)
+	     */
 	    showPanel(index: any): void;
-	    private setSelectedIndexByKeyboard(index, mode);
+	    protected setSelectedIndexByKeyboard(index: any, mode: TabsKeyboardNavigation): number;
 	    /**
 	     * Gère les évèvenements clavier déclenchés
 	     * @param e évènement
@@ -5453,7 +5817,7 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	     * @param e
 	     */
 	    protected homeKeyDownHandler(e: KeyboardEvent<HTMLElement>): void;
-	    private setSelectedTabIndexAndFocus(mode);
+	    protected setSelectedTabIndexAndFocus(mode: TabsKeyboardNavigation): void;
 	    /**
 	     * A surcharger éventuellement
 	     * @param e
@@ -5485,6 +5849,58 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	     */
 	    protected escapeKeyDownHandler(e: KeyboardEvent<HTMLElement>): void;
 	    protected tabKeyDownHandler(e: KeyboardEvent<HTMLElement>): void;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/tool-tip/tool-tip" {
+	import * as React from "react";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	/**
+	 * Propriétés du ToolTip
+	 */
+	export interface ToolTipProps extends HornetComponentProps {
+	    src?: string;
+	    icoToolTip?: string;
+	    alt: string;
+	    idImg?: string;
+	    classImg?: string;
+	    idSpan: string;
+	    classSpan?: string;
+	}
+	/**
+	 * Composant ToolTip
+	 */
+	export class ToolTip extends HornetComponent<ToolTipProps, any> {
+	    static defaultProps: {
+	        classImg: string;
+	        classSpan: string;
+	        icoToolTip: string;
+	    };
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentWillUnmount(): void;
+	    /**
+	     * Gestion des touches du clavier
+	     * @param event
+	     */
+	    protected handleKeyDown(event: any): void;
+	    /**
+	     * Fonction déclenchée lorsque le champ de saisie libre perd le focus
+	     * @param event
+	     */
+	    protected hideTip(event: React.SyntheticEvent<HTMLElement>): void;
+	    protected showTip(event: React.SyntheticEvent<HTMLElement>): void;
 	}
 	
 }
@@ -5607,6 +6023,7 @@ declare module "hornet-js-react-components/src/widget/table/column" {
 	    defaultStyle?: CSSProperties;
 	    /** Texte alternatif */
 	    alt?: string;
+	    headers?: string | string[];
 	}
 	/**
 	 * Propriétés d'une colonne d'entête de tableau
@@ -5726,6 +6143,8 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	    /** Identifiant du groupe de notifications auquel seront rattachées les notifications d'erreurs de validation
 	     * du formulaire */
 	    notifId?: string;
+	    /** Identifiant du formulaire, obligatoire pour les fonctionnalités de submit*/
+	    idForm?: string;
 	    /**  titre du tableau (utilisé pour le caption lié à l'accessibilité */
 	    title?: string;
 	    /** gestion des events emit du content State */
@@ -5734,21 +6153,25 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	    hiddenColumns?: any;
 	    withoutForm?: boolean;
 	    isContentVisible?: boolean;
+	    /** Indique si le header du tableau est visible */
+	    headerHidden?: boolean;
+	    summary?: string;
 	}
 	/**
 	 * Classe permettant de générer le rendu graphique d'uncomposant Tableau
 	 */
 	export class Content extends HornetComponent<ContentProps, any> implements IHornetComponentAsync, IHornetComponentDatasource {
 	    readonly props: Readonly<ContentProps>;
-	    private sortData;
-	    private tableTrsRef;
-	    private tBodyRef;
+	    protected sortData: SortData[];
+	    protected tableTrsRef: any[];
+	    protected tBodyRef: HTMLElement;
+	    protected thElementToFocus: HTMLElement;
 	    /** nombre total de colonnes affichées */
-	    private totalColumns;
+	    protected totalColumns: number;
 	    /** colonnes masquées */
-	    private hiddenColumns;
+	    protected hiddenColumns: any;
 	    /** Collection de colonne avec coordonnées et état */
-	    private columnsWithVisibilityMap;
+	    protected columnsWithVisibilityMap: Array<ColumnState>;
 	    constructor(props?: ContentProps, context?: any);
 	    /**
 	     * @inheritDoc
@@ -5791,18 +6214,18 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	     * Méthode permettant de setter les data dans le tableau
 	     * @param result tableau d'élément
 	     */
-	    private setItem(result);
+	    protected setItem(result: any): void;
 	    /**
 	     * Méthode permettant de setter les data dans le tableau
 	     * @param result tableau d'éléments
 	     */
-	    private setItemPaginate(result);
+	    protected setItemPaginate(result: any): void;
 	    /**
 	     * Méthode permettant de tri les data
 	     * @param result tableau d'éléments
 	     * @param {SortData[]} sortData critères de tri.
 	     */
-	    private sort(result, sortData);
+	    protected sort(result: any, sortData: SortData[]): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -5828,7 +6251,7 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	     * Evènement permettant de déclencher le tri
 	     * @param sortData
 	     */
-	    onSort(sortData: SortData): void;
+	    onSort(sortData: SortData, thElement: any): void;
 	    /**
 	     * Rendu du header du tableau HTML
 	     * @param columns: colonnes déclarées dans le composant Page
@@ -5884,7 +6307,7 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	     * Modifie le mode d'accessibilité au clavier
 	     * @param mode NAVIGATION ou ACTIONABLE
 	     */
-	    private handleChangeKeyboardMode(mode);
+	    protected handleChangeKeyboardMode(mode: KeyboardInteractionMode): void;
 	    /**
 	     * Méthode premettant d'afficher le spinner
 	     * @returns {Table}
@@ -5898,24 +6321,38 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	    /**
 	     * Méthode déclenchant la fermeture de la fenêtre modale de suppresion d'un partenaire
 	     */
-	    private closeAlert();
+	    protected closeAlert(): void;
 	    /**
 	     * Méthode déclenchant la fermeture de la fenêtre modale de suppresion d'un partenaire
 	     */
-	    private validateAlert(fct?);
+	    protected validateAlert(fct?: Function): void;
 	    /***
 	     * Déclenche l'affichage de la modale de suppression d'un partenaire
 	     * @param message
 	     * @param title
 	     * @param {Function} fct fonction exécutée sur la validation
 	     */
-	    private showAlert(message, title, fct);
+	    protected showAlert(message: string, title: string, fct: Function): void;
 	    /**
 	     *  Méthode permettant de cocher/décocher une(des) ligne(s) du tableau
 	     * @param item (l'item selectioonné : deselectioné)
 	     * @param selectAll (le teoggle de selection multiple
 	     */
-	    protected toggleSelectLines(item: any, selectAll?: boolean): void;
+	    protected toggleSelectLines(item: any): void;
+	    /**
+	     * retourne l'intersection de deux liste
+	     * @param object
+	     * @param other
+	     * @returns {any[]}
+	     */
+	    intersectionWith(object: any[], other: any[]): any[];
+	    /**
+	     * retourne l'intersection de deux liste
+	     * @param object
+	     * @param other
+	     * @returns {any[]}
+	     */
+	    static intersectionWith(object: any[], other: any[]): any[];
 	    /***
 	     *
 	     * @param coordinates coordonnées de la cellule qui a déclenché la navigation
@@ -5936,7 +6373,7 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	     * @param item
 	     * @param orPush
 	     */
-	    private removeOrPush(selectedItems, item, orPush?);
+	    protected removeOrPush(selectedItems: any[], item: any, orPush?: boolean): void;
 	    /**
 	     * Méthode qui met a jour le style css pour la selection des lignes
 	     * @param instance
@@ -5948,7 +6385,7 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	     * Cette méthode est déclenchée par un HornetEvent
 	     * @param ev hornetEvent contenant la valeur en booléen sur le visibilité de la colonne
 	     */
-	    private updateColumnVisibility(ev);
+	    protected updateColumnVisibility(ev: HornetEvent<ColumnState | string>): void;
 	    /**
 	     * Initilisation des états de visibilité des colonnes
 	     * On commence à true car les colonnes masquées par défaut
@@ -5956,12 +6393,16 @@ declare module "hornet-js-react-components/src/widget/table/content" {
 	     * et que celles ne pouvant pas être maquées et donc toujours visibles
 	     * ne sont pas gérées dans le ToggleColumnsButton
 	     */
-	    private initializeColumnVisibilityWithCoord();
+	    protected initializeColumnVisibilityWithCoord(): void;
 	    /**
 	     * Propage dans le contentState le columnState de la première column visible
 	     *
 	     */
-	    private setFirstVisibleColumnState();
+	    protected setFirstVisibleColumnState(): void;
+	    /**
+	     * méthode appelée lors de l'effacement du spinner
+	     */
+	    protected onHideSpinner(): void;
 	}
 	
 }
@@ -6047,8 +6488,8 @@ declare module "hornet-js-react-components/src/widget/table/header" {
 	 * Header de tableau
 	 */
 	export class Header extends HornetComponent<HeaderProps, any> {
-	    private headerRef;
-	    private hiddenColumns;
+	    protected headerRef: any;
+	    protected hiddenColumns: any;
 	    constructor(props: HeaderProps, context?: any);
 	    componentWillUnmount(): void;
 	    componentDidMount(): void;
@@ -6080,33 +6521,33 @@ declare module "hornet-js-react-components/src/widget/table/header" {
 	    /**
 	     * Méthode déclenchant la fermeture de la fenêtre modale de suppresion d'un partenaire
 	     */
-	    private closeAlert();
+	    protected closeAlert(): void;
 	    /**
 	     * Méthode déclenchant la fermeture de la fenêtre modale de suppresion d'un partenaire
 	     */
-	    private validateAlert(fct?);
+	    protected validateAlert(fct?: Function): void;
 	    /***
 	     * Déclenche l'affichage de la modale de suppression d'un partenaire
 	     * @param message
 	     * @param title
 	     * @param {Function} fct fonction exécutée sur la validation
 	     */
-	    private showAlert(message, title, fct);
+	    protected showAlert(message: string, title: string, fct: Function): void;
 	    /**
 	     * fonction qui retourne la liste des items selectionés sur l'ihm lors de la pagination
 	     * @returns {any[]}
 	     */
-	    private getSelectedItemsForAllContent();
+	    protected getSelectedItemsForAllContent(): any[];
 	    /**
 	     * Retourne la somme totale des items de tous les dataSource de tous les contents
 	     * @returns {number}
 	     */
-	    private getTotalItemsForAllDataSource();
+	    protected getTotalItemsForAllDataSource(): number;
 	    /**
 	     * Retourne la somme totale des items de tous les dataSource de tous les contents
 	     * @returns {number}
 	     */
-	    private getTotalSelectedItemsForAllDataSource();
+	    protected getTotalSelectedItemsForAllDataSource(): number;
 	}
 	
 }
@@ -6298,7 +6739,10 @@ declare module "hornet-js-react-components/src/widget/table/spinner-table" {
 	}
 	export class SpinnerOverlay<P extends SpinnerTableProps, S extends SpinnerTableProps> extends SpinnerComponent<P, S> {
 	    readonly props: Readonly<SpinnerTableProps>;
+	    protected visibilityChange: boolean;
 	    constructor(props?: P, context?: any);
+	    componentWillUpdate(nextProps: any, nextState: any, nextContext: any): void;
+	    componentDidUpdate(nextProps: any, nextState: any, nextContext: any): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -6515,12 +6959,16 @@ declare module "hornet-js-react-components/src/widget/table/table-state" {
 	    itemInEdition: any;
 	    hiddenColumns: any;
 	    firstVisibleColumnState: ColumnState;
-	    private oldFirstVisibleColumnState;
+	    protected oldFirstVisibleColumnState: ColumnState;
+	    hasCheckColumnMassSelection: boolean;
+	    keyColumnMassSelection: string;
 	    setFocusOn(focusedCell: CellCoordinates): void;
 	    setItemInEdition(itemInEditionValue: any, lineIndex: number): void;
 	    setItems(items: any[]): void;
 	    setHiddenColumns(hiddenColumns: any): void;
 	    setFirstVisibleColumnState(columnState: ColumnState): void;
+	    setHasCheckColumnMassSelection(value: boolean): void;
+	    setKeycolumnMassSelection(keyColumn: string): void;
 	}
 	
 }
@@ -6528,6 +6976,8 @@ declare module "hornet-js-react-components/src/widget/table/table-state" {
 declare module "hornet-js-react-components/src/widget/table/table" {
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
+	import { TableState, ContentState }  from "hornet-js-react-components/src/widget/table/table-state";
 	/**
 	 * Propriétés du composant Table
 	 */
@@ -6544,8 +6994,8 @@ declare module "hornet-js-react-components/src/widget/table/table" {
 	 * Component Table
 	 */
 	export class Table extends HornetComponent<TableProps, any> {
-	    private tableState;
-	    private contentState;
+	    protected tableState: TableState;
+	    protected contentState: ContentState;
 	    static defaultProps: {
 	        className: string;
 	        isVisible: boolean;
@@ -6567,7 +7017,7 @@ declare module "hornet-js-react-components/src/widget/table/table" {
 	     * rendu du composant table
 	     * @returns {any}
 	     */
-	    private renderTable(myContents);
+	    protected renderTable(myContents: any): JSX.Element;
 	    /**
 	     * Méthode permettant de remonter les informations liées aux colonnes
 	     * @returns {Array}
@@ -6577,30 +7027,32 @@ declare module "hornet-js-react-components/src/widget/table/table" {
 	     * fonction qui retourne la liste des PaginateDataSource de tous les contents du composant table
 	     * @returns {PaginateDataSource<any>[]}
 	     */
-	    private getContentsDataSources(myContents);
+	    protected getContentsDataSources(myContents: any): PaginateDataSource<any>[];
 	    /**
 	     * Création d'un composant React
 	     * @returns {any}
 	     */
-	    private renderHeader(myComponent, myContents);
+	    protected renderHeader(myComponent: any, myContents: any): JSX.Element;
 	    /**
 	     * Création d'un composant React
 	     * @returns {any}
 	     */
-	    private renderFooter();
+	    protected renderFooter(): JSX.Element;
 	    /**
 	     * Rendu Html du/des content(s) du Table
 	     * @param myHeader
 	     * @param myContents
 	     * @returns {any}
 	     */
-	    private renderContent(myHeader, myContents);
+	    protected renderContent(myHeader: any, myContents: any): any[] | JSX.Element;
 	    /**
 	     * Permet de récupérer les colonnes masquées par défaut
 	     * @param myHeader
 	     * @returns {any}
 	     */
-	    private getHiddenColumns(myHeader);
+	    protected getHiddenColumns(myHeader: any): any;
+	    protected hasCheckColumnChildren(): boolean;
+	    protected getCheckColumnChildrenDeep(startElement: any, childrenList?: any[]): any[];
 	}
 	
 }
@@ -6700,57 +7152,6 @@ declare module "hornet-js-react-components/src/widget/table/toggle-columns-butto
 	
 }
 
-declare module "hornet-js-react-components/src/widget/tool-tip/tool-tip" {
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	/**
-	 * Propriétés du ToolTip
-	 */
-	export interface ToolTipProps extends HornetComponentProps {
-	    src?: string;
-	    icoToolTip?: string;
-	    alt: string;
-	    idImg?: string;
-	    classImg?: string;
-	    idSpan: string;
-	    classSpan?: string;
-	}
-	/**
-	 * Composant ToolTip
-	 */
-	export class ToolTip extends HornetComponent<ToolTipProps, any> {
-	    static defaultProps: {
-	        classImg: string;
-	        classSpan: string;
-	        icoToolTip: string;
-	    };
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentDidMount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentWillUnmount(): void;
-	    /**
-	     * Gestion des touches du clavier
-	     * @param event
-	     */
-	    private handleKeyDown(event);
-	    /**
-	     * Fonction déclenchée lorsque le champ de saisie libre perd le focus
-	     * @param event
-	     */
-	    private hideTip(event);
-	    private showTip(event);
-	}
-	
-}
-
 declare module "hornet-js-react-components/src/widget/user/user" {
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
@@ -6777,7 +7178,7 @@ declare module "hornet-js-react-components/src/widget/user/user" {
 	        expand: boolean;
 	        user: boolean;
 	    };
-	    private loginButton;
+	    protected loginButton: any;
 	    constructor(props: any, context?: any);
 	    /**
 	     * @inheritDoc
@@ -6803,7 +7204,7 @@ declare module "hornet-js-react-components/src/widget/user/user" {
 	     * Display user info
 	     * @returns JSX
 	     */
-	    private renderUserInfosButton();
+	    protected renderUserInfosButton(): void;
 	}
 	
 }
@@ -6913,6 +7314,7 @@ declare module "hornet-js-react-components/src/widget/table/column/action-column
 	    /** pour valoriser l'indicateur aria-has-popup */
 	    hasPopUp?: boolean;
 	    disabled?: Function | boolean;
+	    label?: string;
 	}
 	export interface ActionColumnState extends ColumnState {
 	}
@@ -6923,7 +7325,7 @@ declare module "hornet-js-react-components/src/widget/table/column/action-column
 	    static defaultProps: any;
 	    readonly props: ActionColumnProps;
 	    /**
-	     * Getter pour le composant générant le entête de colonne
+	     * Getter pour le composant générant l'entête de colonne
 	     * @return Class<HeaderCell<HeaderCellProps, any>>
 	     */
 	    getHeaderCell(): Class<ActionHeaderCell<ActionHeaderCellProps, any>>;
@@ -7592,7 +7994,9 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/abstract
 	 */
 	export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends AbstractCell<P, S> {
 	    protected defaultClassName: string;
+	    protected focus: boolean;
 	    constructor(props: P, context?: any);
+	    componentDidUpdate(nextProps: any, nextState: any, nextContext: any): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -7625,6 +8029,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/abstract
 	        role: string;
 	        title: any;
 	    };
+	    moveCaretAtEnd(e: any): void;
 	}
 	
 }
@@ -7702,7 +8107,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/abstract
 	     * @param value valeur pour tabIndex de la cellule
 	     * @param isFocus indicateur si le focus doit aussi être appliqué
 	     */
-	    protected setCellTabIndex(tableCellRef: any, value: number, isFocus?: boolean): void;
+	    static setCellTabIndex(tableCellRef: any, value: number, isFocus?: boolean): void;
 	    /**
 	     * methode qui permet de mettre le focus sur une cellule
 	     * @param oldCell cellule à vérifier pour un départ
@@ -7981,6 +8386,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/action/a
 	    titleAlert?: string;
 	    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
 	    hasPopUp?: string;
+	    label?: string;
 	}
 	export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
 	    protected title: string;
@@ -8058,7 +8464,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/action/e
 	    replaceUndef?: string;
 	}
 	export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
-	    private buttonsRef;
+	    protected buttonsRef: Array<any>;
 	    constructor(props: P, context: any);
 	    shouldComponentUpdate(nextProps: any, nextState: any): boolean;
 	    /**
@@ -8094,12 +8500,12 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/action/e
 	     * permet de stocker les references des boutons de la cellule
 	     * @param ref
 	     */
-	    private setButtonsRef(ref);
+	    protected setButtonsRef(ref: any): void;
 	    /**
 	     * Permet de switcher le focus entre les deux boutons de la cellule
 	     * @param e
 	     */
-	    private switchFocus(e);
+	    protected switchFocus(e: any): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -8117,7 +8523,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/check/ch
 	    altUnselect?: string;
 	}
 	export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBodyCell<P, any> {
-	    private checkBoxBodyRef;
+	    protected checkBoxBodyRef: any;
 	    constructor(props: P, context?: any);
 	    /**
 	     * @inheritDoc
@@ -8169,7 +8575,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/check/ch
 	export interface CheckHeaderCellProps extends AbstractHeaderCellProps {
 	}
 	export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends AbstractHeaderCell<P, any> {
-	    private checkBoxRef;
+	    protected checkBoxRef: any;
 	    constructor(props: P, context?: any);
 	    componentWillUnmount(): void;
 	    /**

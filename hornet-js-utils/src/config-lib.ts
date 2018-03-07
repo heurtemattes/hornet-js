@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,7 @@ const logger: Logger = Register.getLogger("hornet-js-utils.config-lib");
  * Classe gérant l'accès à l'objet de configuration
  */
 export class ConfigLib {
-    private _configObj: any;
+    protected _configObj: any;
 
     constructor() {
     }
@@ -242,13 +242,12 @@ export class ConfigLib {
     /**
      * Underlying get mechanism
      *
-     * @private
      * @method getImpl
      * @param object {object} - Object to get the property for
      * @param property {string | array[string]} - The property name to get (as an array or '.' delimited string)
      * @return value {mixed} - Property value, including undefined if not defined.
      */
-    private static getImpl(object: any, property: any): any {
+    protected static getImpl(object: any, property: any): any {
         let elems = Array.isArray(property) ? property : property.split(".");
         let name = elems[0];
         let value = object[name];

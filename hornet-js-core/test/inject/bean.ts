@@ -73,12 +73,12 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { injectable } from "hornet-js-core/src/inject/injectable";
+import { injectable } from "src/inject/injectable";
 
 export const HOW_I_AM = "Bean to inject";
 

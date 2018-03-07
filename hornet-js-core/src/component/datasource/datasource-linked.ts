@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,7 +105,7 @@ import { DataSourceConfigPage } from "src/component/datasource/config/service/da
 * @class
 */
 export class DataSourceLinked<T> extends DataSource<T>{
-    private _linked: DataSourceLinked<T>;
+    protected _linked: DataSourceLinked<T>;
 
     constructor(config: DataSourceConfig | DataSourceConfigPage | Array<T>, public keysMap: DataSourceMap = {}, public options?: any[]) {
         super(config, keysMap, options);
@@ -156,7 +156,7 @@ export class DataSourceLinked<T> extends DataSource<T>{
      * @param items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
      * @void
      */
-    private remove(triggerFetch: boolean = false, emiter, ...items: (T | T[])[]): void {
+    protected remove(triggerFetch: boolean = false, emiter, ...items: (T | T[])[]): void {
         this.emit("delete_cascade", this.getSpreadValues(items), emiter, triggerFetch);
         this.delete(triggerFetch, ...items);
     }

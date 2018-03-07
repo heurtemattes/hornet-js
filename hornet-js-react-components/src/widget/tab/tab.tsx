@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -104,7 +104,10 @@ export interface TabProps extends HornetComponentProps {
     /** Méthode appelée lorsque l'onglet est sélectionné(flag=true) ou désélectionné()*/
     onSelect?: Function;
     onClick?: Function;
-    mount?: boolean
+    mount?: boolean;
+    isDeletable?: boolean;
+    deleteButtonTitle?: string;
+    deleteTabFunction?: void | Function;
 }
 
 /**

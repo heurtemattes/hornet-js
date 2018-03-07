@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -150,7 +150,7 @@ export class KeyStoreBuilder {
      * @param keyStoreOptions
      */
     public static setHttpsGlobalAgent(agentOptions?: AgentOptions, keyStoreOptions?: KeyStoreOptions) {
-        (<any> https).globalAgent = KeyStoreBuilder.buildHttpsAgent(agentOptions, keyStoreOptions);
+        (<any>https).globalAgent = KeyStoreBuilder.buildHttpsAgent(agentOptions, keyStoreOptions);
     }
 
     /**
@@ -158,7 +158,7 @@ export class KeyStoreBuilder {
      * @param CAs
      * @returns {Array}
      */
-    private static buildCAs(CAs: Array<string> = []) {
+    protected static buildCAs(CAs: Array<string> = []) {
         let build = [];
         CAs.forEach((ca) => {
             try {
@@ -175,7 +175,7 @@ export class KeyStoreBuilder {
      * @param CERTs
      * @returns {Array}
      */
-    private static buildCERTs(CERTs: Array<string> = []) {
+    protected static buildCERTs(CERTs: Array<string> = []) {
         let build = [];
         CERTs.forEach((cert) => {
             try {
@@ -192,7 +192,7 @@ export class KeyStoreBuilder {
      * @param KEYs
      * @returns {Array}
      */
-    private static buildKEYs(KEYs: Array<KeyOptions> = []) {
+    protected static buildKEYs(KEYs: Array<KeyOptions> = []) {
         let build = [];
         KEYs.forEach((key) => {
             try {
@@ -217,7 +217,7 @@ export class KeyStoreBuilder {
      * @param PKCS12
      * @returns {Object}
      */
-    private static buildPKCS12(PKCS12: PKCS12Options = {file: null, passphrase: null}) {
+    protected static buildPKCS12(PKCS12: PKCS12Options = { file: null, passphrase: null }) {
         let build = null;
         if (PKCS12.file != null) {
             try {

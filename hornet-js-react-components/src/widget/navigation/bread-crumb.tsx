@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -117,7 +117,7 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
     render(): JSX.Element {
 
         return (
-            (this.state.data.length) ? this.renderBreadCrumb() : <div></div>
+            (this.state.data.length) ? this.renderBreadCrumb() : null
         );
     }
 
@@ -139,22 +139,22 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
      * Rtourne les éléments que constitueront le breadCrumb depuis l'url courante
      * @param currentPath
      * @returns {Array}
-     * @private
+     * @protected
      */
-    private getItems(currentPath: string) {
+    protected getItems(currentPath: string) {
 
         let menuConfig = NavigationUtils.getConfigMenu();
         let currentItem = NavigationUtils.getCurrentItem(menuConfig, currentPath);
         let items = this.loopElement(menuConfig, currentPath, null, currentItem);
         let welcomePageUrl = Utils.appSharedProps.get("welcomePageUrl");
         // Suppression du fil d'ariane si page d'accueil
-        if (items.length == 1 && items[0].url == welcomePageUrl) {
+        if (items.length == 1 && items[ 0 ].url == welcomePageUrl) {
             items = [];
         }
 
         /* Ajout de accueil dans le cas ou on est sur une page differente de accueil */
-        if (items.length >= 1 && items[0].url != welcomePageUrl) {
-            items.unshift({text: "navigation.welcome", url: welcomePageUrl});
+        if (items.length >= 1 && items[ 0 ].url != welcomePageUrl) {
+            items.unshift({ text: "navigation.welcome", url: welcomePageUrl });
         }
 
         return items;
@@ -167,23 +167,23 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
      * @param currentElement
      * @param currentItemSelected
      * @returns {Array}
-     * @private
+     * @protected
      */
-    private loopElement(menuDatas: MenuItemConfig[], currentPath: string, currentElement: MenuItemConfig, currentItemSelected) {
+    protected loopElement(menuDatas: MenuItemConfig[], currentPath: string, currentElement: MenuItemConfig, currentItemSelected) {
 
         let datas = [];
         for (let i = 0; i < menuDatas.length; i++) {
-            if (menuDatas[i].submenu) {
-                datas = datas.concat(this.loopElement(menuDatas[i].submenu, currentPath, menuDatas[i], currentItemSelected));
+            if (menuDatas[ i ].submenu) {
+                datas = datas.concat(this.loopElement(menuDatas[ i ].submenu, currentPath, menuDatas[ i ], currentItemSelected));
             }
             if (datas.length == 0) {
-                if (_.isEqual(menuDatas[i], currentItemSelected)) {
+                if (_.isEqual(menuDatas[ i ], currentItemSelected)) {
 
-                    datas.unshift(menuDatas[i]);
+                    datas.unshift(menuDatas[ i ]);
                     break;
                 }
             } else {
-                datas.unshift(menuDatas[i]);
+                datas.unshift(menuDatas[ i ]);
                 break;
             }
         }
@@ -193,13 +193,13 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
     /**
      * Rendu d'un élément du breadCrumb
      * @returns {any}
-     * @private
+     * @protected
      */
-    private renderBreadCrumbElement() {
+    protected renderBreadCrumbElement() {
         let items = this.state.data;
         let ln = items.length;
 
-        return items.map(function(item, i) {
+        return items.map(function (item, i) {
 
             let key = i + 1;
             let data = {
@@ -209,7 +209,7 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
             };
 
             return (
-                <BreadCrumbItem key={key} data={data}/>
+                <BreadCrumbItem key={key} data={data} />
             );
         });
     }

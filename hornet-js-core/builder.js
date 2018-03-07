@@ -89,5 +89,37 @@ module.exports = {
         // chemin vers le fichier "definition.d.ts" généré
         conf.generatedTypings.dir = path.join("..", project.name + "-dts");
         conf.generatedTypings.file = project.name + ".d.ts";
+    },
+    config: {
+        webpack: {
+            externals: {
+                "nodemailer": "''",
+                "carbone": "''",
+                "v8": "''",
+                "module": "''"
+            }
+        },
+        karma: {
+            //browsers: ["Firefox"],
+            //template: {
+            //    debug: "./test/template/debug.html",
+            //    context: "./test/template/context.html",
+            //    clientContext: "./test/template/client_with_context.html"
+            //},
+            clientContext: [
+                [/moment[\/\\]locale$/, /fr|en/],
+                [/intl[\/\\]locale-data[\/\\]jsonp$/, /fr|en/],
+                [/\/appenders\//, /console/],
+                [/^\.$/, (context) => {
+                    if ( !/\/log4js\/lib$/.test(context.context) ) return;
+                    context.regExp = /^\.\/appenders\/console.*$/;
+                    context.request = ".";
+                }]
+            ],
+            clientExclude: {
+                modules: ["nodemailer", "carbone", "v8", "module", "config", "tls", "child_process", "dgram", "cluster"]
+            }
+        }
+
     }
 };

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,7 +112,7 @@ export interface EditionActionBodyCellProps extends AbstractBodyCellProps {
 export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
 
     // gestion de la liste des refs des boutons
-    private buttonsRef: Array<any>;
+    protected buttonsRef: Array<any>;
 
     constructor(props: P, context: any) {
         super(props, context);
@@ -145,8 +145,13 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         let classes: ClassDictionary = {
             "edition-button-action": true
         };
+
+        let classesBefore: ClassDictionary = {
+            "edition-button-action-before": true
+        };
+
         if (this.state.className) {
-            classes[this.state.className] = true;
+            classes[ this.state.className ] = true;
         }
 
         // initialisation de la liste de ref  des boutons
@@ -154,7 +159,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
 
         return (
             this.state.visible ?
-                !this.state.isEditing ? this.renderEditionBoutton(classes) : this.renderSaveCancelBoutton(classes)
+                !this.state.isEditing ? this.renderEditionBoutton(classesBefore) : this.renderSaveCancelBoutton(classes)
                 : null
         );
     }
@@ -194,19 +199,18 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      * @returns {any}
      */
     renderEditionBoutton(classes: ClassDictionary): JSX.Element {
-        return (<button
-                className={classNames(classes)}
-                title={this.i18n(this.state.titleEdit, this.props.value)}
-                aria-label={this.i18n(this.state.titleEdit, this.props.value)}
-                type="button"
-                onClick={this.onClick}
-                tabIndex={-1}
-            >
-                <img src={Picto.blue.quickEdit}
-                     className={this.state.classNameImg}
-                     alt={this.i18n(this.state.titleEdit, this.props.value)}
-                     tabIndex={-1}/>
-            </button>
+        return (<a
+            className={classNames(classes)}
+            title={this.i18n(this.state.titleEdit, this.props.value)}
+            aria-label={this.i18n(this.state.titleEdit, this.props.value)}
+            onClick={this.onClick}
+            tabIndex={-1}
+        >
+            <img src={Picto.blue.quickEdit}
+                className={this.state.classNameImg}
+                alt={this.i18n(this.state.titleEdit, this.props.value)}
+                tabIndex={-1} />
+        </a>
         );
     }
 
@@ -225,9 +229,9 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                         title={this.state.titleSave}
                         aria-label={this.state.titleSave}
                         type="submit"
-                        tabIndex={-1}>
+                        tabIndex={0}>
                     <img src={Picto.editable.valider} className={this.state.classNameImg} alt={this.state.titleSave}
-                         tabIndex={-1}/>
+                        tabIndex={-1} />
                 </button>
 
                 <button ref={(elt) => {
@@ -238,9 +242,9 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                         aria-label={this.state.titleCancel}
                         onClick={this.onClick}
                         type="button"
-                        tabIndex={-1}>
+                        tabIndex={0}>
                     <img src={Picto.editable.annuler} className={this.state.classNameImg} alt={this.state.titleCancel}
-                         tabIndex={-1}/>
+                        tabIndex={-1} />
                 </button>
             </div>
         );
@@ -250,7 +254,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      * permet de stocker les references des boutons de la cellule
      * @param ref
      */
-    private setButtonsRef(ref): void {
+    protected setButtonsRef(ref): void {
         if (ref) {
             this.buttonsRef.push(ref);
         }
@@ -261,39 +265,37 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      * Permet de switcher le focus entre les deux boutons de la cellule
      * @param e
      */
-    private switchFocus(e): void {
+    protected switchFocus(e): void {
         e.stopPropagation();
         let indexBtnSave = 0;
         let indexBtnCancel = 1;
         if (!this.state.isEditing) {
             this.handleKeyDown(e);
         } else if (e.keyCode === KeyCodes.RIGHT_ARROW && this.state.submitFocused) {
-            this.buttonsRef[indexBtnCancel].focus();
+            this.buttonsRef[ indexBtnCancel ].focus();
         } else if (e.keyCode === KeyCodes.LEFT_ARROW && !this.state.submitFocused) {
-            this.buttonsRef[indexBtnSave].focus();
+            this.buttonsRef[ indexBtnSave ].focus();
         } else {
             this.handleKeyDown(e);
         }
 
-        this.setState({submitFocused: !this.state.submitFocused});
+        this.setState({ submitFocused: !this.state.submitFocused });
 
     }
 
     /**
+     * Méthode permettant de mettre le focus sur le bouton
      * @inheritDoc
      */
     handleCellFocus(tableCellRef) {
-
         if (this.buttonsRef.indexOf(document.activeElement) === -1) {
-            if (tableCellRef instanceof HTMLButtonElement) {
-
-                this.setState({submitFocused: (tableCellRef as HTMLElement).getAttribute("type") === "submit"});
+            if (tableCellRef instanceof HTMLButtonElement || tableCellRef.tagName == "A") {
+                this.setState({ submitFocused: (tableCellRef as HTMLElement).getAttribute("type") === "submit" });
                 (tableCellRef as HTMLElement).focus();
 
             } else if (tableCellRef && tableCellRef.children) {
-                this.handleCellFocus(tableCellRef.children[0]);
+                this.handleCellFocus(tableCellRef.children[ 0 ]);
             }
         }
-
     }
 }

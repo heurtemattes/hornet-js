@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -249,13 +249,13 @@ export class BatchExecutor {
      * Contient la liste des batchs en cours de traitement
      * @instance 
      */
-    private static processing = {};
+    protected static processing = {};
 
     /***
      * Contient la liste des batchs dans la file d'attente
      * @instance 
      */
-    private static queue = {};
+    protected static queue = {};
 
 
     /***
@@ -265,9 +265,9 @@ export class BatchExecutor {
     public static summary = {};
 
 
-    private static _instance: BatchExecutor;
+    protected static _instance: BatchExecutor;
 
-    private constructor() {
+    protected constructor() {
     }
 
     static get Instance() {

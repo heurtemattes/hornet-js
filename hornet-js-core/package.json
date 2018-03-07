@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-core",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants qui forment le coeur de hornet-js",
   "bugs": {
@@ -12,69 +12,54 @@
   },
   "main": "./index.js",
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.1.0",
-    "hornet-js-utils-dts": "5.1.0",
-    "hornet-js-components-dts": "5.1.0",
-    "hornet-js-test-dts": "5.1.0"
+    "hornet-js-ts-typings": "5.1.1",
+    "hornet-js-utils-dts": "5.1.1",
+    "hornet-js-components-dts": "5.1.1",
+    "hornet-js-test-dts": "5.1.1"
   },
   "appDependencies": {
-    "hornet-js-components": "5.1.0",
-    "hornet-js-utils": "5.1.0",
-    "ajv": "5.2.2",
-    "ajv-keywords": "2.1.0",
-    "body-parser": "1.17.1",
-    "carbone": "1.0.0",
+    "hornet-js-components": "5.1.1",
+    "hornet-js-utils": "5.1.1",
+    "ajv": "6.1.1",
+    "ajv-keywords": "3.1.0",
+    "body-parser": "1.18.2",
+    "carbone": "1.0.1",
     "cookie": "0.3.1",
-    "cookie-signature": "1.0.6",
+    "cookie-signature": "1.1.0",
     "crc": "3.5.0",
     "csurf": "1.9.0",
-    "detect-browser": "1.7.0",
+    "detect-browser": "2.0.0",
     "director": "1.2.8",
-    "es6-promise": "4.1.0",
+    "es6-promise": "4.2.4",
     "event-loop-monitor": "0.2.0",
-    "express": "4.15.5",
+    "express": "4.16.2",
     "express-state": "1.4.0",
-    "helmet": "3.8.1",
+    "helmet": "3.10.0",
     "hpp": "0.2.2",
     "intl": "1.2.5",
-    "intl-messageformat": "1.3.0",
+    "intl-messageformat": "2.2.0",
     "multer": "1.3.0",
     "object.assign": "4.0.4",
     "on-headers": "1.0.1",
     "onionskin": "1.1.6",
-    "parseurl": "1.3.1",
-    "path-to-regexp": "1.7.0",
-    "superagent": "3.5.2",
-    "uuid": "3.0.1",
-    "uid-safe": "2.1.0",
-    "json2csv": "3.7.3",
-    "csv-parse": "1.2.0",
-    "pdfmake": "0.1.27",
-    "reflect-metadata": "0.1.10",
-    "nodemailer": "4.1.1"
+    "parseurl": "1.3.2",
+    "path-to-regexp": "2.1.0",
+    "superagent": "3.8.2",
+    "uuid": "3.2.1",
+    "uid-safe": "2.1.5",
+    "json2csv": "3.11.5",
+    "csv-parse": "2.0.0",
+    "pdfmake": "0.1.35",
+    "reflect-metadata": "0.1.12",
+    "nodemailer": "4.4.2"
   },
   "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.1.0",
-    "moment-timezone": "0.5.13",
-    "log4js": "0.6.38",
-    "config": "1.19.0",
+    "hornet-js-test": "5.1.1",
+    "moment-timezone": "0.5.14",
+    "log4js": "2.3.12",
+    "config": "1.29.4",
     "onionskin": "1.1.6"
   },
-  "author": "MEAE - Ministère de l'Europe et des Affaires étrangères",
-
-
-
-
-
-  "____HORNET-BUILDER____DO_NOT_MODIFY_THIS_OBJECT____": {
-    "current": "a9cc565a460adf2a7fb6c00b426741b54f658317",
-    "history": {
-      "a9cc565a460adf2a7fb6c00b426741b54f658317": {
-        "version": "5.1.0",
-        "date": "2017-10-30T08:32:25.081Z",
-        "deps": {"accepts":"1.3.4","acorn":"5.2.1","ajv":"5.2.2","ajv-keywords":"2.1.0","amdefine":"1.0.1","append-field":"0.1.0","ast-types":"0.7.8","asynckit":"0.4.0","babel-runtime":"6.26.0","base64-js":"1.2.1","body-parser":"1.17.1","brfs":"1.4.3","brotli":"1.3.2","browser-resolve":"1.11.2","browserify-optional":"1.0.1","buffer-crc32":"0.2.13","busboy":"0.2.14","carbone":"1.0.0","cli-table":"0.3.1","clone":"1.0.2","co":"4.6.0","combined-stream":"1.0.5","commander":"2.11.0","component-emitter":"1.2.1","concat-stream":"1.6.0","content-type":"1.0.4","cookie":"0.3.1","cookie-signature":"1.0.6","cookiejar":"2.1.1","core-js":"2.5.1","crc":"3.5.0","csrf":"3.0.6","csurf":"1.9.0","csv-parse":"1.2.0","dashify":"0.2.2","deep-equal":"1.0.1","define-properties":"1.1.2","delayed-stream":"1.0.0","depd":"1.1.1","destroy":"1.0.4","detect-browser":"1.7.0","dfa":"1.1.0","director":"1.2.8","duplexer2":"0.0.2","encodeurl":"1.0.1","es6-promise":"4.1.0","escape-html":"1.0.3","escodegen":"1.3.3","esprima":"1.1.1","estraverse":"1.5.1","esutils":"1.0.0","etag":"1.8.1","event-loop-monitor":"0.2.0","express":"4.15.5","express-state":"1.4.0","extend":"3.0.1","falafel":"2.1.0","fast-deep-equal":"1.0.0","fd-slicer":"1.0.1","finalhandler":"1.0.6","flat":"2.0.1","fontkit":"1.7.7","foreach":"2.0.5","form-data":"2.3.1","formidable":"1.1.1","forwarded":"0.1.2","function-bind":"1.1.1","has":"1.0.1","helmet":"3.8.1","hornet-js-components":"5.1.0","hornet-js-utils":"5.1.0","hpp":"0.2.2","http-errors":"1.6.2","intl":"1.2.5","intl-messageformat":"1.3.0","is-buffer":"1.1.6","isarray":"1.0.0","json-schema-traverse":"0.3.1","json-stable-stringify":"1.0.1","json2csv":"3.7.3","jsonify":"0.0.0","linebreak":"0.3.0","lodash":"4.17.4","lodash.clonedeep":"4.5.0","lodash.flatten":"4.4.0","lodash.get":"4.4.2","lodash.set":"4.3.2","lodash.uniq":"4.5.0","methods":"1.1.2","mime":"1.4.1","mime-db":"1.30.0","mime-types":"2.1.17","minimist":"1.2.0","mkdirp":"0.5.1","moxie-zip":"0.0.3","multer":"1.3.0","nodemailer":"4.1.1","object-assign":"3.0.0","object-inspect":"0.4.0","object-keys":"1.0.11","object.assign":"4.0.4","on-finished":"2.3.0","on-headers":"1.0.1","onionskin":"1.1.6","pako":"0.2.9","parseurl":"1.3.1","path-is-absolute":"1.0.1","path-parse":"1.0.5","path-to-regexp":"1.7.0","pdfkit":"0.8.3","pdfmake":"0.1.27","pend":"1.2.0","png-js":"0.1.1","process-nextick-args":"1.0.7","proxy-addr":"1.1.5","qs":"6.5.1","quote-stream":"1.0.2","random-bytes":"1.0.0","range-parser":"1.2.0","raw-body":"2.2.0","readable-stream":"2.3.3","reflect-metadata":"0.1.10","regenerator-runtime":"0.11.0","resolve":"1.5.0","restructure":"0.5.4","safe-buffer":"5.1.1","serialize-javascript":"1.4.0","shallow-copy":"0.0.1","source-map":"0.6.1","static-eval":"0.2.4","static-module":"1.5.0","statuses":"1.4.0","string_decoder":"1.0.3","superagent":"3.5.2","through":"2.3.8","through2":"2.0.3","tiny-inflate":"1.0.2","type-is":"1.6.15","typedarray":"0.0.6","uid-safe":"2.1.0","unicode-properties":"1.1.0","unicode-trie":"0.3.1","util-deprecate":"1.0.2","uuid":"3.0.1","vary":"1.1.2","xtend":"4.0.1","yauzl":"2.8.0"}
-      }
-    }
-  }
+  "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

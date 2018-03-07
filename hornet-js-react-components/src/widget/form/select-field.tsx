@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,7 +91,6 @@ import {
 } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import * as _ from "lodash";
-import HTMLAttributes = __React.HTMLAttributes;
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 
 /**
@@ -115,7 +114,6 @@ export interface SelectFieldProps extends HornetWrittableProps,
 export interface SelectChoice {
     /** Valeur du choix : peut être une chaîne de caractères vide pour un libellé 'Aucun(e)" par exemple */
     value: string;
-
     /** Libellé */
     label?: string;
 
@@ -143,25 +141,54 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
         }
     }
 
+    /**
+     * Génère le rendu spécifique du champ : une liste déroulante dont les éléments correspondent au tableau dataSource
+     * @returns {any}
+     */
+    renderWidget(): JSX.Element {
+        let hasError = this.hasErrors() ? " has-error" : "";
+        let htmlProps = this.getHtmlProps();
+        _.assign(htmlProps, { "className": htmlProps[ "className" ] ? htmlProps[ "className" ] + " selectfield" + hasError : " selectfield" + hasError , value: this.state.currentValue});
+
+        let hasData = this.state.data && this.state.data.length > 0;
+        let hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
+
+        if (this.state.currentValue == undefined) {
+            if (hasDataSource && this.state.items && Array.isArray(this.state.items)) {
+                (htmlProps as any).value = this.state.items[0][this.state.valueKey];
+            } else if (hasData) {
+                (htmlProps as any).value = this.state.data[0][this.state.valueKey];
+            }
+        }
+
+        return (
+            <select onChange={(e) => { this.handleChange(e) }} ref={(elt) => this.registerHtmlElement(elt)} {...htmlProps}>
+                {hasDataSource ? this.renderOptionsDataSource() : null}
+                {hasData ? this.state.data.map(this.renderOption) : null}
+            </select>
+        );
+    }
+
+
     // Setters
     setData(data: SelectChoice[] | any[], cb?): this {
-        this.setState({data: data}, cb);
+        this.setState({ data: data }, cb);
         return this;
     }
 
     setValueKey(key: string, cb?): this {
-        this.setState({valueKey: key}, cb);
+        this.setState({ valueKey: key }, cb);
         return this;
     }
 
     setLabelKey(key: string, cb?): this {
-        this.setState({labelKey: key}, cb);
+        this.setState({ labelKey: key }, cb);
         return this;
     }
 
     /**
      * Override
-     * @param props
+     * @param state
      */
     processHtmlProps(state: SelectFieldProps): void {
 
@@ -201,22 +228,35 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
     }
 
     /**
-     * Génère le rendu spécifique du champ : une liste déroulante dont les éléments correspondent au tableau dataSource
-     * @returns {any}
+     *
+     * @param value
      */
-    renderWidget(): JSX.Element {
-        let hasError = this.hasErrors() ? " has-error" : "";
-        let htmlProps = this.getHtmlProps();
-        _.assign(htmlProps, {"className": htmlProps["className"] ? htmlProps["className"] + " selectfield" + hasError : " selectfield" + hasError});
-
-        let hasData = this.state.data && this.state.data.length > 0;
+    protected selectItemByValue(value) {
         let hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
+        if (hasDataSource) {
+            for (let index = 0; index < this.state.dataSource.results.length; index++) {
+                let element = this.state.dataSource.results[ index ];
+                if (element[ this.state.valueKey ] == value) {
+                    this.state.dataSource.select(element);
+                    break;
+                }
+            }
+        }
+    }
 
-        return (
-            <select ref={(elt) => this.registerHtmlElement(elt)} {...htmlProps} >
-                {hasDataSource ? this.renderOptionsDataSource() : null}
-                {hasData ? this.state.data.map(this.renderOption) : null}
-            </select>
-        );
+    /**
+     * @override
+     */
+    setCurrentValue(value: any): this {
+        super.setCurrentValue(value);
+        this.selectItemByValue(value);
+        return this;
+    }
+
+    /**
+     * @override
+     */
+    protected handleChange(e: React.ChangeEvent<HTMLElement>) {
+        this.setCurrentValue((e.target as any).value);
     }
 }

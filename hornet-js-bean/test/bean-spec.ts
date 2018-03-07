@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -119,13 +119,13 @@ describe("Test of BeanUtils.serialize* : ", () => {
         user2.id = 12;
     });
 
-    it("should create a array of User", (done) => {
+    it("should create a array of Flat object [no instance] ", (done) => {
         let array = [user, user2];
         BeanUtils.serializeObject(User, array).then((result)=> {
             expect(result).not.empty;
             expect(result.length).to.be.eq(array.length);
             _.map(result, function (item) {
-                expect(item).to.be.an.instanceOf(User)
+                expect(item.constructor).to.be.eq(undefined);
             });
             for (var i = 0; i < result.length; i++) {
                 expect(result[i].id).to.be.undefined;
@@ -173,7 +173,7 @@ describe("Test of BeanUtils.serialize* : ", () => {
         }).catch((error) => {
             expect(error).to.be.instanceOf(TechnicalError);
             expect(error.args.message).to.be.equals('Cannot find @Bean for object : 2 .So, we cannot transform it to an object User');
-            done()
+            done(error)
         });
     });
 
@@ -207,7 +207,7 @@ describe("Test of BeanUtils.serialize* : ", () => {
 
     it("should test empty array with mapArray", (done) => {
         BeanUtils.serializeArray(User, []).then((result)=> {
-            expect(result).isArray;
+            expect(result).to.be.an('array');
             expect(result).to.be.empty;
             done();
         }).catch((error)=> {
@@ -217,7 +217,7 @@ describe("Test of BeanUtils.serialize* : ", () => {
 
     it("should test empty array with serializeObject ", (done) => {
         BeanUtils.serializeObject(User, []).then((result)=> {
-            expect(result).isArray;
+            expect(result).to.be.an('array');
             expect(result).to.be.empty;
             done();
         }).catch((error)=> {
@@ -225,16 +225,16 @@ describe("Test of BeanUtils.serialize* : ", () => {
         });
     });
 
-    it("should test class User", (done) => {
+    it("should test Flat object [no instance]", (done) => {
         BeanUtils.serializeObject(User, user).then((result)=> {
-            expect(result).to.be.instanceof(User);
+            expect(result.constructor).to.be.eq(undefined);
             expect(result.id).to.be.undefined;
             expect(result.name).to.be.eql(user.name);
             expect(result.adress.label).to.be.eql(user.adress.label);
             expect(result.adress.id).to.be.undefined;
             expect(result.list.length).to.be.eq(user.list.length);
             for (var j = 0; j < result.list.length; j++) {
-                expect(result.list[j]).to.be.instanceOf(Adress);
+                expect(result.list[j].constructor).to.be.eq(undefined);
                 expect(result.list[j].id).to.be.undefined;
                 expect(user.list[j].id).to.be.exist;
                 expect(result.list[j].label).to.be.eq(user.list[j].label);
@@ -247,14 +247,14 @@ describe("Test of BeanUtils.serialize* : ", () => {
 
     it("should test class UserDTO ", (done) => {
         BeanUtils.serializeObject(UserDTO, user).then((result)=> {
-            expect(result).to.be.instanceof(UserDTO);
+            expect(result.constructor).to.be.eq(undefined);
             expect(result.id).to.be.undefined;
             expect(result.name).to.be.eql(user.name);
             expect(result.adress.label).to.be.eql(user.adress.label);
             expect(result.adress.id).to.be.undefined;
             expect(result.list.length).to.be.eq(user.list.length);
             for (var j = 0; j < result.list.length; j++) {
-                expect(result.list[j]).to.be.instanceOf(AdressDTO);
+                expect(result.list[j].constructor).to.be.eq(undefined);
                 expect(result.list[j].id).to.be.undefined;
                 expect(user.list[j].id).to.be.exist;
                 expect(result.list[j].label).to.be.eq(user.list[j].label);
@@ -349,7 +349,7 @@ describe("Test of BeanUtils.map* : ", () => {
         }).catch((error) => {
             expect(error).to.be.instanceOf(TechnicalError);
             expect(error.args.message).to.be.equals('Cannot find @Bean for object : 2 .So, we cannot transform it to an object User');
-            done()
+            done(error)
         });
     });
 
@@ -391,7 +391,7 @@ describe("Test of BeanUtils.map* : ", () => {
 
     it("should test empty array with mapArray", (done) => {
         BeanUtils.mapArray(User, []).then((result)=> {
-            expect(result).isArray;
+            expect(result).to.be.an('array');
             expect(result).to.be.empty;
             done();
         }).catch((error)=>{
@@ -401,7 +401,7 @@ describe("Test of BeanUtils.map* : ", () => {
 
     it("should test empty array with mapObject ", (done) => {
         BeanUtils.mapObject(User, []).then((result)=> {
-            expect(result).isArray;
+            expect(result).to.be.an('array');
             expect(result).to.be.empty;
             done();
         }).catch((error)=>{
@@ -537,10 +537,11 @@ describe("Test of BeanUtils.map* : ", () => {
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 describe("Test of BeanUtils.clone* : ", () => {
-    it.skip("should do a dummy deep equal test", () => {
+    it("should do a dummy deep equal test", (done) => {
         let array = [user, user2];
         let array2 = _.cloneDeep(array);
         expect(array).to.deep.eql(array2);
+        done();
     });
 
     it("should do a cloneArray deep equal test", (done) => {

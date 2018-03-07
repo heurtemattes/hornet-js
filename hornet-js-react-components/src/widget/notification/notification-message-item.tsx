@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,6 +95,7 @@ export interface MessageItemProps extends HornetComponentProps {
     text: string;
     anchor?: string;
     className?: string;
+    id?:string;
 }
 
 /**
@@ -105,13 +106,13 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
     setFocus(e: React.MouseEvent<HTMLElement>) {
         e.preventDefault();
         let element = document.getElementsByName(this.state.field) ?
-            document.getElementsByName(this.state.field)[0] : document.getElementById(this.state.field);
+            document.getElementsByName(this.state.field)[ 0 ] : document.getElementById(this.state.field);
         if (element && element.focus) {
             Accordion.handleFocusOnAccordion(element);
             element.focus();
         } else {
             element = document.getElementsByName(this.state.field + "$text") ?
-                document.getElementsByName(this.state.field + "$text")[0] :
+                document.getElementsByName(this.state.field + "$text")[ 0 ] :
                 document.getElementById(this.state.field + "$text");
             if (element && element.focus) {
                 element.focus();
@@ -124,11 +125,12 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
     /**
      * Rendu Lien
      * @returns {any}
-     * @private
+     * @protected
      */
-    renderLink() {
+    protected renderLink() {
+        let id = this.props.id? this.props.id : null;
         return (
-            <a href="#" onClick={this.setFocus} className={this.props.className}>
+            <a href="#" onClick={this.setFocus} className={this.props.className} id={id}>
                 {this.i18n(this.state.text)}
                 {this.props.children}
             </a>
@@ -138,9 +140,9 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
     /**
      * Rendu span
      * @returns {any}
-     * @private
+     * @protected
      */
-    renderSpan() {
+    protected renderSpan() {
         return (
             <span className={this.props.className}>
                 {this.i18n(this.state.text)}

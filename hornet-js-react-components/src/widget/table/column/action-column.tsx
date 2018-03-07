@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,6 +107,7 @@ export interface ActionColumnProps extends ColumnProps {
     /** pour valoriser l'indicateur aria-has-popup */
     hasPopUp?: boolean;
     disabled?: Function | boolean;
+    label?: string;
 }
 
 export interface ActionColumnState extends ColumnState {
@@ -119,7 +120,7 @@ export interface ActionColumnState extends ColumnState {
 export class ActionColumn<T extends ActionColumnProps, S extends ActionColumnState> extends Column<ActionColumnProps, ActionColumnState> {
 
     static defaultProps = Column.mergeObjects(Column.defaultProps, {
-        defaultStyle: {"textAlign": "center", "paddingLeft": 0, "width": "1.7em"},
+        defaultStyle: { "textAlign": "center", "paddingLeft": 0, "width": "1.7em" },
         sortable: false,
         hiddenable: false
     });
@@ -128,7 +129,7 @@ export class ActionColumn<T extends ActionColumnProps, S extends ActionColumnSta
     public readonly props: ActionColumnProps;
 
     /**
-     * Getter pour le composant générant le entête de colonne
+     * Getter pour le composant générant l'entête de colonne
      * @return Class<HeaderCell<HeaderCellProps, any>>
      */
     public getHeaderCell(): Class<ActionHeaderCell<ActionHeaderCellProps, any>> {

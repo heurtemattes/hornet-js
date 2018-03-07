@@ -7,11 +7,11 @@ Ce module est basé sur *PassportJs* qui est un Middleware d'authentification po
 
 ## Prérequis #
 
-* NodeJS 6.X
+* NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -21,7 +21,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet-js-passport`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -29,7 +29,9 @@ Compiler les sources typescript de `hornet-js-passport`
 Ajouter au package.json
 
 ```shell
-
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
     "hornet-js-passport": "5.1.X",
   }
@@ -39,9 +41,7 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-
-    $ hb install
-    
+hb install
 ```
 
 ## PassportJs et Stratégies
@@ -71,7 +71,7 @@ Ensuite il faut préciser la ou les stratégies à utiliser, exemple :
 
 ```javascript
 
-passport.use(new authentication.StrategyArobas());
+passport.use(new authentication.StrategySaml());
 
 ```
 
@@ -97,7 +97,7 @@ server.use(function ensureAuthenticated(req, res, next) { // test si l'utilisate
     if (req.isAuthenticated()) {
         return next();
     }
-    passport.authenticate('cas')(req, res, next);
+    passport.authenticate('saml')(req, res, next);
 });
 
 ```
@@ -117,7 +117,7 @@ On instancie le module d'authentification et on lui ajoute les stratégies d'aut
 
 #### SAML
 
-Cette stratégie s'appuie sur la classe de configuration *hornet-js-passport/src/cas/cas-configuration*, et l'initialisation des différents attributs est faite lors de l'instanciation de l'objet de configuration :
+Cette stratégie s'appuie sur la classe de configuration *hornet-js-passport/src/strategy/saml/saml-configuration*, et l'initialisation des différents attributs est faite lors de l'instanciation de l'objet de configuration :
 
 - **`logoutCallbackUrl`**: Page de déconnexion de l'application
 - **`hostUrlReturnTo`**: Nom du serveur applicatif par défaut
@@ -128,6 +128,7 @@ Cette stratégie s'appuie sur la classe de configuration *hornet-js-passport/src
 - **`privateCert`**: Certificat de fournisseur de services
 - **`availableIdp`**: IDPs déclarés au sein de l'application: objet de type `IdentityProviderProps` ou tableau d'objet de type `IdentityProviderProps`
 - **`verifyFunction`**: Fonction de callback permettant de traiter la réponse du flux SAML
+- **`isMetadataAccessible`**: Détermine si le metadata de l'application est accessible via la route `/metadata-saml`
 
 ##### Propriétés de l'/des IDP(s): `availableIdp`
 
@@ -137,7 +138,8 @@ Le module `passport-saml` permet la gestion d'un ou plusieurs IDP. Lors de sa d�
 - **`shibbolethUrl`**: URL pointant vers le fichier des metadata liés à l'IDP
 - **`httpsCert`**: Certificat de l'IDP
 
-Ces 3 propriétés sont suffisantes pour la configuration d'un IDP.
+La propriété `httpsCert` n'est pas nécessaire dans le cas où le fichier metadata de l'idp (renseigné via la propriété `shibbolethUrl`) n'est pas une Url dynamique sécurisée (https).
+
 Un Parser SAML permet ensuite de récupérer les informations utiles à la connexion/déconnexion auprès de l'IDP. Ces informations sont présentes dans le fichier metadata mis à disposition depuis l'url `shibbolethUrl`. Le parser permet alors de récupérer:
 
 - **`entryPoint`**: adresse de redirection vers l'IDP lors de l'authentification
@@ -164,24 +166,28 @@ Dans le fichier de configuration de l'application **default.json** :
 
 ```javascript
 
-"saml": {
-  "enabled": true,
-  "configuration": {
-    "hostUrlReturnTo": "http://localhost:8888",
-    "callbackUrl": "/login",
-    "logoutCallbackUrl": "/logout",
-    "issuer": "http://localhost:8888/applitutoriel",
-    "idp": [
-      {
-        "name": "toto",
-        "shibbolethUrl": "{metadata-idp.xml}",
+"authentication": {
+    "loginUrl": "/login",
+    "logoutUrl": "/logout",
+    "saml": {
+      "enabled": true,
+      "configuration": {
+        "hostUrlReturnTo": "http://localhost:8888",
+        "callbackUrl": "/login",
+        "logoutCallbackUrl": "/logout",
+        "issuer": "http://localhost:8888/applitutoriel",
+        "idp": [
+          {
+            "name": "toto",
+            "shibbolethUrl": "{metadata-idp.xml}",
+          }
+        ,{
+            "name": "titi",
+            "shibbolethUrl": "{metadata-idp.xml}",
+          }
+        ]
       }
-    ,{
-        "name": "titi",
-        "shibbolethUrl": "{metadata-idp.xml}",
-      }
-    ]
-  }
+    }
 }
 
 ```
@@ -236,90 +242,12 @@ server.start();
 
 ```
 
-#### CAS (Deprecated)
 
-Cette stratégie s'appuie sur la classe de configuration *hornet-js-passport/src/cas/cas-configuration*, et l'initialisation des différents attributs est faite lors de l'instanciation de l'objet de configuration :
+##### Génération du fichier metadata.xml de l'application
 
-* appLoginPath : url relative de l'application déclenchant le process de connexion.
-* appLogoutPath : url relative de l'application déclenchant le process de déconnexion.
-* hostUrlReturnTo : url de retour après authentification sur le CAS.
-* casValidateUrl : url absolue du service de validation des tichets CAS.
-* casLoginUrl : url absolue de connexion du CAS.
-* casLogoutUrl : url absolue de déconnexion du CAS.
-* verifyFunction (facultatif) : fonction à utiliser pour la récupération/vérification des infos de l'utilisateur (par défaut, c'est celle qui est définie dans la stratégie (getUserInfo) qui s'applique
+Afin d'être référencé auprès de l'IDP, il faut au préalable fournir un fichier metadata auprès de ce dernier. Une fois les certificats générés et l'application paramétrée,
+le `metadata` applicatif sera accessible depuis la route: ${urlDeMonApplication}/metadata-saml
 
-Cette stratégie reprend les principes de connexion à CAS, elle est donc réutilisable pour n'importe quel serveur CAS.
-
-1. Vérifie la présence d'un ticket à valider, sinon appelle la méthode 'pass' de la stratégie (PassportJs), qui appelle le middleware suivant et fin.
-2. Lance la validation du ticket avec l'url fournie dans la configuration.
-3. Réception de la réponse CAS. Si il y a eu une erreur, appel du middleware de gestion des erreurs.
-4. Utilise la fonction verifyAuthentication pour vérifier l'utilisateur (ne fait rien par défaut), puis appelle 'success' sur la stratégie (PassportJs).
-
-
-Ensuite on instancie simplement la stratégie avec cette objet de configuration.
-
-##### Exemple d'utilisation pour une application
-
-Dans le fichier de configuration de l'application **default.json** :
-
-```javascript
-
-  "authentication": {
-    "loginUrl": "/login",
-    "logoutUrl": "/logout",
-    "cas": {
-      "configuration": {
-        "hostUrlReturnTo": "http://localhost:8888",
-        "urls": {
-          "casValidate": "http://cas-server-dns/cas-server/serviceValidate",
-          "casLogin": "http://cas-server-dns/cas-server/login",
-          "casLogout": "http://cas-server-dns/cas-server/logout"
-        }
-      }
-    }
-  }
-
-```
-
-
-Dans le fichier **server.ts** :
-
-```javascript
-
-// Authent passport
-import { PassportAuthentication } from "hornet-js-passport/src/passport-authentication";
-import { AuthenticationtConfiguration } from "hornet-js-passport/src/authentication-configuration";
-// Cas
-import { CasConfiguration } from "hornet-js-passport/src/strategy/cas/cas-configuration";
-import { CasStrategy } from "hornet-js-passport/src/strategy/cas/cas-strategy";
-
-let configAuth = new AuthenticationtConfiguration(
-Utils.config.get("authentication.loginUrl"),
-Utils.config.get("authentication.logoutUrl"));
-
-let authent = new PassportAuthentication(configAuth);
-
-let configuration = new CasConfiguration(
-    Utils.config.get("authentication.loginUrl"),
-    Utils.config.get("authentication.logoutUrl"),
-    Utils.config.get("authentication.cas.configuration.hostUrlReturnTo"),
-    Utils.config.get("authentication.cas.configuration.urls.casValidate"),
-    Utils.config.get("authentication.cas.configuration.urls.casLogin"),
-    Utils.config.get("authentication.cas.configuration.urls.casLogout"),
-    (login, done) => {
-        // mock d'un user avec role ADMIN
-        return done(null, {name: login, roles: [{name: Roles.ADMIN_STR}]});
-    }
-);
-
-authent.initStrategy(new CasStrategy(configuration));
-hornetMiddlewareList.addAfter(authent.getMiddleware(), HornetMiddlewares.SessionMiddleware);
-
-
-var server = new Server(configServer, hornetMiddlewareList);
-server.start();
-
-```
 
 
 ## Licence

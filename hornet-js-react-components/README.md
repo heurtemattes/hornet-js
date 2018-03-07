@@ -1,6 +1,6 @@
 # hornet-js-react-components
 
-hornet-js-bean fournit un module pour la gestion des composants graphiques. Les composants graphiques sont implémentés avec la librairie React.
+hornet-js-react-components fournit un module pour la gestion des composants graphiques. Les composants graphiques sont implémentés avec la librairie React.
 
 Les composants graphique du framework :
 
@@ -32,14 +32,13 @@ Les composants graphique du framework :
 * **ToolTip** :  Composant qui affiche une icône d'information qui laisse apparaitre une infobulle au survol du pointeur.
 
 
-
 ## Prérequis #
 
-* NodeJS 6.X
+* NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-    $ npm install -g hornet-js-builder
+npm install -g hornet-js-builder
 ```
 
 ## Initialisation #
@@ -49,7 +48,7 @@ Récupérer les sources sur projet.
 Compiler les sources typescript de `hornet-js-react-components`
 
 ```shell
-    $ hb compile
+hb compile
 ```
 
 ## Utilisation dans un projet #
@@ -57,11 +56,12 @@ Compiler les sources typescript de `hornet-js-react-components`
 Ajouter au package.json
 
 ```shell
-
+  "tsDefinitionDependencies": {
+    "hornet-js-ts-typings": "5.1.X"
+  }
   "appDependencies": {
     "hornet-js-react-components": "5.1.X",
     "hornet-js-core": "5.1.X",
-    "hornet-js-ts-typings": "5.1.X",
     "hornet-js-utils": "5.1.X"
   }
   
@@ -70,12 +70,8 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-
-    $ hb install
-    
+hb install
 ```
-
-
 ## Licence
 
 `hornet-js` est sous [licence cecill 2.1](./LICENSE.md).

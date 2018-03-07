@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,10 @@ import * as _ from "lodash";
 import { Picto } from "src/img/picto";
 import * as classNames from "classnames";
 import { InputField } from "src/widget/form/input-field";
-
+import { VALUE_CHANGED_EVENT } from "./event";
+import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
+import * as ReactDOM from "react-dom";
+import { Alert } from "src/widget/dialog/alert";
 /**
  * Champ de formulaire Hornet de type zone de texte (textarea)
  */
@@ -96,14 +99,45 @@ export interface TextAreaFieldProps extends HornetWrittableProps,
     HornetClickableProps,
     HornetBasicFormFieldProps {
     resettable?: boolean;
+    displayCharNumber?: boolean;
+    extendable?: boolean;
+    maxChar?: number;
+    showAlert?: boolean;
+    alertMessage?: string;
+    alertTitle?: string;
+    charLabel?: string;
 }
 
 export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
 
+    protected refChar;
+    protected element;
+    protected errorShowed: boolean = false;
+
+    public readonly props: Readonly<TextAreaFieldProps>;
+
     static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
         rows: 6,
-        resettable: true
+        resettable: true,
+        displayCharNumber: true,
+        extendable: true,
+        showAlert: true
     });
+
+    /**
+     * @inheritDoc
+     */
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.state.valued != nextState.valued || this.state.currentValue != nextState.currentValue || this.state.errors != nextState.errors;
+        ;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    componentDidMount() {
+        this.setClientHeight();
+    }
 
     /**
      * Génère le rendu spécifique du champ
@@ -117,12 +151,21 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
         _.assign(htmlProps, {"className": htmlProps["className"] ? htmlProps["className"] + hasError : hasError});
 
         return (
-            <div>
-                <textarea onChange={this.valueChange} ref={(elt) => this.registerHtmlElement(elt)}  {...htmlProps}>
+            <div className={"textarea-container"}>
+                {this.state.displayCharNumber ? <div className="textarea-character-value" ref={(elt) => {
+                    this.refChar = elt
+                }}></div> : null}
+                <textarea onChange={this.valueChange} ref={
+                    (elt) => {
+                        this.registerHtmlElement(elt);
+                        this.element = elt
+                    }} {...htmlProps}>
                     {this.state.currentValue}
                 </textarea>
                 {this.state.resettable && this.state.valued && !this.state.readOnly && !this.state.disabled ? this.renderResetButton() :
                     <div/>}
+                <Alert ref="alert" message={""}
+                       onClickClose={this.closeAlert}/>
             </div>
         );
     }
@@ -154,10 +197,38 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                   id={this.props.id || this.props.name + "ResetButton"}
             >
                 <a {...aProps}>
-                    <img src={Picto.grey.close}/>
+                    <img src={Picto.grey.close} alt="reset"/>
                 </a>
             </span>
         );
+    }
+
+    /**
+     * règle la taille du textarea en fonction du texte présent à l'intérieur de celui ci
+     * @param event
+     */
+    private setClientHeight(event?): void {
+        if (this.props.extendable) {
+            let text = event ? event.target.value : this.element.textContent;
+            if (text !== undefined && text !== null) {
+                let height = (text.split("\n").length + 1 ) * 25;
+                let finalHeight = this.props.maxLength && this.props.maxLength < this.state.height ? this.props.maxLength : height;
+                this.element.style.height = finalHeight + "px";
+                this.element.height = finalHeight;
+
+                // recalcul de la hauteur à l'aide de la taille du scroll
+                let elem = document.getElementById(this.element.id) as any;
+                let elemheight = elem.height;
+                //cas de lapparition du scroll
+                while (elemheight < this.element.scrollHeight) {
+                    elemheight = elemheight + 25;
+                }
+                let elemFinalHeight = this.props.maxLength && this.props.maxLength < this.state.height ? this.props.maxLength : elemheight;
+                elem.style.height = elemFinalHeight + "px";
+                elem.height = elemFinalHeight;
+
+            }
+        }
     }
 
     /**
@@ -165,8 +236,46 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
      * @param event
      */
     valueChange(event: any) {
+
+        if (this.state.extendable) {
+            this.setClientHeight(event)
+        }
+
+        // mise à jour du texte d'affichage du nombre de caractère
+        let value = event.target.value;
+        if (value !== 0) {
+            this.refChar.innerHTML = this.props.charLabel ?
+                this.props.charLabel.replace('{count}', value.length) :
+                this.i18n("textarea.charLabel", {count: value.length});
+        } else {
+            this.refChar.innerHTML = "";
+        }
+
+        //affichage de l'alerte indiquant que le nombre de caractère est dépassé
+        if (this.props.maxChar && value.length > this.props.maxChar && !this.errorShowed) {
+
+            if (this.props.showAlert) {
+                //affichage de l'alerte
+                let message = this.props.alertMessage ?
+                    this.props.alertMessage.replace('{count}', value.length).replace('{maxChar}', this.props.maxChar.toString()) :
+                    this.i18n("textarea.alertMessage", {count: value.length, maxChar: this.props.maxChar});
+                let title = this.props.alertTitle ?
+                    this.props.alertTitle.replace('{count}', value.length).replace('{maxChar}', this.props.maxChar.toString()) :
+                    this.i18n("textarea.alertTitle", {count: value.length, maxChar: this.props.maxChar});
+
+                this.showAlert(message, title);
+            }
+
+            this.refChar.className = this.refChar.className.replace(" textarea-too-many-char", "");
+            this.refChar.className += " textarea-too-many-char";
+        }
+        if (value.length <= this.props.maxChar && this.errorShowed) {
+            this.errorShowed = false;
+            this.refChar.className = this.refChar.className.replace(" textarea-too-many-char", "");
+        }
+
         if (event.target.value && !this.state.valued) {
-            this.setState({valued: true, currentValue: event.target.value});
+            this.setState({valued: true, currentValue: value});
         } else if (!event.target.value && this.state.valued) {
             this.setState({valued: false});
         }
@@ -179,8 +288,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
      */
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
-
-        this.setState({valued: (value !== "" && value)});
+        this.setState({valued: (value !== "" && value), currentValue: value});
         return this;
     }
 
@@ -200,8 +308,33 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
         if(this.htmlElement && this.htmlElement.onchange) {
             this.htmlElement.onchange();
         }
-
+        this.refChar.innerHTML = "";
         this.htmlElement.value = "";
-        this.setState({valued: false});
+        fireHornetEvent(VALUE_CHANGED_EVENT.withData(this.htmlElement));
+        this.setState({valued: false}, () => {
+            this.setClientHeight();
+        });
+    }
+
+    /**
+     * Méthode déclenchant la fermeture de l'alerte
+     */
+    protected closeAlert(): void {
+        this.errorShowed = true;
+        (this.refs.alert as Alert).close();
+    }
+
+    /***
+     * Déclenche l'affichage de l'alerte
+     * @param message
+     * @param title
+     * @param {Function} fct fonction exécutée sur la validation
+     */
+    protected showAlert(message: string, title: string): void {
+        (this.refs.alert as Alert).setMessage(message);
+        (this.refs.alert as Alert).setTitle(title);
+        (this.refs.alert as Alert).setOnClickOk(() => {
+            this.closeAlert();
+        }).open();
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.1.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -142,6 +142,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
                 position={Position.BOTTOMRIGHT}
                 closeClick={false}
                 title={this.state.title}
+                ariaLabel={this.state.title}
             />
         );
     }
@@ -163,7 +164,8 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
             onChange: column.action,
             title: column.label,
             name: this.props.columns.id + "-checkbox-" + column.keyColumn,
-            id: this.props.columns.id + "-checkbox-" + column.keyColumn
+            key: this.props.columns.id + "-checkbox-" + column.keyColumn + "-" + checked,
+            id: this.props.columns.id + "-checkbox-" + column.keyColumn,
         };
 
         return (
@@ -171,7 +173,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
                 <div className="toggle-column-item-checkbox fl">
                     <CheckBox {...checkBoxProps}/>
                 </div>
-                <div className="toggle-column-item-label fl">{column.title}</div>
+                <div className="toggle-column-item-label fl"><label htmlFor={checkBoxProps.id}>{column.title}</label></div>
             </div>
         );
     }
@@ -219,15 +221,15 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
 
         Promise.resolve(
             this.props.columns.columns.map((column) => {
-                this.toggleColumn(column.keyColumn, !checked);
-                this.toggleCheckBox(column.keyColumn, !checked);
+                this.toggleColumn(column.keyColumn, checked);
+                this.toggleCheckBox(column.keyColumn, checked);
                 fireHornetEvent(new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY").withData({
                     column: column.keyColumn,
-                    isVisible: !checked
+                    isVisible: checked
                 }));
             })
         ).then(() => {
-            this.toggleCheckBox(SELECTALL_KEYCOLUMN, !checked);
+            this.toggleCheckBox(SELECTALL_KEYCOLUMN, checked);
         });
 
         // On exécute la méthode applicative de changement si elle a été déclarée
@@ -248,8 +250,8 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
         // Récupération de l'état de la checkbox
         let checkbox: HTMLInputElement = (document.getElementsByName(this.props.columns.id + "-checkbox-" + keyColumn)[0] as any);
 
-        this.toggleColumn(keyColumn, !checkbox.checked);
-        this.toggleCheckBox(keyColumn, !checkbox.checked);
+        this.toggleColumn(keyColumn, checkbox.checked);
+        this.toggleCheckBox(keyColumn, checkbox.checked);
 
         if (this.props.selectAllItem) {
             this.controlSelectAllChecked();
