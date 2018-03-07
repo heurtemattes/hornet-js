@@ -1,11 +1,12 @@
 # hornet-js
 
 Le framework `Hornet.js` est un framework open-source conçu pour développer des applications web basé sur le language `typescript`.
+Il est conçu selon le principe d'`isomorphisme`, c'est à dire que le code d'une application Hornet s'exécute aussi bien dans un navigateur web que sur un serveur d'application Node.js.
 
 Il permet de répondre aux besoins posés par les référentiels généraux de l'état Français pour les administrations :
-* [RGS](http://references.modernisation.gouv.fr/securite) : Référentiel Général de Sécurité
-* [RGI](http://references.modernisation.gouv.fr/interoperabilite) : Référentiel Général d'Interopérabilité
-* [RGAA](https://references.modernisation.gouv.fr/rgaa-accessibilite/) : Référentiel Général d'Accessibilité pour les Administrations 
+* RGS : Référentiel Général de Sécurité
+* RGI : Référentiel Général d'Interopérabilité
+* RGAA : Référentiel Général d'Accessibilité pour les Administrations
 
 Il se distingue par la mise en place de deux filières  :
 * hornet.js
@@ -26,26 +27,30 @@ D'un point de vue technique, il est lui-même composé de briques open-source or
 * `Superagent` : composant JavaScript pour l'exécution d'appels http
 * `Webpack` : outil de création de paquetages (JavaScript, CSS, ...) pour les navigateurs web
 
+<br/>
 
-## Prérequis #
+![Presentation generale](./doc/sources/hornet-diagramme-5.1.png)
+
+## Prérequis
 
 * NodeJS 8.X
 * hornet-js-builder 1.X installé en global:
 
 ```shell
-npm install -g hornet-js-builder
+    $ npm install -g hornet-js-builder
 ```
-## Initialisation #
+
+## Initialisation
 
 Récupérer les sources sur projet.
 
 Compiler les sources typescript de `hornet.js`
 
 ```shell
-hb compile
+    $ hb compile
 ```
 
-## Utilisation dans un projet #
+## Utilisation dans un projet
 
 Ajouter au package.json
 
@@ -61,13 +66,13 @@ Ajouter au package.json
 Puis lancer la commande :
 
 ```shell
-hb install
+    $ hb install
 ```
-## Hornet.js
 
-## Architecture
+# Architecture Hornet.js
 
-### Fonctionnement
+## Fonctionnement
+
 
 Principe de fonctionnement du framework en mode isomorphique.
 
@@ -97,7 +102,20 @@ Cinématique de rendu serveur / SPA :
 
 Chaque fragment HTML, correspondant aux éléments de page, est conçu sous forme de composant pour être indépendant de son conteneur.
 
-## Architecture technique
+
+### Diagrammes de séquence
+
+Ci-dessous sont présentés les schémas généraux de déroulements des échanges dans le pattern implémenté dans Hornet en mode SPA (navigateur web) et rendu serveur (serveur NodeJS).
+
+#### Suite des actions pour le rendu côté serveur
+
+![Pattern Rendu d'une page côté serveur](./doc/sources/pattern-rendu-serveur.png)
+
+#### Suite des actions pour le rendu côté client
+
+![Pattern Rendu d'une page côté serveur](./doc/sources/pattern-rendu-client.png)
+
+# Architecture technique
 
 Le module applicatif de présentation a pour fonction de fournir l'IHM de l'application.
 
@@ -113,28 +131,23 @@ Les principaux composants techniques intervenant dans le module applicatif de pr
 * `Webpack` : outil de création de paquetages (JavaScript, CSS, ...) pour les navigateurs web
 * `Gulp` : outil pour la création de tâches de développement
 
-### Navigateur web
+## Pattern d’architecture Hornet
 
-Dans Node.js les interactions proviennent de requêtes http. Celles-ci sont prises en charge par le framework `Express` avant d'intégrer le déroulement du pattern Hornet.
+Le schéma ci-dessous explique les responsabilités dans les grandes lignes de chaque élément.
 
-### Architecture Hornet
+![Pattern](./doc/sources/pattern-hornet.png)
 
-Ci-dessous les composants qui permettent de remplir les différentes responsabilités définies dans le pattern.
+### Actions
 
-#### Actions
+Les actions portent les traitements de l’application. Leur réalisation est à la charge du développeur de l’application.
 
-Les actions sont exécutées côté serveur et portent les traitements de l’application. Les services externes sont appelés depuis les actions afin d’effectuer les traitements demandés par l’utilisateur.
+Les services externes sont appelés depuis les api afin d’effectuer les traitements demandés par l’utilisateur. Les retours des services externes sont transmis aux actions qui, elles mêmes, les re-dispatchent à la vue.
 
-Chaque **action** doit être une fonction retournant une `Promise` effectuant l’action à proprement parler (au sens métier). Ce fonctionnement est nécessaire afin de permettre au `routeur` :
+### Routeur
 
-* de savoir quand effectuer le rendu de la page côté serveur.
-* de pouvoir désactiver les actions lors du premier affichage de la page côté client pour éviter un double appel des API externes (serveur puis client).
+Ce composant est le point central de la navigation. Il permet de gérer de manière identique la navigation au sein de l’application que ce soit côté client ou côté serveur (nodeJs).
 
-#### Routeur
-
-Ce composant est le point central de la navigation. Il permet de gérer de manière identique la navigation au sein de l’application que ce soit côté client (avec ou sans JavaScript) ou côté serveur.
-
-Ce composant est configuré à partir d’un ensemble de « routes » qui viennent faire le lien entre une URL et les actions du pattern (dans son implémentation isomorphe).
+Ce composant est configuré à partir d’un ensemble de « routes » qui viennent faire le lien entre une URL et les actions du pattern décrit ci-dessus.
 
 Le routeur d'Hornet s'appuie sur le composant [Director](http://github.com/flatiron/director).
 
@@ -143,14 +156,47 @@ Les particularités :
 * Transmission des données `POST` par une méthode spécifique afin de ne pas modifier l’url du navigateur
 * Utilisation du mode « historique » html5 (mode `pushState` à la place de la notation `!#`) afin d’uniformiser les urls entre la partie client et serveur.
 
-#### Vues
+Le routeur se décline en 2 parties:
+
+* routerPage: permet de router vers le composant Page associé à la route appelée
+* routerData: permet d'exécuter l'action associée à la route appelée
+
+### Vues
 
 Les vues sont les composants servant à produire le code html affiché à l'utilisateur.
 
+Les données permettant d'alimenter la vue doivent être récupérées en utilisant la méthode  `getService` du composant page, au sein de la méthode `prepareClient`. 
+La méthode `prepareClient` est déclenchée lorsque le composant Page est monté (à travers la méthode `componentDidMount` propre au [cycle de vie React](https://facebook.github.io/react/docs/react-component.html)).
+
+
 Les composants de cette brique utilisent le moteur de rendu [React](https://reactjs.org/ ou https://github.com/facebook/react/) :
 
-## Licence
+* Un rendu des composants à partir d’un template JSX/TSX/JavaScript
+* Une gestion des évènements permettant un binding unidirectionnel (vue -> modèle).
+
+Les composants graphiques sont implémentés avec la librairie React et les contrôles de surface des formulaires sont décrits avec [ajv](https://github.com/epoberezkin/ajv) 
+
+
+
+## Diagrammes  et enchainement des différentes couches
+
+Ci-dessous sont présentés les schémas généraux des différentes couches et de l'enchainement entre elles.
+
+### JS frontend
+
+![Pattern Rendu d'une page côté serveur](./doc/sources/architecture-logique-js-frontend.png)
+
+### JS backend
+
+![Pattern Rendu d'une page côté serveur](./doc/sources/architecture-logique-js-backend.png)
+
+# Exemple
+
+Un exemple d'implémentation d'application basé sur ce framework est disponible sur https://github.com/diplomatiegouvfr/applitutoriel-modules ainsi qu'une page github https://diplomatiegouvfr.github.io/applitutoriel-online
+
+# Licence
 
 `hornet-js` est sous [licence cecill 2.1](./LICENSE.md).
 
 Site web : [http://www.cecill.info](http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html)
+
