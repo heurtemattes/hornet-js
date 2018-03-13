@@ -189,7 +189,7 @@ export class Form extends AbstractForm<FormProps, any> {
         this.state.notifId = props.notifId != null ? props.notifId : "Form-" + (Form.idx++);
 
         this.listen(VALUE_CHANGED_EVENT, (ev: HornetEvent<any>) => {
-            if (ev.detail.form.id == this.state.id) {
+            if (ev.detail.form.id == this.state.id && this.state.onFormChange) {
                 this.state.onFormChange();
             }
         });

@@ -407,9 +407,13 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
 
         let button;
         if (notifType != notificationType.INFOS) {
-            button = <button className="error-button-open" ref={(btnError) => (this.btnError = btnError)} onClick={this.handleClickShowError.bind(this)} title={"Afficher/Masquer"} > Afficher/Masquer</button >
+            button = <button type="button" className="error-button-open" ref={(btnError) => (this.btnError = btnError)}
+                             onClick={this.handleClickShowError.bind(this)} title={"Afficher/Masquer"}>
+                Afficher/Masquer</button>
         } else {
-            button = <button className="info-button" ref={(btnInfo) => (this.btnInfo = btnInfo)} onClick={this.handleClickRemove.bind(this, idMessages)} title={"Supprimer"}>Supprimer</button>
+            button = <button type="button" className="info-button" ref={(btnInfo) => (this.btnInfo = btnInfo)}
+                             onClick={this.handleClickRemove.bind(this, idMessages)} title={"Supprimer"}>
+                Supprimer</button>
         }
 
         let CustomContainertStyle = (notifType == notificationType.PERSONNALS) ? { border: "0.063em solid " + this.state.color } : {};

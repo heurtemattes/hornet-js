@@ -1,0 +1,9 @@
+node_modules
+**/node_modules
+**/definition-ts
+**/src/**/*.js
+**/src/**/*.js.map
+**/test/**/*.js
+**/test/**/*.js.map
+**/package.json
+**/test_report

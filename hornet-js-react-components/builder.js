@@ -110,6 +110,9 @@ module.exports = {
             clientExclude: {
                 modules: ["cluster", "continuation-local-storage", "config", "cluster"]
             }
+        },
+        typescript: {
+            bin: __dirname + "/node_modules/build/typescript"
         }
     }
 };

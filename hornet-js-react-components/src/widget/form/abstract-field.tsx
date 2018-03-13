@@ -934,11 +934,13 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      *  si c'est le cas on effecteur un scroll du double de la hauteur du bandeau
      */
     handleSimulateScroll() {
-        let elementWithFocusPosTop = this.htmlElement ? this.htmlElement.getBoundingClientRect().top : this.multipleElement[ 0 ].getBoundingClientRect().top;
-        let stickyElmtPos = (document.getElementById("banner")) ? document.getElementById("banner").offsetHeight : null;
+        if (this.htmlElement || this.multipleElement) {
+            let elementWithFocusPosTop = this.htmlElement ? this.htmlElement.getBoundingClientRect().top : this.multipleElement[0].getBoundingClientRect().top;
+            let stickyElmtPos = (document.getElementById("banner")) ? document.getElementById("banner").offsetHeight : null;
 
-        if (elementWithFocusPosTop <= stickyElmtPos) {
-            window.scrollBy(0, -(window.innerHeight / 2));
+            if (elementWithFocusPosTop <= stickyElmtPos) {
+                window.scrollBy(0, -(window.innerHeight / 2));
+            }
         }
     }
 

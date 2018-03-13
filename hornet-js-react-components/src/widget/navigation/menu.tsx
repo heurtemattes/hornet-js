@@ -267,13 +267,14 @@ export class Menu extends HornetComponent<MenuProps, any> {
 
         return (
             <button className={classnames(buttonClasses)}
-                onClick={this.handleToggleMenu.bind(this)}
-                aria-controls="menu-container"
-                aria-expanded={this.state.isMenuActive}
-                aria-haspopup={true}
-                ref={(button) => {
+                    onClick={this.handleToggleMenu.bind(this)}
+                    aria-controls="menu-container"
+                    aria-expanded={this.state.isMenuActive}
+                    aria-haspopup={true}
+                    ref={(button) => {
                     this.burgerIcon = button;
                 }}
+                    type={"button"}
             >
                 <span>{this.state.isMenuActive ? this.i18n("menu.closeMenu") : this.i18n("menu.openMenu")}</span>
             </button>

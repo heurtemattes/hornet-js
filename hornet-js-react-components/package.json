@@ -35,7 +35,9 @@
     "tabbable": "1.1.2",
     "rc-util": "4.3.1"
   },
-  "buildDependencies": {},
+  "buildDependencies": {
+    "typescript": "2.5.2"
+  },
   "testDependencies": {
     "hornet-js-test": "5.1.1"
   },

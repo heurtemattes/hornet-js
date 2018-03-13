@@ -248,7 +248,8 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             disabled: this.state.disabled,
             "aria-expanded": this.state.isActive ? "true" : "false",
             "aria-haspopup": true,
-            "aria-label": this.props.ariaLabel
+            "aria-label": this.props.ariaLabel,
+            "type": "button"
         };
 
         let labelClass: string = this.props.labelClassName || "dropdown-label-span";

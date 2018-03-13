@@ -198,6 +198,7 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
                 </a>
                 {this.props.isDeletable ?
                     <button id={key + "-delete-tab-button"}
+                            type={"button"}
                             tabIndex={-1}
                             className={deleteButtonClasses}
                             onClick={this.deleteTabFunction}
@@ -607,9 +608,10 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
                                 {this.elementsHeaderReact}
                             </ul>
                             {this.state.addTabFunction ? <button className={"tabs-add-button"}
-                                title={this.props.addButtonTtitle ? this.props.addButtonTtitle : this.i18n("tabs.add-button")}
-                                onClick={this.state.addTabFunction}
-                                id={this.prefixWithId() + "add-button"}
+                                                                 type={"button"}
+                                                                 title={this.props.addButtonTtitle ? this.props.addButtonTtitle : this.i18n("tabs.add-button")}
+                                                                 onClick={this.state.addTabFunction}
+                                                                 id={this.prefixWithId() + "add-button"}
                             >
                                 <span className={"tabs-button-label"}>
                                     {this.props.addButtonTtitle ? this.props.addButtonTtitle : this.i18n("tabs.add-button")}

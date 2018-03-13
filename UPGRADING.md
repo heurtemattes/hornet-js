@@ -140,7 +140,7 @@ export interface FormProps extends AbstractFormProps {
 ```
 
 ### AutocompleteField & autocompleteMutilple
-Changements lié à la sélection des items dans un autocomplete. Lorsqu'un ou plusieurs éléments sont sélectionnés
+Changements liés à la sélection des items dans un autocomplete. Lorsqu'un ou plusieurs éléments sont sélectionnés
 le composant ne se contente plus de mettre uniquement la value dans la selection datasource mais il met tout l'objet
 5.1.0 :
 ```JavaScript
@@ -183,7 +183,7 @@ Le composant Confirm prend en guise de props la possibilité de configurer un bo
 
 ### NotificationManager
 
-La méthode statique du NotificationManager notify voit son interface changer avec l'apparition d'un nouveau paramêtre.
+La méthode statique du NotificationManager notify voit son interface changer avec l'apparition d'un nouveau paramètre.
 
 5.1.0 :
 ```JavaScript
@@ -222,6 +222,22 @@ Par défaut, c'est le framework qui gère les business exceptions.
 Ajout d'une méthode findAll qui permet de recupérer certains items dans un datasource
 ```JavaScript
     public findAll(criteria: any): any
+```
+
+La méthode sort prend en paramètre un objet de type DatasourceSortOption et non plus SortData
+
+```javascript
+    public sort(options: DatasourceSortOption): void {
+```
+
+
+### I18nServiceApi
+
+I18nServiceApi à été supprimé, pour le changeLanguage utiliser:
+```javascript
+import * as ChangeLanguageService from "hornet-js-core/src/services/default/change-language";
+
+new ChangeLanguageService.ChangeLanguage();
 ```
 
 ## Gestion des logs gzip
