@@ -672,11 +672,15 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             });
         }
 
-        if (!this.hiddenInput || !this.hiddenInput.value || this.hiddenInput.value.length == 0) {
-            this.clearFilterData();
-            if (!this.state.isShiftTab) this.props.dataSource.select(undefined);
-        } else {
-            this.props.dataSource.select(_.find(this.state.allChoices, { value: this.hiddenInput.value }));
+        if (!this.props.dataSource.selected || (this.props.dataSource.selected &&
+                this.props.dataSource.selected.value &&
+                this.props.dataSource.selected.value.toString() !== this.hiddenInput.value)) {
+            if (!this.hiddenInput || !this.hiddenInput.value || this.hiddenInput.value.length == 0) {
+                this.clearFilterData();
+                if (!this.state.isShiftTab) this.props.dataSource.select(undefined);
+            } else {
+                this.props.dataSource.select(_.find(this.state.allChoices, {value: this.hiddenInput.value}));
+            }
         }
 
         this.hideChoices();

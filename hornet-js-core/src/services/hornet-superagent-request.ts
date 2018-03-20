@@ -109,9 +109,15 @@ export interface HornetRequest {
     cert?: string;
     key?: string;
     progress?: Function;
+    timeout?: HornetRequestTimeOut;
     resultDisposition?: HornetRequestResultDisposition;
     clientTimeout?: ClientSessionTimeout;
     manageBusiness?: boolean;
+}
+
+export interface HornetRequestTimeOut {
+    response?: number;
+    deadline?: number;
 }
 
 export interface Attachment {

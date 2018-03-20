@@ -167,8 +167,6 @@ export class HornetSuperAgent {
 
     public response: Response;
 
-    public static globalCache;
-
     /** pour du cache de la configuration globale  */
     public static globalClientSessionConfig: ClientSessionTimeout;
 
@@ -217,22 +215,19 @@ export class HornetSuperAgent {
     }
 
     protected getCacheConfig(): any {
-        if (!HornetSuperAgent.globalCache) {
-            let globalCache = Utils.config.getIfExists("cache") || { enabled: false };
-            if (globalCache) {
-                if (!Utils.isServer) {
-                    if (globalCache.client) {
-                        globalCache = globalCache.client;
-                    }
-                } else {
-                    if (globalCache.server) {
-                        globalCache = globalCache.server;
-                    }
+        let globalCache = Utils.config.getIfExists("request.cache") || { enabled: false };
+        if (globalCache) {
+            if (!Utils.isServer) {
+                if (globalCache.client) {
+                    globalCache = globalCache.client;
+                }
+            } else {
+                if (globalCache.server) {
+                    globalCache = globalCache.server;
                 }
             }
-            HornetSuperAgent.globalCache = globalCache;
         }
-        return HornetSuperAgent.globalCache;
+        return globalCache;
     }
 
     protected getClientSessionConfig(): ClientSessionTimeout {
@@ -246,6 +241,16 @@ export class HornetSuperAgent {
         }
 
         return HornetSuperAgent.globalClientSessionConfig;
+    }
+
+
+    protected getTimeoutConfig(): any {
+        let request = Utils.config.get("request");
+        let timeout;
+        if (request && request.timeout) {
+            timeout = request.timeout;
+        }
+        return timeout;
     }
 
     /**
@@ -369,7 +374,11 @@ export class HornetSuperAgent {
                         if (request.key) (ha as any).key(request.key);
                         if (request.cert) (ha as any).cert(request.cert);
                         if (request.progress) ha.on("progress", request.progress);
-
+                        if (request.timeout) {
+                            (ha as any).timeout(request.timeout);
+                        } else {
+                            (ha as any).timeout(this.getTimeoutConfig());
+                        }
                         if (request.attach && request.attach.length > 0) {
                             (<any>ha).field("content", JSON.stringify(request.data));
                             request.attach.forEach((attachFile) => {
