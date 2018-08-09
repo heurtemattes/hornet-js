@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -176,7 +176,7 @@ class CalendarFieldTest extends HornetReactTest {
         let dateInput = (document.querySelector("#main2 .calendar-input"));
 
         setTimeout(() => {
-        
+
             SpecialCar.forEach((char, index) => {
                 this.triggerKeyPressEvent(dateInput, char.key, char.key.charCodeAt(0), false);
                 expect(this.isPreventDefault, "Impossible de saisir le caractère : " + char.key).be.true;
@@ -206,13 +206,13 @@ class CalendarFieldTest extends HornetReactTest {
 
     @Decorators.it("Test selection d'une date dans la boite de dialogue")
     opentAndSelectedDate() {
-        
+
         let onSelectCount = 0;
         let onChangeCount = 0;
         let onValueChangeCount = 0;
 
         form = this.renderIntoDocument(<CalendarField valideOnForm={false} label={"Test date"}
-            name="dateTest" onSelect={(value) => { onSelectCount++; }}  onChange={(value) => { onChangeCount++; }}  onValueChange={(value) => { onValueChangeCount++; }} />, "main5");
+            name="dateTest" onSelect={(value) => { onSelectCount++; }} onChange={(value) => { onChangeCount++; }} onValueChange={(value) => { onValueChangeCount++; }} />, "main5");
 
         setTimeout(() => {
 

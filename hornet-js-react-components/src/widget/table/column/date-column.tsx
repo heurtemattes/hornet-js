@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,16 +98,16 @@ export class DateColumn<P extends DateColumnProps, S extends ColumnState> extend
 
     static defaultProps = Column.mergeObjects(Column.defaultProps, {
         sortable: false,
-        defaultStyle: {"width": "6em"},
-        hiddenable: true
+        defaultStyle: { width: "6em" },
+        hiddenable: true,
     });
 
     readonly props: Readonly<DateColumnProps>;
 
-    /**
-     * @inheritDoc
-     */
-    public getBodyCell(): Class<DateBodyCell<BodyCellProps, any>> {
-        return DateBodyCell;
+
+    static getBodyCell(): Class<DateBodyCell<BodyCellProps, any>> {
+         return DateBodyCell;
     }
+    
 }
+(DateColumn.prototype.getBodyCell as any).__deprecated__ = true;

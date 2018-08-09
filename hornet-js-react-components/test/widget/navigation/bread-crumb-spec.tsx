@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -119,16 +119,16 @@ class NavigationUtilsMock extends NavigationUtils {
     }
     static getCurrentItem() {
         let menu = require("test/widget/navigation/menu-test-app-conf").menu;
-        return menu && menu.length ? menu[3] : null;
+        return menu && menu.length ? menu[ 3 ] : null;
     }
 }
 
 var BreadCrumbNS = proxyquire("src/widget/navigation/bread-crumb", {
-    "hornet-js-components/src/utils/navigation-utils": {NavigationUtils: NavigationUtilsMock},
+    "hornet-js-components/src/utils/navigation-utils": { NavigationUtils: NavigationUtilsMock },
 });
 
 var cls = Utils.getContinuationStorage();
-var contextMock = {"hornet.routePath": "/cas1"};
+var contextMock = { "hornet.routePath": "/cas1" };
 
 describe.skip("BreadCrumb", () => {
     it("doit être configuré avec les informations paramétrées => pas de page courante", () => {

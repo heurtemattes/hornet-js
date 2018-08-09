@@ -73,7 +73,7 @@ declare module "hornet-js-utils/src/app-shared-props" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -118,18 +118,20 @@ declare module "hornet-js-utils/src/array-utils" {
 	    static isInclude(objectList1: any[], objectList2: any[]): boolean;
 	    /**
 	     * fonction qui fait l'union de deux liste avec le predicat id different
-	     * @param object
-	     * @param other
-	     *  @returns {any[]}
-	     */
-	    static unionWith(object: any[], other: any[]): any[];
-	    /**
-	     * retourne l'intersection de deux liste
-	     * @param object
-	     * @param other
+	     * @param {any[]} object
+	     * @param {any[]} other
+	     * @param {string} key
 	     * @returns {any[]}
 	     */
-	    static intersectionWith(object: any[], other: any[]): any[];
+	    static unionWith(object: any[], other: any[], key?: string): any[];
+	    /**
+	     * retourne l'intersection de deux liste
+	     * @param {any[]} object
+	     * @param {any[]} other
+	     * @param {string} key
+	     * @returns {any[]}
+	     */
+	    static intersectionWith(object: any[], other: any[], key?: string): any[];
 	}
 	
 }
@@ -230,7 +232,7 @@ declare module "hornet-js-utils/src/common-register" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -249,7 +251,7 @@ declare module "hornet-js-utils/src/config-lib" {
 	 * Classe gérant l'accès à l'objet de configuration
 	 */
 	export class ConfigLib {
-	    private _configObj;
+	    protected _configObj: any;
 	    constructor();
 	    /**
 	     * Force l'utilisation d'un objet de configuration spécifique, pour les tests ou pour le navigateur
@@ -304,13 +306,12 @@ declare module "hornet-js-utils/src/config-lib" {
 	    /**
 	     * Underlying get mechanism
 	     *
-	     * @private
 	     * @method getImpl
 	     * @param object {object} - Object to get the property for
 	     * @param property {string | array[string]} - The property name to get (as an array or '.' delimited string)
 	     * @return value {mixed} - Property value, including undefined if not defined.
 	     */
-	    private static getImpl(object, property);
+	    protected static getImpl(object: any, property: any): any;
 	}
 	
 }
@@ -349,9 +350,10 @@ declare module "hornet-js-utils/src/date-utils" {
 	     * @param locale locale
 	     * @returns {Moment} un objet Moment correspondant à dateStr ou undefined en cas d'erreur
 	     */
-	    private static parseWithFormat(dateStr, dateFormat, locale?, exact?);
+	    protected static parseWithFormat(dateStr: string, dateFormat: string, locale?: any, exact?: boolean): any;
 	    /**
-	     * Crée un objet Moment à partir de la chaîne de caractère dateStr et en utilisant le format spécifié dans la locale indiquée : calendarLocale.dateFormat
+	     * Crée un objet Moment à partir de la chaîne de caractère dateStr et en utilisant
+	     * le format spécifié dans la locale indiquée : calendarLocale.dateFormat
 	     * @param dateStr chaîne de caractères représentant une date
 	     * @param calendarLocale configuration locale des dates
 	     * @param locale locale
@@ -380,7 +382,8 @@ declare module "hornet-js-utils/src/date-utils" {
 	    static parseInTZ(dateStr: string, format: string, timezone?: string, locale?: string): Date;
 	    /**
 	     * Crée un objet Date à partir de la chaîne de caractères indiquée en utilisant la fonction Date.parse(str)
-	     * @param dateStr chaîne de caractères représentant une date générée par Date.toString(), Date.toUTCString(), Date.toISOString() ou Date.toLocaleString()
+	     * @param dateStr chaîne de caractères représentant une date générée par Date.toString(),
+	     * Date.toUTCString(), Date.toISOString() ou Date.toLocaleString()
 	     * @returns {Date} un objet Date ou undefined en cas d'erreur
 	     */
 	    static stdParse(dateStr: string): Date;
@@ -395,7 +398,8 @@ declare module "hornet-js-utils/src/date-utils" {
 	     * Formatte la date correspondant à time en utilisant le format spécifié dans la locale
 	     * @param date un objet Date
 	     * @param format le format de la date
-	     * @param timezone la timezone sur laquelle formater la date (Europe/Paris, America/Los_Angeles, Australia/Sydney, ...) defaut : Timezone du navigateur/serveur node
+	     * @param timezone la timezone sur laquelle formater la date (Europe/Paris, America/Los_Angeles, Australia/Sydney, ...)
+	     * defaut : Timezone du navigateur/serveur node
 	     * @param locale la locale (fr_FR, en_US, ...) defaut : fr_FR
 	     * @returns {string} la chaîne de caractères formatée suivant {format} ou une chaîne vide en cas d'erreur
 	     */
@@ -470,8 +474,8 @@ declare module "hornet-js-utils" {
 	    static getLogger: (category: any, buildLoggerFn?: (category: string) => void) => Logger;
 	    static dateUtils: typeof DateUtils;
 	    static appSharedProps: typeof AppSharedProps;
-	    private static _config;
-	    private static _contextPath;
+	    protected static _config: ConfigLib;
+	    protected static _contextPath: string;
 	    static log4js: any;
 	    static notify: (nid, errors, infos?) => void;
 	    static registerGlobal<T>(paramName: string, value: T): T;
@@ -604,25 +608,25 @@ declare module "hornet-js-utils/src/key-store-helper" {
 	     * @param CAs
 	     * @returns {Array}
 	     */
-	    private static buildCAs(CAs?);
+	    protected static buildCAs(CAs?: Array<string>): any[];
 	    /**
 	     * Construit l'objet de configuration des certificats dans le cas d'authentification SSL
 	     * @param CERTs
 	     * @returns {Array}
 	     */
-	    private static buildCERTs(CERTs?);
+	    protected static buildCERTs(CERTs?: Array<string>): any[];
 	    /**
 	     * Construit l'objet de configuration des clés privées dans le cas d'authentification SSL
 	     * @param KEYs
 	     * @returns {Array}
 	     */
-	    private static buildKEYs(KEYs?);
+	    protected static buildKEYs(KEYs?: Array<KeyOptions>): any[];
 	    /**
 	     * Construit l'objet de configuration des certificats/clés privées dans le cas d'authentification SSL
 	     * @param PKCS12
 	     * @returns {Object}
 	     */
-	    private static buildPKCS12(PKCS12?);
+	    protected static buildPKCS12(PKCS12?: PKCS12Options): any;
 	}
 	
 }
@@ -642,8 +646,8 @@ declare module "hornet-js-utils/src/logger" {
 	 *            selon le client ou le serveur, c'est pour cette raison quelle doit être injectée
 	 */
 	export class Logger {
-	    private category;
-	    private log4jsLogger;
+	    protected category: any;
+	    protected log4jsLogger: any;
 	    constructor(category: any);
 	    static getLogger(category: any): Logger;
 	    /**
@@ -657,6 +661,7 @@ declare module "hornet-js-utils/src/logger" {
 	    info(...args: any[]): any;
 	    debug(...args: any[]): any;
 	    trace(...args: any[]): any;
+	    deprecated(...args: any[]): any;
 	    /**
 	     * Récupère le nom de la fonction appelante,
 	     * [mantis 0055464] en évitant de ramener l'appel du logger, qui ne nous intéresse pas :
@@ -678,26 +683,20 @@ declare module "hornet-js-utils/src/logger" {
 	     */
 	    log(level: string, ...args: any[]): void;
 	    /**
-	     * Appelle la fonction de log de manière asynchrone
-	     *
-	     * @param niveau de log
-	     * @param logArguments: Un tableau des objets (string, error ou object) à logguer
-	     */
-	    /**
 	     * Appelle la fonction de journalisation du logger en ajoutant le nom de la fonction appelant et si
 	     * disponible l'id de traitement
 	     *
 	     * @param niveau de log
 	     * @param logArguments: Un tableau des objets (string, error ou object) à logguer
 	     */
-	    private logInternal(level, logArguments);
+	    protected logInternal(level: string, logArguments: IArguments): void;
 	    /**
 	     * Méthode de recherche de stack depuis les arguments passés dans le logger
 	     * @param args
 	     * @returns {{}}
 	     */
-	    private searchStack(args);
-	    private mappingObjectToString(arg);
+	    protected searchStack(args: any): {};
+	    protected mappingObjectToString(arg: any): string;
 	}
 	
 }
@@ -777,7 +776,7 @@ declare module "hornet-js-utils/src/object-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -881,7 +880,7 @@ declare module "hornet-js-utils/src/string-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -898,12 +897,17 @@ declare module "hornet-js-utils/src/string-utils" {
 }
 
 declare module "hornet-js-utils/src/template" {
+	export interface Key {
+	    key: string;
+	    index: number;
+	    keys: Array<string>;
+	}
 	/**
 	 * @classdesc classe de templating de string
 	 */
 	export class Template {
-	    private template;
-	    private stringKey;
+	    protected template: string;
+	    protected stringKey: Array<Key>;
 	    /**
 	     * @class
 	     */
@@ -914,7 +918,7 @@ declare module "hornet-js-utils/src/template" {
 	     * @param {string} remplaceUndef remplacement si undefined
 	     * @return la chaine avec les valeurs remplacées
 	     */
-	    process(obj: any, remplaceUndef: string): string;
+	    process(obj: any, remplaceUndef: string): any;
 	}
 	
 }
@@ -994,7 +998,7 @@ declare module "hornet-js-utils/src/typescript-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1109,7 +1113,7 @@ declare module "hornet-js-utils/src/exception/business-error-list" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1118,7 +1122,7 @@ declare module "hornet-js-utils/src/exception/business-error-list" {
 	 * Liste d'erreurs métier
 	 */
 	export class BusinessErrorList extends BusinessError {
-	    private errors;
+	    protected errors: Array<BusinessError>;
 	    constructor(businessErrors?: Array<BusinessError>);
 	    addError(error: BusinessError): this;
 	    getErrors(): BusinessError[];
@@ -1201,12 +1205,13 @@ declare module "hornet-js-utils/src/exception/business-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { BaseError }  from "hornet-js-utils/src/exception/base-error";
 	export class BusinessError extends BaseError {
+	    type: string;
 	    constructor(code: string, args?: {
 	        [key: string]: any;
 	    }, cause?: Error);
@@ -1289,7 +1294,7 @@ declare module "hornet-js-utils/src/exception/codes-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1330,6 +1335,8 @@ declare module "hornet-js-utils/src/exception/codes-error" {
 	    static DATASOURCE_ADD_ERROR: number;
 	    static DATASOURCE_DELETE_ERROR: number;
 	    static DATASOURCE_RESPONSE_ERROR: number;
+	    static DATASOURCE_SORT_ARGS_ERROR: number;
+	    static DATASOURCE_CONFIGURATION_ERROR: number;
 	    /**
 	     * codes error INJECT 10400 - 10499
 	     */
@@ -1355,6 +1362,12 @@ declare module "hornet-js-utils/src/exception/codes-error" {
 	     * code error BATCH 10700 - 10799
 	     */
 	    static BATCH_OPTIONS_UNDEFINED: number;
+	    /**
+	     * code error REFERENTIEL 10800 - 10899
+	     */
+	    static REFERENTIEL_TABLE_NOTFOUND: number;
+	    static REFERENTIEL_HORNET_SEQUELIZE_MODEL_NOTFOUND: number;
+	    static REFERENTIEL_HORNET_SEQUELIZE_ENTITY_NOTFOUND: number;
 	}
 	
 }
@@ -1434,14 +1447,13 @@ declare module "hornet-js-utils/src/exception/http-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { TechnicalError }  from "hornet-js-utils/src/exception/technical-error";
 	export class HttpError extends TechnicalError {
-	    status: number;
-	    constructor(status: any, code?: string, args?: {
+	    constructor(httpStatus: any, code?: string, args?: {
 	        [key: string]: any;
 	    }, cause?: Error);
 	}
@@ -1449,87 +1461,9 @@ declare module "hornet-js-utils/src/exception/http-error" {
 }
 
 declare module "hornet-js-utils/src/exception/not-found-error" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
-	 *
-	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
 	import { HttpError }  from "hornet-js-utils/src/exception/http-error";
 	export class NotFoundError extends HttpError {
-	    static status: number;
+	    static httpStatus: number;
 	    constructor(args?: {
 	        [key: string]: any;
 	    }, cause?: Error);
@@ -1612,7 +1546,7 @@ declare module "hornet-js-utils/src/exception/security-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1701,12 +1635,14 @@ declare module "hornet-js-utils/src/exception/technical-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { BaseError }  from "hornet-js-utils/src/exception/base-error";
 	export class TechnicalError extends BaseError {
+	    type: string;
+	    httpStatus: number;
 	    constructor(code?: string, args?: {
 	        [key: string]: any;
 	    }, cause?: Error);
@@ -1789,7 +1725,7 @@ declare module "hornet-js-utils/src/exception/validation-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

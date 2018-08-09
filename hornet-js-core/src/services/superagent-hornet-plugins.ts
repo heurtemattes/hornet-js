@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,15 +86,15 @@ import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 const logger = Utils.getLogger("hornet-js-core.services.superagent-hornet-plugins");
 const browser = require("detect-browser");
 
-const HEADER_CSRF_NAME:string = "x-csrf-token";
-const HEADER_LOGIN_PAGE:string = "x-is-login-page";
+const HEADER_CSRF_NAME: string = "x-csrf-token";
+const HEADER_LOGIN_PAGE: string = "x-is-login-page";
 
 
 export abstract class HornetPlugin {
-    static getPlugin(...args) : (request:HornetSuperAgentRequest) => void {
+    static getPlugin(...args): (request: HornetSuperAgentRequest) => void {
         throw new TechnicalError("NOT IMPLEMENTED")
     }
-     
+
 }
 
 /**HornetPlugin
@@ -103,9 +103,9 @@ export abstract class HornetPlugin {
  * @return {HornetSuperAgentRequest}
  * @constructor
  */
-export class CsrfPlugin extends HornetPlugin{
-    static getPlugin() : (request:HornetSuperAgentRequest) => void{
-        return function (request:HornetSuperAgentRequest) {
+export class CsrfPlugin extends HornetPlugin {
+    static getPlugin(): (request: HornetSuperAgentRequest) => void {
+        return function (request: HornetSuperAgentRequest) {
             logger.trace("Ajout du token csrf.");
             if (!Utils.isServer) {
                 logger.trace("Ajout du token csrf valeur : ", Utils.getCls("hornet.csrf") || "no-token");
@@ -129,9 +129,9 @@ export class CsrfPlugin extends HornetPlugin{
  * @return {HornetSuperAgentRequest}
  * @constructor
  */
-export class noCacheIEPlugin extends HornetPlugin{
-  static getPlugin() : (request:HornetSuperAgentRequest) => void{
-        return function (request:HornetSuperAgentRequest) {
+export class noCacheIEPlugin extends HornetPlugin {
+    static getPlugin(): (request: HornetSuperAgentRequest) => void {
+        return function (request: HornetSuperAgentRequest) {
             if (!Utils.isServer && browser.name === "ie") {
                 request.set("If-Modified-Since", "Sun, 12 Jul 1998 05:00:00 GMT");
                 request.set("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -139,7 +139,7 @@ export class noCacheIEPlugin extends HornetPlugin{
                 request.set("Expires", "0");
             }
         }
-  }
+    }
 }
 
 
@@ -152,22 +152,22 @@ export class noCacheIEPlugin extends HornetPlugin{
  * @return {HornetSuperAgentRequest}
  * @constructor
  */
-export class RedirectToLoginPagePlugin extends HornetPlugin{
-  static getPlugin() : (request:HornetSuperAgentRequest) => void{
-        return function (request:HornetSuperAgentRequest) {
-                if (!Utils.isServer) {
-                    // Gestion du header
-                    var realRequest = request.callback;
-                    request.callback = function (err, res) {
-                        if (res && res.get(HEADER_LOGIN_PAGE) == "true") {
-                            var loginUrl = Utils.buildContextPath(Utils.appSharedProps.get("loginUrl"));
-                            logger.debug("Redirection vers la page:", loginUrl);
-                            window.location.href = loginUrl + "?previousUrl=" + window.location.href;
-                        } else {
-                            realRequest.call(this, err, res);
-                        }
-                    };
-             }
+export class RedirectToLoginPagePlugin extends HornetPlugin {
+    static getPlugin(): (request: HornetSuperAgentRequest) => void {
+        return function (request: HornetSuperAgentRequest) {
+            if (!Utils.isServer) {
+                // Gestion du header
+                var realRequest = request.callback;
+                request.callback = function (err, res) {
+                    if (res && res.get(HEADER_LOGIN_PAGE) == "true") {
+                        var loginUrl = Utils.buildContextPath(Utils.appSharedProps.get("loginUrl"));
+                        logger.debug("Redirection vers la page:", loginUrl);
+                        window.location.href = loginUrl + "?previousUrl=" + window.location.href;
+                    } else {
+                        realRequest.call(this, err, res);
+                    }
+                };
+            }
         }
     }
 }
@@ -178,16 +178,16 @@ export class RedirectToLoginPagePlugin extends HornetPlugin{
  * @return {HornetSuperAgentRequest}
  * @constructor
  */
-export class AddParamFromLocalStorage extends HornetPlugin{
-    static getPlugin(param:string, propNameName?:string, localStorageName?:string)  : (request:HornetSuperAgentRequest) => void {
-        return  (request:HornetSuperAgentRequest) => {
+export class AddParamFromLocalStorage extends HornetPlugin {
+    static getPlugin(param: string, propNameName?: string, localStorageName?: string): (request: HornetSuperAgentRequest) => void {
+        return (request: HornetSuperAgentRequest) => {
             logger.trace("Ajout Param request from local storage.");
             if (Utils.isServer) {
                 var callbacksStorage = Utils.getContinuationStorage(localStorageName);
                 // var callbacksStorage = require("hornet-js-utils/src/callbacks-local-storage").getStorage(localStorageName);
                 var paramValue = callbacksStorage.get(propNameName || param);
                 var query = request.query;
-                query[param] = paramValue;
+                query[ param ] = paramValue;
 
                 logger.trace("Ajout des paramètres superAgent,", param, ":", paramValue);
                 request.query(query);
@@ -202,16 +202,16 @@ export class AddParamFromLocalStorage extends HornetPlugin{
  * @return {HornetSuperAgentRequest}
  * @constructor
  */
-export class AddParam extends HornetPlugin{
-  static getPlugin(param:string, paramValue:any) : (request:HornetSuperAgentRequest) => void {
-        return (request:HornetSuperAgentRequest) => {
+export class AddParam extends HornetPlugin {
+    static getPlugin(param: string, paramValue: any): (request: HornetSuperAgentRequest) => void {
+        return (request: HornetSuperAgentRequest) => {
             logger.trace("Ajout Param request.");
             if (Utils.isServer) {
                 var query = request.query;
-                query[param] = paramValue;
-                logger.trace("Ajout des paramètres superAgent,", param,":", paramValue);
+                query[ param ] = paramValue;
+                logger.trace("Ajout des paramètres superAgent,", param, ":", paramValue);
                 request.query(query);
             }
         };
-  }
+    }
 }

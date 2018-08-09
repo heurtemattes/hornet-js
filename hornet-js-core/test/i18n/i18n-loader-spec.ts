@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,29 +82,34 @@ import { Logger } from "hornet-js-utils/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 import { TestUtils } from "hornet-js-test/src/test-utils";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "appenders": {
-        "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
-        }
+    appenders: {
+        console: {
+            type: "console",
+            layout: {
+                type: "pattern",
+                pattern: "%[%d{ISO8601}|%p|%c|%m%]",
+            },
+        },
     },
-    "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
-    }
+    categories: {
+        default: { appenders: [ "console" ], level: "INFO" },
+    },
 });
 
-var expect:any = TestUtils.chai.expect;
+const expect: any = TestUtils.chai.expect;
 
 import { I18nLoader } from "src/i18n/i18n-loader";
 import * as path from "path";
 
 
-describe.skip("Test of I18nLoader : ", () => {
+describe("Test of I18nLoader : ", () => {
 
-    let i18nLoader = new I18nLoader(path.join(__dirname, "simple"));
+    let i18nLoader;
+
+    beforeEach(function () {
+        i18nLoader = new I18nLoader(path.join(__dirname, "simple"));
+    });
+
 
     it("find 2 locales", (done) => {
         expect(i18nLoader.getLocales().length).to.eql(2);
@@ -118,21 +123,21 @@ describe.skip("Test of I18nLoader : ", () => {
     });
 
     it("load message first locale", (done) => {
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.testValue).to.eql("fr");
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.labelLanguage).to.eql("test-fr");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.testValue).to.eql("fr");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.labelLanguage).to.eql("test-fr");
         done();
     });
 
     it("load message second locale", (done) => {
-        expect(i18nLoader.getMessages({lang: "ab", locale: "ab-AB"}).messages.testValue).to.eql("ab");
-        expect(i18nLoader.getMessages({lang: "ab", locale: "ab-AB"}).messages.labelLanguage).to.eql("test-ab");
+        expect(i18nLoader.getMessages({ lang: "ab", locale: "ab-AB" }).messages.testValue).to.eql("ab");
+        expect(i18nLoader.getMessages({ lang: "ab", locale: "ab-AB" }).messages.labelLanguage).to.eql("test-ab");
         done();
     });
 
 
     it("load message second locale not overhide first locale", (done) => {
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.testValue).to.eql("fr");
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.labelLanguage).to.eql("test-fr");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.testValue).to.eql("fr");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.labelLanguage).to.eql("test-fr");
         done();
     });
 });

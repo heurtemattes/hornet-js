@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -113,25 +113,23 @@ export interface ActionBodyCellProps extends AbstractBodyCellProps {
 }
 
 export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
-
     protected title: string;
 
     constructor(props: P, context: any) {
         super(props, context);
-        if (props.url) {
-            this.state.url = this.genUrlWithParams(props.url, props.value);
-        }
 
-        this.state.visible = true;
-        if (this.props.visible) {
-            this.state.visible = this.props.visible(this.props.value);
-        }
+        const message = props.messageAlert && new Template(props.messageAlert).process(props.value, props.replaceUndef || "?");
+        const title = props.messageAlert && new Template(props.titleAlert).process(props.value, props.replaceUndef || "?");
 
-        if (this.props.messageAlert) {
-            this.state.hasPopUp = true;
-            this.state.messageAlert = new Template(this.props.messageAlert).process(this.props.value, this.props.replaceUndef || "?");
-            this.state.titleAlert = new Template(this.props.titleAlert).process(this.props.value, this.props.replaceUndef || "?");
-        }
+        this.state = {
+            ...this.state,
+            url: this.props.url && this.genUrlWithParams(props.url, props.value),
+            visible: (this.props.visible && (typeof this.props.visible === "function")) ? this.props.visible(this.props.value) : true,
+            hasPopUp: this.props.messageAlert,
+            messageAlert: message,
+            titleAlert: title,
+
+        };
 
         this.title = this.getCellTitleWithProps(props);
 
@@ -144,34 +142,36 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
 
         logger.trace("render ActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        let classes: ClassDictionary = {
+        const classes: ClassDictionary = {
             "button-action": true,
-            "picto-svg": true
+            "picto-svg": true,
         };
 
         if (this.state.className) {
-            classes[ this.state.className ] = true;
+            classes[this.state.className] = true;
         }
 
         let img = null;
-        if (typeof this.props.srcImg == "string") {
-            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title} />;
+        if (typeof this.props.srcImg === "string") {
+            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title}/>;
         } else {
 
             img = this.props.srcImg;
         }
 
-        let disabled: boolean = (typeof this.state.disabled == "function") ? this.state.disabled() : this.state.disabled;
+        const disabled: boolean = (typeof this.state.disabled === "function") ? this.state.disabled() : this.state.disabled;
 
-        let aProps: any = {
+        const aProps: any = {
             href: this.state.url || "#",
             className: classNames(classes),
-            title: this.title,
+            title: this.state.titleCell instanceof Function ? this.state.titleCell(this.props.value) :
+                this.state.titleCell ? this.state.titleCell : this.title,
             onClick: this.onClick,
             disabled: (this.props.contentState.itemInEdition && this.state.isEditing === false) || disabled,
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
-            "aria-haspopup": this.state.hasPopUp
+            "aria-haspopup": this.state.hasPopUp,
+            role: "button"
         };
 
         return (
@@ -210,7 +210,9 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
     onClick(e): void {
         if (this.props.messageAlert) {
             e.stopPropagation();
-            this.props.showAlert(this.state.messageAlert, this.state.titleAlert, this.onAction);
+            setTimeout(() => {
+                this.props.showAlert(this.state.messageAlert, this.state.titleAlert, this.onAction);
+            }, 150);
         } else {
             this.onAction();
         }
@@ -232,19 +234,21 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      * @param lineIndex
      */
     handleEdition(lineIndex: number) {
-        let nameClass: string = "default-body-cell";
+        const nameClass: string = "default-body-cell";
+        const sortableColumnCass: string = "datatable-header-sortable-column";
+
         if (_.isNull(lineIndex)) {
             this.setState({ isEditing: false });
             this.tableCellRef.removeAttribute("disabled");
             this.tableCellRef.classList.remove("datatable-cell-in-edition");
 
-        } else if (lineIndex === this.props.cellCoordinate.row) {
-            this.setState({ isEditing: (lineIndex === this.props.cellCoordinate.row) });
+        } else if (lineIndex === this.props.coordinates.row) {
+            this.setState({ isEditing: (lineIndex === this.props.coordinates.row) });
             this.tableCellRef.classList.add("datatable-cell-in-edition");
             this.tableCellRef.setAttribute("disabled", "true");
-        } else if (this.tableCellRef.localName == "th") {
+        } else if (this.tableCellRef.localName === "th") {
             this.tableCellRef.classList.add("is_disabled");
-            this.tableCellRef.classList.remove("datatable-header-sortable-column", "datatable-header-sorted", "datatable-header-sorted-asc");
+            this.tableCellRef.classList.remove(sortableColumnCass, "datatable-header-sorted", "datatable-header-sorted-asc");
         } else {
             this.tableCellRef.setAttribute("disabled", "true");
         }

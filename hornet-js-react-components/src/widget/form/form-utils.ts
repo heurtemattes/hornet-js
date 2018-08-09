@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -101,12 +101,12 @@ export abstract class FormUtils {
         if (error) {
             if (error.dataPath && error.dataPath.length > 1) {
                 let offset: number = 0;
-                if (error.dataPath.charAt(0) == ".") {
+                if (error.dataPath.charAt(0) === ".") {
                     offset = 1;
                 }
                 fieldName = error.dataPath.substring(offset);
             }
-            if (error.keyword == "required") {
+            if (error.keyword === "required") {
                 if (error.params && (error.params as DependenciesParams).missingProperty) {
                     if (fieldName) {
                         fieldName += ".";
@@ -127,24 +127,27 @@ export abstract class FormUtils {
      * @param complement
      * @return le message ou undefined lorsqu'aucun n'est défini pour le mot-clé indiqué
      */
-    static extractMessage(keyword: string, fieldName: string, fieldsMessages?: any, genericValidationMessages?: any, complement?: any): string {
+    static extractMessage(keyword: string, fieldName: string, fieldsMessages?: any, genericValidationMessages?: any, complement?: any, field?: DomAdapter<any, any>): string {
         let message: string;
-        let specificMessage: any = _.get(fieldsMessages, fieldName + "." + keyword);
+        const specificMessage: any = _.get(fieldsMessages, fieldName + "." + keyword);
 
         if (_.isString(specificMessage)) {
 
             message = specificMessage;
             if (complement) {
-                complement["field"] = fieldName;
-                let intlMsg = new IntlMessageFormat(specificMessage);
+                complement[ "field" ] = fieldName;
+                const intlMsg = new IntlMessageFormat(specificMessage);
                 message = intlMsg.format(complement);
             }
 
         } else if (genericValidationMessages) {
-            let genericMessage: any = genericValidationMessages[keyword] || genericValidationMessages["generic"];
+            const genericMessage: any = genericValidationMessages[ keyword ] || genericValidationMessages[ "generic" ];
+            if (field && _.isString(field.state.label) && !_.isEmpty(field.state.label)) { // on récupére le label associé
+                fieldName = field.state.label;
+            }
             if (_.isString(genericMessage)) {
-                let intlMsg = new IntlMessageFormat(genericMessage);
-                message = intlMsg.format({field: fieldName});
+                const intlMsg = new IntlMessageFormat(genericMessage);
+                message = intlMsg.format({ field: fieldName });
             }
         }
         return message;
@@ -159,12 +162,12 @@ export abstract class FormUtils {
      * @param genericValidationMessages messages d'erreur génériques
      * @return {Notifications} les notifications correspondant aux erreurs de validation
      */
-    static getErrors(errors: Array<ErrorObject>, fields: { [key: string]: DomAdapter<any, any> }, fieldsMessages?: any, genericValidationMessages?: any): Notifications {
-        let notificationsError: Notifications = new Notifications();
+    static getErrors(errors: Array<ErrorObject>, fields: { [ key: string ]: DomAdapter<any, any> }, fieldsMessages?: any, genericValidationMessages?: any): Notifications {
+        const notificationsError: Notifications = new Notifications();
 
         for (let index: number = 0; index < errors.length; index++) {
-            let error = errors[index];
-            let erreurNotification = new NotificationType();
+            const error = errors[ index ];
+            const erreurNotification = new NotificationType();
             erreurNotification.id = "ACTION_ERREUR_" + index;
             erreurNotification.text = error.message;
             let fieldName: string = FormUtils.extractFieldName(error);
@@ -174,18 +177,19 @@ export abstract class FormUtils {
                 erreurNotification.field = fieldName;
                 erreurNotification.additionalInfos = error.params;
 
-                let complement: any = {};
+                let complement: any = {...error.params};
 
                 // Gestion des champs editables d'un tableau
-                if (fields[fieldName] && fields[fieldName].props && fields[fieldName].props.title) {
-                    let data = fieldName.split(".");
-                    if (!isNaN(data[data.length - 2] as any)) {
-                        fieldName = data[data.length - 1];
-                        complement = {complement: (parseInt(data[data.length - 2]) + 1).toString()};
+                if (fields[ fieldName ] && fields[ fieldName ].props && fields[ fieldName ].props.title) {
+                    const data = fieldName.split(".");
+                    if (!isNaN(data[ data.length - 2 ] as any)) {
+                        fieldName = data[ data.length - 1 ];
+                        complement = { complement: (parseInt(data[ data.length - 2 ], 10) + 1).toString() };
                     }
                 }
 
-                let message: string = FormUtils.extractMessage(error.keyword, fieldName, fieldsMessages, genericValidationMessages, complement);
+                const message: string = FormUtils.extractMessage(error.keyword, fieldName, 
+                                                                 fieldsMessages, genericValidationMessages, complement, fields[ fieldName ]);
                 if (message) {
                     /* Surcharge du message produit par ajv */
                     erreurNotification.text = message;
@@ -204,15 +208,15 @@ export abstract class FormUtils {
      */
     static extractFileData(inputItem: HTMLInputElement): UploadedFile {
         let selectedFile: UploadedFile;
-        if (inputItem.dataset && inputItem.dataset["fileId"]) {
+        if (inputItem.dataset && inputItem.dataset[ "fileId" ]) {
             selectedFile = {
-                id: parseInt(inputItem.dataset["fileId"]),
-                originalname: inputItem.dataset["fileOriginalname"],
-                name: inputItem.dataset["fileName"],
-                mimeType: inputItem.dataset["fileMimeType"],
-                encoding: inputItem.dataset["fileEncoding"],
-                size: parseInt(inputItem.dataset["fileSize"]),
-                buffer: null
+                id: parseInt(inputItem.dataset[ "fileId" ], 10),
+                originalname: inputItem.dataset[ "fileOriginalname" ],
+                name: inputItem.dataset[ "fileName" ],
+                mimeType: inputItem.dataset[ "fileMimeType" ],
+                encoding: inputItem.dataset[ "fileEncoding" ],
+                size: parseInt(inputItem.dataset[ "fileSize" ], 10),
+                buffer: null,
             };
         }
         return selectedFile;

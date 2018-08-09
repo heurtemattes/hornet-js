@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -100,7 +100,7 @@ import { ReactTestUtils } from "hornet-js-test/src/react-test-utils";
 import * as React from "react";
 
 
-import {Button, ButtonProps} from "src/widget/button/button";
+import { Button, ButtonProps } from "src/widget/button/button";
 
 const expect = TestUtils.chai.expect;
 const render = ReactTestUtils.render;
@@ -109,7 +109,7 @@ const render = ReactTestUtils.render;
 describe.skip("Button", () => {
     it("doit être configuré avec les informations paramétrées", () => {
         // Arrange
-        let item:ButtonProps = {
+        let item: ButtonProps = {
             type: "submit",
             id: "form_btnTest",
             name: "btnTest",
@@ -120,7 +120,7 @@ describe.skip("Button", () => {
         };
 
         // Act
-        let $ = render(() => <Button {...item}/>),
+        let $ = render(() => <Button {...item} />),
             $button = $("button");
 
         // Assert

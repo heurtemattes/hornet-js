@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,42 +87,60 @@ import { expect } from 'chai'
 
 import { InputField } from "src/widget/form/input-field";
 import { Form } from "src/widget/form/form";
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+import { Utils } from 'hornet-js-utils';
 
 
-let elementBase, elementWithValue: JSX.Element;
+let elementBase, elementWithValue, elementWithValueEtCompteur: JSX.Element;
 let $element;
 let count: number = 0;
 
 @Decorators.describe('Test Karma InputField')
 class InputFieldTest extends HornetReactTest {
+    protected inputField;
 
     @Decorators.beforeEach
     beforeEach() {
+        Utils.setCls("hornet.internationalization", { messages: messages });
         count++;
         elementBase = (
             <InputField name="prenom"
-                        id="prenom"
-                        label={"prénom"}
-                        required={true}
-                        requiredLabel="Prénom obligatoire"
-                        maxLength={50}
-                        resettable={true}
+                id="prenom"
+                label={"prénom"}
+                required={true}
+                requiredLabel="Prénom obligatoire"
+                maxLength={50}
+                resettable={true}
             />
         );
 
         elementWithValue = (
-            <Form id={"id-form-"+count} defaultValues={{prenom: "test"}}>
+            <Form id={"id-form-" + count} defaultValues={{ prenom: "test" }}>
                 <InputField name="prenom"
-                            id="prenom"
-                            label={"prénom"}
-                            required={true}
-                            requiredLabel="Prénom obligatoire"
-                            maxLength={50}
-                            resettable={true}
-
+                    id="prenom"
+                    label={"prénom"}
+                    required={true}
+                    requiredLabel="Prénom obligatoire"
+                    maxLength={50}
+                    resettable={true}
+                    maxChar={25}
                 />
             </Form>
         );
+
+        elementWithValueEtCompteur = (<InputField name="nom"
+            ref={elt => { this.inputField = elt; }}
+            id="nom"
+            label={"Nom"}
+            required={true}
+            requiredLabel="Prénom obligatoire"
+            maxLength={50}
+            resettable={true}
+            maxChar={25}
+            displayMaxCharInLabel={true}
+            displayCharNumber={true}
+            showAlert={true}
+        />)
     };
 
     @Decorators.it('Test OK')
@@ -148,10 +166,176 @@ class InputFieldTest extends HornetReactTest {
     @Decorators.it("Vérifier l'existence du bouton reset lorsqu'un champ est valorisé")
     testResetButton() {
         $element = this.renderIntoDocument(elementWithValue, "main3");
-        expect(document.querySelector('#main3 #prenomResetButton.input-reset'), "bouton reset non trouvé").to.exist;
+        expect(document.querySelector("#main3 #prenomResetButton.input-reset"), "bouton reset non trouvé").to.exist;
         this.end();
-    };
+    }
+
+    @Decorators.it("Test reverseLabel")
+    testReverseLabel() {
+        const elementWithReverseLabel = (<InputField name="testReverseLabel"
+            label={"testReverseLabel"}
+            reverseLabel={true}
+        />)
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithReverseLabel, id);
+        setTimeout(() =>{
+            expect(document.querySelector(`#${id} .abstractfield-container-reverse-label`)).to.exist;
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test du compte de caractère")
+    testCharsCounter() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main400");
+        const inputNom = document.querySelector("#main400 #nom") as HTMLTextAreaElement;
+        this.triggerKeydownEvent(inputNom, "m", 77, true);
+        setTimeout(() => {
+            const charLabel = document.querySelector("#main400 .chars-counter") as HTMLDivElement;
+            expect(charLabel).to.exist;
+            expect(charLabel.innerHTML).to.equals("1 caractère");
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test du compte de caractère avec setCurrentValue")
+    testCharsCounterWithSetCurrentValue() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main401");
+        this.inputField.setCurrentValue("Malam");
+        const charLabel = document.querySelector("#main401 .chars-counter") as HTMLDivElement;
+        setTimeout(() => {
+            expect(charLabel).to.exist;
+            expect(charLabel.innerHTML).to.equals("5 caractères");
+            expect(charLabel.className).to.be.equals("chars-counter");
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test de l'affichage de l'alerte avec setCurrentValue")
+    testCharsCounterWithAlertWithSetCurrentValue() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main402");
+        this.inputField.setCurrentValue("Adria moratizna zenimaheri");
+        const charLabel = document.querySelector("#main402 .chars-counter") as HTMLDivElement;
+        setTimeout(() => {
+            expect(charLabel.innerHTML).to.be.equal("26 caractères");
+            expect(charLabel.className).to.be.equals("chars-counter chars-counter-too-many-char");
+            const alert = document.querySelector(".widget-alert-body");
+            expect(alert).to.exist;
+            const alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
+            const alertTitle = document.querySelector(".widget-dialogue-title h1") as HTMLDivElement;
+            const alertBody = document.querySelector(".widget-alert-body") as HTMLDivElement;
+            expect(alertOk).to.exist;
+            expect(alertTitle).to.exist;
+            expect(alertTitle.innerText).to.be.equals("Nombre de caractères trop élevé");
+            expect(alertBody).to.exist;
+            expect(alertBody.innerText).to.be.equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (26/25).");
+
+            (alertOk as any).click();
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test de l'affichage de l'alerte avec setCurrentValue")
+    testAffichageAlert() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main403");
+        const inputNom = document.querySelector("#main403 #nom") as HTMLTextAreaElement;
+        let i;
+        for (i = 0; i < 26; i++) {
+            this.triggerKeydownEvent(inputNom, "m", 77, true);
+        }
+        const charLabel = document.querySelector("#main403 .chars-counter") as HTMLDivElement;
+        setTimeout(() => {
+            expect(charLabel.innerHTML).to.be.equal("26 caractères");
+            const alert = document.querySelector(".widget-alert-body");
+            expect(alert).to.exist;
+            const alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
+            const alertTitle = document.querySelector(".widget-dialogue-title h1") as HTMLDivElement;
+            const alertBody = document.querySelector(".widget-alert-body") as HTMLDivElement;
+            expect(alertOk).to.exist;
+            expect(alertTitle).to.exist;
+            expect(alertTitle.innerText).to.be.equals("Nombre de caractères trop élevé");
+            expect(alertBody).to.exist;
+            expect(alertBody.innerText).to.be.equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (26/25).");
+
+            (alertOk as any).click();
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test de non activation du compteur")
+    testNoCharsCount() {
+        $element = this.renderIntoDocument(elementWithValue, "main404");
+        const inputPrenom = document.querySelector("#main404 #prenom") as HTMLTextAreaElement;
+        let i;
+        for (i = 0; i < 30; i++) {
+            this.triggerKeydownEvent(inputPrenom, "m", 77, true);
+        }
+        setTimeout(() => {
+            const charLabel = document.querySelector("#main404 .chars-counter") as HTMLDivElement;
+            expect(inputPrenom.hasAttribute("aria-labelledby")).to.be.true;
+            expect(inputPrenom.getAttribute("aria-labelledby")).to.be.equals("prenom-span-label");
+            expect(charLabel).to.be.null;
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test de l'activation de l'alerte si dernier caractere est espace")
+    testShowAlertWithEspaceInLastPosition() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main405");
+        const inputNom = document.querySelector("#main405 #nom") as HTMLTextAreaElement;
+        const charLabel = document.querySelector("#main405 .chars-counter") as HTMLDivElement;
+        let i;
+        for (i = 0; i < 25; i++) {
+            this.triggerKeydownEvent(inputNom, "m", 77, true);
+        }
+        this.triggerKeydownEvent(inputNom, " ", 32, true);
+        setTimeout(() => {
+            expect(charLabel.innerHTML).to.be.equal("26 caractères");
+            const alert = document.querySelector(".widget-alert-body");
+            expect(alert).to.exist;
+            const alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
+            expect(alertOk).to.exist;
+            (alertOk as any).click();
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test de l'affichage du label sans maxChar")
+    testLabelWithoutMaxChar() {
+        $element = this.renderIntoDocument(elementBase, "main406");
+        const label = document.querySelector("#main406 .label") as HTMLSpanElement;
+        setTimeout(() => {
+            expect(label.innerHTML).to.be.equal("prénom");
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test de l'affichage du label avec maxChar")
+    testLabelWithMaxChar() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main407");
+        const label = document.querySelector("#main407 .label") as HTMLSpanElement;
+        setTimeout(() => {
+            expect(label.innerHTML).to.be.equal("Nom (limite 25 caractères)");
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test des attributs RGAA")
+    testAriaAttributes() {
+        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main408");
+        const inputNom = document.querySelector("#main408 #nom") as HTMLTextAreaElement;
+        const charLabel = document.querySelector("#main408 .chars-counter") as HTMLDivElement;
+        setTimeout(() => {
+            expect(inputNom.hasAttribute("aria-labelledby")).to.be.true;
+            expect(inputNom.getAttribute("aria-labelledby")).to.be.equals("nom-span-label chars-counter-nom");
+
+            expect(charLabel.hasAttribute("role")).to.be.true;
+            expect(charLabel.getAttribute("role")).to.be.equals("log");
+
+            this.end();
+        }, 250);
+    }
+
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new InputFieldTest());

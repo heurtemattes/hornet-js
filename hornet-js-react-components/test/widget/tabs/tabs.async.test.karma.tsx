@@ -73,13 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-'use strict';
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 
@@ -117,7 +116,7 @@ let beforeHideTabCount = 0;
 let afterShowTabCount = 0;
 let onSelectCount = 0;
 
-@Decorators.describe('Test Karma tabs async')
+@Decorators.describe("Test Karma tabs async")
 class tabsTest extends BaseTest {
 
     @Decorators.beforeEach
@@ -131,7 +130,7 @@ class tabsTest extends BaseTest {
 
         let step = 1;
         for (let i: number = 1; i < 10; i++) {
-            data.push({ id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++ });
+            data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
         dataSource = new DataSource(data);
         fnt = () => {
@@ -139,20 +138,21 @@ class tabsTest extends BaseTest {
                 dataSource.init();
             }
         };
+
         tabsElement = (
             <Tabs id="tabs" selectedTabIndex={0} beforeHideTab={() => {
-                beforeHideTabCount++
+                beforeHideTabCount++;
             }} afterShowTab={() => {
-                afterShowTabCount++
+                afterShowTabCount++;
             }}>
-                <Tab title="tab1" >
+                <Tab title="tab1" id="test784">
                     <div>TabContent1</div>
                 </Tab>
-                <Tab title="tab2" >
+                <Tab title="tab2" id="test788">
                     <div>TabContent2</div>
                 </Tab>
-                <Tab title="tab3" mount={false} onClick={fnt} onSelect={(select: boolean) => {
-                    select === true ? onSelectCount += 10 : onSelectCount += 1
+                <Tab id="test785" title="tab3" mount={false} onClick={fnt} onSelect={(select: boolean) => {
+                    select === true ? onSelectCount += 10 : onSelectCount += 1;
                 }}>
                     <TabHeader>tab3 Async</TabHeader>
                     <TabContent dataSource={dataSource}>
@@ -170,51 +170,54 @@ class tabsTest extends BaseTest {
                 </Tab>
             </Tabs>
         );
-    };
+    }
 
-    @Decorators.it('Test OK')
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('affichage d\'un tabs avec tab async non chargé')
+    @Decorators.it("affichage d'un tabs avec tab async non chargé")
     displayTabAsyncNotLoaded() {
-        tabs = this.renderIntoDocument(tabsElement, "main1");
-        expect(document.querySelector('#main1 #tabs-sectionTabPanel-2[style*="display: none"]')).to.exist;
-        expect(document.querySelector('#main1 #tabs-sectionTabPanel-2[style*="display: none"]')['children'].length).to.be.equal(1);
-        expect(document.querySelector('#main1 #tabs-tabList-item-2')['text']).to.be.equal('tab3 Async');
+        const id = this.generateMainId();
+        tabs = this.renderIntoDocument(tabsElement, id);
+        expect(document.querySelector(`#${id} #tabs-sectionTabPanel-2[style*="display: none"]`)).to.exist;
+        expect(document.querySelector(`#${id} #tabs-sectionTabPanel-2[style*="display: none"]`)["children"].length).to.be.equal(1);
+        expect(document.querySelector(`#${id} #tabs-tabList-item-2`)["text"]).to.be.equal("tab3 Async");
         this.end();
-    };
+    }
 
-    @Decorators.it('affichage d\'un tab async chargé')
+    @Decorators.it("affichage d'un tab async chargé")
     displayTabAsync() {
-        tabs = this.renderIntoDocument(tabsElement, "main2");
-        this.triggerMouseEvent(document.querySelector('#main2 #tabs-tabList-item-2'), 'focus');
-        expect(document.querySelector('#main2 #tabs-sectionTabPanel-2[style*="display: block"]')).to.exist;
-        expect(document.querySelector('#main2 #tabs-sectionTabPanel-2[style*="display: block"] .tab-panel .datatable-container')).to.exist;
-        expect(document.querySelector('#main2 #tabs-tabList-item-2')['text']).to.be.equal('tab3 Async');
+        const id = this.generateMainId();
+        tabs = this.renderIntoDocument(tabsElement, id);
+        this.triggerMouseEvent(document.querySelector(`#${id} #tabs-tabList-item-2`), "focus");
+        expect(document.querySelector(`#${id} #tabs-sectionTabPanel-2[style*="display: block"]`)).to.exist;
+        expect(document.querySelector(`#${id} #tabs-sectionTabPanel-2[style*="display: block"] .tab-panel .datatable-container`)).to.exist;
+        expect(document.querySelector(`#${id} #tabs-tabList-item-2`)["text"]).to.be.equal("tab3 Async");
         this.end();
-    };
+    }
 
-    @Decorators.it('test des méthodes beforeHideTab/afterShowTab')
+    @Decorators.it("test des méthodes beforeHideTab/afterShowTab")
     hideShowTabs() {
+        const id = this.generateMainId();
         setTimeout(() => {
-            tabs = this.renderIntoDocument(tabsElement, "main3");
+            tabs = this.renderIntoDocument(tabsElement, id);
             setTimeout(() => {
-                this.triggerMouseEvent(document.querySelector('#main3 #tabs-2'), 'focus');
+                this.triggerMouseEvent(document.querySelector(`#${id} #tabs-2`), "focus");
                 expect(beforeHideTabCount).to.equal(1);
                 expect(afterShowTabCount).to.equal(2);
             }, 250);
 
-            this.triggerMouseEvent(document.querySelector('#main3 #tabs-1'), 'focus');
+            this.triggerMouseEvent(document.querySelector(`#${id} #tabs-1`), "focus");
             setTimeout(() => {
                 expect(beforeHideTabCount).to.equal(2);
                 expect(afterShowTabCount).to.equal(3);
                 expect(onSelectCount).to.equal(11);
             }, 250);
             this.end();
-        }, 250)
+        }, 250);
     }
 
     @Decorators.after
@@ -224,5 +227,5 @@ class tabsTest extends BaseTest {
     }
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new tabsTest());

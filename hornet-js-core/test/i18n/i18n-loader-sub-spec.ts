@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,21 +82,21 @@ import { Logger } from "hornet-js-utils/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 import { TestUtils } from "hornet-js-test/src/test-utils";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "appenders": {
-        "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
-        }
+    appenders: {
+        console: {
+            type: "console",
+            layout: {
+                type: "pattern",
+                pattern: "%[%d{ISO8601}|%p|%c|%m%]",
+            },
+        },
     },
-    "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
-    }
+    categories: {
+        default: { appenders: [ "console" ], level: "INFO" },
+    },
 });
 
-var expect:any = TestUtils.chai.expect;
+const expect: any = TestUtils.chai.expect;
 
 import { I18nLoaderSubDirectory } from "src/i18n/i18n-loader-sub-directory";
 import * as path from "path";
@@ -104,7 +104,11 @@ import * as path from "path";
 
 describe("Test of I18nLoaderSubDirectory : ", () => {
 
-    let i18nLoader = new I18nLoaderSubDirectory([path.join(__dirname, "sub")]);
+    let i18nLoader;
+
+    beforeEach(function () {
+        i18nLoader = new I18nLoaderSubDirectory([ path.join(__dirname, "sub") ]);
+    });
 
     it("find 2 locales", (done) => {
         expect(i18nLoader.getLocales().length).to.eql(2);
@@ -118,21 +122,37 @@ describe("Test of I18nLoaderSubDirectory : ", () => {
     });
 
     it("load message first locale", (done) => {
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.testValue).to.eql("fr");
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.labelLanguage).to.eql("test-fr-one-one");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.testValue).to.eql("fr");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.labelLanguage).to.eql("test-fr-one-one");
         done();
     });
 
     it("load message second locale", (done) => {
-        expect(i18nLoader.getMessages({lang: "ab", locale: "ab-AB"}).messages.testValue).to.eql("ab");
-        expect(i18nLoader.getMessages({lang: "ab", locale: "ab-AB"}).messages.labelLanguage).to.eql("test-ab");
+        expect(i18nLoader.getMessages({ lang: "ab", locale: "ab-AB" }).messages.testValue).to.eql("ab");
+        expect(i18nLoader.getMessages({ lang: "ab", locale: "ab-AB" }).messages.labelLanguage).to.eql("test-ab");
         done();
     });
 
 
     it("load message second locale not overhide first locale", (done) => {
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.testValue).to.eql("fr");
-        expect(i18nLoader.getMessages({lang: "fr", locale: "FR-fr"}).messages.labelLanguage).to.eql("test-fr-one-one");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.testValue).to.eql("fr");
+        expect(i18nLoader.getMessages({ lang: "fr", locale: "FR-fr" }).messages.labelLanguage).to.eql("test-fr-one-one");
         done();
     });
+
+    it("load messages from two dirs", (done)=> {
+        let i18nLoaderFromTwoDirs = new I18nLoaderSubDirectory([ path.join(__dirname, "sub"),  path.join(__dirname, "other")]);
+        // vérification d'un message défini dans les dossiers sub et other avec la même valeur
+        expect(i18nLoaderFromTwoDirs.getMessages({ lang: "fr", locale: "FR-fr" }).messages.testValue).to.eql("fr");
+        // vérification d'un message défini dans le dossier sub mais pas dans le dossier other
+        expect(i18nLoaderFromTwoDirs.getMessages({ lang: "fr", locale: "FR-fr" }).messages.labelLanguage).to.eql("test-fr-one-one");
+        // vérification d'un message défini dans le dossier other mais pas dans le dossier sub
+        expect(i18nLoaderFromTwoDirs.getMessages({ lang: "fr", locale: "FR-fr" }).messages.otherlabelLanguage).to.eql("test-fr-other");
+         // vérification d'un message défini dans les dossiers sub et other avec des valeurs différentes: la value à retenir est celle du dernier dossier
+         // du tableau passé à l'instanciation de I18nLoaderSubDirectory dans notre cas, la valeur à retenur est celle du dossier other
+         expect(i18nLoaderFromTwoDirs.getMessages({ lang: "fr", locale: "FR-fr" }).messages.value).to.eql("other-value");
+          // vérification d'un message défini uniquement dans hornet-component 
+          expect(i18nLoaderFromTwoDirs.getMessages({ lang: "fr", locale: "FR-fr" }).messages.form.requiredLabel).to.eql("Saisie obligatoire");
+        done();
+    })
 });

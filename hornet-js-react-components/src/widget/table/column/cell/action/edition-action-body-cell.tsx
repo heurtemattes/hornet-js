@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -117,18 +117,13 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
     constructor(props: P, context: any) {
         super(props, context);
 
-        this.state.visible = true;
-        // gestion du focus sur les boutons save et cancel de la cellule
-        this.state.submitFocused = false;
-        if (this.props.visible) {
-            this.state.visible = this.props.visible(this.props.value);
-        }
-
-        if (this.props.messageAlert) {
-            this.state.messageAlert = new Template(this.props.messageAlert).process(this.props.value, this.props.replaceUndef || "?");
-            this.state.titleAlert = new Template(this.props.titleAlert).process(this.props.value, this.props.replaceUndef || "?");
-        }
-
+        this.state = {
+            ...this.state,
+            submitFocused: false,
+            visible: props.visible ? this.props.visible(props.value) : true,
+            messageAlert: props.messageAlert && new Template(props.messageAlert).process(props.value, props.replaceUndef || "?"),
+            titleAlert: props.messageAlert && new Template(props.titleAlert).process(props.value, props.replaceUndef || "?"),
+        };
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -142,12 +137,12 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
 
         logger.trace("render EditableActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        let classes: ClassDictionary = {
-            "edition-button-action": true
+        const classes: ClassDictionary = {
+            "edition-button-action": true,
         };
 
-        let classesBefore: ClassDictionary = {
-            "edition-button-action-before": true
+        const classesBefore: ClassDictionary = {
+            "edition-button-action-before": true,
         };
 
         if (this.state.className) {
@@ -182,7 +177,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         } else {
             this.setItemInEdition();
         }
-    };
+    }
 
     /**
      * Permet de stocker l'item du tableau qui est en cours d'edition
@@ -190,7 +185,9 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
     setItemInEdition(): void {
         // remove tous les messages d'erreur
         NotificationManager.cleanAll();
-        this.props.contentState.setItemInEdition(this.state.isEditing ? null : this.props.value, this.state.isEditing ? null : this.props.coordinates.row);
+        this.props.contentState.setItemInEdition(
+            this.state.isEditing ? null : this.props.value,
+            this.state.isEditing ? null : this.props.coordinates.row);
     }
 
     /**
@@ -225,11 +222,11 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                 <button ref={(elt) => {
                     this.setButtonsRef(elt);
                 }}
-                        className={classNames(classes)}
-                        title={this.state.titleSave}
-                        aria-label={this.state.titleSave}
-                        type="submit"
-                        tabIndex={0}>
+                    className={classNames(classes)}
+                    title={this.state.titleSave}
+                    aria-label={this.state.titleSave}
+                    type="submit"
+                    tabIndex={0}>
                     <img src={Picto.editable.valider} className={this.state.classNameImg} alt={this.state.titleSave}
                         tabIndex={-1} />
                 </button>
@@ -237,12 +234,12 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                 <button ref={(elt) => {
                     this.setButtonsRef(elt);
                 }}
-                        className={classNames(classes)}
-                        title={this.state.titleCancel}
-                        aria-label={this.state.titleCancel}
-                        onClick={this.onClick}
-                        type="button"
-                        tabIndex={0}>
+                    className={classNames(classes)}
+                    title={this.state.titleCancel}
+                    aria-label={this.state.titleCancel}
+                    onClick={this.onClick}
+                    type="button"
+                    tabIndex={0}>
                     <img src={Picto.editable.annuler} className={this.state.classNameImg} alt={this.state.titleCancel}
                         tabIndex={-1} />
                 </button>
@@ -267,8 +264,8 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      */
     protected switchFocus(e): void {
         e.stopPropagation();
-        let indexBtnSave = 0;
-        let indexBtnCancel = 1;
+        const indexBtnSave = 0;
+        const indexBtnCancel = 1;
         if (!this.state.isEditing) {
             this.handleKeyDown(e);
         } else if (e.keyCode === KeyCodes.RIGHT_ARROW && this.state.submitFocused) {
@@ -289,7 +286,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      */
     handleCellFocus(tableCellRef) {
         if (this.buttonsRef.indexOf(document.activeElement) === -1) {
-            if (tableCellRef instanceof HTMLButtonElement || tableCellRef.tagName == "A") {
+            if (tableCellRef instanceof HTMLButtonElement || tableCellRef.tagName === "A") {
                 this.setState({ submitFocused: (tableCellRef as HTMLElement).getAttribute("type") === "submit" });
                 (tableCellRef as HTMLElement).focus();
 

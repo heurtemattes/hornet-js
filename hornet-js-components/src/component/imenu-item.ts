@@ -73,7 +73,7 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,5 +99,5 @@ export interface IMenuItem {
     /** Indique si l'élément doit être visible dans le plan */
     visibleDansPlan?: boolean;
     /** Nom de rôle ou liste de noms de rôles autorisé(s) à accéder à ce menu */
-    rolesAutorises?: string|string[];
+    rolesAutorises?: string | string[];
 }

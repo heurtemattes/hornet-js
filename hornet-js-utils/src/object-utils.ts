@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -96,12 +96,12 @@ export class ObjectUtils {
     static getSubObject(obj: any, deepAttr: string) {
         let res: any;
         if (obj && deepAttr) {
-            let stringKeys: Array<String> = deepAttr.split(".");
+            const stringKeys: Array<String> = deepAttr.split(".");
             let value = obj;
-            for (let attr in stringKeys) {
-                let key = stringKeys[attr];
+            for (const attr in stringKeys) {
+                const key = stringKeys[ attr ];
                 if (key) {
-                    value = value[key as string];
+                    value = value[ key as string ];
                     if (!value) {
                         break;
                     }

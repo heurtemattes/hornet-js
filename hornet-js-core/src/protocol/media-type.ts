@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,17 +93,17 @@ export class MediaTypes {
 
     static JSON = {
         SHORT: "json",
-        MIME: "application/json"
+        MIME: "application/json",
     };
 
     static XLS = {
         SHORT: "xls",
-        MIME: "application/vnd.ms-excel"
+        MIME: "application/vnd.ms-excel",
     };
 
     static CSV = {
         SHORT: "csv",
-        MIME: "text/csv"
+        MIME: "text/csv",
     };
 
     static PDF = {
@@ -113,42 +113,42 @@ export class MediaTypes {
 
     static DOC = {
         SHORT: "doc",
-        MIME: "application/msword"
+        MIME: "application/msword",
     };
 
     static TXT = {
         SHORT: "txt",
-        MIME: "text/plain"
+        MIME: "text/plain",
     };
 
     static PNG = {
         SHORT: "png",
-        MIME: "image/png"
+        MIME: "image/png",
     };
 
     static BMP = {
         SHORT: "bmp",
-        MIME: "image/x-ms-bmp"
+        MIME: "image/x-ms-bmp",
     };
 
     static JPG = {
         SHORT: "jpg",
-        MIME: "image/jpeg"
+        MIME: "image/jpeg",
     };
 
     static OCTETSTREAM = {
         SHORT: "octet-stream",
-        MIME: "application/octet-stream"
+        MIME: "application/octet-stream",
     };
 
     static ODS = {
         SHORT: "ods",
-        MIME: "application/vnd.oasis.opendocument.spreadsheet"
+        MIME: "application/vnd.oasis.opendocument.spreadsheet",
     };
 
     static ODT = {
         SHORT: "odt",
-        MIME: "application/vnd.oasis.opendocument.text"
+        MIME: "application/vnd.oasis.opendocument.text",
     };
 
     // Attention à ne pas déclarer le DEFAUT avant sa valeur

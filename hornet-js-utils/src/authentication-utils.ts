@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import * as _ from "lodash";
 import { Register } from "src/common-register";
 
-let logger = Register.getLogger("hornet-js-utils.authentication-utils");
+const logger = Register.getLogger("hornet-js-utils.authentication-utils");
 
 export interface Role {
     name: string;
@@ -103,7 +103,7 @@ export class AuthUtils {
     static isAllowed(user: UserInformations, roles: Array<string>): boolean {
         let ok = false;
         // Si pas de roles à tester, on est autorisé
-        if (!roles || roles.length === 0 || user && roles[0] == "*") ok = true;
+        if (!roles || roles.length === 0 || user && roles[ 0 ] === "*") ok = true;
         else {
             if (user && _.isArray(user.roles)) {
                 ok = roles.some((role) => {
@@ -120,6 +120,6 @@ export class AuthUtils {
     static hasRole(user: UserInformations, role: string): boolean {
         if (!user || !role) return false;
 
-        return AuthUtils.isAllowed(user, [role]);
+        return AuthUtils.isAllowed(user, [ role ]);
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,11 +106,8 @@ import { TabContent } from "src/widget/tab/tab-content";
 import { TabHeader } from "src/widget/tab/tab-header";
 
 
-let dataSource: DataSource<any>;
 let tabsElement: JSX.Element;
 let tabs;
-let data;
-let fnt;
 let beforeHideTabCount = 0;
 let afterShowTabCount = 0;
 let onSelectCount = 0;
@@ -121,31 +118,20 @@ class tabsDeleteButtonTest extends BaseTest {
 
     @Decorators.beforeEach
     beforeEach() {
-        data = [];
         tabs = null;
 
         beforeHideTabCount = 0;
         afterShowTabCount = 0;
         onSelectCount = 0;
 
-        let step = 1;
-        for (let i: number = 1; i < 10; i++) {
-            data.push({id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++});
-        }
-        dataSource = new DataSource(data);
-        fnt = () => {
-            if (!dataSource.status) {
-                dataSource.init();
-            }
-        };
         tabsElement = (
             <Tabs id="tabs" selectedTabIndex={0} beforeHideTab={() => {
                 beforeHideTabCount++
             }} afterShowTab={() => {
                 afterShowTabCount++
             }}
-                  deleteTabFunction={this.deleteTabFunction.bind(this)}
-                  deleteButtonTitle={"test"}
+                deleteTabFunction={this.deleteTabFunction.bind(this)}
+                deleteButtonTitle={"test"}
             >
                 <Tab title="tab1" isDeletable={true} id={"tab1"}>
                     <div>TabContent1</div>

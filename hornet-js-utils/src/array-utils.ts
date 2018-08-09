@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,9 +112,9 @@ export class ArrayUtils {
         if (objectList1 && objectList1.length === 0 && objectList2 && objectList2.length === 0) {
             return false;
         }
-        let result = _.filter(objectList1, (item) => {
-            let index = this.getIndexById(objectList2, item);
-            return (index === -1 );
+        const result = _.filter(objectList1, (item) => {
+            const index = this.getIndexById(objectList2, item);
+            return (index === -1);
         });
         return result.length === 0;
     }
@@ -128,11 +128,11 @@ export class ArrayUtils {
      */
     static unionWith(object: any[], other: any[], key: string = "id"): any[] {
 
-        let listResult: any[] = _.unionWith(object, other,
-            (item1, item2) => {
+        const listResult: any[] = _.unionWith(object, other,
+                                              (item1, item2) => {
 
-                let templateItem1 = new Template("${" + key + "}").process(item1, "id");
-                let templateItem2 = new Template("${" + key + "}").process(item2, "id");
+                const templateItem1 = new Template("${" + key + "}").process(item1, "id");
+                const templateItem2 = new Template("${" + key + "}").process(item2, "id");
 
                 return templateItem1 === templateItem2;
             });
@@ -149,11 +149,11 @@ export class ArrayUtils {
      */
     static intersectionWith(object: any[], other: any[], key: string = "id"): any[] {
 
-        let listResult: any[] = _.intersectionWith(object, other,
-            (item1, item2) => {
+        const listResult: any[] = _.intersectionWith(object, other,
+                                                     (item1, item2) => {
 
-                let templateItem1 = new Template("${" + key + "}").process(item1, "id");
-                let templateItem2 = new Template("${" + key + "}").process(item2, "id");
+                const templateItem1 = new Template("${" + key + "}").process(item1, "id");
+                const templateItem2 = new Template("${" + key + "}").process(item2, "id");
 
                 return templateItem1 === templateItem2;
             });

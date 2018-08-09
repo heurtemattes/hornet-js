@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -117,7 +117,7 @@ export class TestUtils {
         var max: number = 10;
 
         function doStart() {
-            var server = app && app.listen(_port, function() {
+            var server = app && app.listen(_port, function () {
                 console.log("Serveur démarré sur le port", _port);
                 done(server, _port, undefined);
             })

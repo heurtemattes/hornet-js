@@ -73,14 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {Response} from "express";
-import { MediaTypes} from "src/protocol/media-type";
-import {HornetResult} from "src/result/hornet-result";
+import { Response } from "express";
+import { MediaTypes } from "src/protocol/media-type";
+import { HornetResult } from "src/result/hornet-result";
 
 
 // ------------------------------------------------------------------------------------------------------------------- //
@@ -90,22 +90,22 @@ import {HornetResult} from "src/result/hornet-result";
  * @class
  * @classdesc HornetResult définit un result de type Stream.
  */
-export class ResultStream extends HornetResult{
-    constructor(options, mime : string){
-        super(options,  MediaTypes.OCTETSTREAM)
+export class ResultStream extends HornetResult {
+    constructor(options, mime: string) {
+        super(options, MediaTypes.OCTETSTREAM);
     }
 
     /*
      *@inheritdoc
      */
-    protected compute() : Promise<any> {
-        return Promise.resolve(true)
+    protected compute(): Promise<any> {
+        return Promise.resolve(true);
     }
 
     /*
      *@inheritdoc
      */
-    protected configure(res : Response) : boolean {
+    protected configure(res: Response): boolean {
         return false;
     }
 }

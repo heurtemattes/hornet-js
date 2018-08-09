@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,11 +82,11 @@ import { AbstractTest } from "hornet-js-test/src/abstract-test";
 import { Utils } from "hornet-js-utils";
 
 Utils.setConfigObj({
-    "themeName": "hornet-themes-intranet",
+    themeName: "hornet-themes-intranet",
 });
 import events = require("events");
 
-var HCE = require("hornet-js-core/src/component/hornet-component-errors");
+const HCE = require("hornet-js-core/src/component/hornet-component-errors");
 
 /**
  * classe abstraite de Test
@@ -99,7 +99,7 @@ export class BaseTest extends AbstractTest {
     public catchAsyncThrow(done: (any)) {
         super.catchAsyncThrow(done);
         HCE.DEFAULT_ERROR_HANDLER = (a) => {
-            done(a.error)
+            done(a.error);
         };
     }
 

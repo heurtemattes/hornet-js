@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -108,12 +108,16 @@ export interface FooterProps extends HornetComponentProps {
 export class Footer extends HornetComponent<FooterProps, any> {
 
     static defaultProps = {
-        className: "hornet-datatable-bottom"
+        className: "hornet-datatable-bottom",
     };
 
     constructor(props: FooterProps, context?: any) {
         super(props, context);
-        this.state.i18n = this.i18n("table");
+
+        this.state = {
+            ...this.state,
+            i18n: this.i18n("table"),
+        };
 
         // gestion de l'event d'eidtion du tableau
         this.props.contentState.setMaxListeners(Infinity);
@@ -130,7 +134,7 @@ export class Footer extends HornetComponent<FooterProps, any> {
      * @param lineIndex
      */
     handleEdition(lineIndex: number): void {
-        this.setState({disabled: lineIndex !== undefined && lineIndex !== null});
+        this.setState({ disabled: lineIndex !== undefined && lineIndex !== null });
     }
 
     /**
@@ -139,15 +143,15 @@ export class Footer extends HornetComponent<FooterProps, any> {
     render(): JSX.Element {
         logger.trace("render");
 
-        let divProps: any = {
+        const divProps: any = {
             className: this.state.className,
-            disabled: this.state.disabled
+            disabled: this.state.disabled,
         };
 
         return (
             <div {...divProps}>
                 {this.setChildrenDisabled()}
-            </div> );
+            </div>);
     }
 
     /**
@@ -155,12 +159,15 @@ export class Footer extends HornetComponent<FooterProps, any> {
      * @returns {Array}
      */
     setChildrenDisabled(): Array<any> {
-        let children = [];
-        React.Children.map(this.props.children, (child: React.ReactChild) => {
-            if ( ( child as React.ReactElement<any> ).type === Pager) {
-                children.push(this.wrap(Pager, ( child as React.ReactElement<any> ).props,  {disabled: this.state.disabled}));
+        const children = [];
+        React.Children.map(this.props.children, (child: React.ReactChild, i: number) => {
+            if ((child as React.ReactElement<any>).type === Pager) {
+                const childProps = (child as React.ReactElement<any>).props;
+                const props = {...childProps,  disabled: this.state.disabled, key: `footer-element-${i}`};
+                children.push(React.createElement(Pager, props));
+                // children.push(this.wrap(Pager, (child as React.ReactElement<any>).props, { disabled: this.state.disabled }));
             } else {
-                children.push(( child as React.ReactElement<any> ).props.children);
+                children.push((child as React.ReactElement<any>).props.children);
             }
         });
 

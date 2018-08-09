@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,7 +89,7 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.spinne
 /**
  * Composant affichant une image sur un champ autocomplete
  */
-export class SpinnerAutoComplete<P extends SpinnerProps, S extends SpinnerProps>  extends SpinnerComponent<P, S> {
+export class SpinnerAutoComplete<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
 
     constructor(props?: P, context?: any) {
         super(props, context);
@@ -101,7 +101,7 @@ export class SpinnerAutoComplete<P extends SpinnerProps, S extends SpinnerProps>
     render(): JSX.Element {
 
         return (
-            ( this.state.isVisible ) ?
+            (this.state.isVisible) ?
                 <div className="component-spinner autocomplete autocompleteloading">
                 </div> : null
         );

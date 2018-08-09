@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,19 +118,19 @@ export let Decorators = {
     beforeEach: setAnnotation.bind(null, Annotations.beforeEach, true),
     after: setAnnotation.bind(null, Annotations.after, true),
     it(testName, fnt?: any) {
-        return setAnnotation.bind(null, Annotations.it, [testName, fnt]);
+        return setAnnotation.bind(null, Annotations.it, [ testName, fnt ]);
     },
     xit(testXit) {
         return setAnnotation.bind(null, Annotations.xit, testXit);
     },
     describe(suiteName) {
         return (suite) => {
-            suite[Annotations.describe] = suiteName;
+            suite[ Annotations.describe ] = suiteName;
         };
     }
 };
 
 function setAnnotation(annotationName, value, target, name, descriptor) {
-    descriptor.value[annotationName] = value;
+    descriptor.value[ annotationName ] = value;
     return descriptor;
 }

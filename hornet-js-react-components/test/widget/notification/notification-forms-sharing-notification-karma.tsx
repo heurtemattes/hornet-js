@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -126,11 +126,11 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected generateAccordionsIntoForm1(): JSX.Element {
         return (
             <Form id={"form1"}
-                  onSubmit={this.onSubmit}
-                  schema={schema}
-                  notifId={"myNotificationSpot1"}>
+                onSubmit={this.onSubmit}
+                schema={schema}
+                notifId={"myNotificationSpot1"}>
                 <Accordions id={"id-accordions-form-1"}
-                            multiSelectable={false}>
+                    multiSelectable={false}>
                     <Accordion>
                         <Row>
                             <InputField
@@ -188,11 +188,11 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected generateAccordionsIntoForm2(): JSX.Element {
         return (
             <Form id={"form2"}
-                  onSubmit={this.onSubmit}
-                  schema={schema2}
-                  notifId={"myNotificationSpot1"}>
+                onSubmit={this.onSubmit}
+                schema={schema2}
+                notifId={"myNotificationSpot1"}>
                 <Accordions id={"id-accordions-form-2"}
-                            multiSelectable={false}>
+                    multiSelectable={false}>
                     <Accordion>
                         <Row>
                             <InputField
@@ -212,10 +212,10 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected renderButtons(formName: string): JSX.Element {
         return (
             <ButtonsArea>
-                <Button type="submit" id={"envoi-"+formName} name={"action:"+formName} className="hornet-button"
-                        value={"valider"}
-                        label={"valider"}
-                        title={"valider"} />
+                <Button type="submit" id={"envoi-" + formName} name={"action:" + formName} className="hornet-button"
+                    value={"valider"}
+                    label={"valider"}
+                    title={"valider"} />
             </ButtonsArea>
         );
     }
@@ -267,7 +267,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
 
     protected getNotificationMessageListForm(form: string, className: string) {
         let formElement = document.getElementById(form);
-        let messageList = formElement.getElementsByClassName(className)[0];
+        let messageList = formElement.getElementsByClassName(className)[ 0 ];
         return (messageList) ? messageList.children : null;
     }
 
@@ -275,8 +275,8 @@ class NotificationFormDispatchingTest extends HornetReactTest {
         let formElement = document.getElementById(form);
         let errorTagAccordion = formElement.getElementsByClassName(className);
         let count: number = 0;
-        for(let i=0;i<errorTagAccordion.length;i++) {
-            count += Number(errorTagAccordion[i].textContent.split(" ")[0]);
+        for (let i = 0; i < errorTagAccordion.length; i++) {
+            count += Number(errorTagAccordion[ i ].textContent.split(" ")[ 0 ]);
         }
         return count;
     }

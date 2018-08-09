@@ -1,3 +1,145 @@
+# hornet-js-react-components 5.2.0
+
+- EVOL - AbstractField : Contextualisation bouton reset
+- EVOL - AbstractField : Ajout d'une classe css pour les reverseLabel
+- EVOL - AbstractField : Ajout de props pour gérer le placement du label
+- FIX  - AbstractField : Accès aux attributs d'un objet undefined
+- EVOL - [M0069061]: AbstractField : ajout de la props resettable pour les champs avec un reset button
+- FIX  - (Support) - AbstractField : Ajout input type number au domadapter
+- FIX  - [M0067247] - AbstractField : initialisation du state dans le componentWillReceiveProps du abstractField -- validation WM
+
+- EVOL - Accessibilité: title dropdownItem MenuActions
+- EVOL - Accessibilité: title dropdownItem toggleColumnButton
+- EVOL - Accessibilité: title dropdownItem toggleColumnButton/Pager
+- EVOL - Accessibilité: mise en place title sur liens dropDown
+- FIX  - Accessibilité: aria-describedby et champs en erreur (champs liés en erreur)
+- FIX  - Accessibilité - entêtes de colonne retour crocus
+- FIX  - Accessibilité: scrollToNotification
+- FIX  - [s240] - Accessibilité: px to em
+- EVOL - [s231] - Accessibilité : Table vide
+
+- FIX  - AutocompleteField : Correction RGAA sur les autocomplete
+- EVOL - AutocompleteField : ajout d'un test pour les button reset des autocomplete disabled
+- FIX  - AutocompleteField : Correction de l'affichage du bouton reset en cas d'autocomplete disabled
+- EVOL - AutocompleteField : rollback utilisation de this.setState
+- EVOL - AutocompleteField : utilisation de setState en dehors du constructeur
+- EVOL - [S202-546] - Autocomplete : ajout d'un bouton de suppression sur l'autocomplete
+- FIX  - [M0066889] - AutocompleteField : correction du texte affiché dans l'autocomplete
+- FIX  - [M0066964] - AutocompleteField : appel au onChange lors de la modification de l'autocomplete
+
+- FIX  - AutocompleteFieldMultiple : problème avec autocomplete multiple, les case ne se cochaient plus dans certains cas
+
+- EVOL - [s231] - CalendarField : Montée de version de rc-calendar en 9.6.2
+
+- FIX  - [m69060] - CharsCounter : correction ajout incorrect de aria-labelledby
+- FIX  - CharCounter: correction des bugs lors d'une saisie rapide
+- FIX  - [m-67828] - CharsCounter : refacto Textarea et InputField
+
+- FIX  - [s244] - CheckBox: CSS en erreur
+- FIX  - Checkbox : un click sur la barre espace en etant focus sur une checbox cochait et décochait celle ci
+- FIX  - [M68103] Checkbox : Une checkbox disabled est cochable en navigation par tabulation
+
+- FIX  - DropDown : Correction fermeture dropdown avec la touche espace dans un tableau
+- EVOL - [s228] - Dropdown : gestion du clic sur la barre d'espace
+- EVOL - [s228] - DropDown : Accessibilité DropDownItem
+
+- EVOL - Form : transmettre données null lors de validation
+- EVOL - Form : recupération du label pour les messages génériques de validation
+- FIX  - [m69123] - Form : messages d'erreur paramétré avec maxLength
+- FIX  - Form : split methode validateAndSubmit
+- FIX  - Form : correction temporaire pour l'affichage du texte et des champs requis
+
+- EVOL - hornet-js-react-components : EVOL: update version react (XSS)
+- FIX  - hornet-js-react-components :  Erreur clés de message i18n
+- FIX  - hornet-js-react-components : top button fonctionne aléatoirement
+- EVOL - hornet-js-react-components : menage cls client et parametrage exclusion
+- FIX  - [t596] hornet-js-react-components : Nav clavier espace pour ouverture modal et uniquement ouverture sous firefox
+- EVOL - [S201] - hornet-js-react-components : Tester la validation de formulaire sans soumission
+- EVOL - [S177-492] - hornet-js-react-components : normalisation injector
+- EVOL - [S80] - hornet-js-react-components : Montée de version React 16.4.0
+- EVOL - [S96] - hornet-js-react-components : Reprise des composants pour affectation du state ailleurs que dans le constructeur
+
+
+- EVOL - [s228] - Menu : Ajout title sur les menuitems
+- EVOL - [s228] - Menu et dropdown accessibilité
+
+- FIX  - [s198] - Modal : accessibilite composant modale
+
+- FIX  - Notification : ajout role alert
+- EVOL - Notification : style composant session idp
+- FIX  - [s225] - Notification : I18N suppression message en "dur"
+- FIX  - [s199] - Notification: props manquantes: color et logo
+- FIX  - [M0066773] - Notification : correction de la suppression d'une notification
+
+- EVOL - Pager : Contextualisation du pager
+
+- FIX  - [s244] - RadioField : CSS en erreur
+- FIX  - [m0068017] - RadioField : Hornet 5.1.1 getCurrentValue() sur RadiosField de plus de 2 labels renvoie null
+
+- EVOL - Row : fix alignement inputs dans un Row
+- FIX  - Row : Ajout props fraction à Row
+
+- EVOL - SelectField : ajout d'une props nullable sur le selectfield
+- FIX  - [SUPPORT_ELECTIS] - SelectField : déclenchement event select sur sélection numérique
+- FIX  - [M0067235] - Selectfield : correction de l'appel à la prop onChange dans le selectfield
+
+- EVOL - [s231] - Switch : ajout attribut checked si le chexbox est coché
+
+- FIX  - Table Problème des colSpan des expandableCells
+- EVOL - [s247] - Table : Suppression du spinnerLoader après chargement des données
+- FIX  - Table: Ajout TU pour SpinnerLoader
+- FIX  - [S247-623] - Table : correction du scroll lors d'un click sur la touche espace sur une header cell triable
+- FIX  - [s226] - Table : optimisation Table - ajout des log deprecated
+- FIX  - Page/Footer: Suppression warning React
+- FIX  - [s246] - Table: Accessibilité: Entêtes de Table - Tri
+- FIX  - Table : focus sur les check body column dans le tableau
+- FIX  - Table : CSS & taille min MoreInfoColumn
+- EVOL - [s231] - Table : accessibilité sur le Pager
+- EVOL - [s231] - Table : ActionButton & ajout role button
+- EVOL - [s231] - Table: Suppression de aria-label sur les boutons du pager
+- EVOL - [s231] - Table: suppression role grid
+- EVOL - [S226-570] - Table : suppression des appels restants à la méthode wrap dans le tableau
+- EVOL - Table : Suppression wrap
+- FIX  - Table : correctif format date sur méthode componentWillReceiveProps
+- EVOL - Table - AbstractBodyCell & creation méthode static  getTemplatedValue
+- FIX  - Table : pour le fonctionnement de la cellule check du tableau
+- FIX  - Table : correctif perf
+- EVOL - [m8242] - Table : Précision sur l'ordre du tri dans les tableaux
+- FIX  - [m68378] - Table - Problème de lenteur
+- FIX  - Table : optimisation Peformances
+- EVOL - Table : Content Ajout surcharge emptyResult
+- FIX  - Table : correction du title dans les actions cells du tableau (le problème était que le titlecell était écrasé par le title)
+- FIX  - Table : correction du titleCell pour passer props.value et non state.value
+- FIX  - Table: correction du classname sur les colonnes
+- FIX  - Table : correction pour l'affichage du titleCell
+- FIX  - [m67437] - Table : correction du bug et creation du test associé
+- FIX  - [M0066957] - Table : correction du style qui ne marche plus lorsque la colonne est cachée par défaut
+- EVOL - [M0066961] - Table : ajout d'un className dans les columns
+
+
+- EVOL - Tabs : ajout props style pour surcharger le css par défaut
+- FIX  - Tabs: correction erreur sur les tabs
+
+- FIX  - (M69055) - TextArea : prise en compte rows
+- FIX  - Textarea : ajout TU accessibilite et changement role compteur
+- FIX  - Textarea : erreur affichage alerte lors d'une suppression rapide
+- FIX  -	[m68171] - Textarea : utilisation de i18n pour le label du compteur
+- EVOL - [s200] -  Textarea : Ajout limite maxchar dans le label
+- FIX  - Textarea : affichage compteur lorsque value change via setCurrentValue
+- FIX  - [m68171] - Textarea : fix fermeture systematique alert
+- FIX  - [s195] - Textarea : balise RGA
+- FIX  - [s485] - Textarea : correction message lié au compteur de caractères
+- EVOL - [M0067015] - TextareaField : réglage de la taille du textarea au moment du updateFields
+
+- FIX  - (S247-621) - TopButton : remonter sur barre d'espace
+- EVOL - TopButton : scrollTop with smooth animation
+
+- FIX  - UploadFileField : suppression log.info dans le composant upload
+
+- EVOL  - User : adding title User Component
+- EVOL - User : Init user test karma pour le composant User
+
+
 # hornet-js-react-components 5.1.1
 
 -	65965	-	Problème de mise à jour de pagination lors du tri sur une colonne

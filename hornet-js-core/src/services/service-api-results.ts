@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,25 +105,26 @@ export interface NodeApiResult {
 }
 
 export class NodeApiResultBuilder {
-    static build(jsonData: any): NodeApiResult {
+    static build(jsonData: any, url?: string): NodeApiResult {
         return {
             hasTechnicalError: false,
             hasBusinessError: false,
             status: 200,
-            url: "???",
+            url: url || "???",
             data: jsonData,
-            errors: []
+            errors: [],
         };
     }
 
-    static buildError(error: BaseError): NodeApiResult {
+    static buildError(error: BaseError, url?: string): NodeApiResult {
         return {
             hasTechnicalError: error instanceof TechnicalError,
             hasBusinessError: error instanceof BusinessError,
-            status: (error.args["httpStatus"] && parseInt(error.args["httpStatus"])) || 200,
-            url: "???",
+            status: (error.args[ "httpStatus" ] && parseInt(error.args[ "httpStatus" ], 10)) 
+            || (error["httpStatus"] && parseInt(error["httpStatus"], 10)) ||  200,
+            url: url || "???",
             data: null,
-            errors: [error]
+            errors: [ error ],
         };
     }
 }
@@ -140,13 +141,13 @@ export class NodeApiError {
     details: string;
     reportId: string;
     /** Paramètres utilisables dans la construction du message d'erreur correspondant au code */
-    args: { [key: string]: string };
+    args: { [ key: string ]: string };
     backend: boolean = false;
     httpStatus: number;
     nodeApiErrorList: Array<NodeApiError>;
 
     constructor(date?: number, code?: string, name?: string, details?: string,
-                args?: { [key: string]: string }, reportId?: string, backend?: boolean, httpStatus?: number) {
+                args?: { [ key: string ]: string }, reportId?: string, backend?: boolean, httpStatus?: number) {
         this.date = date;
         this.code = code;
         this.name = name;
@@ -170,7 +171,7 @@ export class NodeApiError {
              * on récupère uniquement la première ligne car il n'est pas judicieux
              * (notamment pour des raisons de sécurité) d'afficher toute la pile
              * d'erreur serveur dans le log client */
-            let lineEndIndex = apiError.err_cause.message.indexOf("\n");
+            const lineEndIndex = apiError.err_cause.message.indexOf("\n");
             if (process.env.NODE_ENV !== "production") {
                 details = apiError.err_cause.message;
             } else {
@@ -185,20 +186,20 @@ export class NodeApiError {
     }
 
     static parseError(apiErrors: BaseError[] | BaseError, httpStatus: number): NodeApiError {
-        if (!_.isArray(apiErrors) && (apiErrors as BaseError).name == "BusinessErrorList") {
-            apiErrors = apiErrors["errors"];
-        } else if (_.isArray(apiErrors) && apiErrors.length == 1 && apiErrors[0].name == "BusinessErrorList") {
-            apiErrors = apiErrors[0]["errors"];
+        if (!_.isArray(apiErrors) && (apiErrors as BaseError).name === "BusinessErrorList") {
+            apiErrors = apiErrors[ "errors" ];
+        } else if (_.isArray(apiErrors) && apiErrors.length === 1 && apiErrors[ 0 ].name === "BusinessErrorList") {
+            apiErrors = apiErrors[ 0 ][ "errors" ];
         }
 
         if (_.isArray(apiErrors) && apiErrors.length > 1) {
             // cas d'une liste d'erreurs
-            let global: NodeApiError = new NodeApiError();
+            const global: NodeApiError = new NodeApiError();
             for (let i: number = 0; i < apiErrors.length; i++) {
-                let details: string = NodeApiError.parseDetails(apiErrors[i]);
+                const details: string = NodeApiError.parseDetails(apiErrors[ i ]);
                 global.nodeApiErrorList.push(
-                    new NodeApiError(apiErrors[i].date, apiErrors[i].code, apiErrors[i].name,
-                        details, apiErrors[i].args, apiErrors[i].reportId, apiErrors[i].backend, httpStatus)
+                    new NodeApiError(apiErrors[ i ].date, apiErrors[ i ].code, apiErrors[ i ].name,
+                                     details, apiErrors[ i ].args, apiErrors[ i ].reportId, apiErrors[ i ].backend, httpStatus),
                 );
             }
             return global;
@@ -206,71 +207,72 @@ export class NodeApiError {
             // cas d'une erreur simple
             let singleError: BaseError;
             if (_.isArray(apiErrors)) {
-                singleError = apiErrors[0];
+                singleError = apiErrors[ 0 ];
             } else {
                 singleError = apiErrors as BaseError;
             }
 
-            let details: string = NodeApiError.parseDetails(singleError);
+            const details: string = NodeApiError.parseDetails(singleError);
 
             return new NodeApiError(singleError.date, singleError.code, singleError.name,
-                details, singleError.args, singleError.reportId, singleError.backend, httpStatus);
+                                    details, singleError.args, singleError.reportId, singleError.backend, httpStatus);
         }
     }
 
     toJsError(): BaseError {
-        if (this.nodeApiErrorList.length == 0) {
+        if (this.nodeApiErrorList.length === 0) {
             let error;
-            let args = {};
+            const args = {};
 
             // backend args
-            for (let i in this.args) {
-                args[i] = this.args[i];
+            for (const i in this.args) {
+                args[ i ] = this.args[ i ];
             }
 
             // default args
-            if (!args["reportId"] && this.reportId) {
-                args["reportId"] = this.reportId;
+            if (!args[ "reportId" ] && this.reportId) {
+                args[ "reportId" ] = this.reportId;
             }
-            if (!args["httpStatus"] && this.httpStatus) {
-                args["httpStatus"] = this.httpStatus;
+            if (!args[ "httpStatus" ] && this.httpStatus) {
+                args[ "httpStatus" ] = this.httpStatus;
             }
 
             // Error type
-            if (this.name == "BusinessError") {
+            if (this.name === "BusinessError") {
                 error = new BusinessError(this.code, args);
-            } else if (this.httpStatus && (this.httpStatus < 200 || this.httpStatus > 299)) {
-                error = new HttpError(this.httpStatus, this.code, args, this.details ? new BaseError("", this.details) : null)
             } else {
                 error = new TechnicalError(this.code, args, this.details ? new BaseError("", this.details) : null);
+                if (this.httpStatus && (this.httpStatus < 200 || this.httpStatus > 299)) {
+                    (error as TechnicalError).httpStatus = this.httpStatus;
+                }
             }
             error.backend = this.backend;
 
             return error;
 
         } else {
-            let error = new BusinessErrorList();
+            const error = new BusinessErrorList();
             let backend = false;
             for (let i = 0; i < this.nodeApiErrorList.length; i++) {
-                let apiError = this.nodeApiErrorList[i];
+                const apiError = this.nodeApiErrorList[ i ];
                 let suberror;
-                let args = {};
+                const args = {};
 
                 // backend args
-                for (let i in apiError.args) {
-                    args[i] = apiError.args[i];
+                for (const i in apiError.args) {
+                    args[ i ] = apiError.args[ i ];
                 }
 
                 // default args
-                if (!args["reportId"] && apiError.reportId) {
-                    args["reportId"] = apiError.reportId;
+                if (!args[ "reportId" ] && apiError.reportId) {
+                    args[ "reportId" ] = apiError.reportId;
                 }
-                if (!args["httpStatus"] && apiError.httpStatus) {
-                    args["httpStatus"] = apiError.httpStatus;
+                if (!args[ "httpStatus" ] && apiError.httpStatus) {
+                    args[ "httpStatus" ] = apiError.httpStatus;
                 }
 
                 // Error type
-                if (apiError.name == "BusinessError") {
+                if (apiError.name === "BusinessError") {
                     suberror = new BusinessError(apiError.code, args);
                 } else {
                     suberror = new TechnicalError(apiError.code, args, apiError.details ? new BaseError("", apiError.details) : null);
@@ -297,9 +299,10 @@ export class BackendApiError {
     args: Array<string>;
     httpStatus: number;
     backendApiErrorList: Array<BackendApiError>;
+    originalAttrs: object;
 
     constructor(date?: number, code?: string, name?: string, type?: string, details?: string,
-                args?: Array<string>, reportId?: string, httpStatus?: number) {
+                args?: Array<string>, reportId?: string, httpStatus?: number, originalAttrs?: object) {
         this.date = date;
         this.code = code;
         this.name = name;
@@ -309,6 +312,14 @@ export class BackendApiError {
         this.reportId = reportId;
         this.httpStatus = httpStatus;
         this.backendApiErrorList = [];
+
+        this.originalAttrs = (<any>Object).assign(originalAttrs || {}, {});
+        delete(this.originalAttrs["stack"]);
+
+        Object.keys(this).forEach((attrib) => {
+            delete(this.originalAttrs[attrib]);
+        });
+
     }
 
     /**
@@ -320,93 +331,96 @@ export class BackendApiError {
     static parseError(apiErrors: BackendApiError | Array<BackendApiError>, httpStatus: number): BackendApiError {
         if (_.isArray(apiErrors) && apiErrors.length > 1) {
             // cas d'une liste d'erreurs
-            let global: BackendApiError = new BackendApiError();
+            const global: BackendApiError = new BackendApiError();
             for (let i = 0; i < (apiErrors as Array<BackendApiError>).length; i++) {
                 global.backendApiErrorList.push(
-                    new BackendApiError(apiErrors[i].date, apiErrors[i].code, apiErrors[i].name, apiErrors[i].type,
-                        apiErrors[i].details, apiErrors[i].args, apiErrors[i].reportId, httpStatus)
-                );
+                    new BackendApiError(apiErrors[ i ].date, apiErrors[ i ].code, apiErrors[ i ].name, apiErrors[ i ].type,
+                                        apiErrors[ i ].details, apiErrors[ i ].args, apiErrors[ i ].reportId, httpStatus, apiErrors[ i ]));
             }
             return global;
         } else {
             // cas d'une erreur simple
             let singleError: BackendApiError;
             if (_.isArray(apiErrors)) {
-                singleError = apiErrors[0];
+                singleError = apiErrors[ 0 ];
             } else {
                 singleError = apiErrors;
             }
-
             return new BackendApiError(singleError.date, singleError.code, singleError.name, singleError.type,
-                singleError.details, singleError.args, singleError.reportId, httpStatus);
+                                       singleError.details, singleError.args, singleError.reportId, httpStatus || 200, singleError);
         }
     }
 
     toJsError(): BaseError {
-        if (this.backendApiErrorList.length == 0) {
+        if (this.backendApiErrorList.length === 0) {
             let error: BaseError;
-            let args = {};
+            const args = (<any>Object).assign(this.originalAttrs || {}, {});
 
             // backend args
             for (let i = 0; i < this.args.length; i++) {
-                args["$" + i] = this.args[i];
+                args[ "$" + i ] = this.args[ i ];
             }
+            
 
             // default args
             if (this.reportId) {
-                args["reportId"] = this.reportId;
+                args[ "reportId" ] = this.reportId;
             }
             if (this.httpStatus) {
-                args["httpStatus"] = this.httpStatus;
+                args[ "httpStatus" ] = this.httpStatus;
             }
             if (this.name) {
-                args["errorMessage"] = this.name;
+                args[ "errorMessage" ] = this.name;
             } else {
-                args["errorMessage"] = "";
+                args[ "errorMessage" ] = "";
             }
 
             // Error type
-            if (this.type == "TechnicalException") {
+            if (this.type === "TechnicalException") {
                 error = new TechnicalError(this.code, args, this.details ? new BaseError("", this.details) : null);
+                if (this.httpStatus !== 200) {
+                    (error as TechnicalError).httpStatus = this.httpStatus;
+                }
                 error.backend = true;
-            } else if (this.type == "BusinessException") {
+            } else if (this.type === "BusinessException") {
                 error = new BusinessError(this.code, args);
                 error.backend = true;
+            } else {
+                error = new BaseError(this.code, this.originalAttrs["message"] || undefined, args);
             }
-
             return error;
 
         } else {
-            let error = new BusinessErrorList();
+            const error = new BusinessErrorList();
 
             for (let i = 0; i < this.backendApiErrorList.length; i++) {
-                let apiError = this.backendApiErrorList[i];
+                const apiError = this.backendApiErrorList[ i ];
                 let suberror;
-                let args = {};
+                const args = (<any>Object).assign(this.originalAttrs || {}, {});
 
                 // backend args
                 for (let i = 0; i < apiError.args.length; i++) {
-                    args["$" + i] = apiError.args[i];
+                    args[ "$" + i ] = apiError.args[ i ];
                 }
 
                 // default args
                 if (apiError.reportId) {
-                    args["reportId"] = apiError.reportId;
+                    args[ "reportId" ] = apiError.reportId;
                 }
                 if (apiError.httpStatus) {
-                    args["httpStatus"] = apiError.httpStatus;
+                    args[ "httpStatus" ] = apiError.httpStatus;
                 }
                 if (apiError.name) {
-                    args["errorMessage"] = apiError.name;
+                    args[ "errorMessage" ] = apiError.name;
                 } else {
-                    args["errorMessage"] = "";
+                    args[ "errorMessage" ] = "";
                 }
 
                 // Error type
-                if (apiError.type == "TechnicalException") {
+                if (apiError.type === "TechnicalException") {
                     suberror = new TechnicalError(apiError.code, args, apiError.details ? new BaseError("", apiError.details) : null);
 
-                } else if (apiError.type == "BusinessException") {
+                } else if (apiError.type === "BusinessException") {
                     suberror = new BusinessError(apiError.code, args);
                 }
                 suberror.backend = true;

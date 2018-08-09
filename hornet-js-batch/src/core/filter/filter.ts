@@ -57,7 +57,7 @@
  * with loading,  using,  modifying and/or developing or reproducing the
  * software by the user in light of its specific status of free software,
  * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
+ * therefore means  that it is reserved for developers  and  experiencedgitlens.showSettingsPage
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
  * requirements in conditions enabling the security of their systems and/or
@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,6 +110,6 @@ export class Filter extends BatchProcess implements BatchFilter {
             this.result = _.filter(this.options.args, this.options.service);
             this.status = STATUS.SUCCEEDED;
             resolve(this.result);
-        })
+        });
     }
 }

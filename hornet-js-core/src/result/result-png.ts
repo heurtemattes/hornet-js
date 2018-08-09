@@ -73,20 +73,20 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {MediaTypes} from "src/protocol/media-type";
-import {ResultFile} from "src/result/result-file";
+import { MediaTypes } from "src/protocol/media-type";
+import { ResultFile } from "src/result/result-file";
 
 /**
  * @class
  * @classdesc HornetResult définit un result de type PNG.
  */
 export class ResultPNG extends ResultFile {
-    constructor(options){
-        super(options, MediaTypes.PNG)
+    constructor(options) {
+        super(options, MediaTypes.PNG);
     }
 }

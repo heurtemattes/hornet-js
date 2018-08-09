@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,7 +112,7 @@ export interface HornetRequest {
     timeout?: HornetRequestTimeOut;
     resultDisposition?: HornetRequestResultDisposition;
     clientTimeout?: ClientSessionTimeout;
-    manageBusiness?: boolean;
+    manageError?: ErrorManagementType;
 }
 
 export interface HornetRequestTimeOut {
@@ -160,3 +160,14 @@ export enum ResultDispositionType {
     Custom = "custom",
     Default = "default"
 };
+
+/**
+ * Type de spinnerType
+ * valeur possible (None, Default, Component[depreacated])
+ */
+export enum ErrorManagementType {
+    None = "",
+    Business = "business",
+    Technical = "technical",
+    All = "all",
+}

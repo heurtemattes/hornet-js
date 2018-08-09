@@ -70,85 +70,66 @@
  */
 
 /**
- * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+ * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { TestUtils } from "hornet-js-test/src/test-utils";
+const chai = require("chai");
+const expect = chai.expect;
+import * as _ from "lodash";
+import * as React from "react";
 
-var chai = TestUtils.chai;
-var sinon = TestUtils.sinon;
-var expect:any = chai.expect;
+import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
+import { runTest } from "hornet-js-test/src/test-run";
+import { Decorators } from "hornet-js-test/src/decorators";
+import * as assert from "assert";
+import {SpinnerLoader} from "src/widget/table/spinner-table"
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-describe("ActionSpec", () => {
+let spinnerElement: JSX.Element;
 
-    // it("should dispatch starting and ending event", () => {
-    //     // Arrange
-    //     var payload = TestUtils.randomString();
-    //     var actionChain = new ActionsChainData();
-    //     var actionContext = {
-    //         dispatch: sinon.spy()
-    //     };
-    //     var instance = new action().withContext(<any>actionContext).withPayload(payload);
-    //     instance.execute = function (doneFn) {
-    //         expect(this.payload).to.equal(payload);
-    //         doneFn();
-    //     };
-    //     // Act
-    //     return instance.promise(actionChain).then((expectedPayload) => {
-    //         // Assert
-    //         expect(expectedPayload).to.equal(actionChain);
-    //
-    //         expect(actionContext.dispatch).to.have.been.calledTwice;
-    //         expect(actionContext.dispatch).to.have.been.calledWith(action.ASYNCHRONOUS_REQUEST_START);
-    //         expect(actionContext.dispatch).to.have.been.calledWith(action.ASYNCHRONOUS_REQUEST_END_SUCCESS);
-    //     });
-    // });
+@Decorators.describe("Test Spinner table")
+class SpinnerTableTest extends HornetReactTest {
 
-    // it("should change actionChainData", () => {
-    //     // Arrange
-    //     var payload = TestUtils.randomString();
-    //     var actionChain = new ActionsChainData();
-    //     var actionContext = {
-    //         dispatch: sinon.spy()
-    //     };
-    //     var instance = new action().withContext(<any>actionContext).withPayload(payload);
-    //     instance.execute = function (doneFn) {
-    //         expect(this.payload).to.equal(payload);
-    //         doneFn(this.payload);
-    //     };
-    //     // Act
-    //     return instance.promise(actionChain).then((expectedPayload) => {
-    //         // Assert
-    //         expect(expectedPayload).to.equal(payload);
-    //     });
-    // });
+    @Decorators.it("Test OK")
+    testOk() {
+        assert.equal(1, 1);
+        this.end();
+    }
 
-    // it("should dispatch starting and error ending event", () => {
-    //     // Arrange
-    //     var payload = TestUtils.randomString();
-    //     var errorPayload = TestUtils.randomString();
-    //     var actionContext = {
-    //         dispatch: sinon.spy()
-    //     };
-    //     var instance = new action().withContext(<any>actionContext).withPayload(payload);
-    //     instance.execute = function (doneFn, errorFn) {
-    //         errorFn(errorPayload);
-    //     };
-    //
-    //     // Act
-    //     return instance.promise(new ActionsChainData()).then(null, (error:any) => {
-    //         // Assert
-    //         expect(error).to.exist;
-    //         expect(error.lastError).to.equal(errorPayload);
-    //
-    //         expect(actionContext.dispatch).to.have.been.calledTwice;
-    //         expect(actionContext.dispatch).to.have.been.calledWith(action.ASYNCHRONOUS_REQUEST_START);
-    //         expect(actionContext.dispatch).to.have.been.calledWith(action.ASYNCHRONOUS_REQUEST_END_ERROR);
-    //     });
-    // });
-});
+
+    @Decorators.it("Afficher spinner-table")
+    testSpinnerVisible() {
+        const id = this.generateMainId();
+        spinnerElement = (
+            <SpinnerLoader isVisible={true} nbColumns={7}/>
+        );
+        this.renderIntoDocument(spinnerElement, id);
+        setTimeout(()=> {
+            expect(document.querySelector(`#${id} tr.datatable-line-loader`)).to.exist;
+            expect(document.querySelector(`#${id} th`).getAttribute("colSpan")).to.equals("7");
+            this.end();
+        }, 500);
+    }
+
+    @Decorators.it("Masquer spinner-table")
+    testSpinnerInvisible() {
+        const id = this.generateMainId();
+        spinnerElement = (
+            <SpinnerLoader isVisible={false} nbColumns={7} />
+        );
+        this.renderIntoDocument(spinnerElement, id);
+        expect(document.querySelector(`#${id}`).innerHTML).to.be.empty;
+        this.end();
+    }
+
+    
+}
+
+// lancement des Tests
+runTest(new SpinnerTableTest());

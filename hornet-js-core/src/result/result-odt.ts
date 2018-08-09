@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,7 +97,7 @@ const logger: Logger = Utils.getLogger("hornet-js-core.src.result.result-odt");
  */
 export class ResultODT extends ResultOpenDocument {
 
-    constructor(options: OptionsOpenDocument){
+    constructor(options: OptionsOpenDocument) {
         super(options, MediaTypes.ODT);
     }
 }

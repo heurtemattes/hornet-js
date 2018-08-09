@@ -1,3 +1,16 @@
+# hornet-js-passport 5.2.0
+
+- DOC  - boolean pour desaction timeout session IDP
+- EVOL - ajout possibilté de ne pas vérifier la fin de session idp
+- EVOL - récupération du timeout saml
+- EVOL - Ajout de génération des index
+- EVOL - prise en compte de la fin de session idp
+- SECURITE - Upgrade librairies xml-encryption & request
+- FIX  - TSLint
+- EVOL - MAJ d.ts nodejs et suppression méthodes deprecated new BUFFER()
+- FIX  - documentation SAML
+- EVOL - [s93] - SAML: configuration des chemins des certificats dans default.json
+
 # hornet-js-passport 5.1.1
 
 -	Ajout unauthorize event

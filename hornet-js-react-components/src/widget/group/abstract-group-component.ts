@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,14 +93,14 @@ export class GroupComponent<P extends GroupComponentProps, S extends GroupCompon
     }
 
     static generateKey(object: any, defaultKey?: string): string {
-        //par défaut on prend la key de l'objet
+        // par défaut on prend la key de l'objet
         let key: string = object.key;
         if (!key && defaultKey) {
-            //si ni key, on prend une default key
+            // si ni key, on prend une default key
             key = defaultKey;
         }
         if (!key) {
-            //si il n'y a pas de default key on prend l'id
+            // si il n'y a pas de default key on prend l'id
             key = object.props.id;
         }
         return key;

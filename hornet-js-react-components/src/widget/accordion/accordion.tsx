@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,11 +85,11 @@ import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
 import { fireHornetEvent, HornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { ADD_NOTIFICATION_EVENT, CLEAN_NOTIFICATION_EVENT, CLEAN_ALL_NOTIFICATION_EVENT } from "hornet-js-core/src/notification/notification-events";
+import { ADD_NOTIFICATION_EVENT,
+        CLEAN_NOTIFICATION_EVENT,
+        CLEAN_ALL_NOTIFICATION_EVENT } from "hornet-js-core/src/notification/notification-events";
 import { AccordionHeader } from "src/widget/accordion/accordion-header";
 import { AccordionInfo } from "hornet-js-react-components/src/widget/accordion/accordion-info";
-import { Form } from "src/widget/form/form";
-import KeyboardEventHandler = __React.KeyboardEventHandler;
 import KeyboardEvent = __React.KeyboardEvent;
 const logger = Utils.getLogger("hornet-js-react-components.widget.accordion.accordion");
 
@@ -120,15 +120,18 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
 
     constructor(props?: AccordionProps, context?: any) {
         super(props, context);
-        this.state.id = this.props.id + this.props.panelIndex;
+        this.state = {
+            ...this.state, id: this.props.id + this.props.panelIndex,
+            };
+
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.trackInputFieldFromChildren(document.getElementById(this.getAccordionLiId()));
         this.listen(FOCUS_ON_ACCORDION, (ev: HornetEvent<string>) => {
-            if (ev.detail == this.getAccordionPanelId()) {
-                let element = document.getElementById(ev.detail);
+            if (ev.detail === this.getAccordionPanelId()) {
+                const element = document.getElementById(ev.detail);
                 element.className = element.className.replace("hidden", "visible");
             }
         });
@@ -163,7 +166,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                     this.trackInputFieldFromChildren(element);
                 });
             } else {
-                if (node.localName == "input" && !node.hidden) {
+                if (node.localName === "input" && !node.hidden) {
                     node.setAttribute("accordion", this.getAccordionPanelId());
                     node.setAttribute("accordionIndex", this.state.panelIndex);
                 } else if (node.children) {
@@ -182,68 +185,60 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
      */
     render(): JSX.Element {
 
-        let classNameLi = classNames({
+        const classNameLi = classNames({
             "accordion-header": true,
-            "accordion-selected": this.state.isOpen
+            "accordion-selected": this.state.isOpen,
         });
 
-        let handClick = () => {
+        const handClick = () => {
             this.state.handleClickAccordion(this.state.panelIndex);
         };
 
-        let handleFocus = (e) => {
-            let target = e.target;
-            let event = e;
-            this.state.handleFocusAccordion(this.state.panelIndex, event, target);
+        const handleFocus = (e) => {
+            this.state.handleFocusAccordion(this.state.panelIndex, e, e.target);
         };
 
-        let handleBlur = (e) => {
-            let target = e.target;
-            let event = e;
-            this.state.handleBlurAccordion(this.state.panelIndex, event, target);
-        };
-
-        let classNameDivContent = classNames({
+        const classNameDivContent = classNames({
             "accordion-content": true,
-            "visible": this.state.isOpen,
-            "hidden": !this.state.isOpen
+            visible: this.state.isOpen,
+            hidden: !this.state.isOpen,
         });
 
-        let classAccordionPicto = classNames({
-            'accordion-arrow-close': !this.state.isOpen,
-            'accordion-arrow-open': this.state.isOpen,
-            "fr": true
+        const classAccordionPicto = classNames({
+            "accordion-arrow-close": !this.state.isOpen,
+            "accordion-arrow-open": this.state.isOpen,
+            fr: true,
         });
 
-        let classAccordionErrors = classNames({
-            'accordion-errors-close': !this.state.isOpen,
-            'accordion-errors-open': this.state.isOpen,
-            "fr": true
+        const classAccordionErrors = classNames({
+            "accordion-errors-close": !this.state.isOpen,
+            "accordion-errors-open": this.state.isOpen,
+            fr: true,
         });
 
 
-        let classNameAccordion = classNames({
+        const classNameAccordion = classNames({
             "accordion-label": true,
-            'accordion-label-open': this.state.isOpen
+            "accordion-label-open": this.state.isOpen,
         });
 
         let errorMessage = "";
         if (this.state.errors > 0) {
             errorMessage = this.state.errors + " ";
-            errorMessage += this.state.errors == 1 ? this.i18n("form.accordion.error") : this.i18n("form.accordion.errors");
+            errorMessage += this.state.errors === 1 ? this.i18n("form.accordion.error") : this.i18n("form.accordion.errors");
         }
 
         let header;
         React.Children.map(this.props.children, (child: React.ReactChild) => {
             if ((child as React.ReactElement<any>).type === AccordionHeader) {
-                header = child
+                header = child;
             }
         });
 
         let info;
         React.Children.map(this.props.children, (child: React.ReactChild) => {
             if ((child as React.ReactElement<any>).type === AccordionInfo) {
-                info = child
+                info = child;
             }
         });
 
@@ -258,7 +253,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                     id={this.state.id + "-" + TAB_ID_NAME}
                     aria-expanded={this.state.isOpen}
                     role="button"
-                    aria-level="3"
+                    aria-level={3}
                     tabIndex={this.state.tabIndex}
                     aria-controls={this.getAccordionPanelId()}>{header ? header : this.props.title}
                     <div id={this.state.id + "-" + "arrow-content"}
@@ -272,9 +267,9 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                     role="region"
                     aria-labelledby={this.state.id + "-" + TAB_ID_NAME}>
                     {React.Children.map(this.state.children,
-                        (child: React.ReactElement<any>) => {
-                            if (((child as React.ReactElement<any>).type != AccordionHeader) &&
-                                ((child as React.ReactElement<any>).type != AccordionInfo)) {
+                                        (child: React.ReactElement<any>) => {
+                            if (((child as React.ReactElement<any>).type !== AccordionHeader) &&
+                                ((child as React.ReactElement<any>).type !== AccordionInfo)) {
                                 return React.cloneElement(child);
                             }
                         })
@@ -294,16 +289,17 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
         /* On ne prend en compte que les évènements clavier sans modificateur, pour ne pas surcharger
          * des raccourcis standards tels Alt+ArrowLeft */
 
-        let keyCode: number = e.keyCode;
+        const keyCode: number = e.keyCode;
         let preventDefault: boolean = true;
-        let maxAccordion = ((this.props as any).totalAccordion - 1);
+        const maxAccordion = ((this.props as any).totalAccordion - 1);
 
 
         if (e.ctrlKey) {
             this.handleKeyDownPanel(e, preventDefault);
         } else {
             /** Si c'est différent d */
-            if ((e.target as any).className != "accordion-label accordion-label-open" && (e.target as any).className != "accordion-label") {
+            if ((e.target as any).className !== "accordion-label accordion-label-open"
+            && (e.target as any).className !== "accordion-label") {
                 e.stopPropagation();
                 preventDefault = false;
             } else {
@@ -312,7 +308,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                     case KeyCodes.UP_ARROW:
                         logger.trace("Focus sur header precedent");
                         if (this.state.panelIndex > 0) {
-                            this.Panelfocus(this.state.panelIndex - 1)
+                            this.Panelfocus(this.state.panelIndex - 1);
                         } else {
                             this.Panelfocus(maxAccordion);
                         }
@@ -322,7 +318,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                         logger.trace("Focus sur header suivant");
 
                         if (this.state.panelIndex >= 0 && this.state.panelIndex < maxAccordion) {
-                            this.Panelfocus(this.state.panelIndex + 1)
+                            this.Panelfocus(this.state.panelIndex + 1);
                         } else {
                             this.Panelfocus(0);
                         }
@@ -355,8 +351,8 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
 
     /**
      * gestion du clavier lors de la touche CTRL ou SHIFT
-     * @param e :
-        * @param preventDefault
+     * @param e
+     * @param preventDefault
      */
     handleKeyDownPanel(e, preventDefault) {
         logger.trace("navigation avec la touche ctrl");
@@ -399,18 +395,18 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
      * @param index
      */
     Panelfocus(index) {
-        let element = document.getElementById(this.props.id + index + "-" + TAB_ID_NAME);
+        const element = document.getElementById(this.props.id + index + "-" + TAB_ID_NAME);
         if (element && element.focus) {
             element.focus();
         } else {
-            if (index != 0) {
+            if (index !== 0) {
                 this.Panelfocus(0);
             }
         }
     }
 
     static handleFocusOnAccordion(element: HTMLElement) {
-        let accordionAttribute = element.getAttribute("accordion");
+        const accordionAttribute = element.getAttribute("accordion");
         if (accordionAttribute) {
             fireHornetEvent(FOCUS_ON_ACCORDION.withData(accordionAttribute));
         }
@@ -426,7 +422,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
             if (ev.detail && ev.detail.errors && ev.detail.errors.notifications) {
                 ev.detail.errors.notifications.map((error) => {
                     React.Children.map(this.state.children,
-                        (child: React.ReactElement<any>) => {
+                                       (child: React.ReactElement<any>) => {
                             this.errors += this.isErrorInAccordion(child, error);
                         });
                 });
@@ -447,15 +443,15 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
 
             // Gestion de champs dans un tableau
             // todo: améliorer la recherche des champs en erreur présents dans un tablea éditable
-            let tableIdTmp = error.field.split(".");
+            const tableIdTmp = error.field.split(".");
             let tableId = "";
             if (Array.isArray(tableIdTmp) && tableIdTmp.length > 0) {
                 tableId = tableIdTmp[ 0 ].split("-").splice(0, tableIdTmp[ 0 ].split("-").length - 1).join("-");
             }
 
-            if ((elem.props.id && elem.props.id == error.field && !elem.props.keyColumn) ||
-                (elem.props.name && elem.props.name == error.field && !elem.props.keyColumn) ||
-                (elem.props.labelKey && elem.props.name && (elem.props.name + "." + elem.props.labelKey) == error.field && !elem.props.keyColumn) ||
+            if ((elem.props.id && elem.props.id === error.field && !elem.props.keyColumn) ||
+                (elem.props.name && elem.props.name === error.field && !elem.props.keyColumn) ||
+                (elem.props.labelKey && elem.props.name && (elem.props.name + "." + elem.props.labelKey) === error.field && !elem.props.keyColumn) ||
                 (elem.props.id === tableId)) {
                 errors++;
             }
@@ -463,7 +459,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                 if (elem.props.children instanceof Array) {
                     elem.props.children.map((child) => {
                         errors += this.isErrorInAccordion(child, error);
-                    })
+                    });
                 } else {
                     errors += this.isErrorInAccordion(elem.props.children, error);
                 }
@@ -482,13 +478,13 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
     protected isLinkedWithFormManager(idComponent: string): boolean {
         let result: boolean = false;
         if (idComponent) {
-            let accordionHtmlElement = document.getElementById(this.getAccordionLiId());
-            //parcourir les children de l'accordion pour trouver le form dont l'id est idComponent
+            const accordionHtmlElement = document.getElementById(this.getAccordionLiId());
+            // parcourir les children de l'accordion pour trouver le form dont l'id est idComponent
             result = this.isHtmlElementFoundThroughChildren(accordionHtmlElement, idComponent);
-            //si il n'est pas enfant, on vérifie si il est parent
+            // si il n'est pas enfant, on vérifie si il est parent
             if (!result && idComponent) {
-                let formHtmlElement = document.getElementById(idComponent);
-                //parcourir les children du form pour trouver l'accordion
+                const formHtmlElement = document.getElementById(idComponent);
+                // parcourir les children du form pour trouver l'accordion
                 result = this.isHtmlElementFoundThroughChildren(formHtmlElement, this.getAccordionLiId());
             }
         }
@@ -498,7 +494,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
     protected isHtmlElementFoundThroughChildren(element: Element, targetedId: string): boolean {
         let result: boolean = false;
         if (element) {
-            result = element.id == targetedId;
+            result = element.id === targetedId;
             if (!result && element.children) {
                 let i: number = 0;
                 while (!result && i < element.children.length) {

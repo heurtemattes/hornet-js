@@ -73,12 +73,15 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { BaseTest } from "hornet-js-test/src/base-test";
+const Intl = require("intl");
+import 'intl/locale-data/jsonp/fr';
+
 
 let ReactTestUtils = require("react-dom/test-utils");
 
@@ -115,8 +118,8 @@ export class HornetReactTest extends BaseTest {
      * @param keyCode
      * @param changeValue
      */
-    protected triggerKeydownEvent(element: any, valueKey: string, keyCode: number, changeValue?: boolean): void {
-        ReactTestUtils.Simulate.keyDown(element, { key: valueKey, keyCode: keyCode, which: keyCode });
+    protected triggerKeydownEvent(element: any, valueKey: string, keyCodeParam: number, changeValue?: boolean): void {
+        ReactTestUtils.Simulate.keyDown(element, { key: valueKey, keyCode: keyCodeParam, which: keyCodeParam });
         this.handleChangeValueOnElement(changeValue, element, valueKey);
     }
 
@@ -127,16 +130,16 @@ export class HornetReactTest extends BaseTest {
      * @param keyCode
      * @param changeValue
      */
-    protected triggerKeyPressEvent(element: any, valueKey: string, keyCode?: number, changeValue?: boolean): void {
+    protected triggerKeyPressEvent(element: any, valueKey: string, keyCodeParam?: number, changeValue?: boolean): void {
         //ReactTestUtils.Simulate.keyPress(element, { key: valueKey, keyCode: keyCode, which: keyCode });
-
         (ReactTestUtils.Simulate.keyPress as any)(element, {
-            key: valueKey, keyCode: keyCode, which: keyCode,
+            key: valueKey, keyCode: keyCodeParam, which: keyCodeParam,
 
             preventDefault: () => {
                 this.isPreventDefault = true;
-            }
-        })
+            },
+        });
+
         this.handleChangeValueOnElement(changeValue, element, valueKey);
     }
 

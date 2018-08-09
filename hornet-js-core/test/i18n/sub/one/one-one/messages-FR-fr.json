@@ -1,4 +1,5 @@
 {
   "labelLanguage": "test-fr-one-one",
-  "testValue": "fr"
+  "testValue": "fr",
+  "value": "one-value"
 }

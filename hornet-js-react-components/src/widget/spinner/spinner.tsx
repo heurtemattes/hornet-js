@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,7 +91,7 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.spinne
  * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
  * dans une fenêtre modale en attendant la fin d'une action longue.
  */
-export class Spinner<P extends SpinnerProps, S extends SpinnerProps>  extends SpinnerComponent<P, S> {
+export class Spinner<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
 
     constructor(props?: P, context?: any) {
         super(props, context);
@@ -124,8 +124,8 @@ export class Spinner<P extends SpinnerProps, S extends SpinnerProps>  extends Sp
     renderLoader(): JSX.Element {
         return (
             <div>
-                <div className="loader-overlay"/>
-                <div className="loader-page"/>
+                <div className="loader-overlay" />
+                <div className="loader-page" />
             </div>
         );
     }
@@ -149,13 +149,13 @@ export class Spinner<P extends SpinnerProps, S extends SpinnerProps>  extends Sp
      */
     openSpinner() {
         if (this.count > 0 && !this.state.isVisible)
-            this.setState({isVisible: true});
+            this.setState({ isVisible: true });
     }
 
     /**
      * Fermeture Spinner
      */
     closeSpinner() {
-        this.setState({isVisible: false});
+        this.setState({ isVisible: false });
     }
 }

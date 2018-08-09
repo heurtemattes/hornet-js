@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,9 @@ import { Logger } from "hornet-js-utils/src/logger";
 import * as _ from "lodash";
 import * as superagent from "superagent";
 import { Response } from "superagent";
-import { HornetRequest, HornetSuperAgentRequest, SpinnerType, ResultDispositionType } from "src/services/hornet-superagent-request";
+import {
+    HornetRequest, HornetSuperAgentRequest, SpinnerType, ResultDispositionType, ErrorManagementType,
+} from "src/services/hornet-superagent-request";
 import { ClientSessionTimeout } from "src/session/client-session-configuration";
 import { ServiceEvent } from "hornet-js-core/src/event/hornet-event";
 import * as superAgentPlugins from "hornet-js-core/src/services/superagent-hornet-plugins";
@@ -94,16 +96,20 @@ import { MediaTypes } from "hornet-js-core/src/protocol/media-type";
 import { BackendApiResult, NodeApiResult, BackendApiError, NodeApiError } from "hornet-js-core/src/services/service-api-results";
 import { manageError } from "hornet-js-core/src/component/error-manager";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
+import { BusinessError } from "hornet-js-utils/src/exception/business-error";
 import { HornetCache } from "hornet-js-core/src/cache/hornet-cache";
 import { HornetPlugin } from "hornet-js-core/src/services/superagent-hornet-plugins";
 import { HornetEvent } from "src/event/hornet-event";
 import { fireHornetEvent } from "src/event/hornet-event";
 import { ClientConfiguration } from "src/client-conf";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
+import { HttpError } from "hornet-js-utils/src/exception/http-error";
 const logger: Logger = Utils.getLogger("hornet-js-core.services.hornet-agent");
 
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { AppSharedProps } from "hornet-js-utils/src/app-shared-props";
+
+import { Timer } from "src/timers/timer";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap http & https afin de sécuriser l'utilisation de "continuation-local-storage" (perte ou mix de contexte) //
@@ -112,18 +118,18 @@ import * as http from "http";
 import * as https from "https";
 import { DispositionType } from "src/result/disposition-type";
 
-if (http[ "__old_http_request" ] == undefined) {
+if (http[ "__old_http_request" ] === undefined) {
     http[ "__old_http_request" ] = http.request;
     https[ "__old_https_reques" ] = https.request;
 
     (<any>http).request = function () {
-        var req = http[ "__old_http_request" ].apply(http, arguments);
+        const req = http[ "__old_http_request" ].apply(http, arguments);
         Utils.getContinuationStorage().bindEmitter(req);
         return req;
     };
 
     (<any>https).request = function () {
-        var req = https[ "__old_https_reques" ].apply(https, arguments);
+        const req = https[ "__old_https_reques" ].apply(https, arguments);
         Utils.getContinuationStorage().bindEmitter(req);
         return req;
     };
@@ -132,14 +138,14 @@ if (http[ "__old_http_request" ] == undefined) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export enum CacheKey {
-    URL,
-    URL_DATA
+    URL = "URL",
+    URL_DATA = "URL_DATA",
 }
 
-export interface SessionEvent { value: number };
-export var SESSION_WILL_EXPIRE_NOTIFICATION_EVENT = new HornetEvent<SessionEvent>("SESSION_WILL_EXPIRE");
-export var SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT = new HornetEvent<SessionEvent>("SESSION_WILL_EXPIRE_START");
-export var SESSION_REFRESHED_NOTIFICATION_EVENT = new HornetEvent<SessionEvent>("SESSION_REFRESHED");
+export interface SessionEvent { value: number; }
+export let SESSION_WILL_EXPIRE_NOTIFICATION_EVENT = new HornetEvent<SessionEvent>("SESSION_WILL_EXPIRE");
+export let SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT = new HornetEvent<SessionEvent>("SESSION_WILL_EXPIRE_START");
+export let SESSION_REFRESHED_NOTIFICATION_EVENT = new HornetEvent<SessionEvent>("SESSION_REFRESHED");
 
 /**
  * Cette classe sert à encapsuler les appels à SuperAgent pour ajouter des plugins au besoin
@@ -174,9 +180,9 @@ export class HornetSuperAgent {
     protected static sessionExpireTimeout: NodeJS.Timer;
 
     constructor(timeToliveInCache?: number, cacheKey?: CacheKey) {
-        let plugins = [];
-        let cacheConf = this.getCacheConfig();
-        let globalCacheActivated = cacheConf.enabled;
+        const plugins = [];
+        const cacheConf = this.getCacheConfig();
+        const globalCacheActivated = cacheConf.enabled;
 
 
         if (globalCacheActivated) {
@@ -208,8 +214,11 @@ export class HornetSuperAgent {
             plugins.push(new HornetPluginConfig("RedirectToLoginPagePlugin", superAgentPlugins.RedirectToLoginPagePlugin, null));
         }
 
-        plugins.push(new HornetPluginConfig("AddParamFromLocalStorageTid", superAgentPlugins.AddParamFromLocalStorage, [ "tid", "hornet.tid" ]));
-        plugins.push(new HornetPluginConfig("AddParamFromLocalStorageUser", superAgentPlugins.AddParam, [ "user", (Utils.getContinuationStorage().get("hornet.user") || {}).name ]));
+        plugins.push(new HornetPluginConfig("AddParamFromLocalStorageTid",
+                                            superAgentPlugins.AddParamFromLocalStorage, [ "tid", "hornet.tid" ]));
+        plugins.push(new HornetPluginConfig("AddParamFromLocalStorageUser",
+                                            superAgentPlugins.AddParam,
+                                            [ "user", (Utils.getContinuationStorage().get("hornet.user") || {}).name ]));
 
         this.plugins = new HornetList(plugins);
     }
@@ -232,9 +241,9 @@ export class HornetSuperAgent {
 
     protected getClientSessionConfig(): ClientSessionTimeout {
         if (!HornetSuperAgent.globalClientSessionConfig) {
-            let clientSessionConf = (Utils.appSharedProps.get("clientSessionConfig") || {} as ClientConfiguration);
-            if (clientSessionConf && clientSessionConf.isInSessionTimeout == undefined) {
-                clientSessionConf.isInSessionTimeout = clientSessionConf.notifSessionTimeout != undefined;
+            const clientSessionConf = (Utils.appSharedProps.get("clientSessionConfig") || {} as ClientConfiguration);
+            if (clientSessionConf && clientSessionConf.isInSessionTimeout === undefined) {
+                clientSessionConf.isInSessionTimeout = clientSessionConf.notifSessionTimeout !== undefined;
             }
             clientSessionConf.notifSessionTimeoutRepeat = clientSessionConf.notifSessionTimeoutRepeat || 600000;
             HornetSuperAgent.globalClientSessionConfig = clientSessionConf;
@@ -245,7 +254,7 @@ export class HornetSuperAgent {
 
 
     protected getTimeoutConfig(): any {
-        let request = Utils.config.get("request");
+        const request = Utils.config.getOrDefault("request", undefined);
         let timeout;
         if (request && request.timeout) {
             timeout = request.timeout;
@@ -267,9 +276,9 @@ export class HornetSuperAgent {
             this.superAgentRequest = superagent(request.method || "get", request.url);
 
             this.plugins.list.forEach((name: String) => {
-                let config: HornetPluginConfig<any> = this.plugins.mapPlugins[ "" + name ];
-                let fnt = config.clazz[ "getPlugin" ];
-                let plugin = fnt.apply(null, config.args)
+                const config: HornetPluginConfig<any> = this.plugins.mapPlugins[ "" + name ];
+                const fnt = config.clazz[ "getPlugin" ];
+                const plugin = fnt.apply(null, config.args);
                 this.superAgentRequest.use(plugin);
             });
             this.superAgentRequest.set("X-Requested-With", "XMLHttpRequest");
@@ -308,7 +317,7 @@ export class HornetSuperAgent {
         }
         if ((this.enableCache || request.timeToLiveInCache) && request.method === "get") {
             return this.getFromCache(request);
-        } else if (this.enableCache && (request.method === "post" || request.method === "put" || request.method === "patch")) {
+        } else if (this.enableCache && (request.method === "post" || request.method === "put" || request.method === "patch" || request.method === "delete")) {
             return this.removeInCache(request);
         }
     }
@@ -317,9 +326,10 @@ export class HornetSuperAgent {
      * Methode executer sur  la reception d'une requete (gestion spinner et du cache)
      * @param {HornetRequest} request requete envoyée 
      * @param {Response} response réponse recue
+     * @param {boolean} throwed permet de jeter l'exception recu pour la manager
      * @returns Response
      * */
-    protected postProcessRequest(request: HornetRequest, response: Response): Response {
+    protected postProcessRequest(request: HornetRequest, response: Response, throwed?: boolean): Response {
         if ((this.enableCache || request.timeToLiveInCache) && request.method === "get") {
             if (response && !request.noCached) {
                 this.setInCache(response, request, request.timeToLiveInCache || this.timeToLiveInCache);
@@ -332,9 +342,9 @@ export class HornetSuperAgent {
 
         if (!Utils.isServer) {
             this.setClientEventForRequest(false, request.spinnerType);
-            return this.manageClientResult(response, request);
+            return this.manageClientResult(response, request, throwed);
         } else {
-            return this.manageServerResult(response, request);
+            return this.manageServerResult(response, request, throwed);
         }
     }
 
@@ -348,6 +358,7 @@ export class HornetSuperAgent {
 
         return Promise.resolve(true)
             .then(() => {
+                Timer.startTimer(Timer.TIMER_AJAX_REQUEST);
                 return this.preProcessRequest(request);
             }).then((cacheResponse) => {
                 let p: Promise<Response>;
@@ -355,18 +366,18 @@ export class HornetSuperAgent {
                     p = Promise.resolve(cacheResponse);
                 } else {
                     p = new Promise<any>((resolve, reject) => {
-                        let ha: superagent.SuperAgentRequest = this.initSuperAgent(request);
+                        const ha: superagent.SuperAgentRequest = this.initSuperAgent(request);
                         ha.accept((request.typeMime && request.typeMime.MIME) || "json"); // ajoute le format attendu sinon json par defaut
                         if (request.headers) {
-                            for (let header in request.headers) {
+                            for (const header in request.headers) {
                                 ha.set(header, request.headers[ header ]);
                             }
                         }
 
                         if (!Utils.isServer) {
 
-                            if (request.typeMime && request.typeMime.MIME != MediaTypes.JSON.MIME) {
-                                (ha as any).responseType('blob');
+                            if (request.typeMime && request.typeMime.MIME !== MediaTypes.JSON.MIME) {
+                                (ha as any).responseType("blob");
                             }
                         }
 
@@ -385,13 +396,14 @@ export class HornetSuperAgent {
                                 ha.attach(attachFile.field, <any>attachFile.file, attachFile.fileName);
                             });
                         } else {
-                            ha.type((request.headers && request.headers.contentType) || "json"); // ajoute le format envoyé sinon json par defaut
+                            // ajoute le format envoyé sinon json par defaut
+                            ha.type((request.headers && request.headers.contentType) || "json");
                             ha.send(request.data); // ajout du body
                         }
 
                         if (pipedStream) {
-                            pipedStream[ 'contentType' ](request.typeMime.MIME);
-                            pipedStream[ 'attachment' ]("export." + request.typeMime.SHORT);
+                            pipedStream[ "contentType" ](request.typeMime.MIME);
+                            pipedStream[ "attachment" ]("export." + request.typeMime.SHORT);
 
                             resolve(ha.pipe(pipedStream));
 
@@ -405,71 +417,48 @@ export class HornetSuperAgent {
                     });
                 }
                 return p.then((response: Response) => {
+                    Timer.stopTimer(Timer.TIMER_AJAX_REQUEST);
                     this.response = response;
                     return this.postProcessRequest(request, response);
                 });
             }).catch((e) => {
-                // en cas d'erreur un ferme le spinner
-                this.postProcessRequest(request, null);
-                if (Utils.isServer) {
-                    if (e.response && e.response.body && this.hasHornetBody(e.response.body)) {
-                        let result: NodeApiResult = e.response.body;
-                        if (result.errors && result.errors.length != 0) {
-                            // Erreur(s)
-                            let execp = NodeApiError.parseError(result.errors, e.status).toJsError();
-                            if (result.hasTechnicalError) {
-                                throw execp;
-                            } else {
-                                if (request.manageBusiness) {
-                                    return Promise.reject(result)
-                                } else {
-                                    manageError(execp, Utils.getCls("hornet.appConfig").errorComponent);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (e.response && e.response.body && this.hasHornetBody(e.response.body)) {
-                        let result: NodeApiResult = e.response.body;
-                        if (result.errors && result.errors.length != 0) {
-                            // NOTE: parameters are properties of the event detail property
-                            let execp = NodeApiError.parseError(result.errors, e.status).toJsError();
-                            // See Promise.onPossiblyUnhandledRejection for parameter documentation
-                            if (result.hasTechnicalError) {
-                                let err = NodeApiError.parseError(execp, null).toJsError();
-                                manageError(err, Utils.getCls("hornet.appConfig").errorComponent);
-                            } else {
-
-                                if (request.manageBusiness) {
-                                    return Promise.reject(result)
-                                } else {
-                                    manageError(execp, Utils.getCls("hornet.appConfig").errorComponent);
-                                    return;
-                                }
-                            }
-                        }
-                    } else {
-                        let reason = (e[ "detail" ] && e[ "detail" ].reason) || e[ "reason" ];
-                        let promise = e[ "detail" ] && e[ "detail" ].promise;
-                        if (!(reason instanceof BaseError)) {
-                            let err_tech = new TechnicalError('ERR_TECH_UNKNOWN', { errorMessage: "Erreur inattendue" }, reason || e);
-                            let err = NodeApiError.parseError(err_tech, null).toJsError();
-                            manageError(err, Utils.getCls("hornet.appConfig").errorComponent);
-                        } else {
-                            if (e instanceof TechnicalError) {
-                                manageError(e, Utils.getCls("hornet.appConfig").errorComponent);
-                            } else {
-                                if (request.manageBusiness) {
-                                    return Promise.reject(e)
-                                } else {
-                                    manageError(e, Utils.getCls("hornet.appConfig").errorComponent);
-                                    return;
-                                }
-                            }
-                        }
+                Timer.stopTimer(Timer.TIMER_AJAX_REQUEST);
+                let except = e;
+                // c'est une exception pas encore gérer (code autre que 200)
+                if (e.response) {
+                    try {
+                        // en cas d'erreur un ferme le spinner
+                        // exception pouvant être générer
+                        this.postProcessRequest(request, e.response, true);
+                        except = new HttpError(e.response.status, "ERR_HORNET_HTTP", e.response.body);
+                    } catch (e) {
+                        // on sauvegarde l'exception pour pouvoir la gérer si besoin
+                        except = e;
                     }
                 }
+
+                const reason = (e[ "detail" ] && e[ "detail" ].reason) || e[ "reason" ];
+                if (!(reason instanceof BaseError) && reason) {
+                    except = NodeApiError.parseError(new TechnicalError("ERR_TECH_UNKNOWN",
+                                                                        { errorMessage: "Erreur inattendue" },
+                                                                        reason || e),                null).toJsError();
+                }
+
+                // on veut gérer l'exception
+                if ((except instanceof BusinessError && request.manageError === ErrorManagementType.Business) ||
+                    (except instanceof TechnicalError && request.manageError === ErrorManagementType.Technical) ||
+                    request.manageError === ErrorManagementType.All) {
+                    return Promise.reject(except);
+                } else {
+                    // sinon on renvoit la page d'erreur
+                    if (Utils.getCls("hornet.appConfig") && Utils.getCls("hornet.appConfig").errorComponent) {
+                        manageError(except, Utils.getCls("hornet.appConfig").errorComponent);
+                    }
+                    throw except;
+                }
+
+
+
             });
     }
 
@@ -477,36 +466,31 @@ export class HornetSuperAgent {
      * Formate la réponse pour le client afin de traiter les erreurs automatiquement
      * @param {Response} response reponse de superagent
      */
-    protected manageClientResult(response: Response, request: HornetRequest): any {
+    protected manageClientResult(response: Response, request: HornetRequest, throwed?: boolean): any {
         // try catch car impossible de catcher les erreurs asynchrones sur le Client
         if (response) {
             if (response.body && this.hasHornetBody(response.body)) {
                 // Result OK || Erreur gérée par node
-                let result: NodeApiResult = response.body;
+                const result: NodeApiResult = response.body;
 
-                if (result.errors.length == 0) {
+                if (result.errors.length === 0) {
                     return result.data;
                 } else {
                     // Erreur(s)
-                    let e = NodeApiError.parseError(result.errors, response.status).toJsError();
-                    if (result.hasTechnicalError) {
-                        let err = NodeApiError.parseError(e, null).toJsError();
-                        manageError(err, Utils.getCls("hornet.appConfig").errorComponent);
-                        return result;
+                    const e = NodeApiError.parseError(result.errors, response.status).toJsError();
+                    if (throwed) {
+                        throw e;
                     } else {
-                        if (request.manageBusiness) {
-                            return Promise.reject({ response: response });
-                        } else {
-                            manageError(e, Utils.getCls("hornet.appConfig").errorComponent);
-                            return;
-                        }
+                        return Promise.reject(e);
                     }
                 }
             } else {
-                let regexp = response.header[ 'content-type' ].match(/([a-zA-Z]+)\/([a-zA-Z0-9.-]+)/);
-                if ("application/json" != regexp[ 0 ].toLowerCase()) {
+                const regexp = response.header[ "content-type" ].match(/([a-zA-Z]+)\/([a-zA-Z0-9.-]+)/);
+                if ("application/json" !== regexp[ 0 ].toLowerCase()) {
 
-                    let attachFile = response.header[ 'content-disposition' ] ? response.header[ 'content-disposition' ].match(/(attachment|inline); filename="([^"]+)"/) : undefined;
+                    const attachFile = response.header[ "content-disposition" ]
+                        ? response.header[ "content-disposition" ].match(/(attachment|inline); filename="([^"]+)"/)
+                        : undefined;
                     let attachFilename = undefined;
                     // extract file name from header response
                     if (attachFile) {
@@ -515,32 +499,35 @@ export class HornetSuperAgent {
                         attachFilename = "export." + MediaTypes.fromMime(regexp[ 0 ]).SHORT;
                     }
 
-                    let res = response[ "xhr" ].response;
+                    const res = response[ "xhr" ].response;
                     if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                        window.navigator.msSaveOrOpenBlob(res instanceof Blob ? res : new Blob([ res ], { "type": regexp[ 0 ] }), attachFilename);
+                        window.navigator.msSaveOrOpenBlob(
+                            res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }), attachFilename);
                     }
                     else {
-                        let objectUrl = window.URL.createObjectURL(res instanceof Blob ? res : new Blob([ res ], { "type": regexp[ 0 ] }), { oneTimeOnly: true }); // xhr.response is a blob 
+                        const objectUrl = window.URL.createObjectURL(
+                            // xhr.response is a blob
+                            res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }), { oneTimeOnly: true });  
                         if (!request.resultDisposition) {
-                            if (!attachFile || attachFile[ 1 ] == DispositionType.ATTACHMENT) {
-                                let elemt = { a: null };
-                                elemt.a = document.createElement('a');
+                            if (!attachFile || attachFile[ 1 ] === DispositionType.ATTACHMENT) {
+                                const elemt = { a: null };
+                                elemt.a = document.createElement("a");
                                 elemt.a.href = objectUrl;
                                 elemt.a.download = attachFilename; // Set the file name.
-                                elemt.a.style.display = 'none';
+                                elemt.a.style.display = "none";
                                 document.body.appendChild(elemt.a);
                                 elemt.a.click();
                                 setTimeout(function () {
                                     document.body.removeChild(elemt.a);
                                     window.URL.revokeObjectURL(elemt.a.href);
                                     delete elemt.a;
-                                }, 0);
+                                },         0);
                             }
                         } else {
-                            if (request.resultDisposition && request.resultDisposition.type == ResultDispositionType.Custom) {
+                            if (request.resultDisposition && request.resultDisposition.type === ResultDispositionType.Custom) {
                                 return objectUrl;
                             } else {
-                                let data = request.resultDisposition.data || {};
+                                const data = request.resultDisposition.data || {};
                                 window.open(objectUrl, data.name, data.specs, data.replace);
                             }
                         }
@@ -555,25 +542,25 @@ export class HornetSuperAgent {
      * Formate la réponse pour le serveur afin de traiter les erreurs automatiquement
      * @param {Response} response reponse de superagent
      */
-    protected manageServerResult(response: Response, request: HornetRequest): any {
+    protected manageServerResult(response: Response, request: HornetRequest, throwed?: boolean): any {
 
         if (response && response.body && this.hasHornetBody(response.body)) {
             // Result OK || Erreur gérée par la backend
-            var result: BackendApiResult = response.body;
+            const result: BackendApiResult = response.body;
 
-            if (result.errors.length == 0) {
+            if (result.errors.length === 0) {
                 // Pas d'erreur >> on appelle le cb fourni par l'application
-                if (response.type && response.type != MediaTypes.JSON.MIME) {
+                if (response.type && response.type !== MediaTypes.JSON.MIME) {
                     return response;
                 }
                 return result.data;
 
             } else {
-                throw BackendApiError.parseError(result.errors, response.status).toJsError();
+                throw BackendApiError.parseError(result.errors, result.status || response.status).toJsError();
             }
 
         } else {
-            return response;
+            return (response && response.body) || response;
         }
     }
 
@@ -592,11 +579,11 @@ export class HornetSuperAgent {
      */
     protected manageError(err) {
         // Erreur non gérée par le nodejs ! Réseau etc ...
-        var error = new TechnicalError("ERR_TECH_UNKNOWN", {
+        const error = new TechnicalError("ERR_TECH_UNKNOWN", {
             errorMessage: err.message,
             httpStatus: 500 /*(TODO res || {url}).status*/,
-            errorCause: err
-        }, err);
+            errorCause: err,
+        },                               err);
 
         // pas de callback custom > on appelle le ClientErrorManager
         manageError(error, Utils.getCls("hornet.appConfig").errorComponent);
@@ -625,7 +612,7 @@ export class HornetSuperAgent {
     protected setInCache(response: Response, request: HornetRequest, timetoliveInCache: number) {
 
         logger.debug("Mise en cache de la réponse à l'appel de l url:", request.url);
-        var reponseCopy = this.cloneResponse(response);
+        const reponseCopy = this.cloneResponse(response);
 
         return HornetCache
             .getInstance()
@@ -633,8 +620,8 @@ export class HornetSuperAgent {
             .finally(function () {
                 logger.debug("Sauvegarde dans le cache effectuée");
                 return response;
-            }
-            );
+            },
+        );
     }
 
     /**
@@ -644,7 +631,7 @@ export class HornetSuperAgent {
     protected removeInCache(request: HornetRequest): Promise<any> {
 
         logger.debug("Suppression en cache de l url:", request.url);
-        let keys: Array<Promise<any>> = [ HornetCache.getInstance().clearCacheAsynchrone(this.generateCacheKey(request)).catch((e) => {
+        const keys: Array<Promise<any>> = [ HornetCache.getInstance().clearCacheAsynchrone(this.generateCacheKey(request)).catch((e) => {
             logger.trace(e);
             logger.debug("Pas de valeur en cache à supprimer");
             return null;
@@ -673,14 +660,19 @@ export class HornetSuperAgent {
      */
     protected generateCacheKey(request: HornetRequest): string {
         let key = request.url;
-        if (request.data && request.cacheKey == CacheKey.URL_DATA) {
+        if (request.data && request.cacheKey === CacheKey.URL_DATA) {
             let separator = "?";
-            let dataSort = Object.keys(request.data).sort();
-            for (let data in dataSort) {
+            const dataSort = Object.keys(request.data).sort();
+            for (const data in dataSort) {
                 key += separator + data + "=" + JSON.stringify(dataSort[ data ]);
-                separator = "&"
+                separator = "&";
             }
         }
+
+        if (request.method === "put" || request.method === "patch" || request.method === "delete") {
+            key = key.substring(0, key.lastIndexOf("/"));
+        }
+
         return key;
     }
 
@@ -698,9 +690,9 @@ export class HornetSuperAgent {
             header: res.header,
             ok: res.ok,
             status: res.status,
-            type: res.type
+            type: res.type,
         };
-    };
+    }
 
     /**
      * nettoyage des data (suppression des null (Button)).
@@ -708,10 +700,10 @@ export class HornetSuperAgent {
      * @protected
      */
     protected cleanData(data: any) {
-        for (let attr in data) {
+        for (const attr in data) {
             if (data[ attr ] == null) delete data[ attr ];
         }
-    };
+    }
 
     /**
      * initialise la méthode de timeout pour la notification de fin de session.
@@ -720,10 +712,11 @@ export class HornetSuperAgent {
     protected static initSessionTimeout(clientSessionConfig: ClientSessionTimeout) {
         // On réinitialise l'expiration uniquement si une requète est transmise au serveur
         if (clientSessionConfig.isInSessionTimeout && !Utils.isServer) {
-            let expireIn = clientSessionConfig.sessionTimeout - clientSessionConfig.notifSessionTimeout;
+            const expireIn = clientSessionConfig.sessionTimeout - clientSessionConfig.notifSessionTimeout;
             logger.debug("initSessionTimeout will notify in", clientSessionConfig.notifSessionTimeout, "ms");
             HornetSuperAgent.clear();
-            HornetSuperAgent.sessionExpireTimeout = setTimeout(HornetSuperAgent.sessionWillExpireIn(clientSessionConfig.notifSessionTimeout), expireIn, clientSessionConfig);
+            HornetSuperAgent.sessionExpireTimeout = setTimeout(
+                HornetSuperAgent.sessionWillExpireIn(clientSessionConfig.notifSessionTimeout), expireIn, clientSessionConfig);
         }
     }
 
@@ -735,8 +728,10 @@ export class HornetSuperAgent {
         return (clientSessionConfig: ClientSessionTimeout) => {
             logger.debug("Session will expire in", expireIn, "ms");
             HornetSuperAgent.emitEvent(SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT)(expireIn);
-            let nextUpdateDelay = expireIn - clientSessionConfig.notifSessionTimeoutRepeat;
-            HornetSuperAgent.sessionExpireTimeout = setTimeout(HornetSuperAgent.updateSessionWillExpireIn(nextUpdateDelay), clientSessionConfig.notifSessionTimeoutRepeat, clientSessionConfig);
+            const nextUpdateDelay = expireIn - clientSessionConfig.notifSessionTimeoutRepeat;
+            HornetSuperAgent.sessionExpireTimeout = setTimeout(
+                HornetSuperAgent.updateSessionWillExpireIn(nextUpdateDelay), 
+                clientSessionConfig.notifSessionTimeoutRepeat, clientSessionConfig);
         };
     }
 
@@ -746,16 +741,18 @@ export class HornetSuperAgent {
             HornetSuperAgent.emitEvent(SESSION_WILL_EXPIRE_NOTIFICATION_EVENT)(expireIn);
 
 
-            let nextUpdateDelay = expireIn - clientSessionConfig.notifSessionTimeoutRepeat;
+            const nextUpdateDelay = expireIn - clientSessionConfig.notifSessionTimeoutRepeat;
             if (nextUpdateDelay >= 0) {
-                HornetSuperAgent.sessionExpireTimeout = setTimeout(HornetSuperAgent.updateSessionWillExpireIn(nextUpdateDelay), clientSessionConfig.notifSessionTimeoutRepeat, clientSessionConfig);
+                HornetSuperAgent.sessionExpireTimeout = setTimeout(
+                    HornetSuperAgent.updateSessionWillExpireIn(nextUpdateDelay), 
+                    clientSessionConfig.notifSessionTimeoutRepeat, clientSessionConfig);
             }
         };
     }
 
     protected static emitEvent(event: HornetEvent<SessionEvent>) {
         return (value?: number) => {
-            fireHornetEvent(event.withData({ value: value }));
+            fireHornetEvent(event.withData({ value }));
         };
     }
 
@@ -792,7 +789,7 @@ export class HornetList<T extends HornetPlugin> {
 
         this.list.forEach((name, index) => {
             idx = index;
-            if (idx == -1 && name === Elt.name) {
+            if (idx === -1 && name === Elt.name) {
                 this.mapPlugins[ newElt[ "name" ] ] = newElt;
                 idx = index;
             }
@@ -812,7 +809,7 @@ export class HornetList<T extends HornetPlugin> {
 
         this.list.forEach((name, index) => {
             idx = index;
-            if (idx == -1 && name === Elt.name) {
+            if (idx === -1 && name === Elt.name) {
                 this.mapPlugins[ newElt[ "name" ] ] = newElt;
                 idx = index;
             }
@@ -832,7 +829,7 @@ export class HornetList<T extends HornetPlugin> {
 
         this.list.forEach((name, index) => {
             idx = index;
-            if (idx == -1 && name === Elt.name) {
+            if (idx === -1 && name === Elt.name) {
                 idx = index;
             }
         });

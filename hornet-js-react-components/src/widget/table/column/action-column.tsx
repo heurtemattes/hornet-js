@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -120,27 +120,31 @@ export interface ActionColumnState extends ColumnState {
 export class ActionColumn<T extends ActionColumnProps, S extends ActionColumnState> extends Column<ActionColumnProps, ActionColumnState> {
 
     static defaultProps = Column.mergeObjects(Column.defaultProps, {
-        defaultStyle: { "textAlign": "center", "paddingLeft": 0, "width": "1.7em" },
+        defaultStyle: { textAlign: "center", paddingLeft: 0, width: "1.7em" },
         sortable: false,
-        hiddenable: false
+        hiddenable: false,
     });
 
 
     public readonly props: ActionColumnProps;
 
     /**
-     * Getter pour le composant générant l'entête de colonne
+     * Getter pour le composant générant le entête de colonne
      * @return Class<HeaderCell<HeaderCellProps, any>>
      */
-    public getHeaderCell(): Class<ActionHeaderCell<ActionHeaderCellProps, any>> {
-        return ActionHeaderCell;
+    public static getHeaderCell(): Class<ActionHeaderCell<ActionHeaderCellProps, any>> {
+        return ActionHeaderCell as any;
     }
 
     /**
-     * @inheritDoc
+     * Getter pour le composant générant le contenu de colonne
+     * @return Class<BodyCell<BodyCellProps, any>>
      */
-    public getBodyCell(): Class<ActionBodyCell<ActionBodyCellProps, any>> {
+    public static getBodyCell(props): Class<ActionBodyCell<ActionBodyCellProps, any>> {
         return ActionBodyCell;
     }
 
 }
+
+(ActionColumn.prototype.getHeaderCell as any).__deprecated__ = true;
+(ActionColumn.prototype.getBodyCell as any).__deprecated__ = true;

@@ -79,7 +79,7 @@ const expect = chai.expect;
  *
  * @class HornetTestAssert
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  *
@@ -129,7 +129,7 @@ export class HornetTestAssert {
      * @param {boolean} condition
      * @param {string} message
      */
-    static assertTrue(condition: boolean, message:string) {
+    static assertTrue(condition: boolean, message: string) {
         expect(condition, message).to.be.true;
     }
 
@@ -138,7 +138,7 @@ export class HornetTestAssert {
      * @param {boolean} condition
      * @param {string} message
      */
-    static assertFalse(condition: boolean, message:string) {
+    static assertFalse(condition: boolean, message: string) {
         expect(condition, message).to.be.false;
     }
 

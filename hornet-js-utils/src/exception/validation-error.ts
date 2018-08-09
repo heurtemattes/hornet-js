@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ import { BaseError } from "src/exception/base-error";
  * Erreur de validation de données
  */
 export class ValidationError extends BaseError {
-    constructor(code: string = "ERR_HORNET_VALIDATION", args?: { [key: string]: any }, cause?: Error) {
+    constructor(code: string = "ERR_HORNET_VALIDATION", args?: { [ key: string ]: any }, cause?: Error) {
         super(code, undefined, args, cause);
         this.name = "ValidationError";
     }

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { AsyncElement } from "src/executor/async-element";
-import { HornetEvent, fireHornetEvent, UNAUTHORIZE_ERROR_EVENT} from "src/event/hornet-event";
+import { HornetEvent, fireHornetEvent, UNAUTHORIZE_ERROR_EVENT } from "src/event/hornet-event";
 import { RouteAuthorization, PageRouteInfos } from "src/routes/abstract-routes";
 import { SecurityError } from "hornet-js-utils/src/exception/security-error";
 import { AuthUtils } from "hornet-js-utils/src/authentication-utils";
@@ -112,22 +112,22 @@ export class ContextInitializerElement extends AsyncElement {
 }
 
 
-export var PAGE_READY_EVENT = new HornetEvent<{}>("PAGE_READY_EVENT");
+export const PAGE_READY_EVENT = new HornetEvent<{}>("PAGE_READY_EVENT");
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      UrlModifierAction
 // ------------------------------------------------------------------------------------------------------------------- //
-export interface UrlChangeEventDetail { newUrl: string; newPath: string }
-export var URL_CHANGE_EVENT = new HornetEvent<UrlChangeEventDetail>("URL_CHANGE_EVENT");
+export interface UrlChangeEventDetail { newUrl: string; newPath: string; }
+export const URL_CHANGE_EVENT = new HornetEvent<UrlChangeEventDetail>("URL_CHANGE_EVENT");
 export class UrlChangeElement extends AsyncElement {
 
     execute(next) {
-        var newUrl = window.location.pathname;
-        var newPath = newUrl.replace(Utils.getContextPath(), "");
+        const newUrl = window.location.pathname;
+        const newPath = newUrl.replace(Utils.getContextPath(), "");
         // on synchronise le CLS
         Utils.setCls("hornet.routePath", newPath);
         Utils.setCls("hornet.currentUrl", newUrl);
         // on dispatch le changement d'url
-        fireHornetEvent(URL_CHANGE_EVENT.withData({ newUrl: newUrl, newPath: newPath }));
+        fireHornetEvent(URL_CHANGE_EVENT.withData({ newUrl, newPath }));
         next();
     }
 }
@@ -136,11 +136,13 @@ export class UrlChangeElement extends AsyncElement {
 //                                      UserAccessSecurityAction
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UserAccessSecurityElement extends AsyncElement {
+
+    
     protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UserAccessSecurityElement");
 
     execute(next) {
-        var user = Utils.getCls("hornet.user");
-        var routeAuthorization: RouteAuthorization = Utils.getCls("hornet.routeAuthorization");
+        const user = Utils.getCls("hornet.user");
+        const routeAuthorization: RouteAuthorization = Utils.getCls("hornet.routeAuthorization");
 
         if (routeAuthorization && routeAuthorization.length > 0) {
             // cas de la redirection vers la page de login si page authentifiée et pas connecté
@@ -149,7 +151,7 @@ export class UserAccessSecurityElement extends AsyncElement {
 
                 // TODO: voir s'il n'est pas possible de faire autrement
                 // on stock l'url de la route authentifiée avant de faire le "back"
-                var oldUrl = window.location.href;
+                const oldUrl = window.location.href;
                 // on fait un "back" pour remettre en tête l'url de la page depuis laquelle la route authentifiée a été demandée
                 // cela permet de pouvoir utiliser le bouton "back" depuis la page de login et de revenir sur l'url de la page publique plutôt que sur la page privée
                 history.back();
@@ -162,7 +164,7 @@ export class UserAccessSecurityElement extends AsyncElement {
             } else {
                 UserAccessSecurityElement.logger.trace("Route avec restriction d'accès sur les rôles:", routeAuthorization);
                 if (!AuthUtils.isAllowed(user, routeAuthorization)) {
-                    fireHornetEvent(UNAUTHORIZE_ERROR_EVENT.withData({ user: user, routeAuthorization: routeAuthorization }));
+                    fireHornetEvent(UNAUTHORIZE_ERROR_EVENT.withData({user, routeAuthorization}));
                     throw new SecurityError();
                 }
             }
@@ -190,8 +192,8 @@ export class ViewRenderingElement extends AsyncElement {
     }
 
     execute(next) {
-        var routeInfos: PageRouteInfos = Utils.getCls("hornet.routeInfos");
-        let dataToPass = Utils.getCls("hornet.navigateData");
+        const routeInfos: PageRouteInfos = Utils.getCls("hornet.routeInfos");
+        const dataToPass = Utils.getCls("hornet.navigateData");
         fireHornetEvent(COMPONENT_CHANGE_EVENT.withData({ newComponent: routeInfos.getViewComponent(), data: dataToPass }));
         next();
     }

@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-utils",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "license": "CECILL-2.1",
   "description": "Partie commune et utilitaire à tous les composants hornet-js",
   "bugs": {
@@ -12,8 +12,8 @@
   },
   "main": "./src/index.js",
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.1.1",
-    "hornet-js-test-dts": "5.1.1"
+    "hornet-js-ts-typings": "5.2.0",
+    "hornet-js-test-dts": "5.2.0"
   },
   "appDependencies": {
     "bluebird": "3.5.1",
@@ -21,14 +21,15 @@
     "continuation-local-storage": "3.2.1",
     "json5": "0.5.1",
     "lodash": "4.17.5",
-    "log4js": "2.3.12",
+    "log4js": "2.11.0",
     "moment-timezone": "0.5.14",
     "source-map-support": "0.5.3",
-    "tslib": "1.9.0"
+    "tslib": "1.9.0",
+    "csstype": "2.5.3"
   },
   "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.1.1"
+    "hornet-js-test": "5.2.0"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,8 +93,8 @@ const logger: Logger = Utils.getLogger("hornet-js-batch.reader.batch-call");
 export class Call extends ForEach implements BatchService {
 
     protected execSpecificPool(_process) {
-        let value = _process.list;
-        _process.options.service.apply(_process.options.scope.getService(), [value]);
+        const value = _process.list;
+        _process.options.service.apply(_process.options.scope.getService(), [ value ]);
         _process.list = [];
         _process.execPool();
     }

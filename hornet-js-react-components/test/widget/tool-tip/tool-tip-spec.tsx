@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -116,18 +116,18 @@ describe.skip("Infobulle", () => {
     };
 
     // Act
-    let $: CheerioStatic = render(() => <ToolTip {...props}/>);
+    let $: CheerioStatic = render(() => <ToolTip {...props} />);
     // Assert
     it("should render a <ToolTip/> component", () => {
         assert.isDefined($.html());
     });
 
-    describe('component props', ()=> {
-        it.skip('should have a props', ()=> {
+    describe('component props', () => {
+        it.skip('should have a props', () => {
             let $a = $('a');
             assert.equal($a.attr('class'), props.classSpan);
         });
-        it('should have all img props', ()=> {
+        it('should have all img props', () => {
             let $img = $('img');
             assert.equal($img.attr('alt'), props.alt);
             assert.equal($img.attr('src'), props.src);

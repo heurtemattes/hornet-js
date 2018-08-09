@@ -73,12 +73,12 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Response } from "express";
+import { Response, Request } from "express";
 import { MediaType } from "src/protocol/media-type";
 import { Options } from "src/result/hornet-result-interface";
 import { NodeApiResultBuilder } from "src/services/service-api-results";
@@ -95,40 +95,44 @@ export class HornetResult {
      * référence le mediaType du result
      * @instance
      */
-    protected _mediaType : MediaType;
+    protected _mediaType: MediaType;
 
     /**
      * référence les options à utiliser dans les methodes {@link HornetResult#__compute}  & {@link HornetResult#__configure}
      * @instance
      */
-    protected _options : Options;
+    protected _options: Options;
 
-    constructor(options : Options, mediaType : MediaType){
+    constructor(options: Options, mediaType: MediaType) {
         this._options = options;
         this._mediaType = mediaType;
     }
 
-    set options(options : any) {
+    set options(options: any) {
         this._options = options;
     }
 
-    get options() : any{
+    get options(): any {
         return this._options;
     }
 
-    set mediaType(value : MediaType) {
+    set mediaType(value: MediaType) {
         this._mediaType = value;
     }
 
-    get mediaType() : MediaType{
+    get mediaType(): MediaType {
         return this._mediaType;
+    }
+
+    get status() {
+        return this._options.status || (this._options.data? 200 : 206); 
     }
 
     /**
      * méthode qui permet d'appliquer un traitement supplémentaire sur les données avant la télé-transmission des data dans la réponse
      * @returns {Promise} revoie une promise de traitement
      */
-    protected compute() : Promise<any> {
+    protected compute(): Promise<any> {
         return Promise.resolve(true)
     }
 
@@ -136,8 +140,8 @@ export class HornetResult {
      * méthode qui permet de parametrer les entêtes et le corps de la réponse HTTP en fonction du type de résult
      * @vreturns {boolean} true pour envoyer la reponse [response.end]
      */
-    protected configure(res : Response) : boolean {
-        res.json(NodeApiResultBuilder.build(this.options.data));
+    protected configure(res: Response, req?: Request): boolean {
+        res.json(NodeApiResultBuilder.build(this.options.data, req && req.originalUrl));
         return true;
     }
 
@@ -145,12 +149,12 @@ export class HornetResult {
      * méthode qui permet d'appeler la chaine des traitements + configuration des la response
      * @returns {Promise} revoie une promise de traitement
      */
-    public manageResponse(res : Response): Promise<boolean>{
-        return this.compute().then(()=>{
-            if(!res["_headerSent"]) {
-                return this.configure(res);
+    public manageResponse(res: Response, req?: Request): Promise<boolean> {
+        return this.compute().then(() => {
+            if (!res[ "_headerSent" ]) {
+                return this.configure(res, req);
             }
             return false;
-        })
+        });
     }
 }

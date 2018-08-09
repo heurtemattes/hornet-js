@@ -73,18 +73,18 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-let debug = require("log4js/lib/debug")("dateFileSync");
-let layouts = require("log4js/lib/layouts");
-let path = require("path");
-let fs = require("fs");
-let os = require("os");
-let eol = os.EOL || "\n";
-let format = require("log4js/lib/date_format");
+const debug = require("log4js/lib/debug")("dateFileSync");
+const layouts = require("log4js/lib/layouts");
+const path = require("path");
+const fs = require("fs");
+const os = require("os");
+const eol = os.EOL || "\n";
+const format = require("log4js/lib/date_format");
 
 /**
  * @deprecated since version 5.1.1, Use dateFile instead from log4js.
@@ -108,7 +108,7 @@ class DateRollingFileSync {
      * @param now
      */
     constructor(filename: string, pattern: any, options: any, now?: Function) {
-        console.warn("Deprecated since version 5.1.1, Use dateFile instead from log4js.")
+        console.warn("Deprecated since version 5.1.1, Use dateFile instead from log4js.");
 
         debug("In DateRollingFileSync");
 
@@ -125,7 +125,7 @@ class DateRollingFileSync {
         this.now = now || Date.now;
 
         if (fs.existsSync(filename)) {
-            let stat = fs.statSync(filename);
+            const stat = fs.statSync(filename);
             this.lastTimeWeWroteSomething = format.asString(this.pattern, stat.mtime);
         } else {
             this.lastTimeWeWroteSomething = format.asString(this.pattern, new Date(this.now()));
@@ -165,8 +165,8 @@ class DateRollingFileSync {
      * @returns {boolean}
      */
     public shouldRoll(): boolean {
-        let lastTime = this.lastTimeWeWroteSomething,
-            thisTime = format.asString(this.pattern, new Date(this.now()));
+        const lastTime = this.lastTimeWeWroteSomething;
+        const thisTime = format.asString(this.pattern, new Date(this.now()));
 
         debug("DateRollingFileStream.shouldRoll with now = " +
             this.now() + ", thisTime = " + thisTime + ", lastTime = " + lastTime);
@@ -187,11 +187,11 @@ class DateRollingFileSync {
         if (this.alwaysIncludePattern) {
             this.filename = this.baseFilename + this.lastTimeWeWroteSomething;
         } else {
-            let newFilename = this.baseFilename + this.previousTime;
+            const newFilename = this.baseFilename + this.previousTime;
             try {
                 fs.unlinkSync(newFilename);
             } catch (e) {
-                //ignore err: if we could not delete, it's most likely that it doesn't exist
+                // ignore err: if we could not delete, it's most likely that it doesn't exist
             }
             fs.renameSync(filename, newFilename);
         }
@@ -203,7 +203,7 @@ class DateRollingFileSync {
      * @param encoding
      */
     public write(chunk, encoding): void {
-        let that = this;
+        const that = this;
 
         function writeTheChunk() {
             debug("writing the chunk to the file");
@@ -233,10 +233,10 @@ class DateRollingFileSync {
 export function appender(filename: string, pattern: any, alwaysIncludePattern: boolean, layout: Function, timezoneOffset: number) {
     layout = layout || layouts.basicLayout;
 
-    let logFile = new DateRollingFileSync(
+    const logFile = new DateRollingFileSync(
         filename,
         pattern,
-        { alwaysIncludePattern: alwaysIncludePattern }
+        { alwaysIncludePattern },
     );
 
     return function (logEvent) {

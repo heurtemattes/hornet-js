@@ -73,70 +73,49 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.1.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-
-/**
- * Type d'objet qui est transféré d'une action à une autre (d'une promise à une autre)
- * Les chaines d'actions peuvent étendre cette classe pour ajouter des attributs spécifiques.
- *
- */
-import * as superagent from "superagent";
-import { MediaTypes } from "src/protocol/media-type";
-
-export class ActionsChainData {
-
-    /**
-     * Le mimeType demandé par le client
-     */
-    requestMimeType:string;
-
-    /**
-     * Le MimeType du résultat à retourner au client
-     */
-    responseMimeType:string;
-
-    /**
-     * Le résultat à retourner au client.
-     * Si ce champ est valorisé, il sera prioritaire sur les autres rendus (composant / json)
-     */
-    result:any;
-
-    /**
-     * La dernière erreur technique produite
-     * Si ce champ est valorisé, il sera prioritaire sur les autres rendus (composant / json)
-     */
-    lastError:any;
-
-    /**
-     * Les erreurs présentes dans un formulaire
-     * Si ce champ est valorisé, il sera prioritaire sur les autres rendus (composant / json)
-     */
-    formError:any;
-
-    /**
-     * Boolean indiquant que l'accès à la ressource courante n'est pas autorisé pour l'utilisateur courant
-     * @type {boolean}
-     */
-    isAccessForbidden:boolean = false;
-
-    parseResponse(res:superagent.Response) {
-        this.result = res.body || {"status": res.status};
-        this.responseMimeType = res.type || MediaTypes.JSON.MIME;
-        return this;
+import { Logger } from "hornet-js-utils/src/logger";
+import { TestLogger } from "hornet-js-test/src/test-logger";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
+    "disableClustering": true,
+    "appenders": {
+        "console": {
+        "type": "console",
+        "layout": {
+            "type": "pattern",
+            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+        }
+        }
+    },
+    "categories": {
+        "default": { "appenders": ["console"], "level": "INFO" }
     }
+});
 
-    withBody(body:any) {
-        this.result = body;
-        return this;
-    }
+var expect:any = TestUtils.chai.expect;
 
-    withResponseMimeType(responseMimeType:string) {
-        this.responseMimeType = responseMimeType;
-        return this;
-    }
-}
+import { Injector } from "src/inject/injector";
+import { BeanServerInject } from "test/inject/bean-server-inject";
+import { Bean, BeanInject, BeanToInject, HOW_I_AM } from "test/inject/bean";
 
+
+describe("Test of Inject eager : ", () => {
+
+    
+    it("should auto create and inject a bean in constructor", (done) => {
+        require("test/inject/bean-auto-eager"); // syntaxe pour ne pas que typescript supprime les imports non utilisés
+        let b = new BeanServerInject({howIAm: function() {throw(new Error())}});
+        expect(b.howIAm).to.be.exist;
+        expect(b.howIAm()).to.eql(HOW_I_AM);
+        Injector.getRegistered(BeanToInject);
+        expect((b.bean as any).count).to.eql(1);
+        Injector.removeRegistered(BeanToInject);
+        Injector.removeRegistered(BeanInject);
+        done();
+    });
+});

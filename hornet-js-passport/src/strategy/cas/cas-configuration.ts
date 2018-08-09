@@ -73,20 +73,20 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
 export class CasConfiguration {
 
-    public appLoginPath:string;
-    public appLogoutPath:string;
-    public hostUrlReturnTo:string;
-    public casValidateUrl:string;
-    public casLoginUrl:string;
-    public casLogoutUrl:string;
-    public verifyFunction:any;
+    public appLoginPath: string;
+    public appLogoutPath: string;
+    public hostUrlReturnTo: string;
+    public casValidateUrl: string;
+    public casLoginUrl: string;
+    public casLogoutUrl: string;
+    public verifyFunction: any;
 
     /**
      * Instanciation de la configuration pour un appel CAS direct depuis l'application
@@ -99,7 +99,7 @@ export class CasConfiguration {
      * @param casLogoutUrl url de déconnexion du CAS
      * @param verifyFunction (facultatif) : fonction à utiliser pour la récupération/vérification des infos de l'utilisateur
      */
-    constructor(appLoginPath:string, appLogoutPath:string, hostUrlReturnTo:string, casValidateUrl:string, casLoginUrl:string, casLogoutUrl:string, verifyFunction?:any) {
+    constructor(appLoginPath: string, appLogoutPath: string, hostUrlReturnTo: string, casValidateUrl: string, casLoginUrl: string, casLogoutUrl: string, verifyFunction?: any) {
         this.appLoginPath = appLoginPath;
         this.appLogoutPath = appLogoutPath;
         this.hostUrlReturnTo = hostUrlReturnTo;

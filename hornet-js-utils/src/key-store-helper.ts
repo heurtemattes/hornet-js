@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -130,16 +130,16 @@ export class KeyStoreBuilder {
      * @returns {https.Agent}
      */
     public static buildHttpsAgent(agentOptions: AgentOptions = {}, keyStoreOptions: KeyStoreOptions = {}) {
-        let CAs = KeyStoreBuilder.buildCAs(keyStoreOptions.CAs);
-        let CERTs = KeyStoreBuilder.buildCERTs(keyStoreOptions.CERTs);
-        let KEYs = KeyStoreBuilder.buildKEYs(keyStoreOptions.KEYs);
-        let PKCS12 = KeyStoreBuilder.buildPKCS12(keyStoreOptions.PKCS12);
+        const CAs = KeyStoreBuilder.buildCAs(keyStoreOptions.CAs);
+        const CERTs = KeyStoreBuilder.buildCERTs(keyStoreOptions.CERTs);
+        const KEYs = KeyStoreBuilder.buildKEYs(keyStoreOptions.KEYs);
+        const PKCS12 = KeyStoreBuilder.buildPKCS12(keyStoreOptions.PKCS12);
 
-        let options = _.assign({}, agentOptions, {
+        const options = _.assign({}, agentOptions, {
             ca: CAs,
             cert: CERTs,
-            key: KEYs
-        }, PKCS12);
+            key: KEYs,
+        },                       PKCS12);
 
         return new https.Agent(options);
     }
@@ -159,7 +159,7 @@ export class KeyStoreBuilder {
      * @returns {Array}
      */
     protected static buildCAs(CAs: Array<string> = []) {
-        let build = [];
+        const build = [];
         CAs.forEach((ca) => {
             try {
                 build.push(fs.readFileSync(ca));
@@ -176,7 +176,7 @@ export class KeyStoreBuilder {
      * @returns {Array}
      */
     protected static buildCERTs(CERTs: Array<string> = []) {
-        let build = [];
+        const build = [];
         CERTs.forEach((cert) => {
             try {
                 build.push(fs.readFileSync(cert));
@@ -193,14 +193,14 @@ export class KeyStoreBuilder {
      * @returns {Array}
      */
     protected static buildKEYs(KEYs: Array<KeyOptions> = []) {
-        let build = [];
+        const build = [];
         KEYs.forEach((key) => {
             try {
-                let keyFile = fs.readFileSync(key.file);
+                const keyFile = fs.readFileSync(key.file);
                 if (key.passphrase) {
                     build.push({
                         pem: keyFile,
-                        passphrase: key.passphrase
+                        passphrase: key.passphrase,
                     });
                 } else {
                     build.push(keyFile);
@@ -221,10 +221,10 @@ export class KeyStoreBuilder {
         let build = null;
         if (PKCS12.file != null) {
             try {
-                var p12File = fs.readFileSync(PKCS12.file);
+                const p12File = fs.readFileSync(PKCS12.file);
                 build = {
                     pfx: p12File,
-                    passphrase: PKCS12.passphrase
+                    passphrase: PKCS12.passphrase,
                 };
             } catch (e) {
                 throw new Error("PKCS12 file '" + PKCS12.file + "' cannot be read : " + e);

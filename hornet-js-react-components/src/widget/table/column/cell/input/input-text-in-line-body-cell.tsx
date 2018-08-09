@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,7 +94,11 @@ export class InputTextInLineBodyCell<P extends InputTextInLineBodyCellProps, S> 
 
     constructor(props: P, context?: any) {
         super(props, context);
-        this.state.value = props.value[props.keyColumn];
+
+        this.state = {
+            ...this.state,
+            value: props.value[ props.keyColumn ],
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -108,19 +112,19 @@ export class InputTextInLineBodyCell<P extends InputTextInLineBodyCellProps, S> 
     renderCell() {
         logger.trace("render InputTextBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        let inputTextProps: any = {
+        const inputTextProps: any = {
             name: this.state.keyColumn,
-            hideError : true,
+            hideError: true,
             className: "table-cell-input",
             groupClass: "table-cell-container",
             type: "text",
             currentValue: this.state.value,
-            title: this.state.title
+            title: this.state.title,
         };
 
         return (
             !this.state.isEditing ?
-                this.state.value : <InputField {...inputTextProps}/>
+                this.state.value : <InputField {...inputTextProps} />
         );
     }
 
@@ -135,23 +139,20 @@ export class InputTextInLineBodyCell<P extends InputTextInLineBodyCellProps, S> 
     /**
      * @inheritDoc
      */
-    handleCellFocus(tableCellRef)  {
-        if (tableCellRef ) {
-            //lorsque la cellule n'est en cours d'edition, on met le focus sur toute la div
+    handleCellFocus(tableCellRef) {
+        if (tableCellRef) {
+            // lorsque la cellule n'est en cours d'edition, on met le focus sur toute la div
             if (!this.state.isEditing) {
                 tableCellRef.focus();
             }
-            //sinon , on met le focus sur le premier element HTML de type input
+            // sinon , on met le focus sur le premier element HTML de type input
             else if (tableCellRef instanceof HTMLInputElement) {
                 (tableCellRef as HTMLElement).focus();
 
             } else if (tableCellRef.children) {
-                this.handleCellFocus(tableCellRef.children[0]);
+                this.handleCellFocus(tableCellRef.children[ 0 ]);
             }
         }
 
     }
-
-
-
 }

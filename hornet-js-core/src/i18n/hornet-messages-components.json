@@ -31,6 +31,7 @@
       "error": "erreur"
     },
     "autoCompleteField": {
+      "resetTitle": "Effacer le champ {label}",
       "title": "Aide à la saisie d'un champ d'auto-completion",
       "toolTip": "Commencez la saisie et des propositions vous seront faites. Vous pouvez naviguer dans ces propositions à partir des flèches du clavier",
       "selectedItem": "{count, plural, =0 {aucun item sélectionné } =1 {1 item sélectionné} other {# items sélectionnés}}",
@@ -60,7 +61,13 @@
     }
   },
   "inputField": {
-    "messageBtn": "Effacer le champs"
+    "resetTitle": "Effacer le champ {label}",
+    "alertMessage": "Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum ({count}/{maxChar}).",
+    "alertTitle":"Nombre de caractères trop élevé",
+    "charLabel":"{count, plural, =0 {0 caractère} =1 {1 caractère} other {# caractères}}"
+  },
+  "autoComplete": {
+    "resetTitle": "Effacer le champ {label}"
   },
   "uploadFile": {
     "selectedFile": "{count, plural, =0 {aucun fichier sélectionné } =1 {1 fichier sélectionné} other {# items fichiers sélectionnés}}",
@@ -76,12 +83,17 @@
     "errorsTitle": "Cette page contient des erreurs",
     "warningsTitle": "Message d'alerte",
     "infosTitle": "Messages d'information",
-    "personnalsTitle": "Message personnel"
+    "personnalsTitle": "Message personnel",
+    "hideShowTitle": "Afficher/Masquer",
+    "deleteTitle": "Supprimer"
   },
   "notificationSession": {
     "countDownExpiredMesage": "Votre session a expiré",
     "countDownNormalMessage": "Votre session expire dans ",
     "reconnexion": "Veuillez vous reconnecter"
+  },
+  "notificationIdp": {
+    "expireMessage": "Votre session IDP expire dans {expireIn} seconde(s), vos données seront perdues."
   },
   "spinner": {
     "loadingTitle": "Chargement...",
@@ -91,6 +103,7 @@
     "mainMenu": "Menu principal",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
+    "activePage": "page active",
     "shortcuts": {
       "enterSpace": "Entre dans le menu ou le sous menu ou active le lien",
       "escape": "Ferme le menu",
@@ -102,6 +115,9 @@
       "tab": "Fait sortir du menu. Ferme le menu si la tabulation sort de la barre de menu"
     }
   },
+  "menuAccessibilite": {
+    "label": "Aller au contenu"
+  },
   "breadcrumb": {
     "arialabel": "Fil d'ariane"
   },
@@ -111,10 +127,13 @@
     "modalContentTitle": "Raccourcis clavier"
   },
   "toggleColumnsButton": {
-    "title": "Colonnes à afficher/masquer"
+    "title": "Colonnes à afficher/masquer",
+    "itemTitleToggle": "Afficher/Masquer la colonne « {title} »"
   },
   "user": {
-    "title": "Gestion de l'utilisateur"
+    "title": "Gestion de l'utilisateur",
+    "connectionTitle": "Se connecter à l'application",
+    "deconnectionTitle": "Se déconnecter de l'application"
   },
   "tabs": {
     "arrow-right" : "Onglet suivant",
@@ -124,7 +143,10 @@
   },
   "table": {
     "pager": {
-      "dropdownTitle": "Nombre d'élément"
+      "dropdownTitle": "Nombre d'éléments du {summary}",
+      "inputLabel": "Numéro de la page affichée du {summary}",
+      "titleItem": "Afficher {textKey} éléments par page du {summary}",
+      "titleItemAll": "Afficher tous les éléments du {summary}"
     },
     "menuActions": {
       "title": "Menu d'actions"
@@ -162,10 +184,11 @@
       "csv": "CSV",
       "pdf": "PDF"
     },
-    "firstPage": "|< Début",
-    "prevPage": "< Précédent",
-    "nextPage": "Suivant >",
-    "lastPage": "Fin >|",
+    "firstPage": "Aller à la première page (page {firstPage}) du {summary}",
+    "prevPage": "Aller à la page précédente (page {prevPage} sur {totalPages}) du {summary}",
+    "nextPage": "Aller à la page suivante (page {nextPage} sur {totalPages}) du {summary}",
+    "lastPage": "Aller à la dernière page (page {totalPages}) du {summary}",
+    "pagerSummary" : "tableau",
     "inputPage": "Saisie de la page à afficher",
     "10": "10",
     "20": "20",
@@ -191,9 +214,13 @@
     "booleanNon": "non"
   },
   "textarea": {
-    "alertMessage": "Le nombre de caractère renseigné est trop élevé par rapport au nombre maximum ({count}/{maxChar}).",
+    "resetTitle": "Effacer le champ {label}",
+    "alertMessage": "Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum ({count}/{maxChar}).",
     "alertTitle": "Nombre de caractères trop élevé",
-    "charLabel": "{count, plural, =1 {1 caractère} other {# caractères}}"
+    "charLabel": "{count, plural, =0 {0 caractère} =1 {1 caractère} other {# caractères}}"
+  },
+  "charsCounter": {
+    "limitLabel": "(limite {maxChar} caractères)"
   },
   "calendar": {
     "agendaTitle": "Agenda",
@@ -212,16 +239,23 @@
     "decadeSelect": "Choisir une décade",
     "yearFormat": "YYYY",
     "dateFormat": "DD/MM/YYYY",
+    "timeZone": "Europe/Paris",
     "monthYearFormat": "MMMM YYYY",
     "monthFormat": "MMMM",
     "monthBeforeYear": true,
     "timezoneOffset": 60,
     "firstDayOfWeek": 1,
     "minimalDaysInFirstWeek": 1,
-    "placeHolder": "JJ/MM/AAAA"
+    "placeHolder": "JJ/MM/AAAA",
+    "nextYear": "Année suivante",
+    "previousYear": "Année précédente",
+    "nextMonth": "Mois suivant",
+    "previousMonth": "Mois précédent",
+    "resetTitle": "Effacer le champ {label}"
   },
   "changeLanguage": {
-    "title": "Changer la langue"
+    "title": "Changer la langue",
+    "titleItem": "Changer la langue en {langLabel}"
   },
   "header": {
     "logoTitle": "Accueil - ",
@@ -259,40 +293,41 @@
       "ER-GE-APP-01": "HornetApp : Le composant à rendre est null",
       "ER-CL-CLI-01": "Une erreur technique est survenue: {error}",
       "ERR-CODE-MAIL-001": "Un problème réseau (erreur SMTP) est survenu lors de l'envoi de mail",
-      "ERR_TECH_10001": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10002": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10003": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10004": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10005": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10006": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10007": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10008": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10009": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10010": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10011": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10012": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10013": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10014": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10015": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10301": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10302": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10303": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10304": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10305": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10306": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10400": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10401": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10402": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10500": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10501": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10502": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10599": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10600": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10601": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10602": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10603": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10604": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
-      "ERR_TECH_10700": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}"
+      "ERR_TECH_10001": "Sequelize - Connexion refusée - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10002": "Sequelize - Serveur non trouvé - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10003": "Sequelize - Seveur non accessible - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10004": "Sequelize - Connexion invalide - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10005": "Sequelize - Problème de connexion - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10006": "Sequelize - Erreur d'instance - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10007": "Sequelize - Connection timeout - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10008": "Sequelize - Erreur Timeout - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10009": "Sequelize - Accès refusé - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10010": "Sequelize - Erreur de connexion - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10011": "Sequelize - Erreur d'exclusion - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10012": "Sequelize - Erreur clé étrangère - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10013": "Sequelize - Erreur de validation - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10014": "Sequelize - Unique Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10015": "Sequelize - Erreur de base de données - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10301": "Datasource - Fetch Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10302": "Datasource - Erreur de tri - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10303": "Datasource - Erreur de filtre - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10304": "Datasource - Add Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10305": "Datasource - Delete Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10306": "Datasource - Response Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10400": "Injection - Erreur - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10401": "Injection - Injection déjà définie - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10402": "Injection - Injection non définie - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10500": "NodeMail - Erreur d'authentification - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10501": "NodeMail - Serveur non trouvé - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10502": "NodeMail - Connexion au serveur expiré - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10599": "NodeMail - Inconnu - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10600": "Antivirus - Fichier infecté - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10601": "Antivirus - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10602": "Antivirus - Connexion au serveur expiré - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10603": "Antivirus - Réponse mal formée - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10604": "Antivirus - Scan inconnu - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10700": "Batch - Undefined - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "LIMIT_FILE_SIZE" : "Upload - Taille limite dépassée - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}"
     }
   }
 }

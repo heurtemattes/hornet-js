@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -145,6 +145,11 @@ export class Logger {
         this.logInternal("trace", arguments);
     }
 
+    deprecated(...args: any[]);
+    deprecated(message: string) {
+        this.logInternal("deprecated", arguments);
+    }
+
     /**
      * Récupère le nom de la fonction appelante,
      * [mantis 0055464] en évitant de ramener l'appel du logger, qui ne nous intéresse pas :
@@ -157,8 +162,8 @@ export class Logger {
      *
      */
     static getFunctionName(callStackSize: number): string {
-        let notTyppedError: any = Error;
-        let orig: any = notTyppedError.prepareStackTrace;
+        const notTyppedError: any = Error;
+        const orig: any = notTyppedError.prepareStackTrace;
         let err: any;
         let functionName: string = "";
         if (typeof notTyppedError.captureStackTrace === "function") {
@@ -174,18 +179,18 @@ export class Logger {
                 // Remonter la stack jusqu'a la fonction appellante du logger
 
                 // D'abord, on cherche le premier appel au logger dans la stack (en partant du haut)
-                let lastLoggerStackIndex: number = _.findLastIndex(err.stack, function (o: any) {
+                const lastLoggerStackIndex: number = _.findLastIndex(err.stack, function (o: any) {
                     return o.getTypeName && o.getTypeName() === "Logger";
                 });
                 // si on a trouvé l'appel au logger dans la stack :
                 if (lastLoggerStackIndex > 0 && err.stack.length > lastLoggerStackIndex + 1) {
                     // on remonte d'un cran pour avoir le nom de la fonction appelante
-                    let hornetCall: any = err.stack[ lastLoggerStackIndex + 1 ];
+                    const hornetCall: any = err.stack[ lastLoggerStackIndex + 1 ];
                     functionName = hornetCall.getFunctionName();
                     // parfois, le nom de la fonction est vide (cas des fonctions déclarées dynamiquement)
                     if (!functionName) {
                         // dans ce cas on affiche "anonymous" avec le nom du fichier et le numéro de ligne+colonne
-                        let filename: string = hornetCall.getFileName() || "no source file";
+                        const filename: string = hornetCall.getFileName() || "no source file";
                         functionName = "anonymous:".concat(_.last(filename.split(path.sep)));
                         // functionName = hornetCall.toString();
                     }
@@ -199,9 +204,9 @@ export class Logger {
             notTyppedError.prepareStackTrace = orig;
         } else {
             // Firefox
-            let e = new notTyppedError().stack;
+            const e = new notTyppedError().stack;
             if (e) {
-                let callstack = e.split("\n");
+                const callstack = e.split("\n");
                 if (callstack.length > callStackSize) {
                     functionName = callstack[ callStackSize ];
                 }
@@ -239,7 +244,9 @@ export class Logger {
             this.buildLogger(this.category);
         }
 
-        let logFn, stack, stackLogEnabled;
+        let logFn;
+        let stack;
+        let stackLogEnabled;
 
         stackLogEnabled = this.log4jsLogger.isStackErrorLogEnabled && this.log4jsLogger.isStackErrorLogEnabled() === "true";
 
@@ -274,6 +281,12 @@ export class Logger {
                     stack = this.searchStack(logArguments);
                 }
                 break;
+            case "deprecated":
+                if (this.log4jsLogger.isWarnEnabled() && (process.env.NODE_ENV !== "production")) {
+                    logFn = this.log4jsLogger.warn;
+                    stack = this.searchStack(logArguments);
+                }
+                break;
             default:
                 if (this.log4jsLogger.isErrorEnabled()) {
                     logFn = this.log4jsLogger.error;
@@ -287,8 +300,8 @@ export class Logger {
             }
 
             // On a bien besoin de logguer
-            let parameters = Array.prototype.slice.call(logArguments);
-            let message = parameters.map(this.mappingObjectToString.bind(this)).join(" ");
+            const parameters = Array.prototype.slice.call(logArguments);
+            const message = parameters.map(this.mappingObjectToString.bind(this)).join(" ");
 
             // Et enfin on log réellement
             logFn.call(this.log4jsLogger, message);
@@ -315,7 +328,7 @@ export class Logger {
             return arg;
 
         } else if (arg instanceof TechnicalError) {
-            let errStr: string = arg.toString();
+            const errStr: string = arg.toString();
 
             let infoSupp;
             try {
@@ -332,7 +345,7 @@ export class Logger {
             return errStr + "\nInformations supplémentaires :\n" + infoSupp + "\n" + stacks;
 
         } else if (arg instanceof BusinessErrorList) {
-            let errors = arg.getErrors();
+            const errors = arg.getErrors();
             let errStr: string = "\n";
             for (let i = 0; i < errors.length; i++) {
                 errStr += ("Erreur #" + (i + 1) + " [" + errors[ i ].code + "] :\n" + errors[ i ].toString());
@@ -355,7 +368,7 @@ export class Logger {
             return errStr;
 
         } else if (arg instanceof BusinessError) {
-            let errStr = arg.toString();
+            const errStr = arg.toString();
 
             let infoSupp;
             try {
@@ -372,7 +385,7 @@ export class Logger {
             return errStr + "\nInformations supplémentaires :\n" + infoSupp + "\n" + stacks;
 
         } else if (arg instanceof BaseError) {
-            let errStr = arg.toString();
+            const errStr = arg.toString();
 
             let infoSupp;
             try {

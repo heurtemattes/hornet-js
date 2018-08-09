@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,7 +109,7 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
     /** Valeur de propriétés par défaut */
     static defaultProps: any = {
         readOnly: false,
-        disabled: false
+        disabled: false,
     };
 
     constructor(props?: P, context?: any) {
@@ -155,9 +155,9 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * @return cet objet
      */
     protected updateReadOnlyFields(isReadOnly: boolean): this {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            let field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[ key ];
             if (field.props && field.props.writable && !isReadOnly) {
                 if (field.setState && (field && (field as any).mounted)) {
                     field.setState({ readOnly: isReadOnly });
@@ -180,9 +180,9 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * @return cet objet
      */
     protected updateDisabledFields(isDisabled: boolean): this {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            let field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[ key ];
             // if (field instanceof AbstractField) {
             if (field.setState && (field && (field as any).mounted)) {
                 field.setState({ disabled: isDisabled });
@@ -199,17 +199,17 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * Propage les propriétés devant être transmises aux champs enfants
      */
     protected propagateParentState(): void {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            let field: DomAdapter<any, any> = fields[ key ];
-            if (this.state.readOnly == true) {
+            const field: DomAdapter<any, any> = fields[ key ];
+            if (this.state.readOnly === true) {
                 field.setReadOnly(this.state.readOnly);
             }
-            if (this.state.disabled == true) {
+            if (this.state.disabled === true) {
                 field.setDisabled(this.state.disabled);
             }
             return true;
-        }, this);
+        },                        this);
     }
 
     /**
@@ -224,18 +224,18 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * @returns {Object}
      */
     extractData(removeEmptyStrings: boolean = true): Object {
-        let data: Object = {};
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
-        for (let name in fields) {
-            let value: any = fields[ name ].getCurrentValue();
-            if (value != "" || !removeEmptyStrings) {
+        const data: Object = {};
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        for (const name in fields) {
+            const value: any = fields[ name ].getCurrentValue(removeEmptyStrings);
+            if (value !== "" || !removeEmptyStrings) {
                 _.set(data, name, value);
             } else {
                 /* Le champ est vide : si son nom correspond à une arborescence d'objets, on s'assure tout de même
                 que l'objet parent existe */
-                let lastDotIndex = name.lastIndexOf(".");
+                const lastDotIndex = name.lastIndexOf(".");
                 if (lastDotIndex > 0) {
-                    let parentPath: string = name.substring(0, lastDotIndex);
+                    const parentPath: string = name.substring(0, lastDotIndex);
                     if (_.get(data, parentPath) == null) {
                         _.set(data, parentPath, {});
                     }

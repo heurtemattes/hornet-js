@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -124,7 +124,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
         underlayClickExits: true,
         verticallyCenter: true,
         focusDialog: true,
-        withoutOverflow: false
+        withoutOverflow: false,
     };
 
     constructor(props?: ModalProps, context?: any) {
@@ -132,22 +132,22 @@ export class Modal extends HornetComponent<ModalProps, any> {
     }
 
     setTitle(title: string, cb?) {
-        this.setState({ title: title }, cb);
+        this.setState({ title }, cb);
         return this;
     }
 
     setCloseLabel(closeLabel: string, cb?) {
-        this.setState({ closeLabel: closeLabel }, cb);
+        this.setState({ closeLabel }, cb);
         return this;
     }
 
     setCloseSymbole(closeSymbole: string, cb?) {
-        this.setState({ closeSymbole: closeSymbole }, cb);
+        this.setState({ closeSymbole }, cb);
         return this;
     }
 
     setChildren(children: ReactNode, cb?) {
-        this.setState({ children: children }, cb);
+        this.setState({ children }, cb);
         return this;
     }
 
@@ -176,7 +176,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
      * @param event
      */
     protected handleKeyDown(event: KeyboardEvent): void {
-        if (event.keyCode == KeyCodes.ESCAPE) {
+        if (event.keyCode === KeyCodes.ESCAPE) {
             if (this.state.onClickClose) {
                 this.state.onClickClose(event);
             } else {
@@ -206,23 +206,23 @@ export class Modal extends HornetComponent<ModalProps, any> {
             return null;
         }
 
-        let title = this.getTitle();
-        let closeLabel = this.getCloseLabel();
-        let closeSymbole = this.getCloseSymbole();
+        const title = this.getTitle();
+        const closeLabel = this.getCloseLabel();
+        const closeSymbole = this.getCloseSymbole();
 
         let titleBarRender = null;
         let closeBarRender = null;
 
-        let titleClasses: ClassDictionary = {};
+        const titleClasses: ClassDictionary = {};
         titleClasses[ "widget-dialogue-title" ] = true;
         titleClasses[ "react-draggable-cursor" ] = this.state.isDraggable;
 
-        let titleClassName = classNames(titleClasses);
+        const titleClassName = classNames(titleClasses);
 
         if (!this.state.hideTitleBar) {
             titleBarRender = (
                 <div className="widget-dialogue-header">
-                    <div className={titleClassName} id="dialogue-title" aria-describedby="dialogue-body-content">{title}</div>
+                    <div className={titleClassName} id="dialogue-title"><h1>{title}</h1></div>
                 </div>);
         }
 
@@ -239,9 +239,9 @@ export class Modal extends HornetComponent<ModalProps, any> {
         }
 
 
-        let bodyClasses: ClassDictionary = {
+        const bodyClasses: ClassDictionary = {
             "widget-dialogue-body": true,
-            "modal-overflow-y": !this.state.withoutOverflow
+            "modal-overflow-y": !this.state.withoutOverflow,
         };
 
 

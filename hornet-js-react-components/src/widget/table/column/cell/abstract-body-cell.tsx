@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -103,20 +103,38 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
 
     constructor(props: P, context?: any) {
         super(props, context);
-        let altValue = (typeof props.value[ props.keyColumn ] == "number") ? "0" : "";
-        this.state.value = new Template("${" + props.keyColumn + "}").process(props.value, this.props.replaceUndef || altValue);
-
+        const altValue = (typeof props.value[ props.keyColumn ] === "number") ? "0" : "";
         this.defaultClassName = "default-body-cell";
-        if (this.state.titleCell) {
-            this.state.titleCell = new Template(this.state.titleCell).process(this.props.value, this.props.replaceUndef || "?");
-        }
+
+        this.state = {
+            ...this.state,
+            value: AbstractBodyCell.getTemplatedValue(props),
+            titleCell: AbstractBodyCell.getTemplatedTitleCell(props),
+        };
+    }
+
+    shouldComponentUpdate(nextProps: any, nextState: any) {
+        return super.shouldComponentUpdate(nextProps, nextState) ||
+            this.state.value !== nextState.value;
     }
 
     componentDidUpdate(nextProps: any, nextState: any, nextContext: any) {
         super.componentDidUpdate(nextProps, nextState, nextContext);
         if (this.focus) {
-            this.props.contentState.setFocusOn(this.props.cellCoordinate);
-            this.focus = false
+            this.props.contentState.setFocusOn(this.props.coordinates);
+            this.focus = false;
+        }
+    }
+
+    componentWillReceiveProps(nextProps: P, nextContext: any): void {
+        const altValue = (typeof nextProps.value[ nextProps.keyColumn ] === "number") ? "0" : "";
+        const newValue = AbstractBodyCell.getTemplatedValue(nextProps);
+
+        if (newValue !== this.state.value) {
+            this.setState({
+                value: newValue,
+                titleCell: AbstractBodyCell.getTemplatedTitleCell(nextProps),
+            });
         }
     }
 
@@ -125,12 +143,38 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
      */
     render(): JSX.Element {
 
-        logger.trace("render BodyCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
+        logger.trace(
+            "render BodyCell -> column:",
+            this.props.coordinates.column, " - line:",
+            this.props.coordinates.row, "- isFocused:",
+            this.state.isFocused, "- tabIndex:",
+            this.state.tabIndex);
+            
         return (
-            <td {...this.getDefaultTdProps() }>
+            <td {...this.getDefaultTdProps()}>
                 {this.renderCell()}
             </td>
         );
+    }
+
+    /**
+     * Retourne la value de la cellule du tableau grâce au mapping du keyColumn
+     * // WARNING: keyColumn, value et replaceUndef sont obligatoire
+     * @param props 
+     */
+    static getTemplatedValue(props) {
+        const altValue = (typeof props.value[ props.keyColumn ] === "number") ? "0" : "";
+        return new Template("${" + props.keyColumn + "}").process(props.value, props.replaceUndef || altValue);
+    }
+
+    /**
+     * Retourne le title de la cellule du tableau grâce au mapping du keyColumn
+     * // WARNING: keyColumn, value et replaceUndef sont obligatoire
+     * @param props 
+     */
+    static getTemplatedTitleCell(props) {
+        const altValue = (typeof props.value[ props.keyColumn ] === "number") ? "0" : "";
+        return (props.titleCell && new Template(props.titleCell).process(props.value, props.replaceUndef || "?"));
     }
 
     renderCell() {
@@ -162,15 +206,16 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
      * @returns {{ref: ((instance:HTMLTableCellElement)=>undefined), className: string, onKeyDown: any, tabIndex: number, aria-selected: (((props:any)=>boolean)|any), onFocus: any, style: any}}
      */
     getDefaultTdProps() {
-        let classes: ClassDictionary = { "datatable-cell": true };
+        const classes: ClassDictionary = { "datatable-cell": true };
         classes[ "datatable-cell-custom-" + this.props.keyColumn ] = true;
         classes[ "datatable-cell-in-edition" ] = this.props.contentState.itemInEdition && this.state.abstractisEditing;
-        let key = this.props.id + "-colBody-" + this.props.cellCoordinate.row + "-" + this.props.coordinates.column;
-        if (this.props.cellCoordinate.column == 0 && this.props.contentState.itemInEdition) {
+        const key = this.props.id + "-colBody-" + this.props.coordinates.row + "-" + this.props.coordinates.column;
+        if (this.props.coordinates.column === 0 && this.props.contentState.itemInEdition) {
             this.focus = true;
         }
         classes[ this.props.id + "-" + this.props.keyColumn ] = true;
         classes[ this.defaultClassName ] = true;
+        classes[ this.props.className ] = this.props.className ? true : false;
 
         return ({
             ref: (instance: HTMLTableCellElement) => {
@@ -181,17 +226,16 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
             tabIndex: this.getTabIndex(),
             "aria-selected": this.state.isFocused,
             onFocus: (e) => {
-                this.props.contentState.setFocusOn(this.props.cellCoordinate);
+                this.props.contentState.setFocusOn(this.props.coordinates);
                 this.moveCaretAtEnd(e);
             },
             // disabled s'il existe un item en cours d'edition et l'indicateur isEditing  est a false pour cette cellule
             disabled: this.setDisabled(),
             style: this.props.style,
-            key: key,
+            key,
             id: key,
-            role: "gridcell",
-            title: this.state.visible ? (this.state.titleCell instanceof Function ? this.state.titleCell(this.state.value) :
-                this.state.titleCell ? this.state.titleCell : this.getCellTitle()) : null
+            title: this.state.visible !== false ? (this.state.titleCell instanceof Function ? this.state.titleCell(this.props.value) :
+                this.state.titleCell ? this.state.titleCell : this.getCellTitle()) : null,
         });
     }
 
@@ -200,7 +244,7 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
      * @param e
      */
     moveCaretAtEnd(e) {
-        let temp_value = e.target.value;
+        const temp_value = e.target.value;
         e.target.value = "";
         e.target.value = temp_value;
     }

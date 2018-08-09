@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,37 +92,38 @@ declare var Reflect: any;
  * @param  side {Side} complément de clé correspondant au côté d'exécution (Client ou Serveur)
  * */
 export function injectable(key?: Class<any> | AbstractClass<any> | string, scope: Scope = Scope.VALUE, side?: Side) {
-    return function <T extends {new(...args:any[]):{}}>(constructor:T) {
-        let injectParameters: {index: number, type: any}[] = Reflect.getOwnMetadata(INJECT_METADATA_KEY, constructor);
+    return function <T extends { new(...args: any[]): {} }>(constructor: T) {
+        const injectParameters: { index: number, type: any }[] = Reflect.getOwnMetadata(INJECT_METADATA_KEY, constructor);
         let newConstructor = constructor;
         if (injectParameters) {
             newConstructor = class extends constructor {
-                constructor(...args:any[]) {
+                constructor(...args: any[]) {
                     injectParameters.forEach((injectParameter) => {
-                        args[injectParameter.index] =  Injector.getRegistered(injectParameter.type || args[injectParameter.index]);
+                        args[ injectParameter.index ] = Injector.getRegistered(injectParameter.type ||  args[ injectParameter.index ]);
                     });
                     super(...args);
                 }
             };
-        } 
-        
+        }
+
         if (key) {
-            if (!side || (side as Side == Side.SERVER && Utils.isServer) || (side == Side.CLIENT && !Utils.isServer)) {
-                Injector.register(key, newConstructor, scope );
+            if (!side || (side as Side === Side.SERVER && Utils.isServer) || (side === Side.CLIENT && !Utils.isServer)) {
+                Injector.register(key, newConstructor, scope);
             }
         }
 
         return newConstructor;
-    }
-};
+    };
+}
 
 export enum Side {
-    SERVER,
-    CLIENT
-};
+    SERVER = 1,
+    CLIENT = 2,
+}
 
 export enum Scope {
-    PROTOTYPE,
-    SINGLETON,
-    VALUE
-};
+    PROTOTYPE = 1,
+    SINGLETON = 2,
+    SINGLETON_EAGER = 3,
+    VALUE = 4,
+}

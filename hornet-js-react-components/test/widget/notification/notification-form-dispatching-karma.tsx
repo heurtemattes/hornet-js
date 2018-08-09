@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -126,10 +126,10 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected generateAccordionsIntoForm(): JSX.Element {
         return (
             <Form id={"form1"}
-                  onSubmit={this.onSubmit}
-                  schema={schema}>
+                onSubmit={this.onSubmit}
+                schema={schema}>
                 <Accordions id="id-accordions-form-1"
-                            multiSelectable={false}>
+                    multiSelectable={false}>
                     <Accordion>
                         <Row>
                             <InputField
@@ -188,11 +188,11 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected generateFormsIntoAccordions(): JSX.Element {
         return (
             <Accordions id="id-accordions-form-2"
-                        multiSelectable={true}>
+                multiSelectable={true}>
                 <Accordion>
                     <Form id={"form2"}
-                          onSubmit={this.onSubmit}
-                          schema={schema2}>
+                        onSubmit={this.onSubmit}
+                        schema={schema2}>
                         <Row>
                             <InputField
                                 name={"input6"}
@@ -206,8 +206,8 @@ class NotificationFormDispatchingTest extends HornetReactTest {
                 </Accordion>
                 <Accordion>
                     <Form id={"form3"}
-                          onSubmit={this.onSubmit}
-                          schema={schema3}>
+                        onSubmit={this.onSubmit}
+                        schema={schema3}>
                         <Row>
                             <InputField
                                 name={"input7"}
@@ -229,8 +229,8 @@ class NotificationFormDispatchingTest extends HornetReactTest {
                 </Accordion>
                 <Accordion>
                     <Form id={"form4"}
-                          onSubmit={this.onSubmit}
-                          schema={schema4}>
+                        onSubmit={this.onSubmit}
+                        schema={schema4}>
                         <Row>
                             <InputField
                                 name={"input9"}
@@ -257,10 +257,10 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected renderButtons(formName: string): JSX.Element {
         return (
             <ButtonsArea>
-                <Button type="submit" id={"envoi-"+formName} name={"action:"+formName} className="hornet-button"
-                        value={"valider"}
-                        label={"valider"}
-                        title={"valider"} />
+                <Button type="submit" id={"envoi-" + formName} name={"action:" + formName} className="hornet-button"
+                    value={"valider"}
+                    label={"valider"}
+                    title={"valider"} />
             </ButtonsArea>
         );
     }
@@ -303,7 +303,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
 
     protected getNotificationMessageListForm(form: string, className: string) {
         let formElement = document.getElementById(form);
-        let messageList = formElement.getElementsByClassName(className)[0];
+        let messageList = formElement.getElementsByClassName(className)[ 0 ];
         return (messageList) ? messageList.children : null;
     }
 
@@ -311,8 +311,8 @@ class NotificationFormDispatchingTest extends HornetReactTest {
         let formElement = document.getElementById(form);
         let errorTagAccordion = formElement.getElementsByClassName(className);
         let count: number = 0;
-        for(let i=0;i<errorTagAccordion.length;i++) {
-            count += Number(errorTagAccordion[i].textContent.split(" ")[0]);
+        for (let i = 0; i < errorTagAccordion.length; i++) {
+            count += Number(errorTagAccordion[ i ].textContent.split(" ")[ 0 ]);
         }
         return count;
     }

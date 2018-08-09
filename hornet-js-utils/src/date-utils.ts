@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { Register } from "src/common-register";
 import * as moment from "moment-timezone";
 import Moment = moment.Moment;
 
-let logger = Register.getLogger("hornet-js-utils.date-utils");
+const logger = Register.getLogger("hornet-js-utils.date-utils");
 
 export class DateUtils {
 
@@ -100,7 +100,8 @@ export class DateUtils {
      *  @param calendarLocale objet de configuration des calendriers et dates : doit etre non nul
      */
     static initTimeZone(calendarLocale: any): void {
-        /* (le signe est inversé car Date().getTimezoneOffset() renvoie (temps UTC - temps local) ce qui donne par exemple -60 en hiver en zone UTC+1*/
+        /* (le signe est inversé car Date().getTimezoneOffset() renvoie (temps UTC - temps local) 
+        ce qui donne par exemple -60 en hiver en zone UTC+1*/
         if (calendarLocale) {
             calendarLocale.timezoneOffset = -new Date().getTimezoneOffset();
         }
@@ -121,7 +122,7 @@ export class DateUtils {
             if (!calendar.isValid()) {
                 calendar = undefined;
             } else {
-                let newLocale = locale ? locale : DateUtils.default_locale;
+                const newLocale = locale ? locale : DateUtils.default_locale;
                 calendar.locale(newLocale);
             }
         }
@@ -130,7 +131,8 @@ export class DateUtils {
 
 
     /**
-     * Crée un objet Moment à partir de la chaîne de caractère dateStr et en utilisant le format spécifié dans la locale indiquée : calendarLocale.dateFormat
+     * Crée un objet Moment à partir de la chaîne de caractère dateStr et en utilisant
+     * le format spécifié dans la locale indiquée : calendarLocale.dateFormat
      * @param dateStr chaîne de caractères représentant une date
      * @param calendarLocale configuration locale des dates
      * @param locale locale
@@ -203,10 +205,10 @@ export class DateUtils {
 
         let parsed: Date;
         try {
-            let mdate: Moment = moment.tz(dateStr, format, true, timezone).locale(locale);
+            const mdate: Moment = moment.tz(dateStr, format, true, timezone).locale(locale);
             if (mdate.isValid()) {
                 parsed = mdate.toDate();
-                if (DateUtils.YMD_Formats.indexOf(format) >= 0 && timezone == DateUtils.TZ_EUROPE_PARIS) {
+                if (DateUtils.YMD_Formats.indexOf(format) >= 0 && timezone === DateUtils.TZ_EUROPE_PARIS) {
                     // la date est instanciée avec le fuseau local (UTC+2).
                     // L'heure étant 00h00, la date UTC (renvoyee par getTime) correspond au jour precedent à 22h (15/04/2014)
                     // afin d'éviter le problème on instancie la date sur le fuseau UTC
@@ -217,13 +219,14 @@ export class DateUtils {
             logger.trace("Erreur pour formater la date suivante : ", err);
         }
         logger.trace("Date parsée : ", parsed + "  -- à partir de la chaîne ", dateStr, ", du fuseau horaire ",
-            timezone, " et de la locale", locale);
+                     timezone, " et de la locale", locale);
         return parsed;
     }
 
     /**
      * Crée un objet Date à partir de la chaîne de caractères indiquée en utilisant la fonction Date.parse(str)
-     * @param dateStr chaîne de caractères représentant une date générée par Date.toString(), Date.toUTCString(), Date.toISOString() ou Date.toLocaleString()
+     * @param dateStr chaîne de caractères représentant une date générée par Date.toString(),
+     * Date.toUTCString(), Date.toISOString() ou Date.toLocaleString()
      * @returns {Date} un objet Date ou undefined en cas d'erreur
      */
     static stdParse(dateStr: string): Date {
@@ -249,7 +252,7 @@ export class DateUtils {
 
         let strValue = "";
         try {
-            let calendar = moment(time);
+            const calendar = moment(time);
             strValue = calendar.format(calendarLocale.dateFormat);
         } catch (err) {
             logger.trace("Erreur pour formater la date suivante : ", err);
@@ -262,7 +265,8 @@ export class DateUtils {
      * Formatte la date correspondant à time en utilisant le format spécifié dans la locale
      * @param date un objet Date
      * @param format le format de la date
-     * @param timezone la timezone sur laquelle formater la date (Europe/Paris, America/Los_Angeles, Australia/Sydney, ...) defaut : Timezone du navigateur/serveur node
+     * @param timezone la timezone sur laquelle formater la date (Europe/Paris, America/Los_Angeles, Australia/Sydney, ...)
+     * defaut : Timezone du navigateur/serveur node
      * @param locale la locale (fr_FR, en_US, ...) defaut : fr_FR
      * @returns {string} la chaîne de caractères formatée suivant {format} ou une chaîne vide en cas d'erreur
      */
@@ -271,14 +275,14 @@ export class DateUtils {
 
         let strValue: string = "";
         try {
-            let mdate: Moment = moment(date).locale(locale);
-            let tzDate: Moment = timezone ? mdate.tz(timezone) : mdate;
+            const mdate: Moment = moment(date).locale(locale);
+            const tzDate: Moment = timezone ? mdate.tz(timezone) : mdate;
             strValue = tzDate.format(format);
         } catch (err) {
             logger.trace("Erreur pour formater la date suivante : ", err);
         }
-        logger.trace("Date formatée : ", strValue + "  -- à partir de la date", date, ", " +
-            "de la timezone", timezone, "et de la locale", locale);
+        logger.trace("Date formatée : ", strValue + "  -- à partir de la date", date, ", " + "de la timezone",
+                     timezone, "et de la locale", locale);
         return strValue;
     }
 
@@ -300,12 +304,12 @@ export class DateUtils {
             t2 = date.getTime();
         }
 
-        let d1Y = date.getFullYear();
-        let d2Y = dateBis.getFullYear();
-        let d1M = date.getMonth();
-        let d2M = dateBis.getMonth();
+        const d1Y = date.getFullYear();
+        const d2Y = dateBis.getFullYear();
+        const d1M = date.getMonth();
+        const d2M = dateBis.getMonth();
 
-        let result: DateDiff = {};
+        const result: DateDiff = {};
 
         switch (unit) {
             case DateDiffUnit.DAYS || DateDiffUnit.All:
@@ -339,5 +343,5 @@ export enum DateDiffUnit {
     WEEKS,
     MONTHS,
     YEARS,
-    All
+    All,
 }

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,7 +91,8 @@ const nodemailer = require("nodemailer");
 const logger: Logger = Utils.getLogger("hornet-js.hornet-js-core.src.mail.mailer");
 
 export interface NodeMailerMessage {
-    /** The email address of the sender. All email addresses can be plain ‘sender@server.com’ or formatted ’“Sender Name” sender@server.com‘, see Address object for details */
+    /** The email address of the sender. All email addresses can be plain ‘sender@server.com’ 
+     * or formatted ’“Sender Name” sender@server.com‘, see Address object for details */
     from: string;
     /** Comma separated list or an array of recipients email addresses that will appear on the To: field */
     to: string | any[];
@@ -129,7 +130,7 @@ export class Mailer {
         secure: Utils.config.getOrDefault("mail.config.secure", false),
         connectionTimeout: Utils.config.getOrDefault("mail.config.connectionTimeout", 350000),
         auth: Utils.config.getOrDefault("mail.config.auth", undefined),
-        logger: logger
+        logger,
     };
 
     protected static _instance: Mailer;
@@ -139,13 +140,13 @@ export class Mailer {
 
     static get Instance() {
         return this._instance || (this._instance = new this());
-    };
+    }
 
     protected transport;
 
     getSmtp(options?) {
         if (!this.transport) {
-            let conf = Mailer.defaultOptions;
+            const conf = Mailer.defaultOptions;
             if (options) {
                 _.assignIn(conf, options);
                 logger.trace("NodeMailerTransport :", JSON.stringify(conf));
@@ -163,11 +164,11 @@ export class Mailer {
                 resolve(info.response);
             }).catch((error) => {
                 let errorNumber: number;
-                if (error.code == "EAUTH") {
+                if (error.code === "EAUTH") {
                     errorNumber = CodesError.NODEMAILER_AUTH_ERROR;
-                } else if (error.code == "ECONNECTION") {
+                } else if (error.code === "ECONNECTION") {
                     errorNumber = CodesError.NODEMAILER_SERVER_NOTFOUND;
-                } else if (error.code == "ETIMEDOUT") {
+                } else if (error.code === "ETIMEDOUT") {
                     errorNumber = CodesError.NODEMAILER_SERVER_TIMEOUT;
                 } else {
                     errorNumber = CodesError.NODEMAILER_UNKNOWN;
@@ -175,7 +176,7 @@ export class Mailer {
                 error = new TechnicalError("ERR_TECH_" + errorNumber, null, error);
                 error.message = I18nUtils.getI18n("error.message.ERR_TECH_UNKNOWN", {
                     errorMessage: error.err_cause.message,
-                    reportId: error.reportId
+                    reportId: error.reportId,
                 });
                 logger.error("Erreurs lors de l'envoi de mail :", JSON.stringify(error));
                 reject(error);

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,10 +84,10 @@ import { Logger } from "hornet-js-utils/src/logger";
 import * as React from "react";
 
 
-import {AbstractField, AbstractFieldProps} from "src/widget/form/abstract-field";
+import { AbstractField, AbstractFieldProps } from "src/widget/form/abstract-field";
 import {
     IHornetComponentDatasource,
-    IHornetComponentAsync
+    IHornetComponentAsync,
 } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent, HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
@@ -101,7 +101,7 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.a
  */
 export abstract class AbstractFieldDatasource<P extends HornetComponentDatasourceProps & AbstractFieldProps, S> extends AbstractField<HornetComponentDatasourceProps & AbstractFieldProps, S> implements IHornetComponentDatasource, IHornetComponentAsync {
 
-    readonly props: Readonly <HornetComponentDatasourceProps & AbstractFieldProps>;
+    readonly props: Readonly<HornetComponentDatasourceProps & AbstractFieldProps>;
 
     constructor(props?: HornetComponentDatasourceProps & AbstractFieldProps, context?: any) {
         super(props, context);
@@ -112,7 +112,7 @@ export abstract class AbstractFieldDatasource<P extends HornetComponentDatasourc
      * @param flag booléen true pour l'afficher false sinon
      */
     displaySpinner(flag: boolean) {
-        this.state.inProgress = flag;
+        (this.state as any).inProgress = flag;
         if (!this.props.hideSpinner) {
             this.refs.spinnerLoader && (this.refs.spinnerLoader as SpinnerComponentInput<SpinnerProps, SpinnerProps>).progress(flag);
             flag ? this.showSpinnerComponent() : this.hideSpinnerComponent();
@@ -166,7 +166,7 @@ export abstract class AbstractFieldDatasource<P extends HornetComponentDatasourc
      * enregistre la liste des choix possibles
      */
     protected setItem() {
-        this.setState({items: this.props.dataSource.results});
+        this.setState({ items: this.props.dataSource.results });
         /* permet de faire appel a la méthode setCurrentValue de dom-adapter pour cocher les valeurs*/
         this.setCurrentValue(this.state.currentValue);
     }
@@ -176,7 +176,7 @@ export abstract class AbstractFieldDatasource<P extends HornetComponentDatasourc
      * @returns {Table}
      */
     showSpinnerComponent(): this {
-        this.setState({spinner: true});
+        this.setState({ spinner: true });
         return this;
     }
 
@@ -185,13 +185,13 @@ export abstract class AbstractFieldDatasource<P extends HornetComponentDatasourc
      * @returns {Table}
      */
     hideSpinnerComponent(): this {
-        this.setState({spinner: false});
+        this.setState({ spinner: false });
         return this;
     }
 
     public setDataSource(value: DataSource<any>, callback?: () => any) {
         /** liste des choix disponibles */
-        this.setState({dataSource: value}, callback);
+        this.setState({ dataSource: value }, callback);
         return this;
     }
 
@@ -207,7 +207,7 @@ export abstract class AbstractFieldDatasource<P extends HornetComponentDatasourc
     renderField(): JSX.Element {
         return (
             <div className={this.state.fieldClass + " abstractfield-field-content"}>
-                {<SpinnerComponentInput ref="spinnerLoader" isVisible={this.state.spinner}/>}
+                {<SpinnerComponentInput ref="spinnerLoader" isVisible={this.state.spinner} />}
                 {this.state.prefix ? <span className="abstractfield-field-prefix">{this.state.prefix}</span> : null}
                 {this.renderWidget()}
                 {this.state.suffix ? <span className="abstractfield-field-suffix">{this.state.suffix}</span> : null}

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,7 +91,7 @@ import { MenuActions } from "src/widget/table/menu-actions";
 import { ToggleColumnsButton } from "src/widget/table/toggle-columns-button";
 import { TableState, ContentState } from "src/widget/table/table-state";
 import { Confirm } from "src/widget/dialog/confirm";
-import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
+import { PaginateDataSource, Pagination } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 
 const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.header");
@@ -138,21 +138,23 @@ export class Header extends HornetComponent<HeaderProps, any> {
 
     constructor(props: HeaderProps, context?: any) {
         super(props, context);
-        if (!this.props.id) {
-            this.state.id = this.state.parentId;
-        }
-        this.state.libelleNombreTotalItem = this.state.libelleNombreTotalItem ?
-            this.state.libelleNombreTotalItem : "table.numberElementTitle";
-        this.state.items = [];
-        this.state.selectedItems = [];
+
+        this.state = {
+            ...this.state,
+            id: this.state.id || this.state.parentId,
+            libelleNombreTotalItem: this.state.libelleNombreTotalItem || "table.numberElementTitle",
+            items: [],
+            selectedItems: [],
+        };
+
 
         // gestion de l'event de changement de la liste des items du tableau
         this.handleChangeDataTable = this.handleChangeDataTable.bind(this);
         this.props.tableState.on(TableState.INDEX_CHANGE_EVENT, this.handleChangeDataTable);
-
         // gestion de l'event d'edidtion du tableau
         this.props.contentState.setMaxListeners(Infinity);
         this.handleEdition = this.handleEdition.bind(this);
+        this.props.contentState.on(ContentState.EDITION_CLIC_EVENT, this.handleEdition);
         this.props.contentState.on(ContentState.EDITION_CLIC_EVENT, this.handleEdition);
         this.hiddenColumns = (props as any).hiddenColumns;
         (props as any).contentState.on(ContentState.TOGGLE_COLUMNS_EVENT, this.handleChangeHiddenColumns);
@@ -164,6 +166,8 @@ export class Header extends HornetComponent<HeaderProps, any> {
         if (this.props.dataSourcesList) {
             this.props.dataSourcesList.map((dataSource, index) => {
                 this.props.dataSourcesList[ index ].removeListener("select", this.handleChangeDataTable);
+                this.props.dataSourcesList[ index ].removeListener("pagination", this.handlePaginationChange);
+                this.props.dataSourcesList[ index ].removeListener("fetch", this.handlePaginationChange);
             });
         }
     }
@@ -175,6 +179,8 @@ export class Header extends HornetComponent<HeaderProps, any> {
             this.props.dataSourcesList.map((dataSource, index) => {
                 this.props.dataSourcesList[ index ].setMaxListeners(Infinity);
                 this.props.dataSourcesList[ index ].on("select", this.handleChangeDataTable);
+                this.props.dataSourcesList[ index ].on("pagination", this.handlePaginationChange);
+                this.props.dataSourcesList[ index ].on("fetch", this.handlePaginationChange);
             });
         }
         this.props.tableState.emit(TableState.RESIZE_EVENT, this.headerRef.clientWidth);
@@ -186,15 +192,15 @@ export class Header extends HornetComponent<HeaderProps, any> {
     render(): JSX.Element {
         logger.trace("render");
 
-        let headerContainerProps = {
+        const headerContainerProps = {
             id: this.state.id,
             className: classNames({
                 "datatable-header-title": true,
                 "flex-container": true,
-                "badge-selected-items-before": this.state.contentState.hasCheckColumnMassSelection && this.getTotalSelectedItemsForAllDataSource() != 0
+                "badge-selected-items-before": this.state.contentState.hasCheckColumnMassSelection && this.getTotalSelectedItemsForAllDataSource() !== 0,
             }),
             "data-badge": this.getTotalSelectedItemsForAllDataSource(),
-            tabIndex: this.state.tabIndex
+            tabIndex: this.state.tabIndex,
         };
 
         return (
@@ -202,8 +208,10 @@ export class Header extends HornetComponent<HeaderProps, any> {
             <div {...headerContainerProps} ref={(instance) => { this.headerRef = instance; }}>
                 <div className="datatable-title">
                     <span className="datatable-title-span">
-                        {this.state.title + " " + this.i18n(this.state.libelleNombreTotalItem,
-                            { count: this.getTotalItemsForAllDataSource() })}
+                        {this.i18n(this.state.title,
+                                   { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })
+                        + " " + this.i18n(this.state.libelleNombreTotalItem,
+                                { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })}
                     </span>
                 </div>
                 {(!this.state.hideMenuActions) ? this.renderMenuActions() : null}
@@ -227,7 +235,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
      */
     renderMenuActions(): JSX.Element {
         logger.trace("renderMenuActions");
-        let children: any = this.getChildrenOf(MenuActions);
+        const children: any = this.getChildrenOf(MenuActions);
         let actions: any[] = [];
 
         // cas ou une seule action est déclarée
@@ -238,28 +246,36 @@ export class Header extends HornetComponent<HeaderProps, any> {
         }
 
         // Détection de la présence du toggleColumnsButton
-        let toggleColumnsButton: any = this.getComponentBy(ToggleColumnsButton);
+        const toggleColumnsButton: any = this.getComponentBy(ToggleColumnsButton);
 
         let WrappedToggleColumns = null;
         if (toggleColumnsButton) {
-            let key: string = this.state.id + "toggleColumnsButton";
-            WrappedToggleColumns = Header.wrap(
+            const key: string = this.state.id + "toggleColumnsButton";
+           /* WrappedToggleColumns = Header.wrap(
                 ToggleColumnsButton,
                 toggleColumnsButton,
                 toggleColumnsButton.props,
                 {
                     id: this.state.id,
-                    key: key,
+                    key,
                     tabIndex: -1,
                     columns: this.props.columns,
                     contentState: this.props.contentState,
-                    hiddenColumns: this.hiddenColumns
-                }
-            );
+                    hiddenColumns: this.hiddenColumns,
+                },
+            );*/
+            const props = {...toggleColumnsButton.props,
+                id: this.state.id,
+                key,
+                tabIndex: -1,
+                columns: this.props.columns,
+                contentState: this.props.contentState,
+                hiddenColumns: this.hiddenColumns};
+            WrappedToggleColumns = React.createElement( ToggleColumnsButton , props);
         }
 
-        let menuActionsProps: any = {
-            actions: actions,
+        const menuActionsProps: any = {
+            actions,
             items: this.state.items,
             showAlert: this.showAlert,
             showIconInfo: this.props.showIconInfo,
@@ -267,7 +283,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
             id: this.state.id + "-menu-action",
             columns: this.props.columns,
             toggleColumnsButton: WrappedToggleColumns,
-            contentState: this.props.contentState
+            contentState: this.props.contentState,
         };
 
         return (
@@ -289,7 +305,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
      * @param items
      */
     handleChangeDataTable(selectedItems: any[], items?: any[]) {
-        this.setState({ selectedItems: selectedItems, items: items ? items : this.state.items });
+        this.setState({ selectedItems, items: items ? items : this.state.items });
     }
 
     /**
@@ -349,12 +365,36 @@ export class Header extends HornetComponent<HeaderProps, any> {
             if (dataSource) {
                 // si le dataSource est de type PaginateDataSource, on prend le totalItems sinon on prend le result.length
                 if (dataSource instanceof PaginateDataSource) {
-                    let pagDt: PaginateDataSource<any> = dataSource as PaginateDataSource<any>;
+                    const pagDt: PaginateDataSource<any> = dataSource as PaginateDataSource<any>;
                     nbItem = pagDt && pagDt.pagination && pagDt.pagination.totalItems ? pagDt.pagination.totalItems : 0;
                 } else {
                     nbItem = dataSource.results ? dataSource.results.length : 0;
                 }
                 result += nbItem;
+            }
+        });
+
+        return result;
+    }
+
+        /**
+     * Retourne la somme totale des items de tous les dataSource de tous les contents
+     * @returns {number}
+     */
+    protected getPaginationForFirstDataSource(): {} {
+        logger.trace("getPaginationForFirstDataSource");
+        let result:Pagination = {} as any;
+        this.props.dataSourcesList.every((dataSource: DataSource<any>) => {
+            if (dataSource) {
+                // si le dataSource est de type PaginateDataSource, on prend le totalItems sinon on prend le result.length
+                if (dataSource instanceof PaginateDataSource) {
+                    const pagDt: PaginateDataSource<any> = dataSource as PaginateDataSource<any>;
+                    result = {...pagDt.pagination};
+                    if(!result.nbPages || result.nbPages === 0) {
+                            result.nbPages = Math.max(1, Math.ceil(result.totalItems / result.itemsPerPage)) || 0;
+                    }
+                    return false;
+                }
             }
         });
 
@@ -375,5 +415,9 @@ export class Header extends HornetComponent<HeaderProps, any> {
             }
         });
         return result;
+    }
+
+    handlePaginationChange(result):void {
+        this.setState({ pagination: _.cloneDeep(result.pagination) });
     }
 }

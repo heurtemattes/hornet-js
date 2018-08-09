@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -125,7 +125,7 @@ class AccordionTest extends BaseTest {
     testIdAccordionHeader() {
         data = this.renderIntoDocument(element, "main2");
         let elements = document.querySelectorAll("#main2 .accordion-header");
-        [].forEach.call(elements, function(elem, index) {
+        [].forEach.call(elements, function (elem, index) {
             assert.equal(elem.id, "accordions-test-karma-" + index + "-li");
         });
         this.end();
@@ -135,7 +135,7 @@ class AccordionTest extends BaseTest {
     testIdAccordionHeaderTitre() {
         data = this.renderIntoDocument(element, "main3");
         let elements = document.querySelectorAll("#main3 .accordion-label");
-        [].forEach.call(elements, function(elem, index) {
+        [].forEach.call(elements, function (elem, index) {
             assert.equal(elem.id, "accordions-test-karma-" + index + "-tab");
         });
         this.end();
@@ -145,7 +145,7 @@ class AccordionTest extends BaseTest {
     testIdAccordionContent() {
         data = this.renderIntoDocument(element, "main4");
         let elements = document.querySelectorAll("#main4 .accordion-content");
-        [].forEach.call(elements, function(elem, index) {
+        [].forEach.call(elements, function (elem, index) {
             assert.equal(elem.id, "accordions-test-karma-" + index + "-panel");
         });
         this.end();

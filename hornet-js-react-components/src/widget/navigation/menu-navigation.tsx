@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,10 +94,10 @@ import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { UPDATE_PAGE_EXPAND } from "src/widget/screen/layout-switcher";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 
-let expandBreakPointSize = 1640;
-let expandSecondBreakPointSize = 1400;
-let expandMenuSize = "16.5%";
-let expandReducMenuSize = "20%";
+const expandBreakPointSize = 1640;
+const expandSecondBreakPointSize = 1400;
+const expandMenuSize = "16.5%";
+const expandReducMenuSize = "20%";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-navigation");
 
@@ -147,30 +147,34 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
     static defaultProps = {
         item: {},
         isSubMenu: false,
-        isVisible: false
+        isVisible: false,
     };
 
     constructor(props, context) {
         super(props, context);
 
         /* calcule la taille des menus*/
-        let test = Utils.getCls("hornet.pageLayoutWidth");
+        const test = Utils.getCls("hornet.pageLayoutWidth");
         let style = {
-            width: ""
+            width: "",
         };
-        let isSubMenu: boolean = this.state.isSubMenu;
+        const isSubMenu: boolean = this.state.isSubMenu;
         if (!isSubMenu) {
             if (window.innerWidth > expandBreakPointSize) {
                 style = {
-                    width: ((test === "")) ? expandMenuSize : ""
+                    width: ((test === "")) ? expandMenuSize : "",
                 };
             } else if (window.innerWidth > expandSecondBreakPointSize) {
                 style = {
-                    width: ((test === "")) ? expandReducMenuSize : ""
+                    width: ((test === "")) ? expandReducMenuSize : "",
                 };
             }
         }
-        this.state.style = style;
+
+        this.state = {
+            ...this.state,
+            style,
+        };
 
     }
 
@@ -178,23 +182,23 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * Calcule la taille du menu en fonction de la taille de l'écran
      */
     resizeMenu() {
-        let test = Utils.getCls("hornet.pageLayoutWidth");
+        const test = Utils.getCls("hornet.pageLayoutWidth");
         let style = {
-            width: ""
+            width: "",
         };
-        let isSubMenu: boolean = this.state.isSubMenu;
+        const isSubMenu: boolean = this.state.isSubMenu;
         if (!isSubMenu) {
             if (window.innerWidth > expandBreakPointSize) {
                 style = {
-                    width: ((test === "")) ? expandMenuSize : ""
+                    width: ((test === "")) ? expandMenuSize : "",
                 };
             } else if (window.innerWidth > expandSecondBreakPointSize) {
                 style = {
-                    width: ((test === "")) ? expandReducMenuSize : ""
+                    width: ((test === "")) ? expandReducMenuSize : "",
                 };
             }
         }
-        this.setState({ style: style });
+        this.setState({ style });
     }
 
     /**
@@ -226,20 +230,20 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        let item: MenuItemConfig = this.state.item;
-        let isSubMenu: boolean = this.state.isSubMenu;
+        const item: MenuItemConfig = this.state.item;
+        const isSubMenu: boolean = this.state.isSubMenu;
         if (item.visibleDansMenu) {
             logger.debug("MenuItem.render item.id : ", item.id);
-            let attributesLi: HTMLAttributes<HTMLElement> = {};
+            const attributesLi: HTMLAttributes<HTMLElement> = {};
 
             let active = false;
             if (typeof window !== "undefined") {
                 let url = window.location.pathname;
-                let ind = url.indexOf(this.getContextPath());
+                const ind = url.indexOf(this.getContextPath());
                 if (ind > -1) {
                     url = url.substring(this.getContextPath().length, url.length);
                 }
-                let activeMenu = NavigationUtils.getCurrentItem([ this.state.item ], url);
+                const activeMenu = NavigationUtils.getCurrentItem([this.state.item], url);
 
                 if (activeMenu) {
                     active = true;
@@ -249,13 +253,13 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
             /*on créer un identifiant pour la balise li*/
             attributesLi.id = this.getLiId();
 
-            let isHidden = !(this.isVisible());
-            let isActive = (active) ? " is-active" : "";
-            let hidden = (isHidden) && !(active) ? " " + MASKED_CLASSNAME : "";
+            const isHidden = !(this.isVisible());
+            const isActive = (active) ? " is-active" : "";
+            const hidden = (isHidden) && !(active) ? " " + MASKED_CLASSNAME : "";
             attributesLi.className = (isSubMenu) ? "sub-nav-item" : "nav-item";
             attributesLi.className = attributesLi.className + hidden + isActive;
 
-            let expanded = window.innerWidth > 1200 ? true : !isHidden;
+            const expanded = window.innerWidth > 1200 ? true : !isHidden;
             attributesLi.role = (item.level < 2) ? "presentation" : null;
 
             let subMenu: JSX.Element = <div></div>;
@@ -264,26 +268,30 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
             }
 
 
-            let menuName = item.text.replace(/\./g, "-");
+            const menuName = item.text.replace(/\./g, "-");
             attributesLi.className += " menu-" + menuName;
+            attributesLi.title = this.i18n(item.title) || this.i18n(item.text);
+            if(isActive) {
+                attributesLi.title += `, ${this.i18n("menu.activePage")}`
+            }
 
-            let closeOnLinkClick = this.props.closeOnLinkClick;
+            const closeOnLinkClick = this.props.closeOnLinkClick;
             if (this.hasSubMenu()) {
                 subMenu = <MenuNavigation items={item.submenu}
-                    level={item.level + 1}
-                    idParent={item.id}
-                    closeMenu={this.state.closeMenu}
-                    dataPassThru={this.state.dataPassThru}
-                    closeOnLinkClick={closeOnLinkClick}
+                                          level={item.level + 1}
+                                          idParent={item.id}
+                                          closeMenu={this.state.closeMenu}
+                                          dataPassThru={this.state.dataPassThru}
+                                          closeOnLinkClick={closeOnLinkClick}
                 />;
             }
             return (
                 <li {...attributesLi} aria-expanded={expanded} onKeyDown={this.handleKeyDown} style={this.state.style}>
                     <MenuLink item={item}
-                        closeMenu={this.state.closeMenu}
-                        onClick={this.hideOrShowChildren}
-                        dataPassThru={this.props.dataPassThru}
-                        closeOnLinkClick={closeOnLinkClick}
+                              closeMenu={this.state.closeMenu}
+                              onClick={this.hideOrShowChildren}
+                              dataPassThru={this.props.dataPassThru}
+                              closeOnLinkClick={closeOnLinkClick}
                     />
                     {subMenu}
                 </li>
@@ -298,11 +306,11 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * Fait apparaitre ou disparaitre les sous menus
      */
     public hideOrShowChildren() {
-        let item: MenuItemConfig = this.state.item;
-        let liId = this.getLiId();
-        let elem = document.getElementById(liId);
+        const item: MenuItemConfig = this.state.item;
+        const liId = this.getLiId();
+        const elem = document.getElementById(liId);
         if (elem) {
-            let isVisible = NavigationUtils.isVisible(elem);
+            const isVisible = NavigationUtils.isVisible(elem);
             if (isVisible) {
                 NavigationUtils.hideElement(elem);
             } else {
@@ -316,8 +324,8 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * @returns {boolean|any} le sous menu est visible
      */
     protected isVisible(): boolean {
-        let liId = this.getLiId();
-        let elem = document.getElementById(liId);
+        const liId = this.getLiId();
+        const elem = document.getElementById(liId);
         if (elem) {
             return NavigationUtils.isVisible(elem);
         }
@@ -329,10 +337,10 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * @returns {boolean} le menu parent est visible
      */
     protected isParentVisible(): boolean {
-        let liId = this.getLiId();
-        let ind = liId.lastIndexOf(LVL_SEPARATOR);
-        let parentLiId = liId.substring(0, ind);
-        let parentLi = document.getElementById(parentLiId);
+        const liId = this.getLiId();
+        const ind = liId.lastIndexOf(LVL_SEPARATOR);
+        const parentLiId = liId.substring(0, ind);
+        const parentLi = document.getElementById(parentLiId);
         if (parentLi) {
             return NavigationUtils.isVisible(parentLi);
         }
@@ -344,8 +352,8 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * @returns {string} identifiant de la balise li
      */
     protected getLiId() {
-        let item: MenuItemConfig = this.state.item;
-        let liId: string = item.id.substring(MENU_ROOT.length - 1, item.id.length);
+        const item: MenuItemConfig = this.state.item;
+        const liId: string = item.id.substring(MENU_ROOT.length - 1, item.id.length);
         return "li" + liId;
     }
 
@@ -353,19 +361,19 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * Ferme le menu contenant le menu item
      */
     protected hideMenu() {
-        let isSubMenu: boolean = this.state.isSubMenu;
+        const isSubMenu: boolean = this.state.isSubMenu;
         if (isSubMenu) {
-            let item: MenuItemConfig = this.state.item;
+            const item: MenuItemConfig = this.state.item;
             if (this.hasSubMenu()) {
                 this.hideOrShowChildren();
             } else {
-                let liId = this.getLiId();
-                let ind = liId.lastIndexOf(LVL_SEPARATOR);
-                let parentLiId = liId.substring(0, ind);
-                let parentLi = document.getElementById(parentLiId);
+                const liId = this.getLiId();
+                const ind = liId.lastIndexOf(LVL_SEPARATOR);
+                const parentLiId = liId.substring(0, ind);
+                const parentLi = document.getElementById(parentLiId);
                 if (parentLi) {
                     NavigationUtils.hideElement(parentLi);
-                    let navId = "nav" + parentLiId.substring(2, parentLiId.length);
+                    const navId = "nav" + parentLiId.substring(2, parentLiId.length);
                     NavigationUtils.setFocus(navId);
                 }
             }
@@ -379,13 +387,13 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      */
     protected hideAllMenu(parentId) {
 
-        let elem = document.getElementById(parentId);
+        const elem = document.getElementById(parentId);
         if (elem) {
             NavigationUtils.hideElement(elem);
         }
 
         /*On récupère le premier item du sous menu, si il n'existe pas, il n'y a pas de sous-menu*/
-        let firstChildId = parentId + LVL_SEPARATOR + 0;
+        const firstChildId = parentId + LVL_SEPARATOR + 0;
         let childElem = document.getElementById(firstChildId);
         let ind = 0;
         if (childElem) {
@@ -405,7 +413,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      */
     protected hideAllParentMenu() {
         let liId = this.getLiId();
-        let ind = liId.indexOf(LVL_SEPARATOR, 3);
+        const ind = liId.indexOf(LVL_SEPARATOR, 3);
         liId = liId.substring(0, ind);
         this.hideAllMenu(liId);
     }
@@ -424,9 +432,9 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
      * @protected
      */
     protected handleKeyDown(event) {
-        let keyCode = event.keyCode;
-        let isVisible = this.isVisible();
-        let isSubMenu: boolean = this.state.isSubMenu;
+        const keyCode = event.keyCode;
+        const isVisible = this.isVisible();
+        const isSubMenu: boolean = this.state.isSubMenu;
         switch (keyCode) {
             case KeyCodes.DOWN_ARROW:
                 /*si c'est un sous menu on rend visible ses items */
@@ -454,7 +462,7 @@ export class MenuItem extends HornetComponent<MenuItemProps, any> {
                         this.hideMenu();
                     } else {
                         let liId = this.getLiId();
-                        let ind = liId.lastIndexOf(LVL_SEPARATOR);
+                        const ind = liId.lastIndexOf(LVL_SEPARATOR);
                         liId = liId.substring(0, ind);
                         this.hideAllMenu(liId);
                     }
@@ -478,13 +486,13 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
 
     static defaultProps = {
         items: [],
-        level: 0
+        level: 0,
     };
 
     componentDidMount() {
         super.componentDidMount();
-        let id = "nav" + LVL_SEPARATOR + "0";
-        let element = document.getElementById(id);
+        const id = "nav" + LVL_SEPARATOR + "0";
+        const element = document.getElementById(id);
         if (element) {
             element.focus();
         }
@@ -495,56 +503,55 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
      */
     render(): JSX.Element {
 
-        let level: number = this.props.level;
-        let isVisible: boolean = this.props.isVisible;
+        const level: number = this.props.level;
+        const isVisible: boolean = this.props.isVisible;
         logger.debug("MenuNavigation.render idParent : ", this.state.idParent);
         let infoComplementaires: JSX.Element;
 
         // Menu de premier niveau
-        if (this.state.level == 0) {
+        if (this.state.level === 0) {
             infoComplementaires = this.state.infosComplementaires;
         } else {
             infoComplementaires = <div></div>;
         }
 
-        let closeMenu = this.state.closeMenu;
-        let isSubMenu: boolean = (this.state.level != 0);
+        const closeMenu = this.state.closeMenu;
+        const isSubMenu: boolean = (this.state.level !== 0);
         let indexKey = 0;
-        let dataPassThru = this.props.dataPassThru;
-        let closeOnLinkClick = this.props.closeOnLinkClick;
+        const dataPassThru = this.props.dataPassThru;
+        const closeOnLinkClick = this.props.closeOnLinkClick;
 
-        let items: MenuItem[] = this.state.items.map(function (item: MenuItemConfig) {
+        const items: MenuItem[] = this.state.items.map(function (item: MenuItemConfig) {
             if (item.visibleDansMenu) {
                 indexKey++;
                 return <MenuItem item={item}
-                    isSubMenu={isSubMenu}
-                    key={indexKey + item.text + item.url}
-                    closeMenu={closeMenu}
-                    dataPassThru={dataPassThru}
-                    closeOnLinkClick={closeOnLinkClick} />;
+                                 isSubMenu={isSubMenu}
+                                 key={indexKey + item.text + item.url}
+                                 closeMenu={closeMenu}
+                                 dataPassThru={dataPassThru}
+                                 closeOnLinkClick={closeOnLinkClick}/>;
             }
         });
 
-        let classes: ClassDictionary = {
-            "nav": true,
+        const classes: ClassDictionary = {
+            nav: true,
             "flex-container": true,
-            "sub-nav-1": (level == 1),
-            "sub-nav-2": (level == 2),
-            "masked": !isVisible
+            "sub-nav-1": (level === 1),
+            "sub-nav-2": (level === 2),
+            masked: !isVisible,
         };
 
-        let attributesUl: HTMLAttributes<HTMLElement> = {};
+        const attributesUl: HTMLAttributes<HTMLElement> = {};
         attributesUl.className = classNames(classes);
 
-        if (level == 0) {
+        if (level === 0) {
             /* le premier niveau de menu est horizontal */
             attributesUl.onKeyDown = this.onKeyDownHorizontalMenu;
         } else {
             /* les sous menus sont ensuite verticaux */
             attributesUl.onKeyDown = this.onKeyDownVerticalMenu;
         }
-        attributesUl.role = (level == 0) ? "menubar" : "menu";
-        attributesUl[ "aria-labelledby" ] = (this.state.idParent) ? this.state.idParent : null;
+        attributesUl["aria-labelledby"] = (this.state.idParent) ? this.state.idParent : null;
 
         return (
             <ul {...attributesUl}>
@@ -559,12 +566,12 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
      * @return {number} l'index de l'élément parent au niveau de menu zéro (0 pour le premier élément)
      */
     protected static getRootParentIndex(id: string): number {
-        let beginIndex: number = MENU_ROOT.length;
+        const beginIndex: number = MENU_ROOT.length;
         let endIndex: number = id.indexOf(LVL_SEPARATOR, beginIndex);
         if (endIndex < 0) {
             endIndex = id.length;
         }
-        return parseInt(id.substr(beginIndex, endIndex));
+        return parseInt(id.substr(beginIndex, endIndex), 10);
     }
 
     /**
@@ -584,15 +591,15 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
         if (!this.hasKeyModifier(e)) {
             /* On ne prend en compte que les évènements clavier sans modificateur, pour ne pas surcharger
              * des raccourcis standards tels Alt+ArrowLeft */
-            let keyCode: number = e.keyCode;
-            let id: string = e.target[ "id" ];
+            const keyCode: number = e.keyCode;
+            const id: string = e.target["id"];
             if (id) {
-                let lastSeparatorIndex: number = id.lastIndexOf(LVL_SEPARATOR);
-                let itemHierarchy: string = id.substr(0, lastSeparatorIndex + 1);
-                let itemIndex: number = parseInt(id.substr(lastSeparatorIndex + 1, id.length));
-                let items: MenuItemConfig[] = this.state.items;
+                const lastSeparatorIndex: number = id.lastIndexOf(LVL_SEPARATOR);
+                const itemHierarchy: string = id.substr(0, lastSeparatorIndex + 1);
+                const itemIndex: number = parseInt(id.substr(lastSeparatorIndex + 1, id.length), 10);
+                const items: MenuItemConfig[] = this.state.items;
                 /* Element de menu courant : peut être null lorsqu'on est sur un élément MenuInfosComplementaires */
-                let item: MenuItemConfig = items[ itemIndex ];
+                const item: MenuItemConfig = items[itemIndex];
                 let idToFocus: string = id;
                 let preventDefault: boolean = true;
                 switch (keyCode) {
@@ -603,23 +610,23 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                             idToFocus = itemHierarchy + (itemIndex + 1);
                         } // sinon retour au premier item de même niveau
                         else {
-                            idToFocus = items[ 0 ].id;
+                            idToFocus = items[0].id;
                         }
                         break;
                     case KeyCodes.LEFT_ARROW:
                         // on n'est pas sur le premier item du niveau : vers item précédent de même niveau
                         if (itemIndex > 0) {
-                            idToFocus = items[ itemIndex - 1 ].id;
+                            idToFocus = items[itemIndex - 1].id;
                         } // sinon retour au dernier item de même niveau
                         else {
-                            //indiceToFocus = items[items.length - 1].index;
+                            // indiceToFocus = items[items.length - 1].index;
                             let indexToFocus: number = items.length - 1;
                             /* On ne se base pas sur items.length car il y a éventuellement des MenuInfosComplementaires à la suite */
                             let last: boolean = false;
                             while (!last) {
-                                //if (MenuNavigation.isElementExists(indiceToFocus + 1)) {
+                                // if (MenuNavigation.isElementExists(indiceToFocus + 1)) {
                                 if (MenuNavigation.isElementExists(itemHierarchy + (indexToFocus + 1))) {
-                                    //indiceToFocus++;
+                                    // indiceToFocus++;
                                     indexToFocus++;
                                 } else {
                                     last = true;
@@ -630,9 +637,9 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                         break;
                     case KeyCodes.DOWN_ARROW:
                         /*  sous-menu existant : on va au premier élément du sou-menu */
-                        if (item && item.submenu && item.submenu[ 0 ]) {
-                            //indiceToFocus = item.submenu[0].index;
-                            idToFocus = item.submenu[ 0 ].id;
+                        if (item && item.submenu && item.submenu[0]) {
+                            // indiceToFocus = item.submenu[0].index;
+                            idToFocus = item.submenu[0].id;
                         }
 
                         break;
@@ -648,10 +655,11 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                     default:
                         preventDefault = false;
                 }
-                if (idToFocus != id) {
+                if (idToFocus !== id) {
                     NavigationUtils.setFocus(idToFocus);
                 }
-                /* On supprime le comportement par défaut pour les touches utilisées pour la navigation : pour éviter par exemple de faire défiler les ascenseurs */
+                /* On supprime le comportement par défaut pour les touches utilisées pour la navigation : 
+                pour éviter par exemple de faire défiler les ascenseurs */
                 if (preventDefault) {
                     e.preventDefault();
                 }
@@ -668,13 +676,13 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
         if (!this.hasKeyModifier(e)) {
             /* On ne prend en compte que les évènements clavier sans modificateur, pour ne pas surcharger
              * des raccourcis standards tels Alt+ArrowLeft */
-            let key: number = e.keyCode;
-            let id: string = e.target[ "id" ];
+            const key: number = e.keyCode;
+            const id: string = e.target["id"];
             if (id) {
-                let lastSeparatorIndex: number = id.lastIndexOf(LVL_SEPARATOR);
-                let itemHierarchy: string = id.substr(0, lastSeparatorIndex + 1);
-                let itemIndex: number = parseInt(id.substr(lastSeparatorIndex + 1, id.length));
-                let items: MenuItemConfig[] = this.state.items;
+                const lastSeparatorIndex: number = id.lastIndexOf(LVL_SEPARATOR);
+                const itemHierarchy: string = id.substr(0, lastSeparatorIndex + 1);
+                const itemIndex: number = parseInt(id.substr(lastSeparatorIndex + 1, id.length), 10);
+                const items: MenuItemConfig[] = this.state.items;
 
                 let idToFocus: string = id;
                 let preventDefault: boolean = true;
@@ -682,13 +690,13 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                 switch (key) {
                     case KeyCodes.RIGHT_ARROW:
                         /* Element de menu courant : peut être null lorsqu'on est sur un élément MenuInfosComplementaires */
-                        let item: MenuItemConfig = items[ itemIndex ];
+                        const item: MenuItemConfig = items[itemIndex];
                         /*  sous-menu existant : on va au premier élément du sous-menu */
-                        if (item && item.submenu && item.submenu[ 0 ]) {
-                            idToFocus = item.submenu[ 0 ].id;
+                        if (item && item.submenu && item.submenu[0]) {
+                            idToFocus = item.submenu[0].id;
                         } else {
                             /* On va à l"élément de niveau 0 suivant */
-                            let rootParentIndex: number = MenuNavigation.getRootParentIndex(id);
+                            const rootParentIndex: number = MenuNavigation.getRootParentIndex(id);
                             /* On ne se base pas sur items.length car il y a éventuellement des MenuInfosComplementaires à la suite */
                             if (MenuNavigation.isElementExists(MENU_ROOT + (rootParentIndex + 1))) {
                                 idToFocus = MENU_ROOT + (rootParentIndex + 1);
@@ -704,8 +712,8 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                         break;
                     case KeyCodes.LEFT_ARROW:
                         /* premier niveau de sous-menu : on va à l'élément de niveau 0 précédent*/
-                        if (this.state.level == 1) {
-                            let rootParentIndex: number = MenuNavigation.getRootParentIndex(id);
+                        if (this.state.level === 1) {
+                            const rootParentIndex: number = MenuNavigation.getRootParentIndex(id);
                             // on n'est pas sur le premier item du niveau : vers item précédent de même niveau
                             if (rootParentIndex > 0) {
                                 idToFocus = MENU_ROOT + (rootParentIndex - 1);
@@ -733,7 +741,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                             idToFocus = itemHierarchy + (itemIndex + 1);
                         } // sinon retour au premier item de même niveau
                         else {
-                            idToFocus = items[ 0 ].id;
+                            idToFocus = items[0].id;
                         }
 
                         break;
@@ -743,7 +751,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                             idToFocus = itemHierarchy + (itemIndex - 1);
                         }// sinon retour au dernier item de même niveau
                         else {
-                            idToFocus = items[ items.length - 1 ].id;
+                            idToFocus = items[items.length - 1].id;
                         }
                         break;
                     case KeyCodes.ENTER:
@@ -752,12 +760,13 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
                     default:
                         preventDefault = false;
                 }
-                if (idToFocus != id) {
+                if (idToFocus !== id) {
                     NavigationUtils.setFocus(idToFocus);
                 }
                 /* On stoppe si nécessaire la propagation pour éviter de redéclencher ce handler sur les éléments de menu parents */
                 e.stopPropagation();
-                /* On supprime le comportement par défaut pour les touches utilisées pour la navigation : pour éviter par exemple de faire défiler les ascenceurs */
+                /* On supprime le comportement par défaut pour les touches utilisées pour la navigation : 
+                pour éviter par exemple de faire défiler les ascenceurs */
                 if (preventDefault) {
                     e.preventDefault();
                 }

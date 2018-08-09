@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,7 +90,7 @@ import {
     SubRoutes,
     LazyRoutesClassResolver,
     RouteAuthorization,
-    RouteType
+    RouteType,
 } from "src/routes/abstract-routes";
 import { LazyClassLoader } from "hornet-js-utils/src/lazy-class-loader";
 import * as _ from "lodash";
@@ -127,7 +127,8 @@ export class RouterServer {
         this.directorPage = new http.Router(this.pageRoutes).configure({ recurse: false, async: true });
 
         /** GESTION DES PUBLIC_ROUTES **/
-        // les PUBLIC_ROUTES ne sont pas interprétées comme telles, car la méthode isAuthenticated (PASSPORT) est exécutée avant l'instanciation de DIRECTOR
+        // les PUBLIC_ROUTES ne sont pas interprétées comme telles, car la méthode isAuthenticated (PASSPORT) 
+        // est exécutée avant l'instanciation de DIRECTOR
         // La méthode isAuthenticated de passport est donc surchargée dans le cas d'une PUBLIC_ROUTE
         const req = (<any>Http).IncomingMessage.prototype;
 
@@ -137,14 +138,14 @@ export class RouterServer {
 
         req.isAuthenticated = function () {
 
-            let routesInfos = (<any>global).routesInfos;
-            let _req = this;
+            const routesInfos = (<any>global).routesInfos;
+            const _req = this;
             let isAuthenticated = false;
 
-            let directorPage = new http.Router(routesInfos).configure({ recurse: false, async: true });
-            let fns = (<any>directorPage).traverse(_req.method.toLowerCase(), _req.url, (<any>directorPage).routes, '',
-                (route) => {
-                    if (Array.isArray(route.authorization) && route.authorization.length == 0) {
+            const directorPage = new http.Router(routesInfos).configure({ recurse: false, async: true });
+            const fns = (<any>directorPage).traverse(_req.method.toLowerCase(), _req.url, (<any>directorPage).routes, "",
+                                                     (route) => {
+                    if (!route.authorization || Array.isArray(route.authorization) && route.authorization.length === 0 ) {
                         isAuthenticated = true;
                     } else {
                         isAuthenticated = _req.__oldIsAuthenticated__();
@@ -157,7 +158,7 @@ export class RouterServer {
             }
 
             return isAuthenticated;
-        }
+        };
     }
 
     /**
@@ -165,13 +166,13 @@ export class RouterServer {
      * Note: Fourni un middleware Express
      */
     dataMiddleware() {
-        var directorData = this.directorData;
+        const directorData = this.directorData;
         return function middleware(req: Express.Request, res: Express.Response, next) {
             if (Utils.getCls("hornet.routeType") !== RouteType.DATA) return next();
 
             directorData.dispatch(req, res, function (err) {
                 if (err) {
-                    if (err.status && err.status == 404) {
+                    if (err.status && err.status === 404) {
                         err = new NotFoundError({ errorMessage: err.message }, err);
                     }
                     next(err);
@@ -182,7 +183,7 @@ export class RouterServer {
     }
 
     pageMiddleware() {
-        let directorPage = this.directorPage;
+        const directorPage = this.directorPage;
         return function middleware(req: Express.Request, res: Express.Response, next) {
 
             if (Utils.getCls("hornet.routeType") !== RouteType.PAGE) {
@@ -191,7 +192,7 @@ export class RouterServer {
 
             directorPage.dispatch(req, res, function (err) {
                 if (err) {
-                    if (err.status && err.status == 404) {
+                    if (err.status && err.status === 404) {
                         err = new NotFoundError({ errorMessage: err.message }, err);
                     }
                     next(err);
@@ -212,12 +213,13 @@ export class RouterServer {
 
 
     protected computeAuthorizationsRoutes(pageRoutes, dataRoutes, prefix: string) {
-        let objPage = {}, objData = {};
-        for (let key in pageRoutes) {
+        const objPage = {};
+        const objData = {};
+        for (const key in pageRoutes) {
             objPage[ prefix + key ] = pageRoutes[ key ];
         }
 
-        for (let key in dataRoutes) {
+        for (const key in dataRoutes) {
             objData[ this.dataContext + prefix + key ] = dataRoutes[ key ];
         }
 
@@ -225,9 +227,9 @@ export class RouterServer {
     }
 
     private parseRoutes<T extends RouteInfos>(declaredRoutes: Routes<T>, internalObj: DirectorRoutesDesc, prefix: string) {
-        for (var path in declaredRoutes) {
-            for (var method in declaredRoutes[ path ]) {
-                var uri = prefix + path;
+        for (const path in declaredRoutes) {
+            for (const method in declaredRoutes[ path ]) {
+                const uri = prefix + path;
                 if (!internalObj[ uri ]) {
                     internalObj[ uri ] = {};
                 }
@@ -242,7 +244,7 @@ export class RouterServer {
 
     protected buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string) {
         return (...params: Array<any>) => {
-            var done = params.pop();
+            const done = params.pop();
 
             try {
 
@@ -251,13 +253,13 @@ export class RouterServer {
             } catch (err) {
                 done(err);
             }
-        }
+        };
     }
 
     protected parseLazyRoutes(lazyRoutes: LazyRoutes, prefix: string) {
-        for (let lazy in lazyRoutes) {
-            let lazyClass = this.lazyRoutesClassResolver(lazyRoutes[ lazy ]);
-            let routesClass = LazyClassLoader.load(lazyClass);
+        for (const lazy in lazyRoutes) {
+            const lazyClass = this.lazyRoutesClassResolver(lazyRoutes[ lazy ]);
+            const routesClass = LazyClassLoader.load(lazyClass);
             this.computeRoutes(new routesClass(), prefix + lazy);
         }
     }
@@ -268,8 +270,8 @@ export class RouterServer {
     }
 
     protected parseSubRoutes(subRoutes: SubRoutes, prefix: string) {
-        for (let sub in subRoutes) {
-            let routesClass = LazyClassLoader.load(subRoutes[sub]);
+        for (const sub in subRoutes) {
+            const routesClass = LazyClassLoader.load(subRoutes[ sub ]);
             this.computeRoutes(new routesClass(), prefix + sub);
         }
     }

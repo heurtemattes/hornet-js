@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,7 +89,7 @@ import { COMPONENT_CHANGE_EVENT, PAGE_READY_EVENT } from "hornet-js-core/src/rou
 import { Notification } from "src/widget/notification/notification";
 import { BreadCrumb } from "src/widget/navigation/bread-crumb";
 import { TopButton } from "src/widget/button/top-button";
-import { ErrorPage } from "src/widget/component/error-page"
+import { ErrorPage } from "src/widget/component/error-page";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.component.hornet-content");
 
@@ -97,7 +97,7 @@ export interface HornetContentProps extends HornetComponentProps {
     content: Class<HornetPage<any, any, any>>;
     workingZoneWidth: string;
     id?: string;
-    error?:any
+    error?: any;
 }
 
 export class HornetContent extends HornetComponent<HornetContentProps, any> {
@@ -114,8 +114,12 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }
-        this.state.currentWorkingZoneWidth = maxWidth;
-        this.state.classNameExpanded = classNameExpanded;
+
+        this.state = {
+            ...this.state,
+            currentWorkingZoneWidth: maxWidth,
+            classNameExpanded,
+        };
 
         this.listen(COMPONENT_CHANGE_EVENT, this.handleComponentChangeEvent);
     }
@@ -128,16 +132,16 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if(nextState.error && nextState.error.hasBeenReported) {
+        if (nextState.error && nextState.error.hasBeenReported) {
             nextState.error = undefined;
         }
     }
 
     componentDidMount() {
-        if(this.state.error && this.state.error.hasBeenReported) {
-            this.state.error = undefined;
+        if (this.state.error && this.state.error.hasBeenReported) {
+            (this.state as any).error = undefined;
         } else if (this.state.error) {
-            this.state.error.hasBeenReported = true;
+            (this.state as any).error.hasBeenReported = true;
         }
     }
 
@@ -152,22 +156,22 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
         logger.trace("VIEW Content render");
         let content;
 
-        if(this.state.error && !this.state.error.hasBeenReported) {
-            content = <ErrorPage error={this.state.error} />
+        if (this.state.error && !this.state.error.hasBeenReported) {
+            content = <ErrorPage error={this.state.error} />;
         } else {
-            content = this.wrap(this.state.content, {navigateData: this.state.navigateData}, this.props);
+            content = this.wrap(this.state.content, { navigateData: this.state.navigateData }, this.props);
         }
 
         return (
             <main id={this.props.id || "page"}
-                  role="main"
-                  className={this.state.classNameExpanded}
-                  style={{maxWidth: this.state.currentWorkingZoneWidth}}
+                role="main"
+                className={this.state.classNameExpanded}
+                style={{ maxWidth: this.state.currentWorkingZoneWidth }}
             >
-                <BreadCrumb/>
-                <Notification id="main"/>
+                <BreadCrumb />
+                <Notification id="main" />
                 {content}
-                <TopButton title={this.i18n("topButtonTitle")}/>
+                <TopButton title={this.i18n("topButtonTitle")} />
             </main>
         );
     }
@@ -177,7 +181,7 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
      * @param ev
      */
     handleComponentChangeEvent(ev) {
-        this.setState({content: ev.detail.newComponent, navigateData: ev.detail.data}, () => {
+        this.setState({ content: ev.detail.newComponent, navigateData: ev.detail.data }, () => {
             this.fire(PAGE_READY_EVENT.withData({}));
         });
     }

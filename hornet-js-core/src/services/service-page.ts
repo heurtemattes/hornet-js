@@ -73,21 +73,21 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {ServiceRequest} from "src/services/service-request";
+import { ServiceRequest } from "src/services/service-request";
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 const logger: Logger = Utils.getLogger("hornet-js-core.services.service-page");
 
 export class ServicePage extends ServiceRequest {
 
-     constructor() {
+    constructor() {
         super();
-        var fullSpa:boolean = Utils.config.getOrDefault("fullSpa.enabled", false);
+        var fullSpa: boolean = Utils.config.getOrDefault("fullSpa.enabled", false);
         if (fullSpa) {
             this.serviceHost = Utils.config.getOrDefault("fullSpa.host", "");
             this.serviceName = Utils.buildContextPath(Utils.config.getOrDefault("fullSpa.name", "/services"));

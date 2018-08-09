@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,7 +92,7 @@ export class AutoCompleteState extends events.EventEmitter {
      * @param {string} value
      */
     public setFocusOn(choiceFocused: any, value: string, index) {
-        setTimeout(()=>{
+        setTimeout(() => {
             this.emit(AutoCompleteState.FOCUS_CHANGE_EVENT, this.choiceFocused, choiceFocused, value, index);
         })
         this.choiceFocused = choiceFocused;

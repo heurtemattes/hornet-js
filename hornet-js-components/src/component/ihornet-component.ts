@@ -73,7 +73,7 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,7 @@ import * as React from "react";
  */
 export interface HornetComponentProps {
     /** Référence vers le composant monté dans le DOM HTML */
-    var?: (component: IHornetComponent<HornetComponentProps, any>)=>{};
+    var?: (component: IHornetComponent<HornetComponentProps, any>) => {};
     children?: __React.ReactNode;
 }
 
@@ -107,12 +107,12 @@ export interface IHornetComponentAsync {
     /**
      * Méthode qui permet de cacher le spinner du composant plutot que celui de la page.
      */
-    hideSpinnerComponent():void;
+    hideSpinnerComponent(): void;
 }
 
 
-export interface  IHornetComponentDatasource{
-    setDataSource(value: any):void;
+export interface IHornetComponentDatasource {
+    setDataSource(value: any): void;
 }
 
 export interface HornetComponentChoicesProps {
@@ -123,17 +123,17 @@ export interface HornetComponentChoicesProps {
 /**
  * Composant graphique Hornet générant un rendu HTML.
  */
-export interface IHornetComponent<P extends HornetComponentProps,S extends HornetComponentProps> {
+export interface IHornetComponent<P extends HornetComponentProps, S extends HornetComponentProps> {
 
     /**
      * Méhtode appelée par le moteur de rendu lorsque le composant va être monté dans le DOM HTML pour la première fois.
      */
-    componentWillMount():void;
+    componentWillMount(): void;
 
     /**
      * Méthode appelée par le moteur de rendu lorsque le composant vient d'être monté dans le DOM HTML pour la première fois.
      */
-    componentDidMount():void;
+    componentDidMount(): void;
 
     /**
      * Méthode appelée par le moteur de rendu lorsque l'état interne du composant va êtr mis à jour avec les propriétés
@@ -141,7 +141,7 @@ export interface IHornetComponent<P extends HornetComponentProps,S extends Horne
      * @param nextProps nouvelles propriétés
      * @param nextContext nouveau contexte
      */
-    componentWillReceiveProps(nextProps:P, nextContext:any):void;
+    componentWillReceiveProps(nextProps: P, nextContext: any): void;
 
     /**
      * Méthode appelée par le moteur de rendu lorsque le rendu HTML du composant va être mis à jour suite à un changement
@@ -150,7 +150,7 @@ export interface IHornetComponent<P extends HornetComponentProps,S extends Horne
      * @param nextState nouvel état du composant
      * @param nextContext nouveau contexte
      */
-    componentWillUpdate(nextProps: P, nextState: S, nextContext: any):void;
+    componentWillUpdate(nextProps: P, nextState: S, nextContext: any): void;
 
     /**
      * Méthode appelée par le moteur de rendu lorsque le rendu HTML du composant vient d'être être mis à jour suite à un changement
@@ -159,12 +159,12 @@ export interface IHornetComponent<P extends HornetComponentProps,S extends Horne
      * @param nextState nouvel état du composant
      * @param nextContext nouveau contexte
      */
-    componentDidUpdate(prevProps: P, prevState: S, prevContext: any):void;
+    componentDidUpdate(prevProps: P, prevState: S, prevContext: any): void;
 
     /**
      * Méthode appelée par le moteur de rendu lorsque le composant va être démonté du DOM HTML.
      */
-    componentWillUnmount():void;
+    componentWillUnmount(): void;
 
 
     /**
@@ -174,6 +174,6 @@ export interface IHornetComponent<P extends HornetComponentProps,S extends Horne
      * @param values valeurs de remplacement éventuelles
      * @returns {any} une chaîne de caractères ou un objet contenant des messages
      */
-    i18n(keysString:string, values?:any):any;
+    i18n(keysString: string, values?: any): any;
 
 }

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -113,7 +113,7 @@ describe("Middleware CsrfMiddleware", () => {
                     };
                 },
                 method: "POST",
-                headers: {"x-csrf-token": csrfToken}
+                headers: { "x-csrf-token": csrfToken }
             };
             var res: any = sinon.spy();
             var next = sinon.spy();
@@ -144,7 +144,7 @@ describe("Middleware CsrfMiddleware", () => {
                     };
                 },
                 method: "PATCH",
-                headers: {"x-csrf-token": csrfToken}
+                headers: { "x-csrf-token": csrfToken }
             };
             var res: any = sinon.spy();
             var next = sinon.spy();
@@ -173,7 +173,7 @@ describe("Middleware CsrfMiddleware", () => {
                 },
                 method: "DELETE",
                 headers: {},
-                body: {"x-csrf-token": csrfToken}
+                body: { "x-csrf-token": csrfToken }
             };
             var res: any = sinon.spy();
             var next = sinon.spy();
@@ -204,7 +204,7 @@ describe("Middleware CsrfMiddleware", () => {
                     };
                 },
                 method: "PUT",
-                headers: {"x-csrf-token": csrfToken}
+                headers: { "x-csrf-token": csrfToken }
             };
             var res: any = sinon.spy();
             var next = sinon.spy();
@@ -225,7 +225,7 @@ describe("Middleware CsrfMiddleware", () => {
 
         it("should not validate on GET", () => {
 
-            Utils.setCls = function(key: string, value: any, localStorageName?: string): any {
+            Utils.setCls = function (key: string, value: any, localStorageName?: string): any {
                 sinon.stub();
             };
 

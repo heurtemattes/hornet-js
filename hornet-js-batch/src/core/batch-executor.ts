@@ -52,7 +52,7 @@
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
  * liability.
- * <p/>
+ * <p/>let
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
  * software by the user in light of its specific status of free software,
@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -143,31 +143,31 @@ export class Batch {
      * modifie le statut du batch
      */
     public set status(status: STATUS) {
-        this._status = status
+        this._status = status;
     }
 
     public updateStatus(): {} {
-        let summary = [];
-        let res = this.roadmap.reduce((result, process: BatchProcess) => {
+        const summary = [];
+        const res = this.roadmap.reduce((result, process: BatchProcess) => {
             let res = false;
-            let status = process.status;
+            const status = process.status;
             summary.push({ process_name: process.name, process_status: STATUS[ process.status ] });
-            if (status == STATUS.FAILED) {
+            if (status === STATUS.FAILED) {
                 this.endDate = new Date();
-                this.status = STATUS.FAILED
+                this.status = STATUS.FAILED;
             }
-            if (status == STATUS.SUCCEEDED) {
+            if (status === STATUS.SUCCEEDED) {
                 res = true;
             }
             return result && res;
-        }, true);
+        },                              true);
 
         if (res) {
             this.endDate = new Date();
-            this.status = STATUS.SUCCEEDED
+            this.status = STATUS.SUCCEEDED;
         }
         logger.trace("\nBatch :", this.id, "\n", summary);
-        return summary
+        return summary;
 
     }
 
@@ -185,28 +185,30 @@ export class Batch {
      */
     execPool(): void {
         if (this.roadmap && this.currentStep < this.roadmap.length) {
-            setImmediate((_batch) => {
-                let process: BatchProcess = _batch.roadmap[ _batch.currentStep ];
-                try {
-                    process.execute.apply(process).then((result) => {
-                        _batch.currentStep++;
-                        if (_batch.roadmap[ _batch.currentStep ]) {
-                            _batch.roadmap[ _batch.currentStep ].options.args = result;
-                        }
-                        _batch.execPool();
-                    }).catch((error) => {
+            setImmediate(
+                (_batch) => {
+                    const process: BatchProcess = _batch.roadmap[ _batch.currentStep ];
+                    try {
+                        process.execute.apply(process).then((result) => {
+                            _batch.currentStep++;
+                            if (_batch.roadmap[ _batch.currentStep ]) {
+                                _batch.roadmap[ _batch.currentStep ].options.args = result;
+                            }
+                            _batch.execPool();
+                        }).catch((error) => {
+                            logger.fatal(process.name, error);
+                            this.status = STATUS.FAILED;
+                            this.error = error;
+                            BatchExecutor.Instance.removeBatch(this);
+                        });
+                    } catch (error) {
                         logger.fatal(process.name, error);
                         this.status = STATUS.FAILED;
                         this.error = error;
                         BatchExecutor.Instance.removeBatch(this);
-                    });
-                } catch (error) {
-                    logger.fatal(process.name, error);
-                    this.status = STATUS.FAILED;
-                    this.error = error;
-                    BatchExecutor.Instance.removeBatch(this);
-                }
-            }, this);
+                    }
+                },
+                this);
         }
     }
 
@@ -221,7 +223,7 @@ export class Batch {
         if (!this.startDate) {
             this.startDate = new Date();
         }
-        //normalize roadmap
+        // normalize roadmap
         this.roadmap.forEach((values, index) => {
             let res = values;
             if (values instanceof Array) {
@@ -259,7 +261,8 @@ export class BatchExecutor {
 
 
     /***
-     * Contient l'historique la liste des batchs qui ont été executés la durée de vie est la même que l'instance du serveur [aucune persistance]
+     * Contient l'historique la liste des batchs qui ont été executés la durée de vie est la 
+     * même que l'instance du serveur [aucune persistance]
      * @instance
      */
     public static summary = {};
@@ -290,8 +293,8 @@ export class BatchExecutor {
             startDate: batch.startDate,
             endDate: batch.endDate,
             createDate: batch.createDate,
-            errorBatch: batch.error ? "[" + batch.error.name + "] " + batch.error.message : ""
-        })
+            errorBatch: batch.error ? "[" + batch.error.name + "] " + batch.error.message : "",
+        });
     }
     /***
      * Renvoie le batch associé au BatchUnit qu'il soit en cours de traitement ou dans la file d'attente.
@@ -300,13 +303,15 @@ export class BatchExecutor {
      * @return un batch trouvé ou un nouveau.
      */
     getBatch(unit: BatchUnit): Batch {
-        let criteria = { "_id": "_" + unit.id };
-        let batch = _.find(BatchExecutor.processing[ unit.route ], criteria) || _.find(BatchExecutor.queue[ unit.route ], criteria) || function () {
-            let newBatch = new Batch(unit);
-            newBatch.status = STATUS.QUEUED;
-            BatchExecutor.queue[ unit.route ] = [ newBatch ];
-            return newBatch;
-        } ();
+        const criteria = { _id: "_" + unit.id };
+        const batch = _.find(BatchExecutor.processing[ unit.route ], criteria)
+            || _.find(BatchExecutor.queue[ unit.route ], criteria)
+            || function () {
+                const newBatch = new Batch(unit);
+                newBatch.status = STATUS.QUEUED;
+                BatchExecutor.queue[ unit.route ] = [ newBatch ];
+                return newBatch;
+            }();
         return batch as Batch;
     }
 
@@ -321,21 +326,21 @@ export class BatchExecutor {
         let found = false;
         let history = BatchExecutor.summary[ route ];
         if (test) {
-            let batch = test[ 0 ];
-            let roadmap = batch.roadmap;
+            const batch = test[ 0 ];
+            const roadmap = batch.roadmap;
             for (let i = 0; i < batch.roadmap.length; i++) {
-                let item = roadmap[ i ];
+                const item = roadmap[ i ];
                 if (item instanceof BatchProcessParent) {
                     item.updateStatus();
                 }
-                if (item.status == STATUS.RUNNING || item.status == STATUS.INIT || item.status == STATUS.QUEUED) {
+                if (item.status === STATUS.RUNNING || item.status === STATUS.INIT || item.status === STATUS.QUEUED) {
                     logger.trace("=> batch exist", true);
                     return {
                         isBusy: true,
-                        history: history
+                        history,
                     };
                 }
-                if (item.status == STATUS.FAILED) {
+                if (item.status === STATUS.FAILED) {
                     found = true;
                 }
             }
@@ -349,13 +354,13 @@ export class BatchExecutor {
                 BatchExecutor.Instance.removeBatch(batch);
                 test = undefined;
             }
-            history = BatchExecutor.summary[ route ]
+            history = BatchExecutor.summary[ route ];
         }
 
         return {
             isBusy: (test && test.length > 0),
-            history: history
-        }
+            history,
+        };
     }
 
     /***
@@ -363,13 +368,13 @@ export class BatchExecutor {
      * @param {Batch} batch une route donnée.
      */
     removeBatch(batch: Batch): void {
-        let unit = batch.unit;
-        let criteria = { "_id": "_" + unit.id };
-        //let batch = _.find(BatchExecutor.processing[ unit.route ], criteria);
+        const unit = batch.unit;
+        const criteria = { _id: "_" + unit.id };
+        // let batch = _.find(BatchExecutor.processing[ unit.route ], criteria);
         if (batch) {
             BatchExecutor.Instance.addToSummary(batch);
             _.remove(BatchExecutor.processing[ unit.route ], batch);
-            if (BatchExecutor.processing[ unit.route ].length == 0) {
+            if (BatchExecutor.processing[ unit.route ].length === 0) {
                 delete BatchExecutor.processing[ unit.route ];
             }
         }
@@ -382,7 +387,7 @@ export class BatchExecutor {
      * @return renvoie une promesse du BatchUnit traité
      */
     runBatch(unit: BatchUnit): Promise<any> {
-        let criteria = { "_id": "_" + unit.id };
+        const criteria = { _id: "_" + unit.id };
         let batch: Batch = _.find(BatchExecutor.processing[ unit.route ], criteria) as Batch;
         if (!batch) {
             batch = _.find(BatchExecutor.queue[ unit.route ], criteria) as Batch;
@@ -392,7 +397,7 @@ export class BatchExecutor {
             }
             BatchExecutor.processing[ unit.route ].push(batch);
             _.remove(BatchExecutor.queue[ unit.route ], batch);
-            if (BatchExecutor.queue[ unit.route ].length == 0) {
+            if (BatchExecutor.queue[ unit.route ].length === 0) {
                 delete BatchExecutor.queue[ unit.route ];
             }
             return batch.run();

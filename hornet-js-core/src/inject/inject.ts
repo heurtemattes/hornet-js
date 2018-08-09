@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,13 +89,13 @@ declare var Reflect: any;
  * @param  key {any} clé de stockage
  * @param  side {Side} complément de clé correspondant au côté d'exécution (Client ou Serveur)
  * */
-export function inject(key:Class<any> | AbstractClass<any> | string) {
-    return function(target: Object, propertyKey: string | symbol, parameterIndex: number) {
-        let injectParameters: {index: number, type: any}[] = Reflect.getOwnMetadata(INJECT_METADATA_KEY, target, propertyKey) || [];
-        injectParameters.push({index: parameterIndex, type: key});
+export function inject(key: Class<any> | AbstractClass<any> | string) {
+    return function (target: Object, propertyKey: string | symbol, parameterIndex: number) {
+        const injectParameters: { index: number, type: any }[] = Reflect.getOwnMetadata(INJECT_METADATA_KEY, target, propertyKey) || [];
+        injectParameters.push({ index: parameterIndex, type: key });
         Reflect.defineMetadata(INJECT_METADATA_KEY, injectParameters, target, propertyKey);
     };
-};
+}
 
 
 

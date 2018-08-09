@@ -70,43 +70,78 @@
  */
 
 /**
- * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+ * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import ActionsChainData = require("src/routes/actions-chain-data");
+const chai = require("chai");
+const expect = chai.expect;
+import * as React from "react";
+
+import { BaseTest } from "hornet-js-test/src/base-test";
+import { runTest } from "hornet-js-test/src/test-run";
+import { Decorators } from "hornet-js-test/src/decorators";
+import * as assert from "assert";
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
 import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+Utils.setConfigObj({});
 
-var logger = Utils.getLogger("hornet-js-core.actions.redirect-client");
 
-/**
- * Action permettant de faire rediriger le client vers une url (payload) tout en restant sur la page courante (changement de la barre d'adresse).
- */
-// class RedirectClientAction extends Action<ActionsChainData> {
-//     /**
-//      * Effectue la redirection client.
-//      * payload : url de redirection
-//      *
-//      * @param resolve
-//      * @param reject
-//      */
-//     execute(resolve, reject) {
-//         try {
-//             if (utils.isServer) {
-//                 reject("Cette action ne peut pas être utilisée côté serveur");
-//             } else {
-//                 var url = utils.buildContextPath(this.payload);
-//                 logger.debug("Redirection vers l'url:", url);
-//                 window.router.setRoute(url);
-//             }
-//         } catch (error) {
-//             reject(error);
-//         }
-//         resolve();
-//     }
-// }
-// export = RedirectClientAction;
+
+import SyntheticEvent = React.SyntheticEvent;
+import { User } from 'src/widget/user/user';
+import { isArray } from 'util';
+import { HornetReactTest } from 'hornet-js-test/src/hornet-react-test';
+const logger: Logger = Utils.getLogger("user.test.karma");
+
+
+let userElement: JSX.Element;
+let user;
+@Decorators.describe("Test Karma User")
+class userTest extends  HornetReactTest  {
+    @Decorators.beforeEach
+    beforeEach() {
+        Utils.setCls("hornet.internationalization", { messages});
+        userElement = (
+            <User text={"connect"} login={"login"} url={"#"} title={"title"}/>
+        );
+    }
+
+    @Decorators.it("Test OK")
+    testOk() {
+        assert.equal(1, 1);
+        this.end();
+    }
+    
+    @Decorators.it("affichage composant user")
+    displayUserComponent() {
+        const id = this.generateMainId();
+        user = this.renderIntoDocument(userElement, id);
+        expect(document.querySelector(`#${id} #dropdown-user-drop`)).to.exist;
+        this.end();
+    }
+
+    @Decorators.it("Clic sur le bouton de connexion")
+    testClicButtonUser() {
+        const id = this.generateMainId();
+        user = this.renderIntoDocument(userElement, id);
+        expect(document.querySelector(`#${id} #dropdown-user-drop`)).to.exist;
+        expect(document.querySelector(`#${id} #dropdown-user-drop .dropdown-content-hidden`)).to.exist;
+        const root = document.getElementById(id);
+        const aElement = root.getElementsByClassName("button-action");
+        expect(aElement).to.exist;
+        expect(aElement[0]).to.exist;
+        (aElement[0] as any).click();
+        expect(document.querySelector(`#${id} #dropdown-user-drop .dropdown-content`)).to.exist;
+        expect(document.querySelector(`#${id} #dropdown-user-drop .dropdown-content-hidden`)).to.not.exist;
+        this.end();
+    }
+}
+
+// lancement des Tests
+runTest(new userTest());

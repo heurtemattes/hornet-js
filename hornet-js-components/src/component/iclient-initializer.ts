@@ -73,12 +73,12 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {IHornetPage} from "src/component/ihornet-page";
+import { IHornetPage } from "src/component/ihornet-page";
 /**
  * Gère les étapes d'initialisation du client spécifiques au moteur de rendu
  */
@@ -88,7 +88,7 @@ export interface IClientInitializer<E> {
      * Initialise la page d'erreur technique par défaut
      * @param errorPage page à afficher par défaut en cas d'erreur technique
      */
-    initErrorComponent(errorPage:{new (...args): IHornetPage<any, any>});
+    initErrorComponent(errorPage: { new(...args): IHornetPage<any, any> });
 
     /**
      * Effectue les initialisations spécifiques au moteur de rendu utilisé

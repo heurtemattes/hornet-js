@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -115,7 +115,7 @@ export interface ButtonState extends ButtonProps, HornetComponentState {
 export class Button<P extends ButtonProps, S extends ButtonState> extends HornetComponent<ButtonProps, ButtonState> {
 
     static defaultProps = {
-        disabled: false
+        disabled: false,
     };
 
     public readonly props: Readonly<ButtonProps>;
@@ -127,6 +127,14 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
         this.state.effect = false;
         this.state.css = { dislay: "none" };
 
+    }
+
+    /**
+     * @inheritDoc
+     */
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        this.mounted = false;
     }
 
     /**
@@ -146,7 +154,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
      */
     protected renderButton(): JSX.Element {
 
-        let classes: ClassDictionary = {};
+        const classes: ClassDictionary = {};
         if (this.state.className) {
             classes[ this.state.className ] = true;
         }
@@ -175,17 +183,17 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
      */
     protected renderLink(): JSX.Element {
 
-        let classes: ClassDictionary = {};
+        const classes: ClassDictionary = {};
         if (this.state.className) {
             classes[ this.state.className ] = true;
         }
 
-        let aProps: any = {
+        const aProps: any = {
             href: this.state.url,
             className: classNames(classes),
             title: this.state.title,
             onClick: this.handleClick,
-            disabled: this.state.disabled
+            disabled: this.state.disabled,
         };
 
         return (
@@ -215,26 +223,22 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
      * @param e
      */
     rippleEffect(e) {
-        let xPos = e.pageX - e.target.offsetLeft;
-        let yPos = e.pageY - e.target.offsetTop;
-        let size = e.target.clientHeight;
-        let css = ({
+        const xPos = e.pageX - e.target.offsetLeft;
+        const yPos = e.pageY - e.target.offsetTop;
+        const size = e.target.clientHeight;
+        const css = ({
             top: yPos - (size / 2),
             left: xPos - (size / 2),
             height: size + "px",
-            width: size + "px"
+            width: size + "px",
         });
 
-        this.setState({ effect: true, css: css });
+        this.setState({ effect: true, css });
         setTimeout(() => {
             if (this.mounted) {
                 this.setState({ effect: false });
             }
-        }, 1500);
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        this.mounted = false;
+        },         1500);
     }
 }
+

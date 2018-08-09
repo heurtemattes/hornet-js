@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -104,15 +104,18 @@ export class HeaderPage extends HornetComponent<HeaderPageProps, any> {
 
     constructor(props: HeaderPageProps, context?: any) {
         super(props, context);
-        this.state.isMenuActive = false;
+        this.state = {
+            ...this.state,
+            isMenuActive: false,
+        };
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', this.handleScroll);
+        window.addEventListener("scroll", this.handleScroll);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', this.handleScroll);
+        window.removeEventListener("scroll", this.handleScroll);
     }
 
     /**
@@ -153,9 +156,9 @@ export class HeaderPage extends HornetComponent<HeaderPageProps, any> {
      */
     handleScroll = e => {
         if (this.isInView(this.header)) {
-            this.header.classList.add('sticky');
+            this.header.classList.add("sticky");
         } else {
-            this.header.classList.remove('sticky');
+            this.header.classList.remove("sticky");
         }
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,14 +84,13 @@ import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { Header } from "src/widget/table/header";
-import { Content } from "src/widget/table/content";
+import { Content, UNIT_SIZE } from "src/widget/table/content";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { Columns } from "src/widget/table/columns";
 import { Footer } from "src/widget/table/footer";
 import { TableState, ContentState } from "src/widget/table/table-state";
 import { Notification } from "src/widget/notification/notification";
 import { ToggleColumnsButton } from "src/widget/table/toggle-columns-button";
-import { UNIT_SIZE } from "src/widget/table/content";
 import { CheckColumn } from "src/widget/table/column/check-column";
 
 const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.table");
@@ -120,7 +119,7 @@ export class Table extends HornetComponent<TableProps, any> {
 
     static defaultProps = {
         className: "hornet-datatable-header",
-        isVisible: true
+        isVisible: true,
     };
 
     constructor(props: TableProps, context?: any) {
@@ -131,12 +130,17 @@ export class Table extends HornetComponent<TableProps, any> {
         if (!props.width) {
             this.tableState.once(TableState.RESIZE_EVENT, this.handleResize.bind(this));
         }
-        this.state.isMounted = false;
+
+        this.state = {
+            ...this.state,
+            isMounted: false,
+        };
+
         this.contentState.setHasCheckColumnMassSelection(this.hasCheckColumnChildren());
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.state.isVisible != nextState.isVisible;
+        return this.state.isVisible !== nextState.isVisible;
     }
 
     componentWillUnmount(): void {
@@ -156,8 +160,8 @@ export class Table extends HornetComponent<TableProps, any> {
         logger.trace("render Table");
 
         // si au moins un content n'a pas de notifId specifé, on instancie le composant Notification
-        let myContents: any[] = this.getComponentsBy(Content);
-        let notifId: string = "notif-" + this.props.id;
+        const myContents: any[] = this.getComponentsBy(Content);
+        const notifId: string = "notif-" + this.props.id;
         let componentContent: any;
         if (myContents && myContents.length > 0) {
             myContents.map((myContent) => {
@@ -181,7 +185,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * @param width
      */
     handleResize(width: number) {
-        this.setState({ width: width });
+        this.setState({ width });
     }
 
     /**
@@ -189,7 +193,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * @returns {any}
      */
     protected renderTable(myContents): JSX.Element {
-        let myHeader: any = this.getComponentBy(Header);
+        const myHeader: any = this.getComponentBy(Header);
         return (
             <div className="datatable-container">
                 {this.renderHeader(myHeader, myContents)}
@@ -211,8 +215,8 @@ export class Table extends HornetComponent<TableProps, any> {
 
         if (myContents && myContents.length > 0) {
             myContents.map((myContent, index) => {
-                let myColumns: any[] = HornetComponent.getChildrenFrom(myContent, Columns);
-                let keyColumns = [];
+                const myColumns: any[] = HornetComponent.getChildrenFrom(myContent, Columns);
+                const keyColumns = [];
                 id += "-" + index;
                 if (myColumns.length > 0) {
                     myColumns.map((column) => {
@@ -220,13 +224,13 @@ export class Table extends HornetComponent<TableProps, any> {
                             keyColumns.push({
                                 keyColumn: column.props.keyColumn,
                                 title: column.props.title,
-                                width: (column.props.defaultWidth || column.props.width) + UNIT_SIZE
+                                width: (column.props.defaultWidth || column.props.width) + UNIT_SIZE,
                             });
                         }
                     });
                 }
 
-                infoColumns = { columns: keyColumns, id: id };
+                infoColumns = { columns: keyColumns, id };
             });
         }
         return infoColumns;
@@ -237,7 +241,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * @returns {PaginateDataSource<any>[]}
      */
     protected getContentsDataSources(myContents): PaginateDataSource<any>[] {
-        let listPaginateDataSource: PaginateDataSource<any>[] = [];
+        const listPaginateDataSource: PaginateDataSource<any>[] = [];
         myContents.map((myContent) => {
             listPaginateDataSource.push(myContent.props.dataSource);
         });
@@ -250,10 +254,19 @@ export class Table extends HornetComponent<TableProps, any> {
      * @returns {any}
      */
     protected renderHeader(myComponent, myContents): JSX.Element {
-
         if (myComponent) {
-            let key = "header-" + this.props.id + "-wrapped";
-            let Wrapped = Table.wrap(
+            const key = "header-" + this.props.id ;
+            const props = {...myComponent.props,
+                parentId: this.props.id,
+                key,
+                tableState: this.tableState,
+                contentState: this.contentState,
+                dataSourcesList: this.getContentsDataSources(myContents),
+                tabIndex: -1,
+                columns: this.getColumnsInformation(myContents),
+                hiddenColumns: this.getHiddenColumns(myComponent)};
+            return React.createElement(Header, props);
+            /*let Wrapped = Table.wrap(
                 Header, this,
                 myComponent.props,
                 {
@@ -267,7 +280,7 @@ export class Table extends HornetComponent<TableProps, any> {
                     hiddenColumns: this.getHiddenColumns(myComponent)
                 }
             );
-            return <Wrapped key={"wc-" + key} />;
+            return <Wrapped key={"wc-" + key} />;*/
         } else {
             return <div tabIndex={-1} />;
         }
@@ -278,7 +291,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * @returns {any}
      */
     protected renderFooter(): JSX.Element {
-        let myComponent: any = this.getComponentBy(Footer);
+        const myComponent: any = this.getComponentBy(Footer);
         if (myComponent) {
             return <Footer {...myComponent.props} contentState={this.contentState} />;
         } else {
@@ -294,32 +307,41 @@ export class Table extends HornetComponent<TableProps, any> {
      */
     protected renderContent(myHeader, myContents) {
 
-        let Contents = [];
+        const Contents = [];
         if (myContents && myContents.length > 0) {
             myContents.map((myContent, index) => {
                 if (this.state.isMounted || this.state.isVisible) {
                     this.tableState.addContent(this.contentState);
 
-                    let id: string = myContent.props.id || this.props.id + "-" + index;
-                    let width: number = (this.props.width || this.state.width) / 13 - 0.3;
-                    let key = "content-" + this.props.id + "-" + index + "-wrapped";
-                    let notifId = myContent.props.notifId || "notif-" + this.props.id;
-
-                    let Wrapped = Table.wrap(
+                    const id: string = myContent.props.id || this.props.id + "-" + index;
+                    const width: number = (this.props.width || this.state.width) / 13 - 0.3;
+                    const key = "content-" + this.props.id + "-" + index ;
+                    const notifId = myContent.props.notifId || "notif-" + this.props.id;
+                    const props = {...myContent.props,
+                        id,
+                        key,
+                        contentState: this.contentState,
+                        width,
+                        notifId,
+                        tabIndex: -1,
+                        hiddenColumns: this.getHiddenColumns(myHeader),
+                        title: (!myContent.props.title && myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : myContent.props.title};
+                    /*const Wrapped = Table.wrap(
                         Content, myContent,
                         myContent.props,
                         {
-                            id: id,
-                            key: key,
+                            id,
+                            key,
                             contentState: this.contentState,
                             width,
-                            notifId: notifId,
+                            notifId,
                             tabIndex: -1,
                             hiddenColumns: this.getHiddenColumns(myHeader),
-                            title: (myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : null
-                        }
+                            title: (myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : null,
+                        },
                     );
-                    Contents.push(<Wrapped key={"wc-" + key} />);
+                    Contents.push(<Wrapped key={"wc-" + key} />);*/
+                    Contents.push(React.createElement(Content,props ));
                 }
             });
             return Contents;
@@ -354,12 +376,12 @@ export class Table extends HornetComponent<TableProps, any> {
 
     protected hasCheckColumnChildren(): boolean {
         let res: boolean;
-        let children = this.getCheckColumnChildrenDeep(this);
+        const children = this.getCheckColumnChildrenDeep(this);
         res = (children && children.length > 0);
 
-        if(res) {
-            if(children[0].props && children[0].props.keyColumn) {
-                this.contentState.setKeycolumnMassSelection(children[0].props.keyColumn);
+        if (res) {
+            if (children[ 0 ].props && children[ 0 ].props.keyColumn) {
+                this.contentState.setKeycolumnMassSelection(children[ 0 ].props.keyColumn);
             }
         }
 
@@ -370,8 +392,8 @@ export class Table extends HornetComponent<TableProps, any> {
         let children: any[] = childrenList ? childrenList : [];
 
         React.Children.map(startElement.props.children, (child: React.ReactChild) => {
-            let reactElement = (child as React.ReactElement<any>);
-            if(reactElement) {
+            const reactElement = (child as React.ReactElement<any>);
+            if (reactElement) {
                 if (reactElement.type === CheckColumn) {
                     children.push(child);
                     children = this.getCheckColumnChildrenDeep(child, children);

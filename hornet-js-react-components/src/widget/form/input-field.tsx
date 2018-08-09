@@ -73,38 +73,50 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import {
     AbstractField, HornetWrittableProps,
-    HornetClickableProps, HornetBasicFormFieldProps, ReactFocusDOMAttributes
+    HornetClickableProps, HornetBasicFormFieldProps, ReactFocusDOMAttributes, AbstractFieldProps,
 } from "src/widget/form/abstract-field";
 import { Picto } from "src/img/picto";
 import * as _ from "lodash";
 import * as classNames from "classnames";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
+import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { CharsCounter, HornetCharsCounterAttributes } from "src/widget/form/chars-counter";
+import { ToolTip } from "src/widget/tool-tip/tool-tip";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.input-field");
 
 /**
  * Composant champ de formulaire : input html de type texte par défaut
  */
 
-export interface InputFieldProps extends HornetWrittableProps,
+export interface InputFieldProps extends AbstractFieldProps, HornetWrittableProps,
     HornetClickableProps,
     HornetBasicFormFieldProps,
+    HornetCharsCounterAttributes,
     ReactFocusDOMAttributes {
     resettable?: boolean;
+    displayMaxCharInLabel?: boolean;
+    displayCharNumber?: boolean;
+    resetTitle?:string;
 }
 
 export class InputField<P extends InputFieldProps, S> extends AbstractField<InputFieldProps, S> {
 
-    static defaultProps = _.assign({ type: "text", resettable: true }, AbstractField.defaultProps);
+    static defaultProps = _.assign({ type: "text", resettable: true,  resetTitle: "inputField.resetTitle"}, AbstractField.defaultProps);
 
     public readonly props: Readonly<InputFieldProps>;
+    protected charsCounter: CharsCounter;
 
     /**
      * Génère le rendu spécifique du champ
@@ -112,15 +124,15 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      * @override
      */
     renderWidget(): JSX.Element {
-        let htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = _.cloneDeep(this.getHtmlProps());
 
         if (this.state.currentValue != null) {
-            _.assign(htmlProps, { "defaultValue": this.props.currentValue });
+            _.assign(htmlProps, { defaultValue: this.props.currentValue });
         }
 
-        let inputClasses: ClassDictionary = {
+        const inputClasses: ClassDictionary = {
             "has-error": this.hasErrors(),
-            "input": true
+            input: true,
         };
 
         if (htmlProps[ "className" ]) {
@@ -131,14 +143,30 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
             inputClasses[ this.state.alignment ] = true;
         }
 
+        if (htmlProps[ "type" ] && htmlProps[ "type" ].toLowerCase() === "hidden") {
+            htmlProps[ "type" ] = "text";
+            htmlProps[ "hidden" ] = true;
+        }
+
         htmlProps[ "onChange" ] = this.state.resettable ? this.handleChangeInput : htmlProps[ "onChange" ];
         htmlProps[ "className" ] = classNames(inputClasses);
+        if (this.props.displayCharNumber) {
+            const charsCounterId = `chars-counter-${this.state.id}`;
+            htmlProps[ "aria-labelledby" ] = `${this.state.name}-span-label ${charsCounterId}`;
+        } else {
+            htmlProps[ "aria-labelledby" ] = `${this.state.name}-span-label`;
+        }
+
+        const message = this.props.alertMessage || "inputField.alertMessage";
+        const title = this.props.alertTitle || "inputField.alertTitle";
+        const label = this.props.charLabel || "inputField.charLabel";
 
         return (
             <div>
                 <input ref={(elt) => this.registerHtmlElement(elt)} {...htmlProps} />
-                {this.state.resettable && this.state.valued && !this.state.readOnly && !this.state.disabled ? this.renderResetButton() :
-                    <div />}
+                {this.state.resettable && this.state.valued && !this.state.readOnly && !this.state.disabled
+                    ? this.renderResetButton()
+                    : <div />}
             </div>
         );
     }
@@ -150,7 +178,9 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      */
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
-
+        if (this.charsCounter) {
+            this.charsCounter.handleTextChange(value);
+        }
         this.setState({ valued: (value !== "" && value) });
         return this;
     }
@@ -165,33 +195,46 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      */
     renderResetButton(): JSX.Element {
 
-        let htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = _.cloneDeep(this.getHtmlProps());
 
-        let hidden = htmlProps[ "type" ] === "hidden";
+        const hidden = htmlProps[ "type" ] === "hidden";
 
-        let classList: ClassDictionary = {
+        const classList: ClassDictionary = {
             "input-reset": true,
-            "input-reset-hidden": (!this.isValued() || hidden)
+            "input-reset-hidden": (!this.isValued() || hidden),
         };
 
-        let aProps: any = {};
+        const aProps: any = {};
         if (this.isValued()) {
             aProps[ "onClick" ] = this.resetValue;
+            aProps[ "tabIndex" ] = 0;
+            aProps[ "title"] = this.i18n(this.state.resetTitle, {...this.state});
         }
 
-        let prefixID: string = this.props.id || this.props.name;
+        const prefixID: string = this.props.id || this.props.name;
 
         return (
             <span className={classNames(classList)}
                 role="button"
                 aria-hidden={!this.state.valued}
                 id={prefixID + "ResetButton"}
+                onKeyDown={this.handleResetKeyDown}
             >
                 <a {...aProps}>
-                    <img src={Picto.grey.close} alt={this.i18n("inputField.messageBtn")} title={this.i18n("inputField.messageBtn")} />
+                    <img src={Picto.grey.close} alt={aProps.title} />
                 </a>
             </span>
         );
+    }
+
+    handleResetKeyDown(e: React.KeyboardEvent<HTMLElement>): void {
+        const key: number = e.keyCode;
+        if (key === KeyCodes.ENTER || key === KeyCodes.SPACEBAR) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.resetValue();
+            this.htmlElement.focus();
+        }
     }
 
     /**
@@ -201,6 +244,9 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
         this.htmlElement.value = null;
         if (this.htmlElement && this.htmlElement.onchange) this.htmlElement.onchange();
         fireHornetEvent(VALUE_CHANGED_EVENT.withData(this.htmlElement));
+        if (this.charsCounter) {
+            this.charsCounter.handleTextChange(null);
+        }
         this.setState({ valued: false });
     }
 
@@ -217,10 +263,71 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
             this.setState({ valued: false });
         }
 
-        let htmlProps = this.getHtmlProps();
+        const htmlProps = this.getHtmlProps();
 
         if (_.isFunction(htmlProps[ "onChange" ])) {
             htmlProps[ "onChange" ](e);
         }
+        if (this.charsCounter) {
+            this.charsCounter.handleTextChange(this.htmlElement.value);
+        }
+    }
+
+    /**
+     * Surcharge de la méthode de la classe mère pour ajouter la limite autorisée si le nombre de caractères maximum est défini
+     * et si la props displayMaxCharInLabel est true
+     * @param fieldId 
+     * @param fieldName 
+     * @param label 
+     * @param required 
+     */
+    renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
+        let customLabel = label || "";
+        if (this.props.displayMaxCharInLabel && this.props.maxChar) {
+            customLabel = customLabel.concat(" ").concat(this.i18n("charsCounter.limitLabel", { maxChar: this.props.maxChar }));
+        }
+
+        const urlTheme = this.state.imgFilePath || AbstractField.genUrlTheme();
+        const urlIcoTooltip = urlTheme + this.state.icoToolTip;
+
+        if ((this.state as any).abbr && !this.state.lang) {
+            logger.warn("Field ", fieldName, " Must have lang with abbr configuration");
+        }
+
+        const ariaDescribedby = { "aria-describedby": fieldName + "Tooltip" };
+        const message = this.props.alertMessage || "inputField.alertMessage";
+        const charTitle = this.props.alertTitle || "inputField.alertTitle";
+        const charLabel = this.props.charLabel || "inputField.charLabel";
+
+        return (
+            <div className={this.state.labelClass + " label-container"}>
+                {this.state.displayCharNumber ?
+                    <CharsCounter maxChar={this.props.maxChar}
+                        elementId={this.state.id}
+                        text={this.state.currentValue}
+                        charLabel={charLabel}
+                        alertMessage={message}
+                        showAlert={this.props.showAlert}
+                        alertTitle={charTitle}
+                        ref={(elt) => {
+                            this.charsCounter = elt;
+                        }
+                        } /> : null}
+                <label htmlFor={fieldId} id={fieldName + "Label"}
+                    className="label-content" {...this.state.toolTip ? ariaDescribedby : null}>
+                    {(this.state.abbr) ?
+                        <abbr lang={this.state.lang} title={this.state.abbr}>
+                            <span className="label-abbr" id={fieldName + "-span-label"}>{customLabel}</span>
+                        </abbr> : <span className="label" id={fieldName + "-span-label"}>{customLabel}</span>}
+
+                    {required && this.state.markRequired ?
+                        <span className="label-required"><abbr title={this.getRequiredLabel()}>*</abbr></span> : null}
+
+                    {this.state.toolTip ?
+                        <ToolTip alt={this.state.toolTip} src={urlIcoTooltip} idSpan={fieldName + "Tooltip"} /> : null}
+                </label>
+            </div>
+        );
+
     }
 }

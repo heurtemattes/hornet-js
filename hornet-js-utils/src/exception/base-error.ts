@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,13 +92,13 @@ export class BaseError {
     public message: string;
     public name: string;
     /** Paramètres utilisables dans la construction du message d'erreur correspondant au code */
-    public args: { [key: string]: string };
+    public args: { [ key: string ]: string };
     public err_cause: Error;
     public reportId: string;
     public stack: any;
     public backend: boolean = false;
 
-    constructor(code: string = "", message: string = "", args: { [key: string]: any } = {}, cause?: Error) {
+    constructor(code: string = "", message: string = "", args: { [ key: string ]: any } = {}, cause?: Error) {
         Error.call(this);
 
         this.date = new Date().getTime();
@@ -115,12 +115,12 @@ export class BaseError {
 }
 
 util.inherits(BaseError, Error);
-BaseError.prototype.cause = function() {
+BaseError.prototype.cause = function () {
     return this.err_cause;
 };
 BaseError.prototype.name = "BaseError";
-BaseError.prototype.toString = function() {
-    var str = (this.hasOwnProperty("name") && this.name || this.constructor["name"] || this.constructor.prototype.name);
+BaseError.prototype.toString = function () {
+    let str = (this.hasOwnProperty("name") && this.name || this.constructor[ "name" ] || this.constructor.prototype.name);
     if (this.message) {
         str += ": " + this.message;
     }

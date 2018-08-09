@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,7 +98,7 @@ export interface FooterPageProps extends HornetComponentProps {
 export class FooterPage extends HornetComponent<FooterPageProps, any> {
 
     static defaultProps = {
-        workingZoneWidth: "1200px"
+        workingZoneWidth: "1200px",
     };
 
     constructor(props: FooterPageProps, context?: any) {
@@ -111,8 +111,11 @@ export class FooterPage extends HornetComponent<FooterPageProps, any> {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }
-        this.state.currentWorkingZoneWidth = maxWidth;
-        this.state.classNameExpanded = classNameExpanded;
+        this.state = {
+            ...this.state,
+            currentWorkingZoneWidth: maxWidth,
+            classNameExpanded,
+        };
     }
 
 

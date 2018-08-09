@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,8 +97,8 @@ export class AbstractTest {
      * @param {Error} err : err s'il en existe une
      **/
     public end(err?: Error) {
-       
-        if (http[ "__old_http_request" ] != undefined) {
+
+        if (http[ "__old_http_request" ] !== undefined) {
             (http as any).request = http[ "__old_http_request" ];
             (https as any).request = https[ "__old_https_reques" ];
             delete http[ "__old_http_request" ];
@@ -114,8 +114,8 @@ export class AbstractTest {
      * @param {JSX.Element} element le composant react à insérer
      * @param {string} id l'identifiant du conteneur html dans lequel sera placé cet element
      **/
-    public renderIntoDocument(element: React.ReactElement<any> , id: string) {
-        if (typeof document !== "undefined"){
+    public renderIntoDocument(element: React.ReactElement<any>, id: string) {
+        if (typeof document !== "undefined") {
             let div = document.querySelector("#" + id);
             if (!div) {
                 div = document.createElement("div");
@@ -133,16 +133,17 @@ export class AbstractTest {
     public catchAsyncThrow(done: (any)) {
         // Remove Mocha's error listener
         if (typeof process !== "undefined" && process.listeners) {
-            let originalErrorListeners = process.listeners("error");
+            const originalErrorListeners = process.listeners("uncaughtException");
             process.removeAllListeners("error");
+            process.removeAllListeners("uncaughtException");
 
             // Add your own error listener to check for unhandled exceptions
-            process.on("error", function (e) {
+            process.on("uncaughtException", function (e) {
                 console.log("catchAsyncThrow", e);
                 // Add the original error listeners again
-                process.removeAllListeners("error");
+                process.removeAllListeners("uncaughtException");
                 for (let i = 0; i < originalErrorListeners.length; i += 1) {
-                    process.on("error", originalErrorListeners[ i ]);
+                    process.on("uncaughtException", originalErrorListeners[ i ]);
                 }
                 // For the sake of simplicity we are done after catching the unhandled exception
                 done();
@@ -156,9 +157,16 @@ export class AbstractTest {
      * @param {string} eventType le type d'évènement qu'on souhaite lancer
      **/
     public triggerMouseEvent(node, eventType: string) {
-        let clickEvent = document.createEvent("MouseEvents");
+        const clickEvent = document.createEvent("MouseEvents");
         clickEvent.initEvent(eventType, true, true);
         node.dispatchEvent(clickEvent);
+    }
+
+    /**
+     * Méthode permettant de générer un id aléatoire unique
+     */
+    public generateMainId() {
+        return `main${new Date().getTime()}`;
     }
 
 }

@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -124,7 +124,7 @@ describe.skip("HornetForm", () => {
 
     it.skip("doit afficher les boutons par défaut", () => {
         let $: CheerioStatic = render(() =>
-            <Form id={"form1"}/>);
+            <Form id={"form1"} />);
         expect($("button")).to.exist;
     });
 
@@ -132,11 +132,11 @@ describe.skip("HornetForm", () => {
         let $: CheerioStatic = render(() =>
             <Form id={"form2"}>
                 <Row>
-                    <InputField name="nom"/>
-                    <InputField name="prenom"/>
+                    <InputField name="nom" />
+                    <InputField name="prenom" />
                 </Row>
                 <Row>
-                    <InputField name="date"/>
+                    <InputField name="date" />
                 </Row>
             </Form>);
 

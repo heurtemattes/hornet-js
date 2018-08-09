@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0-rc.4
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,5 +93,8 @@ module.exports = {
         remap: {
             exclude: /src\/extended\/.*.js/
         }
+    },
+    config: {
+        autoGenerateIndex: true
     }
 };

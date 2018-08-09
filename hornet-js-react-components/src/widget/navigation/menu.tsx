@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,6 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { MenuNavigation } from "src/widget/navigation/menu-navigation";
 import * as _ from "lodash";
-import * as classnames from "classnames";
 import * as classNames from "classnames";
 import * as ReactDOM from "react-dom";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -154,17 +153,20 @@ export class Menu extends HornetComponent<MenuProps, any> {
     static defaultProps = {
         closeOnLinkClick: true,
         closeOnClickOutside: true,
-        closeOnTabOutside: true
+        closeOnTabOutside: true,
     };
 
     constructor(props: MenuProps, context?: any) {
         super(props, context);
 
-        this.state.items = this.props.configMenu ? NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(this.props.configMenu), this.user) : NavigationUtils.getFilteredConfigNavigation(NavigationUtils.getConfigMenu(), this.user);
         if (this.props.closeOnClickOutside) this.handleMenuOutsideClick.bind(this);
-        this.state.isMenuActive = false;
 
-        this.handleLayoutExpand();
+        this.state = {
+            ...this.state,
+            ...this.handleLayoutExpand(),
+            items: this.props.configMenu ? NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(this.props.configMenu), this.user) : NavigationUtils.getFilteredConfigNavigation(NavigationUtils.getConfigMenu(), this.user),
+            isMenuActive: false,
+        };
 
         this.listen(UPDATE_PAGE_EXPAND_MENU, this.handleUpatePageMenuExpand);
 
@@ -175,7 +177,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * Change la taille du menu lorque la taille de l'écran est modifiée
      */
     handleResize() {
-        let show = window.innerWidth > showIconSize;
+        const show = window.innerWidth > showIconSize;
         this.setState({ shouldShowIconInfo: show });
     }
 
@@ -190,7 +192,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * @inheritDoc
      */
     componentWillUnmount() {
-        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener("resize", this.handleResize);
         this.remove(MENU_LINK_ACTIVATED, this.handleMajLink);
         this.remove(UPDATE_PAGE_EXPAND_MENU, this.handleUpatePageMenuExpand);
     }
@@ -201,7 +203,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      */
     protected handleKeyDown(event: KeyboardEvent): void {
         /*echap*/
-        let keyCode = event.keyCode;
+        const keyCode = event.keyCode;
         switch (keyCode) {
             case KeyCodes.ESCAPE:
                 this.handleToggleMenu();
@@ -210,12 +212,12 @@ export class Menu extends HornetComponent<MenuProps, any> {
             /*tab si l'element focus n'est pas dans le menu, on ferme celui-ci*/
             case KeyCodes.TAB:
                 if (this.state.closeOnTabOutside) {
-                    let focus = document.activeElement;
-                    let menuMain = document.getElementById("menu-main");
+                    const focus = document.activeElement;
+                    const menuMain = document.getElementById("menu-main");
                     /*le changement de focus passe par le body*/
-                    let body = document.body;
-                    if (menuMain && focus && focus != menuMain && focus != body) {
-                        let inMenu = menuMain.contains(focus);
+                    const body = document.body;
+                    if (menuMain && focus && focus !== menuMain && focus !== body) {
+                        const inMenu = menuMain.contains(focus);
                         if (!inMenu) {
                             this.handleToggleMenu();
                         }
@@ -231,19 +233,19 @@ export class Menu extends HornetComponent<MenuProps, any> {
     render(): JSX.Element {
 
         let classname: any = {};
-        if (typeof window != "undefined") {
+        if (typeof window !== "undefined") {
             classname = {
-                "vertical": this.state.vertical && (window.innerWidth > showIconSize) ? true : false,
-                "menuHaut": true
+                vertical: this.state.vertical && (window.innerWidth > showIconSize) ? true : false,
+                menuHaut: true,
             };
         } else {
             classname = {
-                "vertical": this.state.vertical,
-                "menuHaut": true
+                vertical: this.state.vertical,
+                menuHaut: true,
             };
         }
 
-        let menuAttributes: HTMLAttributes<HTMLElement> = {};
+        const menuAttributes: HTMLAttributes<HTMLElement> = {};
         menuAttributes.className = classNames(classname);
 
         return (
@@ -260,21 +262,21 @@ export class Menu extends HornetComponent<MenuProps, any> {
      */
     protected renderMenuButton(): JSX.Element {
 
-        let buttonClasses = {
+        const buttonClasses = {
             toggler: true,
-            "is-active": this.state.isMenuActive
+            "is-active": this.state.isMenuActive,
         };
 
         return (
-            <button className={classnames(buttonClasses)}
-                    onClick={this.handleToggleMenu.bind(this)}
-                    aria-controls="menu-container"
-                    aria-expanded={this.state.isMenuActive}
-                    aria-haspopup={true}
-                    ref={(button) => {
+            <button className={classNames(buttonClasses)}
+                onClick={this.handleToggleMenu}
+                aria-controls="menu-container"
+                aria-expanded={this.state.isMenuActive}
+                aria-haspopup={true}
+                ref={(button) => {
                     this.burgerIcon = button;
                 }}
-                    type={"button"}
+                type={"button"}
             >
                 <span>{this.state.isMenuActive ? this.i18n("menu.closeMenu") : this.i18n("menu.openMenu")}</span>
             </button>
@@ -303,26 +305,26 @@ export class Menu extends HornetComponent<MenuProps, any> {
     protected renderNavigationMenu(): JSX.Element {
 
         if (this.state.isMenuActive) {
-            let body = document.body;
+            const body = document.body;
             body.classList.add("noscroll");
         }
 
         let shouldShowIconInfo = this.state.shouldShowIconInfo;
-        if (typeof shouldShowIconInfo == "undefined") {
+        if (typeof shouldShowIconInfo === "undefined") {
             shouldShowIconInfo = window.innerWidth > showIconSize;
         }
 
         return (
             <div className="menu-container" id="menu-container">
                 {this.props.closeOnClickOutside ? <div className="menu-overlay"
-                    onClick={this.handleToggleMenu.bind(this)}></div> : null}
+                    onClick={this.handleToggleMenu}></div> : null}
 
                 <div className={"menu-content " + this.state.classNameExpanded}
                     style={{ maxWidth: this.state.currentWorkingZoneWidth }}>
                     {this.state.showIconInfo && shouldShowIconInfo ? <MenuInfoAccessibilite /> : null}
                     <MenuNavigation items={this.state.items}
                         isVisible={this.state.isMenuActive}
-                        closeMenu={this.handleToggleMenu.bind(this)}
+                        closeMenu={this.handleToggleMenu}
                         dataPassThru={this.props.dataPassThru}
                         closeOnLinkClick={this.props.closeOnLinkClick} />
                 </div>
@@ -333,33 +335,35 @@ export class Menu extends HornetComponent<MenuProps, any> {
     /**
      * Action permettant d'afficher/masquer le menu
      */
-    handleToggleMenu() {
-
-        var body = document.body;
+    handleToggleMenu = () => {
+        const body = document.body;
         body.classList.remove("noscroll");
-        let active = !this.state.isMenuActive;
+        const active = !this.state.isMenuActive;
         if (!active) {
             document.removeEventListener("keydown", this.handleKeyDown, false);
         } else {
             document.addEventListener("keydown", this.handleKeyDown, false);
         }
-
+        
         if (this.state.onToggleClick) {
             this.state.onToggleClick();
         }
-        this.setState({ isMenuActive: active });
+        this.setState({ isMenuActive: active }, () => {
+            if(this.burgerIcon) {
+                this.burgerIcon.focus();
+            }
+        });
     }
 
 
     componentDidUpdate() {
-        //gestion de levent click ua chargement de la page
+        // gestion de levent click ua chargement de la page
         if (typeof document !== undefined && this.props.closeOnClickOutside) {
             if (!this.state.isMenuActive) {
                 document.removeEventListener("click", this.handleMenuOutsideClick, false);
             } else {
                 document.addEventListener("click", this.handleMenuOutsideClick, false);
             }
-
         }
     }
 
@@ -380,8 +384,11 @@ export class Menu extends HornetComponent<MenuProps, any> {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }
-        this.state.currentWorkingZoneWidth = maxWidth;
-        this.state.classNameExpanded = classNameExpanded;
+
+        return {
+            currentWorkingZoneWidth: maxWidth,
+            classNameExpanded,
+        };
     }
 
     protected handleMajLink() {
@@ -389,8 +396,9 @@ export class Menu extends HornetComponent<MenuProps, any> {
     }
 
     protected handleUpatePageMenuExpand() {
-        this.handleLayoutExpand();
-        this.setState({ maj: true });
+        const infos: any = this.handleLayoutExpand();
+        infos.maj = true;
+        this.setState(infos);
     }
 
 }

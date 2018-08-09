@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@
 
 import Bean from "hornet-js-bean/src/decorators/Bean";
 import Map from "hornet-js-bean/src/decorators/Map";
-import {Adress} from "./adress";
+import { Adress } from "./adress";
 
 
 export class ForeignUser {
@@ -90,7 +90,7 @@ export class ForeignUser {
   name;
   password;
   comments;
-  list : Array<ForeignAdress>;
+  list: Array<ForeignAdress>;
   adress;
 }
 
@@ -98,6 +98,6 @@ export class ForeignAdress {
   id;
   label;
   comment;
-};
+}
 
 

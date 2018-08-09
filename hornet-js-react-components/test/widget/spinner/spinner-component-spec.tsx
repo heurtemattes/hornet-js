@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -99,7 +99,7 @@ import { TestUtils } from "hornet-js-test/src/test-utils";
 import { ReactTestUtils } from "hornet-js-test/src/react-test-utils";
 import * as React from "react";
 import { SpinnerComponent } from "src/widget/spinner/spinner-component";
-import { ASYNCHRONOUS_REQUEST_EVENT_COMPONENT} from "hornet-js-core/src/event/hornet-event";
+import { ASYNCHRONOUS_REQUEST_EVENT_COMPONENT } from "hornet-js-core/src/event/hornet-event";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { ServiceEvent } from "hornet-js-core/src/event/hornet-event";
 import { Utils } from "hornet-js-utils";
@@ -127,7 +127,7 @@ describe.skip("SpinnerComponentReactComponent", () => {
 
         // Act
         let $ = render(() =>
-                <SpinnerComponent isVisible={true} />);
+            <SpinnerComponent isVisible={true} />);
 
         //broadcast levent qui permet le declenchement du spinner
         // var evt = window.document.createEvent("CustomEvent");
@@ -135,7 +135,7 @@ describe.skip("SpinnerComponentReactComponent", () => {
         // window.dispatchEvent(evt);
 
         // console.error(">>>>>>>>>>>>> $", $.html());
-        let $rootElt = $("div[class='"+defaultclassName+"']");
+        let $rootElt = $("div[class='" + defaultclassName + "']");
 
         // Assert
         // expect($rootElt).to.exist;

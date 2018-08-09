@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,7 +102,7 @@ import {
     ReactWheelDOMAttributes,
     ReactAnimationDOMAttributes,
     ReactTransitionDOMAttributes,
-    ReactBasicDOMAttributes
+    ReactBasicDOMAttributes,
 } from "src/widget/form/abstract-field";
 
 
@@ -152,7 +152,7 @@ export const HTML_STANDARD_CONFIG_ATTRIBUTES: HTMLStandardConfigAttributes = {
     summary: "",
     target: "",
     type: "",
-    useMap: ""
+    useMap: "",
 };
 
 export const HTML_STANDARD_FORM_ATTRIBUTES: HTMLStandardFormAttributes = {
@@ -164,7 +164,7 @@ export const HTML_STANDARD_FORM_ATTRIBUTES: HTMLStandardFormAttributes = {
     formTarget: "",
     noValidate: true,
     required: true,
-    wrap: ""
+    wrap: "",
 };
 
 export const HTML_STANDARD_GLOBAL_ATTRIBUTES: HTMLStandardGlobalAttributes = {
@@ -181,7 +181,7 @@ export const HTML_STANDARD_GLOBAL_ATTRIBUTES: HTMLStandardGlobalAttributes = {
     spellCheck: true,
     style: null,
     tabIndex: 1,
-    title: ""
+    title: "",
 };
 
 export const HTML_STANDARD_MEDIA_ATTRIBUTES: HTMLStandardMediaAttributes = {
@@ -204,12 +204,12 @@ export const HTML_STANDARD_MEDIA_ATTRIBUTES: HTMLStandardMediaAttributes = {
     src: "",
     srcLang: "",
     srcSet: "",
-    wmode: ""
+    wmode: "",
 };
 
 export const HTML_STANDARD_META_ATTRIBUTES: HTMLStandardMetaAttributes = {
     content: "",
-    httpEquiv: ""
+    httpEquiv: "",
 };
 
 export const HTML_STANDARD_PRESENTATION_ATTRIBUTES: HTMLStandardPresentationAttributes = {
@@ -240,7 +240,7 @@ export const HTML_STANDARD_PRESENTATION_ATTRIBUTES: HTMLStandardPresentationAttr
     srcDoc: "",
     start: 1,
     step: "",
-    width: ""
+    width: "",
 };
 
 export const HTML_RDFA_ATTRIBUTES: HTMLRDFaAttributes = {
@@ -251,7 +251,7 @@ export const HTML_RDFA_ATTRIBUTES: HTMLRDFaAttributes = {
     property: "",
     resource: "",
     typeof: "",
-    vocab: ""
+    vocab: "",
 };
 
 export const HTML_NON_STANDARD_ATTRIBUTES: HTMLNonStandardAttributes = {
@@ -266,41 +266,41 @@ export const HTML_NON_STANDARD_ATTRIBUTES: HTMLNonStandardAttributes = {
     itemRef: "",
     results: 1,
     security: "",
-    unselectable: true
+    unselectable: true,
 };
 
 export const REACT_CLIPBOARD_DOM_ATTRIBUTES: ReactClipboardDOMAttributes = {
     onCopy: null,
     onCut: null,
-    onPaste: null
+    onPaste: null,
 };
 
 export const REACT_COMPOSE_DOM_ATTRIBUTES: ReactComposeDOMAttributes = {
     onCompositionEnd: null,
     onCompositionStart: null,
-    onCompositionUpdate: null
+    onCompositionUpdate: null,
 };
 
 export const REACT_FOCUS_DOM_ATTRIBUTES: ReactFocusDOMAttributes = {
     onFocus: null,
-    onBlur: null
+    onBlur: null,
 };
 
 export const REACT_FORM_DOM_ATTRIBUTES: ReactFormDOMAttributes = {
     onChange: null,
     onInput: null,
-    onSubmit: null
+    onSubmit: null,
 };
 
 export const REACT_IMAGE_DOM_ATTRIBUTES: ReactImageDOMAttributes = {
     onLoad: null,
-    onError: null
+    onError: null,
 };
 
 export const REACT_KEYBOARD_DOM_ATTRIBUTES: ReactKeyboardDOMAttributes = {
     onKeyDown: null,
     onKeyPress: null,
-    onKeyUp: null
+    onKeyUp: null,
 };
 
 export const REACT_MEDIA_DOM_ATTRIBUTES: ReactMediaDOMAttributes = {
@@ -325,7 +325,7 @@ export const REACT_MEDIA_DOM_ATTRIBUTES: ReactMediaDOMAttributes = {
     onSuspend: null,
     onTimeUpdate: null,
     onVolumeChange: null,
-    onWaiting: null
+    onWaiting: null,
 };
 
 export const REACT_BASIC_MOUSE_DOM_ATTRIBUTES: ReactBasicMouseDOMAttributes = {
@@ -338,7 +338,7 @@ export const REACT_BASIC_MOUSE_DOM_ATTRIBUTES: ReactBasicMouseDOMAttributes = {
     onMouseMove: null,
     onMouseOut: null,
     onMouseOver: null,
-    onMouseUp: null
+    onMouseUp: null,
 };
 
 export const REACT_DRAG_DOM_ATTRIBUTES: ReactDragDOMAttributes = {
@@ -349,36 +349,36 @@ export const REACT_DRAG_DOM_ATTRIBUTES: ReactDragDOMAttributes = {
     onDragLeave: null,
     onDragOver: null,
     onDragStart: null,
-    onDrop: null
+    onDrop: null,
 };
 
 export const REACT_SELECT_DOM_ATTRIBUTES: ReactSelectDOMAttributes = {
-    onSelect: null
+    onSelect: null,
 };
 
 export const REACT_TOUCH_DOM_ATTRIBUTES: ReactTouchDOMAttributes = {
     onTouchCancel: null,
     onTouchEnd: null,
     onTouchMove: null,
-    onTouchStart: null
+    onTouchStart: null,
 };
 
 export const REACT_SCROLL_DOM_ATTRIBUTES: ReactScrollDOMAttributes = {
-    onScroll: null
+    onScroll: null,
 };
 
 export const REACT_WHEEL_DOM_ATTRIBUTES: ReactWheelDOMAttributes = {
-    onWheel: null
+    onWheel: null,
 };
 
 export const REACT_ANIMATION_DOM_ATTRIBUTES: ReactAnimationDOMAttributes = {
     onAnimationStart: null,
     onAnimationEnd: null,
-    onAnimationIteration: null
+    onAnimationIteration: null,
 };
 
 export const REACT_TRANSITION_DOM_ATTRIBUTES: ReactTransitionDOMAttributes = {
-    onTransitionEnd: null
+    onTransitionEnd: null,
 };
 
 export const REACT_BASIC_DOM_ATTRIBUTES: ReactBasicDOMAttributes = {};
@@ -435,4 +435,4 @@ export class HtmlAttributes {
     static REACT_TRANSITION_DOM_ATTRIBUTES: ReactTransitionDOMAttributes = REACT_TRANSITION_DOM_ATTRIBUTES;
 
     static REACT_BASIC_DOM_ATTRIBUTES: ReactBasicDOMAttributes = REACT_BASIC_DOM_ATTRIBUTES;
-};
+}

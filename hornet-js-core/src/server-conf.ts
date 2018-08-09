@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -179,5 +179,15 @@ export interface ServerConfiguration {
      */
     httpsOptions?: https.ServerOptions;
 
+    /**
+     * inclusion automatique des champs du CLS.
+     * On exclue tout les champs et inclue seulement ceux précisés.
+     */
+    includeClsKey?:{[key: string]: string[]};
 
+    /**
+     * inclusion automatique des champs de la session.
+     * On exclue tout les champs et inclue seulement ceux précisés.
+     */
+    includeSessionKey?:{[key: string]: string[]};
 }

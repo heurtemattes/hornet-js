@@ -73,20 +73,21 @@ declare module "hornet-js-passport/src/authentication-configuration" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
 	export class AuthenticationtConfiguration {
 	    appLoginPath: string;
 	    appLogoutPath: string;
+	    idpSessionTimeout: boolean;
 	    /**
-	     * Instanciation de la configuration pour un appel CAS direct depuis l'application
+	     * Instanciation de la configuration pour une identification SAML depuis l'application
 	     *
 	     * @param appLoginPath path relatif de l'application déclenchant le process de connexion
 	     * @param appLogoutPath path relatif de l'application déclenchant le process de déconnexion
 	     */
-	    constructor(appLoginPath: string, appLogoutPath: string);
+	    constructor(appLoginPath: string, appLogoutPath: string, idpSessionTimeout?: boolean);
 	}
 	
 }
@@ -199,12 +200,13 @@ declare module "hornet-js-passport/src/passport-authentication" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
 	import { Class } from "hornet-js-utils/src/typescript-utils";
 	import { AbstractHornetMiddleware } from "hornet-js-core/src/middleware/middlewares";
+	import { Request } from "express";
 	import { AuthenticationtConfiguration }  from "hornet-js-passport/src/authentication-configuration";
 	import { AuthenticationStrategy }  from "hornet-js-passport/src/strategy/authentication-strategy";
 	export class PassportAuthentication {
@@ -240,12 +242,90 @@ declare module "hornet-js-passport/src/passport-authentication" {
 	     * @param {Request} req requete http eténdu par passport
 	     * @return l'utilisateur
 	     */
-	    private getUser(req);
+	    protected getUser(req: Request): any;
 	}
 	
 }
 
 declare module "hornet-js-passport/src/user" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-passport - Gestion d'authentification
+	 *
+	 * @author
+	 * @version v5.2.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license
+	 */
 	export interface IUSer {
 	    getName(): string;
 	    setName(name: string): void;
@@ -257,8 +337,8 @@ declare module "hornet-js-passport/src/user" {
 	    setName(name: string): void;
 	}
 	export class User implements IUSer {
-	    private name;
-	    private roles;
+	    protected name: string;
+	    protected roles: Array<IRole>;
 	    constructor(name?: string, roles?: Array<IRole>);
 	    getName(): string;
 	    setName(name: string): void;
@@ -266,7 +346,7 @@ declare module "hornet-js-passport/src/user" {
 	    setRoles(roles: Array<IRole>): void;
 	}
 	export class Role implements IRole {
-	    private name;
+	    protected name: string;
 	    constructor(name?: string);
 	    getName(): string;
 	    setName(name: string): void;
@@ -349,7 +429,7 @@ declare module "hornet-js-passport/src/strategy/authentication-strategy" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -456,7 +536,7 @@ declare module "hornet-js-passport/src/strategy/cas/cas-configuration" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -489,7 +569,7 @@ declare module "hornet-js-passport/src/strategy/cas/cas-strategy" {
 	import { AuthenticationStrategy }  from "hornet-js-passport/src/strategy/authentication-strategy";
 	import { Request, Response } from "express";
 	export class CasStrategy implements AuthenticationStrategy {
-	    private _name;
+	    protected _name: string;
 	    protected static optionXml: any;
 	    protected configuration: CasConfiguration;
 	    protected verifyAuthentication: any;
@@ -506,7 +586,7 @@ declare module "hornet-js-passport/src/strategy/cas/cas-strategy" {
 	     * Traitement de la réponse à la validation du ticket CAS
 	     * @param casBody reponse du CAS à parser
 	     */
-	    private validateCasResponse(casBody);
+	    protected validateCasResponse(casBody: any): void;
 	    /**
 	     * Récupérer les informations de l"utilisateur :
 	     * dans la stratégie cas par défaut, c"est une version qui retourne le login
@@ -534,7 +614,7 @@ declare module "hornet-js-passport/src/strategy/cas/cas-strategy" {
 	     * @override
 	     */
 	    disconnect(passport: any, req: Request, res: Response, next: (err?: Error) => void): void;
-	    private manageRedirectToCas(req, res);
+	    protected manageRedirectToCas(req: Request, res: Response): any;
 	    /**
 	     * @override
 	     */
@@ -618,7 +698,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-configuration" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
@@ -631,7 +711,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-configuration" {
 	    hostUrlReturnTo: string;
 	    availableIdp: IdentityProviderProps[];
 	    issuer: string;
-	    profilSeparator: String;
+	    profilSeparator: string;
 	    identifierFormat: string;
 	    decryptionPvk: string;
 	    privateCert: string;
@@ -648,6 +728,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-configuration" {
 	    passReqToCallback: boolean;
 	    authnRequestBinding: string;
 	    connexionComponent: any;
+	    isMetadataAccessible: boolean;
 	    /**
 	     *
 	     * @param appLoginPath path relatif de l'application déclenchant le process de connexion
@@ -657,7 +738,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-configuration" {
 	     * @param privateCert
 	     * @param availableIdp
 	     */
-	    constructor(appLoginPath: string, appLogoutPath: string, hostUrlReturnTo: string, issuer: string, certSignature: string, privateCert: string, availableIdp: IdentityProviderProps[], verifyFunction?: Function);
+	    constructor(appLoginPath: string, appLogoutPath: string, hostUrlReturnTo: string, issuer: string, certSignature: string, privateCert: string, availableIdp: IdentityProviderProps[], isMetadataAccessible?: boolean, verifyFunction?: Function);
 	}
 	/**
 	 * Interface IDP
@@ -749,12 +830,12 @@ declare module "hornet-js-passport/src/strategy/saml/saml-strategy" {
 	 * hornet-js-passport - Gestion d'authentification
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license
 	 */
 	import { AuthenticationStrategy }  from "hornet-js-passport/src/strategy/authentication-strategy";
-	import { Saml } from "hornet-js-passport/src/strategy/saml/saml";
+	import { Saml }  from "hornet-js-passport/src/strategy/saml/saml";
 	import { SamlConfiguration, IdentityProviderProps } from "hornet-js-passport/src/strategy/saml/saml-configuration";
 	import { Request, Response } from "express";
 	export class SamlStrategy implements AuthenticationStrategy {
@@ -768,8 +849,8 @@ declare module "hornet-js-passport/src/strategy/saml/saml-strategy" {
 	    entryPoint: string;
 	    certChiffrement: string;
 	    certSignature: string;
-	    private connexionComponent;
-	    private appCert;
+	    protected connexionComponent: any;
+	    protected appCert: string;
 	    protected configuration: SamlConfiguration;
 	    constructor(options: SamlConfiguration, valid?: Function);
 	    /**
@@ -785,6 +866,14 @@ declare module "hornet-js-passport/src/strategy/saml/saml-strategy" {
 	     * @returns {Array}
 	     */
 	    formateRoles(profils: any): any[];
+	    /**
+	     * Formattage de la chaine de caractère des profils => transformation en tableau d'objets
+	     * Suppression des ' ', '[', ']' et split avec le separateur.
+	     * @param profils
+	     * @param separator
+	     * @returns {Array}
+	     */
+	    static formateRoles(profils: string, separator: string): any[];
 	    authenticate(req: any, options: any): any;
 	    /**
 	     * Méthode permettant de setter les IDP
@@ -797,7 +886,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml-strategy" {
 	     * Permet de faire le rendu HTML de l'écran de sélection d'un IDP
 	     * @returns {string}
 	     */
-	    private renderMultiIdpPage();
+	    protected renderMultiIdpPage(): string;
 	    /**
 	     * Déconnexion
 	     * @param req
@@ -947,7 +1036,7 @@ declare module "hornet-js-passport/src/strategy/saml/saml" {
 	     * @param xml
 	     * @param callback
 	     */
-	    protected processValidlySignedAssertion(xml: string, callback: any): void;
+	    protected processValidlySignedAssertion(xml: string, callback: any, SAMLResponse: any): void;
 	    /**
 	     *
 	     * @param nowMs
@@ -1054,10 +1143,10 @@ declare module "hornet-js-passport/src/strategy/saml/views/cnx/thumbnail-css" {
 	        textAlign: string;
 	    };
 	    appWidth: {
-	        "maxWidth": string;
+	        maxWidth: string;
 	    };
 	    header: {
-	        "paddingTop": string;
+	        paddingTop: string;
 	    };
 	};
 	

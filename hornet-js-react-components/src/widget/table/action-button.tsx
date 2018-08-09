@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,7 +92,7 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.
  */
 export enum TypeAction {
     ACTION_MASSE = 1,
-    ACTION_UNITAIRE = 2
+    ACTION_UNITAIRE = 2,
 }
 
 export interface ActionButtonProps extends ButtonProps {
@@ -108,7 +108,7 @@ export interface ActionButtonProps extends ButtonProps {
     selectedItems?: any;
     items?: any[];
     onKeyDown?: any;
-    displayedWithoutResult?:boolean;
+    displayedWithoutResult?: boolean;
 }
 
 export interface ActionButtonState extends ButtonState {
@@ -118,7 +118,7 @@ export interface ActionButtonState extends ButtonState {
 export class ActionButton<P extends ActionButtonProps, S extends ActionButtonState> extends Button<ActionButtonProps, ActionButtonState> {
 
     static defaultProps = _.assign(Button.defaultProps, {
-        displayedWithoutResult: false
+        displayedWithoutResult: false,
     });
 
     public state: S;
@@ -142,40 +142,40 @@ export class ActionButton<P extends ActionButtonProps, S extends ActionButtonSta
     render(): JSX.Element {
         logger.trace("render actionButtons");
 
-        let classes: ClassDictionary = {};
+        const classes: ClassDictionary = {};
         if (this.props.className) {
-            classes[this.props.className] = true;
+            classes[ this.props.className ] = true;
         }
 
-        classes["picto-svg"] = true;
-        classes["button-action"] = true;
+        classes[ "picto-svg" ] = true;
+        classes[ "button-action" ] = true;
 
         let img = null;
         if (typeof this.props.srcImg === "string") {
             img = <img
                 src={this.props.srcImg}
                 className={this.props.classNameImg}
-                alt={this.props.title}/>;
+                alt={this.props.title} />;
         } else {
             img = this.props.srcImg;
         }
 
         let keyDownFunction = null;
-        if(this.props.onKeyDown) {
+        if (this.props.onKeyDown) {
             keyDownFunction = (e) => {
-                this.props.onKeyDown(e, this.props.onClick || this.onClick)
-            }
+                this.props.onKeyDown(e, this.props.onClick || this.onClick);
+            };
         }
 
 
         return (
             this.state.visible ?
                 <a href={this.props.url || "#"}
-                   className={classNames(classes)}
-                   title={this.props.title}
-                   onClick={this.props.onClick || this.onClick}
-                   onKeyDown={keyDownFunction}
-                   aria-haspopup={this.props.hasPopUp}
+                    className={classNames(classes)}
+                    title={this.props.title}
+                    onClick={this.props.onClick || this.onClick}
+                    onKeyDown={keyDownFunction}
+                    aria-haspopup={this.props.hasPopUp}
                 >
                     {img}
                     <span className="hidden-label">{this.props.title}</span>

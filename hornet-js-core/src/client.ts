@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -213,7 +213,7 @@ export class Client {
 
             Utils.setCls("hornet.appConfig", appConfig);
             // instanciation du router
-            var router = new RouterClient(appConfig.appComponent, appConfig.errorComponent, (appConfig as any).defaultRoutesClass, appConfig.routesLoaderfn);
+            var router = new RouterClient(appConfig.appComponent, appConfig.errorComponent, (appConfig as any).defaultRoutesClass, appConfig.routesLoaderfn, appConfig.directorClientConfiguration, appConfig.userAccessSecurityElement);
             window.router = router;
 
             // cas particulier de l'init : on démarre le moteur de rendu lorsque le router a déterminé le composant à rendre

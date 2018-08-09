@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,11 +82,11 @@
  * Représente un fichier uploadé
  */
 export class UploadedFile {
-    id:number;
-    originalname:string;
-    name:string;
-    mimeType:string;
-    encoding:string;
-    size:number;
-    buffer:Array<number>;
+    id: number;
+    originalname: string;
+    name: string;
+    mimeType: string;
+    encoding: string;
+    size: number;
+    buffer: Array<number>;
 }

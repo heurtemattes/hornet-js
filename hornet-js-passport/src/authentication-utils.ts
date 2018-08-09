@@ -73,13 +73,13 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
 import * as _ from "lodash";
-import {Utils} from "hornet-js-utils";
+import { Utils } from "hornet-js-utils";
 
 export class AuthenticationUtils {
 
@@ -101,8 +101,8 @@ export class AuthenticationUtils {
      * @returns {boolean}
      */
     public static isServiceRequest(req): boolean {
-        var parseUrl = require("parseurl");
-        var oUrl = parseUrl.original(req);
+        const parseUrl = require("parseurl");
+        const oUrl = parseUrl.original(req);
 
         return _.startsWith(oUrl.pathname, Utils.buildContextPath(Utils.config.getOrDefault("fullSpa.name", "/services")));
     }
@@ -114,7 +114,7 @@ export class AuthenticationUtils {
      * @returns {boolean} true si correspond.
      */
     public static isUrl(req, testUrl: string): boolean {
-        var originalUrl = require("parseurl").original(req);
+        const originalUrl = require("parseurl").original(req);
 
         if (originalUrl && originalUrl.pathname && originalUrl.pathname === testUrl) {
             return true;
@@ -137,7 +137,7 @@ export class AuthenticationUtils {
         let query = "?";
 
         Object.keys(params).map((key, i) => {
-            query += (i == 0) ? key + "=" + params[key] : "&" + key + "=" + params[key];
+            query += (i === 0) ? key + "=" + params[ key ] : "&" + key + "=" + params[ key ];
         });
 
         return query;

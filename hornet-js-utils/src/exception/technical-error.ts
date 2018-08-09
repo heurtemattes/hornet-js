@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,18 +83,25 @@ import * as moment from "moment-timezone";
 import * as os from "os";
 
 export class TechnicalError extends BaseError {
-    constructor(code: string = "ERR_TECH_UNKNOWN", args?: { [key: string]: any }, cause?: Error) {
+    
+    type: string = "TechnicalException";
+    httpStatus: number;
+    
+    constructor(code: string = "ERR_TECH_UNKNOWN", args?: { [ key: string ]: any }, cause?: Error) {
         super(code, undefined, args, cause);
         this.name = "TechnicalError";
 
-        if (args && args["reportId"]) {
+        if (args && args[ "reportId" ]) {
             // Dans le cas d'une erreur technique côté backend > on propage le reportId du backend
-            this.reportId = args["reportId"];
+            this.reportId = args[ "reportId" ];
         }
 
-        if (!this.args["reportId"]) {
+        if (!this.args[ "reportId" ]) {
             // Dans le cas d'une erreur technique côté JS > on génère un reportId en JS
-            this.reportId = this.args["reportId"] = "F-" + (process.pid ? process.pid.toString() : "browser") + "@" + os.hostname() + "-" + moment(new Date()).format("YYMMDDHHmmssSSS") + "-" + parseInt((Math.random() * 1000) + "");
+            this.reportId = this.args[ "reportId" ] = "F-" + (process.pid ? process.pid.toString() : "browser") 
+            + "@" + os.hostname() + "-" + moment(new Date()).format("YYMMDDHHmmssSSS") + "-" + parseInt((Math.random() * 1000) + "", 10);
         }
+        this.httpStatus = 500;
     }
+
 }

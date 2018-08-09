@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,6 +88,7 @@ import { HornetComponent } from "src/widget/component/hornet-component";
 export interface RowProps extends HornetComponentProps {
     /** Nom(s) de classe(s) CSS à utiliser. Séparés par un espace lorsqu'il y a plusieurs noms */
     className?: string;
+    fraction?: number;
 }
 
 /**
@@ -97,7 +98,7 @@ export class Row extends HornetComponent<RowProps, any> {
 
     /** Propriétés par défaut */
     static defaultProps = {
-        className: "grid"
+        className: "grid",
     };
 
     /**
@@ -118,7 +119,7 @@ export class Row extends HornetComponent<RowProps, any> {
      * @returns {Row} ce composant
      */
     setClassName(className: string, callback?: () => any): this {
-        this.setState({ className: className }, callback);
+        this.setState({ className }, callback);
         return this;
     }
 
@@ -128,17 +129,17 @@ export class Row extends HornetComponent<RowProps, any> {
     protected getPureChildFraction(): number {
         let fraction: number = 0;
         React.Children.forEach(this.state.children,
-            (child: React.ReactChild) => {
+                               (child: React.ReactChild) => {
                 let childSpan = 1;
                 if (child && (child as React.ReactElement<any>).props) {
                     if ((child as React.ReactElement<any>).props.groupClass) {
-                        let classTab = (child as React.ReactElement<any>).props.groupClass.split("-");
+                        const classTab = (child as React.ReactElement<any>).props.groupClass.split("-");
                         (classTab.length && (classTab.length - 1) && !isNaN(classTab[ classTab.length - 1 ])) ?
                             childSpan = classTab[ classTab.length - 1 ] : 1;
                     }
                     fraction += Number(childSpan);
                 }
-            }
+            },
         );
         return fraction;
     }
@@ -148,9 +149,15 @@ export class Row extends HornetComponent<RowProps, any> {
      */
     render(): JSX.Element {
         /* Affecte automatiquement la classe pure css aux noeuds enfants qui n'en ont pas */
-        let fraction: number = this.getPureChildFraction();
-        let className = "has-gutter " + this.state.className;
-        if (fraction != 1) {
+        const fraction: number = this.props.fraction || this.getPureChildFraction();
+        let className = "";
+        if(!this.props.fraction) {
+            className = "has-gutter ";
+        } else {
+            className = "fraction ";
+        }
+        className += this.state.className
+        if (fraction !== 1) {
             className += "-" + fraction;
         }
         return (
@@ -160,15 +167,15 @@ export class Row extends HornetComponent<RowProps, any> {
                     (child: React.ReactChild, i) => {
                         if (child && (child as React.ReactElement<any>).props && (child as React.ReactElement<any>).props.name) {
                             // définition des props des champs de formulaire enfants
-                            let childPropsSetByParent = {
-                                groupClass: (child as React.ReactElement<any>).props.groupClass || ""
+                            const childPropsSetByParent = {
+                                groupClass: (child as React.ReactElement<any>).props.groupClass || "",
                             };
 
                             return React.cloneElement(child as React.ReactElement<any>, childPropsSetByParent);
                         } else {
                             return child;
                         }
-                    }
+                    },
                 )}
             </div>
         );

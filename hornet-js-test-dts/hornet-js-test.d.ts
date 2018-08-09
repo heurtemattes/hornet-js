@@ -73,7 +73,7 @@ declare module "hornet-js-test/src/abstract-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -96,7 +96,7 @@ declare module "hornet-js-test/src/abstract-test" {
 	     * @param {JSX.Element} element le composant react à insérer
 	     * @param {string} id l'identifiant du conteneur html dans lequel sera placé cet element
 	     **/
-	    renderIntoDocument(element: React.ReactElement<any>, id: string): void | Element | React.Component<any, React.ComponentState>;
+	    renderIntoDocument(element: React.ReactElement<any>, id: string): void | Element | React.Component<any, React.ComponentState, any>;
 	    /**
 	     * Fonction qui permet de catcher une exception pour un traitement asynchrone.
 	     * @param {any} done fonction de fin de test.
@@ -108,6 +108,10 @@ declare module "hornet-js-test/src/abstract-test" {
 	     * @param {string} eventType le type d'évènement qu'on souhaite lancer
 	     **/
 	    triggerMouseEvent(node: any, eventType: string): void;
+	    /**
+	     * Méthode permettant de générer un id aléatoire unique
+	     */
+	    generateMainId(): string;
 	}
 	
 }
@@ -187,7 +191,7 @@ declare module "hornet-js-test/src/base-mocha-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -195,7 +199,7 @@ declare module "hornet-js-test/src/base-mocha-test" {
 	/**
 	 * classe abstraite de Test
 	 */
-	export class BaseMochaTest<P> extends AbstractTest {
+	export class BaseMochaTest extends AbstractTest {
 	    constructor();
 	    end(err?: Error): void;
 	}
@@ -277,7 +281,7 @@ declare module "hornet-js-test/src/base-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -288,7 +292,7 @@ declare module "hornet-js-test/src/base-test" {
 	 */
 	export class BaseTest extends AbstractTest {
 	    /** Gestionnaire de déclenchements d'évenements */
-	    private _eventEmitter;
+	    protected _eventEmitter: events.EventEmitter;
 	    catchAsyncThrow(done: (any)): void;
 	    readonly eventEmitter: events.EventEmitter;
 	}
@@ -370,7 +374,7 @@ declare module "hornet-js-test/src/decorators" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -480,11 +484,12 @@ declare module "hornet-js-test/src/hornet-react-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { BaseTest } from "hornet-js-test/src/base-test";
+	import 'intl/locale-data/jsonp/fr';
 	/**
 	 * classe abstraite de Test pour les composants React
 	 */
@@ -505,7 +510,7 @@ declare module "hornet-js-test/src/hornet-react-test" {
 	     * @param keyCode
 	     * @param changeValue
 	     */
-	    protected triggerKeydownEvent(element: any, valueKey: string, keyCode: number, changeValue?: boolean): void;
+	    protected triggerKeydownEvent(element: any, valueKey: string, keyCodeParam: number, changeValue?: boolean): void;
 	    /**
 	     * Fonction déclenchant un keypress event sur un élement du DOM
 	     * @param element element du DOM
@@ -513,7 +518,7 @@ declare module "hornet-js-test/src/hornet-react-test" {
 	     * @param keyCode
 	     * @param changeValue
 	     */
-	    protected triggerKeyPressEvent(element: any, valueKey: string, keyCode?: number, changeValue?: boolean): void;
+	    protected triggerKeyPressEvent(element: any, valueKey: string, keyCodeParam?: number, changeValue?: boolean): void;
 	    /**
 	     * Fonction pour la prise de focus sur un élement du DOM
 	     * @param element élément du DOM
@@ -529,7 +534,7 @@ declare module "hornet-js-test/src/hornet-test-assert" {
 	 *
 	 * @class HornetTestAssert
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 *
@@ -587,6 +592,14 @@ declare module "hornet-js-test/src/hornet-test-assert" {
 	     * @param {string} message
 	     */
 	    static assertLesserThan(reference: any, actual: any, message: string): void;
+	    /**
+	     * Prépare le message d'erreur pour des asserts d'égalité
+	     * @param actual
+	     * @param expected
+	     * @param {string} message
+	     * @returns {string}
+	     */
+	    private static messageManager(actual, expected, message);
 	}
 	
 }
@@ -758,7 +771,7 @@ declare module "hornet-js-test/src/test-wrapper" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.0
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

@@ -73,21 +73,21 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { HttpError } from "src/exception/http-error";
 import * as moment from "moment-timezone";
 import * as os from "os";
+import { HttpError } from "src/exception/http-error";
 
 export class NotFoundError extends HttpError {
 
-    static status: number = 404;
+    static httpStatus: number = 404;
 
     constructor(args?: { [ key: string ]: any }, cause?: Error) {
-        super(NotFoundError.status, "ERR_HORNET_RESOURCE_NOTFOUND", args, cause);
+        super(NotFoundError.httpStatus, "ERR_HORNET_RESOURCE_NOTFOUND", args, cause);
         this.name = "NotFoundError";
     }
 }

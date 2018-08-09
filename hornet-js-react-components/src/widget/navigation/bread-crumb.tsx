@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -104,9 +104,11 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
     constructor(props: HornetComponentProps, context?: any) {
         super(props, context);
 
-        let currentPath = Utils.getCls("hornet.routePath");
-        this.state.data = this.getItems(currentPath);
-        this.state.currentPath = currentPath;
+        this.state = {
+            ...this.state,
+            data: this.getItems(Utils.getCls("hornet.routePath")),
+            currentPath: Utils.getCls("hornet.routePath"),
+        };
 
         this.listen(URL_CHANGE_EVENT, this.handleChangePath);
     }
@@ -143,17 +145,17 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
      */
     protected getItems(currentPath: string) {
 
-        let menuConfig = NavigationUtils.getConfigMenu();
-        let currentItem = NavigationUtils.getCurrentItem(menuConfig, currentPath);
+        const menuConfig = NavigationUtils.getConfigMenu();
+        const currentItem = NavigationUtils.getCurrentItem(menuConfig, currentPath);
         let items = this.loopElement(menuConfig, currentPath, null, currentItem);
-        let welcomePageUrl = Utils.appSharedProps.get("welcomePageUrl");
+        const welcomePageUrl = Utils.appSharedProps.get("welcomePageUrl");
         // Suppression du fil d'ariane si page d'accueil
-        if (items.length == 1 && items[ 0 ].url == welcomePageUrl) {
+        if (items.length === 1 && items[ 0 ].url === welcomePageUrl) {
             items = [];
         }
 
         /* Ajout de accueil dans le cas ou on est sur une page differente de accueil */
-        if (items.length >= 1 && items[ 0 ].url != welcomePageUrl) {
+        if (items.length >= 1 && items[ 0 ].url !== welcomePageUrl) {
             items.unshift({ text: "navigation.welcome", url: welcomePageUrl });
         }
 
@@ -176,7 +178,7 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
             if (menuDatas[ i ].submenu) {
                 datas = datas.concat(this.loopElement(menuDatas[ i ].submenu, currentPath, menuDatas[ i ], currentItemSelected));
             }
-            if (datas.length == 0) {
+            if (datas.length === 0) {
                 if (_.isEqual(menuDatas[ i ], currentItemSelected)) {
 
                     datas.unshift(menuDatas[ i ]);
@@ -196,16 +198,16 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
      * @protected
      */
     protected renderBreadCrumbElement() {
-        let items = this.state.data;
-        let ln = items.length;
+        const items = this.state.data;
+        const ln = items.length;
 
         return items.map(function (item, i) {
 
-            let key = i + 1;
-            let data = {
+            const key = i + 1;
+            const data = {
                 maxIndice: ln,
                 currentIndice: key,
-                item: item
+                item,
             };
 
             return (
@@ -219,10 +221,10 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
      * @param ev
      */
     handleChangePath(ev) {
-        let currentPath = ev.detail.newPath;
+        const currentPath = ev.detail.newPath;
         this.setState({
-            currentPath: currentPath,
-            data: this.getItems(currentPath)
+            currentPath,
+            data: this.getItems(currentPath),
         });
     }
 }

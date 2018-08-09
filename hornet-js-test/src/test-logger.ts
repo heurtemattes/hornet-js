@@ -73,13 +73,13 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 import * as path from "path";
-if(typeof window !== "undefined") {
-    process.env.LOG4JS_CONFIG = {
+if (typeof window !== "undefined") {
+    (process as any).env.LOG4JS_CONFIG = {
         "disableClustering": true,
         "appenders": {
             "console": {
@@ -91,7 +91,7 @@ if(typeof window !== "undefined") {
             }
         },
         "categories": {
-            "default": { "appenders": ["console"], "level": "INFO" }
+            "default": { "appenders": [ "console" ], "level": "INFO" }
         }
     }
 } else {
@@ -110,7 +110,7 @@ export class TestLogger {
      * Liste des tokens qui sont mis à disposition par Hornet dans le pattern des appender log4js
      */
     static appenderLayoutTokens = {
-        "fn": function() {
+        "fn": function () {
             return TestLogger.getFunctionName(10);
         }
     };
@@ -132,14 +132,14 @@ export class TestLogger {
      */
     static getLoggerBuilder(logConfig) {
         Object.keys(logConfig.appenders).forEach((keyAppender) => {
-                let appender = logConfig.appenders[keyAppender];
-                if(appender.layout){
-                    appender.layout.tokens = TestLogger.appenderLayoutTokens;
-                }
+            let appender = logConfig.appenders[ keyAppender ];
+            if (appender.layout) {
+                appender.layout.tokens = TestLogger.appenderLayoutTokens;
             }
+        }
         );
 
-        (Log4jsNode as any).configure = function() {
+        (Log4jsNode as any).configure = function () {
 
         };
 
@@ -147,26 +147,26 @@ export class TestLogger {
 
         var consoleLogger = Log4jsNode.getLogger("hornet-js.console");
 
-        console.log = function() {
+        console.log = function () {
             consoleLogger.info.apply(consoleLogger, arguments);
         };
-        console.info = function() {
+        console.info = function () {
             consoleLogger.info.apply(consoleLogger, arguments);
         };
-        console.error = function() {
+        console.error = function () {
             consoleLogger.error.apply(consoleLogger, arguments);
         };
-        console.warn = function() {
+        console.warn = function () {
             consoleLogger.warn.apply(consoleLogger, arguments);
         };
-        console.debug = function() {
+        console.debug = function () {
             consoleLogger.debug.apply(consoleLogger, arguments);
         };
-        console.trace = function() {
+        console.trace = function () {
             consoleLogger.trace.apply(consoleLogger, arguments);
         };
 
-        return function(category) {
+        return function (category) {
             this.log4jsLogger = Log4jsNode.getLogger(category);
         };
     }
@@ -189,7 +189,7 @@ export class TestLogger {
         var functionName: string = "";
         if (typeof notTyppedError.captureStackTrace === "function") {
             // Chrome/Node
-            notTyppedError.prepareStackTrace = function(_, stack) {
+            notTyppedError.prepareStackTrace = function (_, stack) {
                 return stack;
             };
             err = new notTyppedError();
@@ -200,13 +200,13 @@ export class TestLogger {
                 // Remonter la stack jusqu'a la fonction appellante du logger
 
                 // D'abord, on cherche le premier appel au logger dans la stack (en partant du haut)
-                var lastLoggerStackIndex: number = _.findLastIndex(err.stack, function(o: any) {
+                var lastLoggerStackIndex: number = _.findLastIndex(err.stack, function (o: any) {
                     return o.getTypeName && o.getTypeName() === "Logger";
                 });
                 // si on a trouvé l'appel au logger dans la stack :
                 if (lastLoggerStackIndex > 0 && err.stack.length > lastLoggerStackIndex + 1) {
                     // on remonte d'un cran pour avoir le nom de la fonction appelante
-                    var hornetCall: any = err.stack[lastLoggerStackIndex + 1];
+                    var hornetCall: any = err.stack[ lastLoggerStackIndex + 1 ];
                     functionName = hornetCall.getFunctionName();
                     // parfois, le nom de la fonction est vide (cas des fonctions déclarées dynamiquement)
                     if (!functionName) {
@@ -219,7 +219,7 @@ export class TestLogger {
                         .concat(":").concat(hornetCall.getColumnNumber());
                 } else if (err.stack.length >= callStackSize) {
                     // traitement par défaut : on va chercher dans la pile avec l'index fourni en paramètre (callStackSize)
-                    functionName = err.stack[callStackSize - 1].getFunctionName();
+                    functionName = err.stack[ callStackSize - 1 ].getFunctionName();
                 }
             }
             notTyppedError.prepareStackTrace = orig;
@@ -229,7 +229,7 @@ export class TestLogger {
             if (e) {
                 var callstack = e.split("\n");
                 if (callstack.length > callStackSize) {
-                    functionName = callstack[callStackSize];
+                    functionName = callstack[ callStackSize ];
                 }
             }
         }

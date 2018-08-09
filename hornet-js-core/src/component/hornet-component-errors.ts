@@ -73,18 +73,15 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
 import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { manageError } from "src/component/error-manager";
 
-//const logger: Logger = Utils.getLogger("hornet-js-core.component.hornet-component-errors");
 
 export interface HornetComponentErrorReport {
     componentName: string;
@@ -105,6 +102,7 @@ export type HornetComponentErrorHandler = (report: HornetComponentErrorReport, e
  * @param report rapport d'erreur
  * @param errorPage page à afficher en cas d'erreur technique
  */
-export const DEFAULT_ERROR_HANDLER: HornetComponentErrorHandler = (report: HornetComponentErrorReport, errorPage: Class<IHornetPage<any, any>>) => {
-    manageError(report.error, errorPage, report.method);
-};
+export const DEFAULT_ERROR_HANDLER: HornetComponentErrorHandler =
+    (report: HornetComponentErrorReport, errorPage: Class<IHornetPage<any, any>>) => {
+        manageError(report.error, errorPage, report.method);
+    };

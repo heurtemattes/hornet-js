@@ -73,24 +73,26 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
 export class AuthenticationtConfiguration {
 
-    public appLoginPath:string;
-    public appLogoutPath:string;
+    public appLoginPath: string;
+    public appLogoutPath: string;
+    public idpSessionTimeout: boolean = true;
 
     /**
-     * Instanciation de la configuration pour un appel CAS direct depuis l'application
+     * Instanciation de la configuration pour une identification SAML depuis l'application
      *
      * @param appLoginPath path relatif de l'application déclenchant le process de connexion
      * @param appLogoutPath path relatif de l'application déclenchant le process de déconnexion
      */
-    constructor(appLoginPath:string, appLogoutPath:string) {
+    constructor(appLoginPath: string, appLogoutPath: string, idpSessionTimeout: boolean = true) {
         this.appLoginPath = appLoginPath;
         this.appLogoutPath = appLogoutPath;
+        this.idpSessionTimeout = idpSessionTimeout;
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,7 +97,7 @@ class PaginateDatasouceDeleteTest extends BaseTest {
         for (let i: number = 1; i < 5; i++) {
             data.push({ id: i, label: "libelle" + i });
         }
-        this.dataSource = new PaginateDataSource(data, { itemsPerPage: 10 }, {});
+        this.dataSource = new PaginateDataSource(data, { itemsPerPage: 4 }, {});
     };
 
     @Decorators.it("Test passant")
@@ -109,11 +109,42 @@ class PaginateDatasouceDeleteTest extends BaseTest {
     @Decorators.it("Suppression d'un element")
     testDelete() {
         this.dataSource.on("delete", (value) => {
-            expect(this.dataSource.results).to.not.include({ id: 1, label: "libelle" + 1 });
+            expect(this.dataSource.results).to.not.deep.include({id: 1, label: "libelle" + 1});
             this.end();
         });
 
-        this.dataSource.delete(false, [ { id: 1, label: "libelle" + 1 }]);
+        this.dataSource.delete(false, [ { id: 1, label: "libelle" + 1 } ]);
+    }
+
+
+
+    @Decorators.it("Ajout d'elements")
+    testAjout() {
+        this.dataSource.on("add", (value) => {
+            try {
+                expect(this.dataSource.results).to.deep.include({id: 5, label: "libelle" + 5});
+                this.end();
+            } catch (e) {
+                this.end(e);
+            }
+        });
+
+        this.dataSource.add(false, [{id: 5, label: "libelle" + 5}]);
+    }
+
+    @Decorators.it("Suppression de tous les elements de la derniere page")
+    testDeleteAllItemOfLastPage() {
+        this.dataSource.on("delete", (value) => {
+            expect(this.dataSource.results).to.deep.include({id: 1, label: "libelle" + 1});
+            expect(this.dataSource.pagination.pageIndex).to.be.equal(1);
+            expect(this.dataSource.results).to.not.deep.include({id: 5, label: "libelle" + 5});
+            this.end();
+        });
+
+        // le tableau contient 5 éléments et on est sur une pagination de 4 items par page.
+        // Le tableau contient alors deux pages, une de 4 items et une d'un item.
+        // Si on supprime l'item de la deuxième page alors on revient sur la première page
+        this.dataSource.delete(false, [ { id: 5, label: "libelle" + 5 } ]);
     }
 
 

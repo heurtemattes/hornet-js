@@ -73,12 +73,10 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
-
-"use strict";
 
 export interface IUSer {
     getName(): string;

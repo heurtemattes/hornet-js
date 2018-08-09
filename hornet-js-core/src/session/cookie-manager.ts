@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,22 +105,22 @@ export class CookieManager {
      * @param {string} name - nom du cookie
      * @param {CookieManagerOption} [options] - options de récupération du cookie
      */
-    static getCookie(req:IncomingMessage, name, options?: CookieManagerOption):any {
-        
+    static getCookie(req: IncomingMessage, name, options?: CookieManagerOption): any {
+
         var header = req.headers.cookie;
         var raw;
         var val;
         var cookieOpt = options || {}
-        , secret = cookieOpt.secret || ""
-        , route = cookieOpt.route || null
+            , secret = cookieOpt.secret || ""
+            , route = cookieOpt.route || null
 
         var cookieRoute = route ? "." + route : null;
 
         // read from cookie header
         if (header) {
-            var cookies = cookie.parse(header);
+            var cookies = cookie.parse(header as string);
 
-            raw = cookies[name];
+            raw = cookies[ name ];
             // sticky session management
             if (cookieRoute && raw && raw.indexOf(cookieRoute, raw.length - cookieRoute.length) > -1) {
                 raw = raw.substr(0, raw.length - cookieRoute.length);
@@ -150,10 +150,10 @@ export class CookieManager {
      * @param {object} value - valeur du cookie
      * @param {CookieManagerOption} [options] - options de récupération du cookie
      */
-    static setCookie(res:ServerResponse, name:string, value:any, options?:CookieManagerOption):void {
-        
+    static setCookie(res: ServerResponse, name: string, value: any, options?: CookieManagerOption): void {
+
         let cookieOpt = options || {};
-        
+
         if (!cookieOpt.maxAge) {
             cookieOpt.maxAge = Utils.config.getOrDefault("cookie.defaultDuration", 3600);
         }
@@ -161,16 +161,16 @@ export class CookieManager {
             cookieOpt.path = Utils.getContextPath();
         }
 
-        let cookieValue = cookieOpt.secret && cookieOpt.secret.length > 0 ? "s:" + signature.sign(value, cookieOpt.secret) : value;
-        
-        var data = cookie.serialize(name, cookieValue, cookieOpt);
+        let cookieValue:string = cookieOpt.secret && cookieOpt.secret.length > 0 ? "s:" + signature.sign(value, cookieOpt.secret) : value;
+
+        let data = cookie.serialize(name, cookieValue, cookieOpt);
 
         logger.trace("set-cookie", data);
 
-        var prev = res.getHeader("set-cookie") || [];
-        var header = Array.isArray(prev) ? prev.concat(data)
-            : Array.isArray(data) ? [prev].concat(data)
-            : [prev, data];
+        let prev = res.getHeader("set-cookie") || [];
+        let header:string[] = Array.isArray(prev) ? prev.concat(data)
+            : Array.isArray(data) ? [ prev.toString() ].concat(data)
+                : [ prev.toString(), data ];
 
         res.setHeader("set-cookie", header)
     }
@@ -183,7 +183,7 @@ export class CookieManager {
      * @param {String} secret - code
      * @returns {String|Boolean}
      */
-    static unsignCookie(val:string, secret:string):String|Boolean {
+    static unsignCookie(val: string, secret: string): String | Boolean {
         var result = signature.unsign(val, secret);
 
         if (result !== false) {
@@ -199,7 +199,7 @@ export class CookieManager {
      * @param {string} name - nom du cookie
      */
     static removeCookie(res, name) {
-        CookieManager.setCookie(res, name, "", {maxAge: 0});
+        CookieManager.setCookie(res, name, "", { maxAge: 0 });
     }
 
 }

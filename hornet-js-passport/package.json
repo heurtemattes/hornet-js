@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-passport",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "description": "Gestion d'authentification",
   "bugs": {
     "url": "https://github.com/diplomatiegouvfr/hornet-js/issues"
@@ -10,28 +10,28 @@
     "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
   },
   "tsDefinitionDependencies": {
-    "hornet-js-react-components-dts": "5.1.1",
-    "hornet-js-ts-typings": "5.1.1",
-    "hornet-js-utils-dts": "5.1.1",
-    "hornet-js-components-dts": "5.1.1",
-    "hornet-js-core-dts": "5.1.1",
-    "hornet-js-test-dts": "5.1.1"
+    "hornet-js-react-components-dts": "5.2.0",
+    "hornet-js-ts-typings": "5.2.0",
+    "hornet-js-utils-dts": "5.2.0",
+    "hornet-js-components-dts": "5.2.0",
+    "hornet-js-core-dts": "5.2.0",
+    "hornet-js-test-dts": "5.2.0"
   },
   "appDependencies": {
     "connect-flash": "0.1.1",
-    "hornet-js-utils": "5.1.1",
-    "hornet-js-components": "5.1.1",
-    "hornet-js-react-components": "5.1.1",
-    "hornet-js-core": "5.1.1",
+    "hornet-js-utils": "5.2.0",
+    "hornet-js-components": "5.2.0",
+    "hornet-js-react-components": "5.2.0",
+    "hornet-js-core": "5.2.0",
     "lodash": "4.17.5",
     "passport": "0.2.1",
-    "request": "2.74.0",
+    "request": "2.87.0",
     "url": "0.11.0",
     "xml2js": "0.4.6",
     "xmldom": "0.1.22",
     "xmlbuilder": "8.2.2",
     "xml-crypto": "0.8.4",
-    "xml-encryption": "0.7.4"
+    "xml-encryption": "0.11.1"
   },
   "buildDependencies": {},
   "testDependencies": {},

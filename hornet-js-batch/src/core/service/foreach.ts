@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,15 +106,15 @@ export class ForEach extends BatchProcess implements BatchService {
         if (this.list && this.list.length > 0) {
             setImmediate((_process, v, b) => {
                 this.execSpecificPool(_process);
-            }, this);
+            },           this);
         } else {
             this.status = STATUS.SUCCEEDED;
         }
     }
 
     protected execSpecificPool(_process) {
-        let value = _process.list.shift();
-        _process.options.service.apply(_process.options.scope.getService(), [value]);
+        const value = _process.list.shift();
+        _process.options.service.apply(_process.options.scope.getService(), [ value ]);
         _process.execPool();
     }
 
@@ -124,6 +124,6 @@ export class ForEach extends BatchProcess implements BatchService {
             this.total = this.list.length;
             this.execPool();
             resolve(this.options.args);
-        })
+        });
     }
 }

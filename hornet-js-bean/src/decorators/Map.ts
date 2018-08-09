@@ -73,33 +73,33 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import "reflect-metadata";
-import {BeanUtils} from "src/bean-utils";
+import { BeanUtils } from "src/bean-utils";
 
 declare var Reflect: any;
 
 export default function map(className?) {
-    return function(target, key, description?) {
-        if (typeof description != 'undefined'){
+    return function (target, key, description?) {
+        if (typeof description !== "undefined") {
             if (description instanceof Object) {
-                let fn = target[key];
+                const fn = target[ key ];
                 description.value = function (...args) {
-                    let fnParam = [];
-                    if (target.__mapParams__ && target.__mapParams__[key]){
-                        for(let index in target.__mapParams__[key]){
-                            fnParam.push(BeanUtils.mapArray(target.__mapParams__[key][index], args[index]).then((result) =>{
-                                args[index] = result;
+                    const fnParam = [];
+                    if (target.__mapParams__ && target.__mapParams__[ key ]) {
+                        for (const index in target.__mapParams__[ key ]) {
+                            fnParam.push(BeanUtils.mapArray(target.__mapParams__[ key ][ index ], args[ index ]).then((result) => {
+                                args[ index ] = result;
                             }));
                         }
                     }
-                    let _instance = this;
-                    let _className = className;
-                    return new Promise((resolve, reject)=> {
+                    const _instance = this;
+                    const _className = className;
+                    return new Promise((resolve, reject) => {
                         Promise.all(fnParam).then(() => {
                             try {
                                 let result;
@@ -115,38 +115,38 @@ export default function map(className?) {
                                         return BeanUtils.mapArray(_className, values);
                                     });
                                 } else {
-                                    result = fn.apply(_instance, args)
+                                    result = fn.apply(_instance, args);
                                 }
-                                resolve(result)
-                            }catch(e) {
-                                reject(e)
+                                resolve(result);
+                            } catch (e) {
+                                reject(e);
                             }
-                        })
-                    })
+                        });
+                    });
 
-             }
-            }else{
+                };
+            } else {
                 if (!target.__mapParams__) {
                     target.__mapParams__ = {};
                 }
-                if (!target.__mapParams__[key]) {
-                    target.__mapParams__[key]= {};
+                if (!target.__mapParams__[ key ]) {
+                    target.__mapParams__[ key ] = {};
                 }
-                target.__mapParams__[key][description] = className;
+                target.__mapParams__[ key ][ description ] = className;
             }
-        }else{
+        } else {
             let mapfield;
             if (!target.__mapFields__) {
-                mapfield = []
-            }else{
-                mapfield = JSON.parse(target.__mapFields__)
+                mapfield = [];
+            } else {
+                mapfield = JSON.parse(target.__mapFields__);
             }
             if (!target.__mapClass__) {
                 target.__mapClass__ = {};
             }
 
-            if(className){
-                target.__mapClass__[key] = className;
+            if (className) {
+                target.__mapClass__[ key ] = className;
             }
 
             mapfield.push(key);
@@ -155,16 +155,16 @@ export default function map(className?) {
         }
 
     };
-};
+}
 
-let checkDateInstance = function(item, _className: any) {
-    for (let attribute in item.dataValues) {
-        let type = Reflect.getMetadata("design:type", _className.prototype, attribute);
-        if (type && (type.name == "Date") && item.dataValues[attribute] && !(item.dataValues[attribute] instanceof type)) {
-            let date = new Date(item.dataValues[attribute]);
-            item.dataValues[attribute] = date;
-        } else if (type && (type.name == "String") && item.dataValues[attribute] && (item.dataValues[attribute] instanceof Date)) {
-            item.dataValues[attribute] = (item.dataValues[attribute] as Date).toDateString();
+const checkDateInstance = function (item, _className: any) {
+    for (const attribute in item.dataValues) {
+        const type = Reflect.getMetadata("design:type", _className.prototype, attribute);
+        if (type && (type.name === "Date") && item.dataValues[ attribute ] && !(item.dataValues[ attribute ] instanceof type)) {
+            const date = new Date(item.dataValues[ attribute ]);
+            item.dataValues[ attribute ] = date;
+        } else if (type && (type.name === "String") && item.dataValues[ attribute ] && (item.dataValues[ attribute ] instanceof Date)) {
+            item.dataValues[ attribute ] = (item.dataValues[ attribute ] as Date).toDateString();
         }
     }
 };

@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,17 +86,18 @@ var Logger = require("hornet-js-utils/src/logger");
 import { TestLogger } from "hornet-js-test/src/test-logger";
 
 Logger.Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
+    "disableClustering": true,
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -104,7 +105,7 @@ import { Utils } from "hornet-js-utils";
 
 Utils.getLogger = Logger.Logger.getLogger;
 
-if (typeof window !== "undefined"){
+if (typeof window !== "undefined") {
     window.addEventListener("unhandledrejection", function (e) {
 
         // NOTE: e.preventDefault() must be manually called to prevent the default
@@ -157,7 +158,7 @@ export function runTest(suite) {
     let suiteName = proto.constructor.suiteName;
     let annotations = getAnnotatedValues(proto);
 
-    let {beforeFunc, beforeEachFunc, afterFunc, testName, testAsyncName, testThrowAsyncName, testXit} = annotations;
+    let { beforeFunc, beforeEachFunc, afterFunc, testName, testAsyncName, testThrowAsyncName, testXit } = annotations;
 
     describe(suiteName, () => {
         before(function () {
@@ -186,7 +187,7 @@ export function runTest(suite) {
             let fnt = (done) => {
                 let _done = done;
                 suite.catchAsyncThrow(_done);
-                if (typeof window !== "undefined"){
+                if (typeof window !== "undefined") {
                     document.body.setAttribute("style", "padding:10px");
                     let fntError: ErrorEventHandler = window.onerror;
                     window.onerror = (errMsg, url, line, lline, err) => {

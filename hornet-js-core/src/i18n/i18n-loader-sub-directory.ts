@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,12 +91,12 @@ import { II18n, AbstractI18nLoader } from "src/i18n/abstract-i18n-loader";
 export class I18nLoaderSubDirectory extends AbstractI18nLoader {
 
     messagesLang = {};
-    allLocales: Array<{langShort: string, locale: string, langLabel:string}>;
+    allLocales: Array<{ langShort: string, locale: string, langLabel: string }>;
 
     constructor(public pathsLang?: Array<string>) {
         super();
         if (!pathsLang) {
-            this.pathsLang = [path.join(path.parse(require.main.filename).dir, "src", "resources")];
+            this.pathsLang = [ path.join(path.parse(require.main.filename).dir, "src", "resources") ];
         }
         this.loadSubDirectoryMessages();
     }
@@ -110,22 +110,27 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
          *  Doit retourner un flux JSON conforme au module react-intl.
          */
         // par défaut on charge le fichier hornet-messages
-        this.messagesLang["default"] = {locale: undefined, lang: "", messages: require("./hornet-messages-components.json")};
+        this.messagesLang[ "default" ] = { locale: undefined, lang: "", messages: require("./hornet-messages-components.json") };
 
         /** chargement des fichiers 'message.json' */
-        this.pathsLang.forEach((pathLAng)=>{
-            this.getFilesRecursive(pathLAng, "messages.json", this.messagesLang["default"].messages);
-        })
+        this.pathsLang.forEach((pathLAng) => {
+            this.getFilesRecursive(pathLAng, "messages.json", this.messagesLang[ "default" ].messages);
+        });
 
 
         /** verifier sur localeI18n dans defaut.json existe */
         if (locales && locales.length > 0) {
             locales.forEach((locale) => {
-                this.pathsLang.forEach((pathLAng)=>{
-                    this.messagesLang[locale.locale] = {locale: locale.locale, lang: locale.lang, messages: _.merge({}, this.messagesLang["default"].messages)};
-                    this.getFilesRecursive(pathLAng, "messages-" + locale.locale + ".json", this.messagesLang[locale.locale].messages);
+                this.pathsLang.forEach((pathLAng) => {
+                    this.messagesLang[ locale.locale ] = {  
+                        locale: locale.locale,
+                        lang: locale.lang,
+                        messages: _.merge({},
+                                          this.messagesLang[ "default" ].messages),
+                    };
+                    this.getFilesRecursive(pathLAng, "messages-" + locale.locale + ".json", this.messagesLang[ locale.locale ].messages);
                 });
-            });  
+            });
         }
     }
 
@@ -140,44 +145,44 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
             return this.messagesLang["default"];
         }it retourner un flux JSON conforme au module react-intl.
          */
-        if(!locales) {
-            return this.messagesLang["default"];
+        if (!locales) {
+            return this.messagesLang[ "default" ];
         }
 
-        if(this.messagesLang[locales.locale]) {
-            return this.messagesLang[locales.locale];
+        if (this.messagesLang[ locales.locale ]) {
+            return this.messagesLang[ locales.locale ];
         }
 
 
-        let localMessage = {};
-        _.merge(localMessage, this.messagesLang["default"]);
+        const localMessage = {};
+        _.merge(localMessage, this.messagesLang[ "default" ].messages);
 
         /** verifier sur localeI18n dans defaut.json existe */
         if (locales && locales.locale) {
-            this.pathsLang.forEach((pathLAng)=>{
+            this.pathsLang.forEach((pathLAng) => {
                 this.getFilesRecursive(pathLAng, "messages-" + locales.locale + ".json", localMessage);
-            })
+            });
         }
-        this.messagesLang[locales.locale] = {locale: locales.locale, lang: locales.lang, messages: localMessage};
-        return this.messagesLang[locales.locale];
+        this.messagesLang[ locales.locale ] = { locale: locales.locale, lang: locales.lang, messages: localMessage };
+        return this.messagesLang[ locales.locale ];
     }
 
     /** Méthode qui liste les langues disponibles dans le dossier resources
      * @returns {string[]}
      */
-    getLocales(): Array<{langShort: string, locale: string, langLabel: string}> {
-        
-        if(!this.allLocales) {
+    getLocales(): Array<{ langShort: string, locale: string, langLabel: string }> {
 
-            let locales = {};
+        if (!this.allLocales) {
+
+            const locales = {};
             this.allLocales = [];
 
-            this.pathsLang.forEach((folder)=>{
-                this.getLocalesRecusive(folder, locales as [string, {langShort: string, locale: string, langLabel:string}]);
+            this.pathsLang.forEach((folder) => {
+                this.getLocalesRecusive(folder, locales as [ string, { langShort: string, locale: string, langLabel: string } ]);
             });
 
-            for(let locale in locales) {
-                this.allLocales.push(locales[locale]);
+            for (const locale in locales) {
+                this.allLocales.push(locales[ locale ]);
             }
         }
 
@@ -187,32 +192,33 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
     /** Méthode qui liste les langues disponibles dans le dossier resources
      * @returns {string[]}
      */
-    protected getLocalesRecusive(folder: string, locales: [string, {langShort: string, locale: string, langLabel:string}]): void {
-            
-        let regx = /^messages-([a-zA-Z\-]+)\.json$/;
+    protected getLocalesRecusive(folder: string, locales: [ string, { langShort: string, locale: string, langLabel: string } ]): void {
         
-        if(fs.existsSync(folder)) {
-            let childDirs = [];
-            var fileContents = fs.readdirSync(folder),
-                stats;
-        
+        const regx = /^messages-([a-zA-Z\-]+)\.json$/;
+
+        if (fs.existsSync(folder)) {
+            const childDirs = [];
+            const fileContents = fs.readdirSync(folder);
+            let stats;
+
             fileContents.forEach((fileName) => {
-                stats = fs.lstatSync(folder + '/' + fileName);
-        
+                stats = fs.lstatSync(folder + "/" + fileName);
+
                 if (stats.isDirectory()) {
-                    this.getLocalesRecusive(path.join(folder, fileName), locales)
+                    this.getLocalesRecusive(path.join(folder, fileName), locales);
                 } else {
-                    let match = fileName.match(regx);
-                    if(match) {
-                        let jsonMessage = JSONLoader.load(path.join(folder, fileName), "UTF-8");
-                        let listShort = match[1].split("-");
-                        if(!locales[match[1]]) {
-                            locales[match[1]] = {};
+                    const match = fileName.match(regx);
+                    if (match) {
+                        const jsonMessage = JSONLoader.load(path.join(folder, fileName), "UTF-8");
+                        const listShort = match[ 1 ].split("-");
+                        if (!locales[ match[ 1 ] ]) {
+                            locales[ match[ 1 ] ] = {};
                         }
-                        _.merge(locales[match[1]], {
-                            langShort: listShort[1],
-                            locale: match[1],
-                            langLabel: jsonMessage.labelLanguage || listShort[1]
+                        
+                        _.merge(locales[ match[ 1 ] ], {
+                            langShort: listShort[ 1 ],
+                            locale: match[ 1 ],
+                            langLabel: jsonMessage.labelLanguage || listShort[ 1 ],
                         });
                     }
                 }
@@ -223,24 +229,24 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
     }
 
     getFilesRecursive(folder: string, searchFileName: string, messages: {}) {
-        if(fs.existsSync(folder)) {
-            let childDirs = [];
-            var fileContents = fs.readdirSync(folder),
-                stats;
-        
+        if (fs.existsSync(folder)) {
+            const childDirs = [];
+            const fileContents = fs.readdirSync(folder);
+            let stats;
+
             fileContents.forEach((fileName) => {
-                stats = fs.lstatSync(folder + '/' + fileName);
-        
+                stats = fs.lstatSync(folder + "/" + fileName);
+
                 if (stats.isDirectory()) {
-                    childDirs.push( path.join(folder, fileName));
+                    childDirs.push(path.join(folder, fileName));
                 } else {
-                    if(fileName == searchFileName) {
+                    if (fileName === searchFileName) {
                         _.merge(messages, require(path.join(folder, fileName)));
                     }
                 }
 
-                childDirs.forEach((childDir)=> {this.getFilesRecursive(childDir, searchFileName, messages)});
+                childDirs.forEach((childDir) => { this.getFilesRecursive(childDir, searchFileName, messages); });
             });
         }
-    };
+    }
 }

@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,24 +106,24 @@ export class ConfigLib {
      *  - répertoire APPLI + INFRA pour le mode PRODUCTION (process.env.HORNET_CONFIG_DIR_APPLI & process.env.HORNET_CONFIG_DIR_INFRA)
      */
     loadServerConfigs() {
-        let appliFolder = process.env.HORNET_CONFIG_DIR_APPLI;
+        const appliFolder = process.env.HORNET_CONFIG_DIR_APPLI;
         if (appliFolder) {
             process.env.NODE_CONFIG_DIR = appliFolder;
-            logger.trace("Chargement de la configuration APPLI (Variable process.env.HORNET_CONFIG_DIR_APPLI) dans ", appliFolder);
+            logger.info("Chargement de la configuration APPLI (Variable process.env.HORNET_CONFIG_DIR_APPLI) dans ", appliFolder);
         } else {
-            logger.trace("Chargement de la configuration APPLI en mode DEV", "./config");
+            logger.info("Chargement de la configuration APPLI en mode DEV", "./config");
         }
         this._configObj = require("config");
-        logger.trace("Configuration APPLI : ", JSON.stringify(this._configObj));
+        logger.info("Configuration APPLI : ", JSON.stringify(this._configObj));
 
-        let infraFolder = process.env.HORNET_CONFIG_DIR_INFRA;
+        const infraFolder = process.env.HORNET_CONFIG_DIR_INFRA;
         if (infraFolder) {
             process.env.NODE_CONFIG_DIR = infraFolder;
-            logger.trace("Chargement de la configuration INFRA (Variable process.env.HORNET_CONFIG_DIR_INFRA) dans ", infraFolder);
-            let infraConf = this._configObj.util.loadFileConfigs();
-            logger.trace("Configuration INFRA : ", JSON.stringify(infraConf));
+            logger.info("Chargement de la configuration INFRA (Variable process.env.HORNET_CONFIG_DIR_INFRA) dans ", infraFolder);
+            const infraConf = this._configObj.util.loadFileConfigs();
+            logger.info("Configuration INFRA : ", JSON.stringify(infraConf));
             this._configObj.util.extendDeep(this._configObj, infraConf);
-            logger.trace("Configuration mergée : ", JSON.stringify(this._configObj));
+            logger.info("Configuration mergée : ", JSON.stringify(this._configObj));
         }
         this.checkVariables(this._configObj);
 
@@ -134,21 +134,21 @@ export class ConfigLib {
     }
 
     checkVariables(obj: any): void {
-        let _check = (obj: any): any => {
+        const _check = (obj: any): any => {
             let retry: any = false;
-            for (let i in obj) {
-                let type = typeof obj[i];
+            for (const i in obj) {
+                const type = typeof obj[ i ];
                 if (type === "function") continue;
 
                 if (type === "object") {
-                    retry |= _check(obj[i]);
+                    retry |= _check(obj[ i ]);
 
                 } else if (type === "string") {
-                    let variables = obj[i].match(/\$\{[^\}]+\}/g);
+                    const variables = obj[ i ].match(/\$\{[^\}]+\}/g);
                     if (variables && variables.length > 0) {
                         retry = true;
                         variables.forEach((variable) => {
-                            obj[i] = obj[i].replace(variable, this.get(variable.substring(2, variable.length - 1)));
+                            obj[ i ] = obj[ i ].replace(variable, this.get(variable.substring(2, variable.length - 1)));
                         });
                     }
                 }
@@ -178,7 +178,7 @@ export class ConfigLib {
         if (property === null || property === undefined) {
             throw new Error("Calling config.get with null or undefined argument");
         }
-        let value = ConfigLib.getImpl(this._configObj, property);
+        const value = ConfigLib.getImpl(this._configObj, property);
 
         // Produce an exception if the property doesn't exist
         if (value === undefined) {
@@ -203,7 +203,7 @@ export class ConfigLib {
                 logger.warn("PROPERTY NOT DEFINED :", property, ", DEFAULT VALUE APPLY :", defaultValue);
             } catch (error) {
                 // MBC - fullSpa - logger pas encore disponible
-                logger.trace("PROPERTY NOT DEFINED :", property, ", DEFAULT VALUE APPLY :", defaultValue);
+                console.log("PROPERTY NOT DEFINED :", property, ", DEFAULT VALUE APPLY :", defaultValue);
             }
             return defaultValue;
         }
@@ -248,9 +248,9 @@ export class ConfigLib {
      * @return value {mixed} - Property value, including undefined if not defined.
      */
     protected static getImpl(object: any, property: any): any {
-        let elems = Array.isArray(property) ? property : property.split(".");
-        let name = elems[0];
-        let value = object[name];
+        const elems = Array.isArray(property) ? property : property.split(".");
+        const name = elems[ 0 ];
+        const value = object[ name ];
         if (elems.length <= 1) {
             return value;
         }

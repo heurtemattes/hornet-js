@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -120,7 +120,7 @@ export class ClientLog {
      */
     static getLoggerBuilder(logConfig) {
 
-        let appenders = [];
+        const appenders = [];
 
         ClientLog.configHornetLoggerHelp();
         ClientLog.configHornetJsLogState();
@@ -130,7 +130,7 @@ export class ClientLog {
             ClientLog.defaultLogLevel = ClientLog.getLoggerKeyValue("LOG level", logConfig.level, ClientLog.defaultLogLevel);
             if (logConfig.appenders && Object.keys(logConfig.appenders).length) {
                 Object.keys(logConfig.appenders).forEach((keyAppender) => {
-                    let appender = logConfig.appenders[ keyAppender ];
+                    const appender = logConfig.appenders[ keyAppender ];
                     if (appender.type === "BrowserConsole") {
                         appenders.push(ClientLog.configureBrowserConsole(appender));
                     } else if (appender.type === "Ajax") {
@@ -145,13 +145,13 @@ export class ClientLog {
         } else {
             console.warn("LOGGER WEB : CONFIGURATION NOT DEFINED");
         }
-        let logLevel = Utils.log4js.Level.INFO.toLevel(ClientLog.setHornetJsLogLevel());
-        let remoteLog = ClientLog.setHornetJsRemoteLog();
+        const logLevel = Utils.log4js.Level.INFO.toLevel(ClientLog.setHornetJsLogLevel());
+        const remoteLog = ClientLog.setHornetJsRemoteLog();
 
         if (!appenders.length) {
             console.warn("LOGGER WEB : NONE APPENDER DEFINED, APPLY DEFAULT APPENDER BrowserConsoleAppender");
-            let consoleAppender = new Utils.log4js.BrowserConsoleAppender();
-            let logLayout = ClientLog.getConsoleLayout(ClientLog.setHornetJsLogLayout());
+            const consoleAppender = new Utils.log4js.BrowserConsoleAppender();
+            const logLayout = ClientLog.getConsoleLayout(ClientLog.setHornetJsLogLayout());
             consoleAppender.setLayout(logLayout);
             appenders.push(consoleAppender);
         }
@@ -194,12 +194,12 @@ export class ClientLog {
                 "AjaxAppender url", Utils.buildContextPath(appender.url), ClientLog.defaultRemoteUrl);
         }
 
-        let remoteLogUrl = ClientLog.setHornetJsRemoteLogUrl(ClientLog.defaultRemoteUrl);
-        let remoteLogLayout = ClientLog.setHornetJsRemoteLogLayout();
+        const remoteLogUrl = ClientLog.setHornetJsRemoteLogUrl(ClientLog.defaultRemoteUrl);
+        const remoteLogLayout = ClientLog.setHornetJsRemoteLogLayout();
 
-        let remoteStackErrorLog = ClientLog.setHornetJsStacksLog();
+        const remoteStackErrorLog = ClientLog.setHornetJsStacksLog();
 
-        let ajaxAppender = new Utils.log4js.AjaxAppender(remoteLogUrl);
+        const ajaxAppender = new Utils.log4js.AjaxAppender(remoteLogUrl);
         ajaxAppender.setLayout(ClientLog.getConsoleLayout(remoteLogLayout.layout));
         ajaxAppender.setThreshold(remoteLogLayout.threshold);
         ajaxAppender.setTimeout(remoteLogLayout.timeout);
@@ -216,8 +216,8 @@ export class ClientLog {
                     "BrowserConsoleAppender layout.type", appender.layout.type, ClientLog.defaultLogLayout);
             }
         }
-        let consoleAppender = new Utils.log4js.BrowserConsoleAppender();
-        let logLayout = ClientLog.getConsoleLayout(ClientLog.setHornetJsLogLayout());
+        const consoleAppender = new Utils.log4js.BrowserConsoleAppender();
+        const logLayout = ClientLog.getConsoleLayout(ClientLog.setHornetJsLogLayout());
         consoleAppender.setLayout(logLayout);
         return consoleAppender;
     }
@@ -232,7 +232,7 @@ export class ClientLog {
     static configHornetLoggerHelp() {
         if (!window.getHornetLoggerHelp) {
             window.getHornetLoggerHelp = function () {
-                let level = "Level : \
+                const level = "Level : \
                     \n\t ALL\
                     \n\t TRACE\
                     \n\t DEBUG\
@@ -242,7 +242,7 @@ export class ClientLog {
                     \n\t FATAL\
                     \n\t OFF";
 
-                let layout = "\n\n Layout : \
+                const layout = "\n\n Layout : \
                     \n\t BASIC : default\
                     \n\t SIMPLE\
                     \n\t THIN\
@@ -251,7 +251,7 @@ export class ClientLog {
                     \n\t HTML\
                     \n\t VOID - eq pattern - see pattern format";
 
-                let pattern = "\n\n Pattern format : \
+                const pattern = "\n\n Pattern format : \
                     \n\t %r - time in toLocaleTimeString format \
                     \n\t %p - log level \
                     \n\t %c - log category\
@@ -276,11 +276,13 @@ export class ClientLog {
                     console.log(
                         "\n Log Level :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_LEVEL_KEY) || ClientLog.defaultLogLevel,
                         "\n Log Layout :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_LAYOUT_KEY) || ClientLog.defaultLogLayout,
+                        "\n log stack :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_STACK_ENABLED) || ClientLog.defaultStackLogEnabled,
                         "\n Remote :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_KEY) || ClientLog.defaultRemote,
                         "\n Remote Log Layout :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_KEY) || ClientLog.defaultRemoteLogLayout,
                         "\n Remote Log Threshold :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_THRESHOLD_KEY) || ClientLog.defaultRemoteLogThreshold,
                         "\n Remote Log Timeout :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_TIMEOUT_KEY) || ClientLog.defaultRemoteLogTimeout,
-                        "\n Remote Url :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_URL_KEY) || ClientLog.defaultRemoteUrl
+                        "\n Remote Url :", window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_URL_KEY) || ClientLog.defaultRemoteUrl,
+
                     );
                 } else {
                     console.log(
@@ -290,7 +292,7 @@ export class ClientLog {
                         "\n Remote Log Layout :", ClientLog.defaultRemoteLogLayout,
                         "\n Remote Log Threshold :", ClientLog.defaultRemoteLogThreshold,
                         "\n Remote Log Timeout :", ClientLog.defaultRemoteLogTimeout,
-                        "\n Remote Url :", ClientLog.defaultRemoteUrl
+                        "\n Remote Url :", ClientLog.defaultRemoteUrl,
                     );
                 }
             };
@@ -301,8 +303,8 @@ export class ClientLog {
         if (window.localStorage) {
             if (!window.setHornetJsLogLevel) {
                 window.setHornetJsLogLevel = function (level: string) {
-                    let logLevel = ClientLog.testParamLocalStorage(level, ClientLog.defaultLogLevel);
-                    let newLogLevel = Utils.log4js.Level.INFO.toLevel(logLevel, ClientLog.defaultLogLevel).toString();
+                    const logLevel = ClientLog.testParamLocalStorage(level, ClientLog.defaultLogLevel);
+                    const newLogLevel = Utils.log4js.Level.INFO.toLevel(logLevel, ClientLog.defaultLogLevel).toString();
                     console.log("New log level :", newLogLevel, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_LEVEL_KEY, newLogLevel);
                 };
@@ -325,7 +327,7 @@ export class ClientLog {
         if (window.localStorage) {
             if (!window.setHornetJsStacksLog) {
                 window.setHornetJsStacksLog = function (enableValue: string) {
-                    let enableStacks: string = (!enableValue || enableValue === "null" || enableValue === "undefined") ? ClientLog.defaultStackLogEnabled : enableValue;
+                    const enableStacks: string = (!enableValue || enableValue === "null" || enableValue === "undefined") ? ClientLog.defaultStackLogEnabled : enableValue;
                     console.log("New value for enableStacksErrorsLog :", enableValue, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_STACK_ENABLED, enableStacks);
                 };
@@ -339,7 +341,7 @@ export class ClientLog {
         if (window.localStorage) {
             if (!window.setHornetJsLogLayout) {
                 window.setHornetJsLogLayout = function (layout: string) {
-                    let logLayout = ClientLog.testParamLocalStorage(layout, ClientLog.defaultLogLayout);
+                    const logLayout = ClientLog.testParamLocalStorage(layout, ClientLog.defaultLogLayout);
 
                     console.log("New log layout :", logLayout, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_LAYOUT_KEY, logLayout);
@@ -356,7 +358,7 @@ export class ClientLog {
         if (window.localStorage) {
             if (!window.setHornetJsRemoteLog) {
                 window.setHornetJsRemoteLog = function (remote: boolean) {
-                    let logRemote = ClientLog.testParamLocalStorage(remote, ClientLog.defaultRemote);
+                    const logRemote = ClientLog.testParamLocalStorage(remote, ClientLog.defaultRemote);
 
                     console.log("Remote log (De)Activation :", logRemote, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_KEY, logRemote.toString());
@@ -373,11 +375,12 @@ export class ClientLog {
         if (window.localStorage) {
             if (!window.setHornetJsRemoteLogLayout) {
                 window.setHornetJsRemoteLogLayout = function (layout: string, threshold: string, timeout: string) {
-                    let logLayout = ClientLog.testParamLocalStorage(layout, ClientLog.defaultRemoteLogLayout);
-                    let logTreshold = parseInt(threshold) || ClientLog.defaultRemoteLogThreshold;
-                    let logTimeout = parseInt(timeout) || ClientLog.defaultRemoteLogTimeout;
+                    const logLayout = ClientLog.testParamLocalStorage(layout, ClientLog.defaultRemoteLogLayout);
+                    const logTreshold = parseInt(threshold, 10) || ClientLog.defaultRemoteLogThreshold;
+                    const logTimeout = parseInt(timeout, 10) || ClientLog.defaultRemoteLogTimeout;
 
-                    console.log("New remote log layout :", logLayout, " thresold :", logTreshold, ", logTimeout :", logTimeout, ". Reload page (F5) to activate");
+                    console.log("New remote log layout :", logLayout, " thresold :",
+                                logTreshold, ", logTimeout :", logTimeout, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_KEY, logLayout.toString());
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_THRESHOLD_KEY, logTreshold.toString());
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_TIMEOUT_KEY, logTimeout.toString());
@@ -385,15 +388,17 @@ export class ClientLog {
             }
             return {
                 layout: window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_KEY) || ClientLog.defaultRemoteLogLayout,
-                threshold: window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_THRESHOLD_KEY) || ClientLog.defaultRemoteLogThreshold,
-                timeout: window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_TIMEOUT_KEY) || ClientLog.defaultRemoteLogTimeout
+                threshold: window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_THRESHOLD_KEY)
+                    || ClientLog.defaultRemoteLogThreshold,
+                timeout: window.localStorage.getItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_TIMEOUT_KEY)
+                    || ClientLog.defaultRemoteLogTimeout,
             };
         } else {
             console.log("ERREUR: Browser doesn't support LocalStorage");
             return {
                 layout: ClientLog.defaultRemoteLogLayout,
                 threshold: ClientLog.defaultRemoteLogThreshold,
-                timeout: ClientLog.defaultRemoteLogTimeout
+                timeout: ClientLog.defaultRemoteLogTimeout,
             };
         }
     }
@@ -402,7 +407,7 @@ export class ClientLog {
         if (window.localStorage) {
             if (!window.setHornetJsRemoteLogUrl) {
                 window.setHornetJsRemoteLogUrl = function (url: string) {
-                    let logRemoteUrl = ClientLog.testParamLocalStorage(url, defaultUrl);
+                    const logRemoteUrl = ClientLog.testParamLocalStorage(url, defaultUrl);
 
                     console.log("New remote url :", logRemoteUrl, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_URL_KEY, logRemoteUrl.toString());

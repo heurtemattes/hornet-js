@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -101,7 +101,7 @@ export interface FieldSetProps extends AbstractFormProps, HornetComponentProps {
 export class FieldSet extends AbstractForm<FieldSetProps, any> {
 
     static defaultProps = {
-        className: "fieldset"
+        className: "fieldset",
     };
 
     /**
@@ -115,36 +115,36 @@ export class FieldSet extends AbstractForm<FieldSetProps, any> {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this.fieldSetElement["__component"] = null;
+        this.fieldSetElement[ "__component" ] = null;
     }
 
     // Setters
     setLegend(legend: string, callback?: () => any): this {
-        this.setState({legend: legend}, callback);
+        this.setState({ legend }, callback);
         return this;
     }
 
     setClassName(className: string, callback?: () => any): this {
-        this.setState({className: className}, callback);
+        this.setState({ className }, callback);
         return this;
     }
 
     /** @override */
     protected extractFields(): { [ key: string ]: DomAdapter<any, any> } {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = {};
+        const fields: { [ key: string ]: DomAdapter<any, any> } = {};
         if (this.fieldSetElement && this.fieldSetElement.form && this.fieldSetElement.form.elements) {
             /* Note : l'attribut HTMLFieldSetElement.elements n'est pas compatible avec Internet Explorer */
             for (let index = 0; index < this.fieldSetElement.form.elements.length; index++) {
-                let item: Element = this.fieldSetElement.form.elements[index];
-                if (item["name"] && this.fieldSetElement.contains(item)) {
-                    if (item["__component"]) {
-                        fields[item["name"]] = item["__component"];
+                const item: Element = this.fieldSetElement.form.elements[ index ];
+                if (item[ "name" ] && this.fieldSetElement.contains(item)) {
+                    if (item[ "__component" ]) {
+                        fields[ item[ "name" ] ] = item[ "__component" ];
                     } else {
-                        if (fields[item["name"]]) {
-                            fields[item["name"]].addHtmlElement(item);
+                        if (fields[ item[ "name" ] ]) {
+                            fields[ item[ "name" ] ].addHtmlElement(item);
                         } else {
-                            fields[item["name"]] = new DomAdapter<any, any>();
-                            fields[item["name"]].registerHtmlElement(item);
+                            fields[ item[ "name" ] ] = new DomAdapter<any, any>();
+                            fields[ item[ "name" ] ].registerHtmlElement(item);
                         }
                     }
                 }

@@ -73,26 +73,26 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "appenders": {
-        "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
-        }
+    appenders: {
+        console: {
+            type: "console",
+            layout: {
+                type: "pattern",
+                pattern: "%[%d{ISO8601}|%p|%c|%m%]"
+            }
+        },
     },
-    "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
-    }
+    categories: {
+        default: { appenders: [ "console" ], level: "INFO" },
+    },
 });
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
@@ -111,47 +111,47 @@ class NavigationUtilsMock extends NavigationUtils {
     }
 }
 
-var MenuNS = proxyquire("src/widget/navigation/menu", {
-    "hornet-js-components/src/utils/navigation-utils": {NavigationUtils: NavigationUtilsMock},
+const MenuNS = proxyquire("src/widget/navigation/menu", {
+    "hornet-js-components/src/utils/navigation-utils": { NavigationUtils: NavigationUtilsMock },
 });
 
 Utils.setConfigObj({
-    contextPath: "applitutoriel"
+    contextPath: "applitutoriel",
 });
 
-var cls = Utils.getContinuationStorage();
-var contextMock = {"hornet.user": {name: "admin", roles: [{"id": 1, "name": "admin"}, {"id": 2, "name": "user"}]}};
+const cls = Utils.getContinuationStorage();
+const contextMock = { "hornet.user": { name: "admin", roles: [ { id: 1, name: "admin" }, { id: 2, name: "user" } ] } };
 
 describe("MenuSpec", () => {
 
     it("doit afficher le menu lorsque exist des items", () => {
         // Act
-        var $ = render(() => (
+        const $ = render(() => (
             <div>
-                <MenuNS.Menu showIconInfo={true}  />
+                <MenuNS.Menu showIconInfo={true} />
             </div>));
 
         // Assert
-        var $nav = $("nav#menu-main");
+        const $nav = $("nav#menu-main");
         expect($nav).to.exist;
 
-        var $button =  $nav.find("button.toggler");
+        const $button = $nav.find("button.toggler");
         expect($button).to.exist;
 
     });
 
     it("cas du menu actif", () => {
 
-        var configMenu = require("test/widget/navigation/menu-test-app-conf").menu;
+        const configMenu = require("test/widget/navigation/menu-test-app-conf").menu;
 
         // Act
-        var $ = render(() => (
-                <div>
-                    <MenuNS.Menu showIconInfo={true} configMenu={configMenu} />
-                </div>));
+        const $ = render(() => (
+            <div>
+                <MenuNS.Menu showIconInfo={true} configMenu={configMenu} />
+            </div>));
 
         // Assert
-        var $nav = $("nav#menu-main");
+        const $nav = $("nav#menu-main");
         expect($nav).to.exist;
     });
 

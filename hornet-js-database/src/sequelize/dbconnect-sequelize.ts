@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,7 +97,7 @@ export class DbConnect {
      */
     static init(configName: string, namespace?: string) {
         DbConnect.defaultConfigName = configName;
-        if (!DbConnect.global[configName]) {
+        if (!DbConnect.global[ configName ]) {
             let db = new Database();
             db.config = new Configuration(configName);
             db.namespace = require("continuation-local-storage").createNamespace(namespace || configName);
@@ -140,18 +140,18 @@ export class DbConnect {
             } else {
                 db.sequelize = new Sequelize(db.config.basename, db.config.username, db.config.password, db.config.options);
             }
-            DbConnect.global[configName] = db;
+            DbConnect.global[ configName ] = db;
         }
     }
 
     static getConfiguration(configName?: string): Configuration {
-        return DbConnect.global[configName || DbConnect.defaultConfigName].config;
+        return DbConnect.global[ configName || DbConnect.defaultConfigName ].config;
     }
 
     static getGlobal(configName: string): Database {
         let res;
         try {
-            res = DbConnect.global[configName];
+            res = DbConnect.global[ configName ];
         } catch (e) {
             logger.error(e);
         }

@@ -73,16 +73,19 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { IModelDAO } from "src/interfaces/interface-model-dao";
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
+import { Injector } from "hornet-js-core/src/inject/injector";
+import { Logger } from "hornet-js-utils/src/logger";
+import { Utils } from "hornet-js-utils";
 
-export class HornetSequelizeModel implements IModelDAO {
+const logger: Logger = Utils.getLogger("hornet-js-database.src.sequelize.hornet-sequelize-model");
 
+export class HornetSequelizeModel {
     configDatabase: string;
 
     constructor(configDatabase: string = "config", namespace?: string) {

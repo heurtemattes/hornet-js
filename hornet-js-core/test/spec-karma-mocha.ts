@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,7 @@ import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 import * as assert from "assert";
 import { DataSource } from "src/component/datasource/datasource";
 
-@Decorators.describe('exemple de test avec les Annotations')
+@Decorators.describe("exemple de test avec les Annotations")
 class MyUnitTest extends BaseTest {
 
     dataSource: DataSource<any>;
@@ -99,7 +99,7 @@ class MyUnitTest extends BaseTest {
         this.dataSource = new DataSource(data);
     };
 
-    @Decorators.it('exemple de cas de test passant')
+    @Decorators.it("exemple de cas de test passant")
     testCas1() {
         assert.equal(1, 1);
         this.end();

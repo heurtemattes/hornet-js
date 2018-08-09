@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,19 +94,30 @@ export interface MoreInfoBodyCellProps extends ActionBodyCellProps {
 export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends ActionBodyCell<P, any> {
 
     static defaultProps = {
-        srcImg: Picto.blue.user
+        srcImg: Picto.blue.user,
     };
 
     constructor(props: P, context: any) {
         super(props, context);
-        if (props.url) {
-            this.state.url = this.genUrlWithParams(props.url, props.value);
-        }
 
-        this.state.visible = true;
-        if (this.props.visible) {
-            this.state.visible = this.props.visible(this.props.value);
-        }
+        this.state = {
+            ...this.state,
+            url: (props.url) ? this.genUrlWithParams(props.url, props.value) : null,
+            visible: (this.props.visible) ? this.props.visible(this.props.value) : true,
+
+        };
+    }
+
+    /**
+     * @inheritDoc
+     */
+    componentWillReceiveProps(nextProps: MoreInfoBodyCellProps, context) {
+        super.componentWillReceiveProps(nextProps as any,context);
+        // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
+         this.state = {...this.state, ...nextProps,
+            url: (nextProps.url) ? this.genUrlWithParams(nextProps.url, nextProps.value) : null,
+            visible:(nextProps.visible) ? nextProps.visible(nextProps.value) : true,
+         };
     }
 
     /**
@@ -116,14 +127,13 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
 
         logger.trace("render MoreInfoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        let classes: ClassDictionary = {
-            "button-action": true
+        const classes: ClassDictionary = {
+            "button-action": true,
         };
-
         if (this.state.className) {
             classes[ this.state.className ] = true;
         }
-        let aProps: any = {
+        const aProps: any = {
             href: this.state.url || "#",
             className: classNames(classes),
             title: this.title,
@@ -131,7 +141,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
             disabled: this.props.contentState.itemInEdition && this.state.isEditing === false,
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
-            "aria-haspopup": this.state.hasPopUp
+            "aria-haspopup": this.state.hasPopUp,
         };
 
         return (
@@ -161,11 +171,11 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
      * Permet de masquer/afficher  une ligne de tableau
      * @param before
      */
-    expandLine(before?: boolean) {
-        let type: string = before ? "before" : "after";
-        let selector: string = this.props.id + "-expandable-line-" + type + "-" + this.props.coordinates.row;
+    expandLine(before ? : boolean) {
+        const type: string = before ? "before" : "after";
+        const selector: string = this.props.id + "-expandable-line-" + type + "-" + this.props.coordinates.row;
 
-        let element = document.getElementById(selector);
+        const element = document.getElementById(selector);
 
         if (element) {
             if (element.classList && element.classList.contains("datatable-expandable-line-hidden")) {

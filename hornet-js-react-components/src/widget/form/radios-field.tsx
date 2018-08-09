@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,14 +85,12 @@ import {
     AbstractField,
     HornetClickableProps,
     HornetBasicFormFieldProps,
-    InlineStyle
+    InlineStyle,
+    AbstractFieldProps,
 } from "src/widget/form/abstract-field";
 import * as _ from "lodash";
-import {
-    HornetComponentChoicesProps
-} from "hornet-js-components/src/component/ihornet-component";
+import { HornetComponentChoicesProps, IHornetComponentDatasource } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
-import { IHornetComponentDatasource } from "hornet-js-components/src/component/ihornet-component";
 import * as classNames from "classnames";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 
@@ -102,7 +100,7 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.r
 /**
  * Propriétés d'un champ de formulaire de type groupe de boutons radios
  */
-export interface RadiosFieldProps extends HornetClickableProps,
+export interface RadiosFieldProps extends AbstractFieldProps, HornetClickableProps,
     HornetBasicFormFieldProps,
     HornetComponentDatasourceProps,
     HornetComponentChoicesProps {
@@ -130,7 +128,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         valueKey: "value",
         labelKey: "label",
         checkedKey: "defaultChecked",
-        inline: InlineStyle.NONE
+        inline: InlineStyle.NONE,
     });
 
     constructor(props?: any, context?: any) {
@@ -138,19 +136,22 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         if (this.state.dataSource && this.state.data) {
             throw new Error("Le RadiosField " + this.state.name + " possède une props dataSource et une props data");
         }
-        if (!this.state.id) {
-            this.state.id = this.state.name;
+
+        let selected = this.props.defaultValue;
+        if (this.state.dataSource && this.state.dataSource.selected
+            && ((this.isDataSourceSelectedArray() && this.state.dataSource.selected.length > 0) || !this.isDataSourceSelectedArray())) {
+            selected = this.state.dataSource.selected;
         }
 
-        if (this.state.dataSource && this.state.dataSource.selected
-            && ((this.isDataSourceSelectedArray() && this.state.dataSource.selected.length > 0) || !this.isDataSourceSelectedArray() )) {
-            this.state.selected = this.state.dataSource.selected;
-        } else {
-            this.state.selected = this.props.defaultValue;
-        }
+        this.state = {
+            ...this.state,
+            id: (!this.state.id) ? this.state.name : this.state.id,
+            selected,
+        };
+
         if (this.state.dataSource) {
-            this.state.dataSource.on("select", (selectedItems)=> {
-                this.setState({selected: selectedItems});
+            this.state.dataSource.on("select", (selectedItems) => {
+                this.setState({ selected: selectedItems });
             });
         }
     }
@@ -169,11 +170,11 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         this.setCurrentValue(this.state.currentValue);
     }
 
-    handleClick(item):any {
+    handleClick(item): any {
         if (this.props.dataSource) {
             this.props.dataSource.select(item);
         } else {
-            this.setState({selected: item});
+            this.setState({ selected: item });
         }
     }
 
@@ -220,32 +221,38 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         }
 
         /* On n'inclut pas les propriétés spécifiques ou celles dont on surcharge la valeur */
-        let htmlProps: HtmlPropsInterface = _.omit(
+        const htmlProps: HtmlPropsInterface = _.omit(
             this.getHtmlProps(),
             [
-                "RadiosField, lié à une datasource (initialisée avec un array)dataSource",
+                "dataSource",
                 "type",
                 "currentValue",
                 "defaultChecked",
                 "value",
                 "id",
-                "data"
-            ]
+                "data",
+            ],
         );
 
         if (this.state.readOnly && !this.state.disabled) {
             htmlProps.disabled = true;
         }
 
-        let cx = classNames({
-            "fl radio-inline": this.state.inline == InlineStyle.ALL || this.state.inline == InlineStyle.FIELD
+        const cx = classNames({
+            "fl radio-inline": this.state.inline === InlineStyle.ALL || this.state.inline === InlineStyle.FIELD,
         });
-        let label = choice[ this.state.labelKey ] ?
+        const label = choice[ this.state.labelKey ] ?
             choice[ this.state.labelKey ] :
             choice[ this.state.valueKey ];
 
-        let idInput = `${this.state.id}-${label}`;
-        let key = `${idInput}-${choice.value}`;
+        const idInput = `${this.state.id}-${label}`;
+        const key = `${idInput}-${choice.value}`;
+
+
+        const classNamesSpan: ClassDictionary = {
+            outer: true,
+            "has-error":this.hasErrors(), 
+        };
 
         // positioning an input inside a label
         // see @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label#Usage_notes
@@ -259,12 +266,12 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
                         ref={(elt) => this.registerHtmlElement(elt)}
                         type="radio"
                         onClick={() => this.handleClick(choice)}
-                        value={choice[this.state.valueKey]}
+                        value={choice[ this.state.valueKey ]}
                         id={idInput}
                         checked={this.shouldRadioBeChecked(choice)}
                         onChange={this.handleChange}
                     />
-                    <span className="outer">
+                    <span className={classNames(classNamesSpan)}>
                     </span>
                     {label}
                 </label>
@@ -273,17 +280,17 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
     }
 
     protected shouldRadioBeChecked(choice: any): boolean {
-        if (this.state.selected != undefined) {
+        if (this.state.selected !== undefined) {
             if (this.state.dataSource) {
                 let mySelected;
-                if (this.state.selected[this.props.valueKey] != undefined) {
-                    mySelected = this.state.selected[this.props.valueKey];
+                if (this.state.selected[ this.props.valueKey ] !== undefined) {
+                    mySelected = this.state.selected[ this.props.valueKey ];
                 } else {
-                    mySelected = this.state.selected[this.state.dataSource.keysMap[this.props.valueKey]];
+                    mySelected = this.state.selected[ this.state.dataSource.keysMap[ this.props.valueKey ] ];
                 }
-                return choice[this.state.valueKey] == mySelected;
+                return choice[ this.state.valueKey ] === mySelected;
             } else {
-                return choice == this.state.selected;
+                return choice === this.state.selected;
             }
         } else {
             return false;
@@ -303,8 +310,8 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
      */
     renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
 
-        let hasData = this.state.data && this.state.data.length > 0;
-        let hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
+        const hasData = this.state.data && this.state.data.length > 0;
+        const hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
         let id = "";
         if (hasData) {
             id = fieldId + "-" + this.state.data[ 0 ][ this.state.labelKey ];
@@ -322,14 +329,14 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
      * @returns {any}
      */
     renderWidget(): JSX.Element {
-        let cx = classNames(
+        const cx = classNames(
             "radio",
             { "flex-container": this.state.inline },
-            { "inline": this.state.inline == RadiosField.Inline.ALL }
+            { inline: this.state.inline === RadiosField.Inline.ALL },
         );
 
-        let hasData = this.state.data && this.state.data.length > 0;
-        let hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
+        const hasData = this.state.data && this.state.data.length > 0;
+        const hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
 
         return (
             <ul className={cx}>

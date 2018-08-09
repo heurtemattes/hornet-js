@@ -6,7 +6,7 @@
 //                 MartynasZilinskas <https://github.com/MartynasZilinskas>
 //                 Josh Rutherford <https://github.com/theruther4d>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.3
+// TypeScript Version: 2.6
 
 /// <reference path="react.d.ts" />
 
@@ -17,7 +17,7 @@ declare namespace __React {
 
         function unmountComponentAtNode(container: Element): boolean;
 
-        function createPortal(children:  __React.ReactNode, container: Element):  __React.ReactPortal;
+        function createPortal(children:  __React.ReactNode, container: Element, key?: null | string):  __React.ReactPortal;
 
         const version: string;
         const render: Renderer;

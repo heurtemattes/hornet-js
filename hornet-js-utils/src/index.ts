@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@
 require("src/extended/capture_stack_trace_polyfill");
 
 /* Inclusion du shim object.assign : Firefox < 34 */
-if (!Object["assign"]) {
+if (!Object[ "assign" ]) {
     require("object.assign").shim();
 }
 /* Inclusion du polyfill es6-promise */
@@ -90,14 +90,9 @@ if (typeof Promise === "undefined") {
     require("es6-promise").polyfill();
 }
 
-// propagation dynamique de la variable NODE_ENV vers le client
-if (typeof window !== "undefined" && window["Mode"]) {
-    process.env.NODE_ENV = window["Mode"];
-}
-
-//permet de changer la serialisation json des types dates
-//cette surcharge est destinée à disparaitre lorsque les hornet-js-bean-converteurs seront créés
-Date.prototype.toJSON = function(){ return this.getTime(); }
+// permet de changer la serialisation json des types dates
+// cette surcharge est destinée à disparaitre lorsque les hornet-js-bean-converteurs seront créés
+Date.prototype.toJSON = function () { return this.getTime(); };
 
 
 import { Register } from "src/common-register";
@@ -109,19 +104,19 @@ import { ContinuationLocalStorage } from "src/continuation-local-storage";
 import * as _ from "lodash";
 
 export class Utils {
-    static isServer:boolean = Register.isServer;
-    static getLogger:(category:any, buildLoggerFn?:(category:string)=>void)=>Logger = Register.getLogger;
+    static isServer: boolean = Register.isServer;
+    static getLogger: (category: any, buildLoggerFn?: (category: string) => void) => Logger = Register.getLogger;
 
     static dateUtils = DateUtils;
 
     static appSharedProps = AppSharedProps;
-    protected static _config:ConfigLib;
-    protected static _contextPath:string;
+    protected static _config: ConfigLib;
+    protected static _contextPath: string;
 
-    static log4js:any;
-    static notify:(nid, errors, infos?)=>void;
+    static log4js: any;
+    static notify: (nid, errors, infos?) => void;
 
-    static registerGlobal<T>(paramName:string, value:T):T {
+    static registerGlobal<T>(paramName: string, value: T): T {
         return Register.registerGlobal(paramName, value);
     }
 
@@ -141,7 +136,7 @@ export class Utils {
      */
     static getContextPath() {
         if (_.isUndefined(Utils._contextPath)) {
-            var context = Utils.config.getOrDefault("contextPath", "");
+            let context = Utils.config.getOrDefault("contextPath", "");
             if (!_.startsWith(context, "/")) {
                 // On force le démarrage par un slash
                 context = "/" + context;
@@ -160,10 +155,10 @@ export class Utils {
      * @param path
      * @return {string}
      */
-    static buildContextPath(path:string = "") {
-        var retour = path;
+    static buildContextPath(path: string = "") {
+        let retour = path;
 
-        var contextPath = Utils.getContextPath();
+        const contextPath = Utils.getContextPath();
         if (path === "" || (_.startsWith(path, "/") && !_.startsWith(path, contextPath))) {
             // On ne prend que les urls relatives à la racine (=> commence par "/")
             // On ne concatène que lorsque ca ne commence pas déja par le contextPath
@@ -183,27 +178,27 @@ export class Utils {
      * @param path
      * @return {string}
      */
-    static buildStaticPath(path:string) {
+    static buildStaticPath(path: string) {
         let retour = path;
 
-        let contextPath = Utils.getContextPath();
-            if (_.startsWith(path, "/") && !_.startsWith(path, contextPath)) {
-                // On ne prend que les urls relatives à la racine (=> commence par "/")
-                // On ne concatène que lorsque ca ne commence pas déja par le contextPath
-                retour = contextPath + Utils.getStaticPath() + path;
-            }
+        const contextPath = Utils.getContextPath();
+        if (_.startsWith(path, "/") && !_.startsWith(path, contextPath)) {
+            // On ne prend que les urls relatives à la racine (=> commence par "/")
+            // On ne concatène que lorsque ca ne commence pas déja par le contextPath
+            retour = contextPath + Utils.getStaticPath() + path;
+        }
 
-            if (_.endsWith(retour, "/")) {
-                // On enlève toujours le dernier slash
-                retour = retour.substr(0, retour.length - 1);
-            }
+        if (_.endsWith(retour, "/")) {
+            // On enlève toujours le dernier slash
+            retour = retour.substr(0, retour.length - 1);
+        }
 
-            return retour;
+        return retour;
 
     }
 
     static getStaticPath() {
-        var staticpath = "";
+        let staticpath = "";
 
         // mantis 53394 - Pour le mode full spa :
         // tout ce qui est dans /static est en fait déployé directement a la racine du serveur web
@@ -223,7 +218,7 @@ export class Utils {
     }
 
     static setConfigObj(theConfig: Object) {
-        var config: ConfigLib = new ConfigLib();
+        const config: ConfigLib = new ConfigLib();
         config.setConfigObj(theConfig);
         Utils.config = config;
     }
@@ -269,18 +264,18 @@ export class Utils {
      * @returns {any}
      */
     static getValueObject(object: any, chaine: string) {
-        var tab = (chaine ? chaine.split('.') : []),
-            newObject: any = object,
-            lastValue: any = null,
-            first: any = _.first(tab);
+        let tab = (chaine ? chaine.split(".") : []);
+        let newObject: any = object;
+        let lastValue: any = null;
+        let first: any = _.first(tab);
 
         // tant que l'on en a un
         while (first && newObject) {
             // si l'on a bien la propriété demandée
-            if (_.has(newObject, first) || _.isFunction(newObject[first])) {
-                newObject = _.isFunction(newObject[first]) ? newObject[first]() : newObject[first];
+            if (_.has(newObject, first) || _.isFunction(newObject[ first ])) {
+                newObject = _.isFunction(newObject[ first ]) ? newObject[ first ]() : newObject[ first ];
                 // s'il en reste plus qu'un
-                if (tab.length == 1) {
+                if (tab.length === 1) {
                     // on a trouvé notre propriété
                     lastValue = newObject;
                 }
@@ -300,7 +295,7 @@ export class Utils {
 }
 
 if (Utils.isServer) {
-    var config: ConfigLib = new ConfigLib();
+    const config: ConfigLib = new ConfigLib();
     config.loadServerConfigs();
     Utils.config = Utils.registerGlobal("config", config);
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -111,8 +111,8 @@ export interface AbstractCellProps extends HornetComponentProps {
     keyColumn?: string; // from content.tsx
     handleKeyDown?: () => void; // from content.tsx
     isHeader?: boolean; // from content.tsx
-    cellCoordinate?: CellCoordinates; // from content.tsx
     navigateFct?: (CellCoordinates, NavigateDirection) => void; // from content.tsx
+    className?: string;
 
 }
 
@@ -128,8 +128,13 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
 
     constructor(props: P, context: any) {
         super(props, context);
-        this.state.isFocused = false;
-        this.state.isEditing = false;
+
+        this.state = {
+            ...this.state,
+            isFocused: false,
+            isEditing: false,
+        };
+
         this.props.contentState.on(ContentState.FOCUS_CHANGE_EVENT, this.handleFocus);
         this.props.contentState.on(ContentState.BLUR_EVENT, this.handleBlur);
 
@@ -141,7 +146,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
     }
 
     shouldComponentUpdate(nextProps: any, nextState: any) {
-        return this.state.editable !== undefined && this.state.isEditing !== nextState.isEditing;
+        return (this.state.editable !== undefined && this.state.isEditing !== nextState.isEditing);
     }
 
     componentWillUnmount() {
@@ -160,7 +165,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
         } else if (this.props.navigateFct) {
             /* On ne prend en compte que les évènements clavier sans modificateur, pour ne pas surcharger
              * des raccourcis standards tels Alt+ArrowLeft */
-            let keyCode: number = e.keyCode;
+            const keyCode: number = e.keyCode;
 
             let preventDefault: boolean = true;
             /* Implémentation des interactions clavier correspondant au rôle ARIA "grid"
@@ -168,39 +173,39 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
             switch (keyCode) {
                 case KeyCodes.RIGHT_ARROW:
                     logger.trace("Focus sur la cellule suivante de la même ligne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.RIGHT);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.RIGHT);
                     break;
                 case KeyCodes.LEFT_ARROW:
                     logger.trace("Focus sur la cellule précédente de la même ligne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.LEFT);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.LEFT);
                     break;
                 case KeyCodes.DOWN_ARROW:
                     logger.trace("Focus sur la cellule suivante de la même colonne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.BOTOM);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.BOTTOM);
                     break;
                 case KeyCodes.UP_ARROW:
                     logger.trace("Focus sur la cellule précédente de la même colonne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.TOP);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.TOP);
                     break;
                 case KeyCodes.HOME:
                     logger.trace("Focus sur la première cellule de la ligne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.HOME_COL);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.HOME_COL);
                     break;
                 case KeyCodes.END:
                     logger.trace("Focus sur la dernière cellule de la ligne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.END_COL);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.END_COL);
                     break;
                 case KeyCodes.PAGE_UP:
                     logger.trace("Focus sur la première cellule de la colonne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.HOME_LINE);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.HOME_LINE);
                     break;
                 case KeyCodes.PAGE_DOWN:
                     logger.trace("Focus sur la dernière cellule de la colonne");
-                    this.props.navigateFct(this.props.cellCoordinate, NavigateDirection.END_LINE);
+                    this.props.navigateFct(this.props.coordinates, NavigateDirection.END_LINE);
                     break;
                 case KeyCodes.ENTER:
                     /* Lorsque la cellule contient un lien ou un bouton, on la touche entrée sert à activer celui-ci */
-                    if (e.target != this.tableCellRef[ this.props.cellCoordinate.row ]) {
+                    if (e.target !== this.tableCellRef[ this.props.coordinates.row ]) {
                         preventDefault = false;
                         break;
                     }
@@ -279,9 +284,9 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
         if (node && node.children) {
             for (let i = 0; i < node.children.length; i++) {
                 if (!value) {
-                    if (node.children[ i ].localName != "input" && node.children[ i ].children) {
+                    if (node.children[ i ].localName !== "input" && node.children[ i ].children) {
                         value = this.getInputValue(node.children[ i ]);
-                    } else if (node.children[ i ].localName == "input") {
+                    } else if (node.children[ i ].localName === "input") {
                         value = node.children[ i ].value;
                     }
                 }
@@ -296,19 +301,21 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      * @param lineIndex
      */
     handleEdition(lineIndex: number) {
-        let nameClass: string = "default-body-cell";
+        const nameClass: string = "default-body-cell";
         if (_.isNull(lineIndex)) {
             this.setState({ isEditing: false });
             this.tableCellRef.removeAttribute("disabled");
             this.tableCellRef.classList.remove("datatable-cell-in-edition");
 
-        } else if (lineIndex === this.props.cellCoordinate.row) {
-            this.setState({ isEditing: (lineIndex === this.props.cellCoordinate.row) });
+        } else if (lineIndex === this.props.coordinates.row) {
+            this.setState({ isEditing: (lineIndex === this.props.coordinates.row) });
             this.tableCellRef.classList.add("datatable-cell-in-edition");
         } else {
-            if (this.tableCellRef.localName == "th") {
+            if (this.tableCellRef.localName === "th") {
                 this.tableCellRef.classList.add("is_disabled");
-                this.tableCellRef.classList.remove("datatable-header-sortable-column", "datatable-header-sorted", "datatable-header-sorted-asc");
+                this.tableCellRef.classList.remove("datatable-header-sortable-column",
+                                                   "datatable-header-sorted",
+                                                   "datatable-header-sorted-asc");
             } else {
                 this.tableCellRef.setAttribute("disabled", "true");
             }
@@ -320,10 +327,10 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      * @param e
      */
     handleBlur = (oldCell: CellCoordinates) => {
-        if (this.props.cellCoordinate.isSame(oldCell) && this.tableCellRef) {
+        if (this.props.coordinates.isSame(oldCell) && this.tableCellRef) {
             this.blurActions(this.tableCellRef);
         }
-    };
+    }
 
     /**
      * Méthode encapsulant le traitement qui permet de gerer la perte de focus sur une cellule
@@ -345,7 +352,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
         if (tableCellRef && tableCellRef.firstChild && (tableCellRef.firstChild as HTMLElement).focus) {
             (tableCellRef.firstChild as HTMLElement).tabIndex = value;
             if (isFocus) {
-                (tableCellRef.firstChild as HTMLElement).focus();
+               (tableCellRef.firstChild as HTMLElement).focus();
             }
         }
         else {
@@ -362,18 +369,18 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      * @param newCell cellule à vérifier pour l'arrivée
      */
     handleFocus = (oldCell: CellCoordinates, newCell: CellCoordinates) => {
-        if (this.props.cellCoordinate) {
-            if (this.props.cellCoordinate.isSame(oldCell)) {
+        if (this.props.coordinates) {
+            if (this.props.coordinates.isSame(oldCell)) {
                 if (this.tableCellRef) {
                     this.tableCellRef.tabIndex = -1;
                 }
                 this.setState({ isFocused: false });
             }
-            if (this.props.cellCoordinate.isSame(newCell)) {
+            if (this.props.coordinates.isSame(newCell)) {
                 this.setState({ isFocused: true }, this.handleCellFocus(this.tableCellRef));
             }
         }
-    };
+    }
 
     /**
      * Permet de mettre le focus sur l'AbstractBodyCell
@@ -381,7 +388,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      * sinon on met le focus sur toute la cellule
      */
     handleCellFocus(tableCellRef): any {
-        if (tableCellRef) {
+       if (tableCellRef) {
             AbstractCell.setCellTabIndex(this.tableCellRef, 0, true);
         }
     }

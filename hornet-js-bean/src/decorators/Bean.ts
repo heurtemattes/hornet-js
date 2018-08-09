@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,17 +86,17 @@ export default function (target) {
     if (!target.prototype.__pull__) {
         target.prototype.__pull__ = function (options) {
 
-            //liste des champs à mapper
-            let destMap = JSON.parse(this.__proto__.__mapFields__ ? this.__proto__.__mapFields__ : null);
+            // liste des champs à mapper
+            const destMap = JSON.parse(this.__proto__.__mapFields__ ? this.__proto__.__mapFields__ : null);
 
-            //instance à mapper
-            let object = options.object;
+            // instance à mapper
+            const object = options.object;
 
-            //option permettant de serialiser les objects
-            //et ainsi supprimer les attributs non désirables dans la réponse
+            // option permettant de serialiser les objects
+            // et ainsi supprimer les attributs non désirables dans la réponse
             if (options.serialize) {
-                for (let key in this) {
-                    if (this[ key ] != "function") {
+                for (const key in this) {
+                    if (this[ key ] !== "function") {
                         delete this[ key ];
                     }
                 }
@@ -106,36 +106,40 @@ export default function (target) {
             if (destMap) {
                 for (let idxField = 0; idxField < destMap.length; idxField++) {
                     let result;
-                    //nom de la propriété courante
-                    let fieldName = destMap[ idxField ];
-                    //valeur de la propriété
+                    // nom de la propriété courante
+                    const fieldName = destMap[ idxField ];
+                    // valeur de la propriété
                     let prop = object[ fieldName ];
 
-                    //Y a t'il un alias sur la propriété
-                    let mapAlias = JSON.parse(this.__proto__.__alias__ ? this.__proto__.__alias__ : null);
+                    // pour les champs custom
+                    if (!prop && object.dataValues && object.dataValues[fieldName]) {
+                        prop = object.dataValues[fieldName];
+                    }
+                    // Y a t'il un alias sur la propriété
+                    const mapAlias = JSON.parse(this.__proto__.__alias__ ? this.__proto__.__alias__ : null);
                     if (mapAlias && mapAlias[ fieldName ]) {
-                        let alias = mapAlias[ fieldName ];
+                        const alias = mapAlias[ fieldName ];
                         _.each(alias, (value) => {
                             let val;
                             try {
-                                //val = eval('object.'+value);
-                                val = ObjectUtils.getSubObject(object, value)
+                                // val = eval('object.'+value);
+                                val = ObjectUtils.getSubObject(object, value);
                             } catch (e) {
-                                //nothing
+                                // nothing
                             }
                             if (val) {
                                 prop = val;
                                 return false;
                             }
-                        })
+                        });
                     }
 
-                    //Phase de copie
-                    //si on a un Array ou un Object on instancie la classe cible
-                    //sinon on fait une copie brute.
+                    // Phase de copie
+                    // si on a un Array ou un Object on instancie la classe cible
+                    // sinon on fait une copie brute.
                     if ((prop instanceof Object && this.__proto__.__mapClass__[ fieldName ]) || prop instanceof Array) {
 
-                        let Clazz = this.__proto__.__mapClass__[ fieldName ];
+                        const Clazz = this.__proto__.__mapClass__[ fieldName ];
                         if (prop instanceof Array) {
                             result = [];
                             prop.forEach(res => {
@@ -144,7 +148,7 @@ export default function (target) {
                                 } else {
                                     result.push(res);
                                 }
-                            })
+                            });
                         } else {
                             result = new Clazz().__pull__(_.extend(options, { object: prop }));
                         }
@@ -154,13 +158,13 @@ export default function (target) {
                     }
                 }
                 if (options.serialize) {
-                    this[ '__proto__' ] = null;
-                    delete this[ '__proto__' ];
+                    this[ "__proto__" ] = null;
+                    delete this[ "__proto__" ];
 
                 }
             }
             return this;
-        }
+        };
     }
 
     if (!target.prototype.clone) {
@@ -173,17 +177,17 @@ export default function (target) {
                 res = _.clone(this);
             }
             return res;
-        }
+        };
     }
     if (!target.prototype.map) {
         target.prototype.map = function (options) {
             return this.__pull__(_.extend(options, { serialize: false }));
-        }
+        };
     }
 
     if (!target.prototype.serialize) {
         target.prototype.serialize = function (options) {
             return this.__pull__(_.extend(options, { serialize: true }));
-        }
+        };
     }
-};
+}

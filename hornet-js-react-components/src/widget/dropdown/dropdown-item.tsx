@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,7 +100,7 @@ export class DropdownItem extends HornetComponent<any, any> {
                 this.state.action(this.props.valueCurrent, e);
             }
         }
-    };
+    }
 
     /**
      * @inheritDoc
@@ -113,11 +113,11 @@ export class DropdownItem extends HornetComponent<any, any> {
         /* Si une image existe */
         if (this.props.srcImg) {
 
-            if (typeof this.props.srcImg == "string") {
+            if (typeof this.props.srcImg === "string") {
                 image = <img
                     src={this.props.srcImg}
                     className={"imgItem"}
-                    alt={this.props.label} />
+                    alt={this.props.label} />;
             } else {
 
                 image = this.props.srcImg;
@@ -126,23 +126,25 @@ export class DropdownItem extends HornetComponent<any, any> {
         if (this.props.disabled) {
             checked = " checked";
         }
-        if (this.props.label.props && "toggle-column-item-content" === this.props.label.props.className) {
-            rendu = this.props.label
+        if (this.props.label && this.props.label.props && "toggle-column-item-content" === this.props.label.props.className) {
+            rendu = this.props.label;
         } else {
-            let aHtmlProps = {
+            const aHtmlProps = {
                 lang: this.props.disabled ? null : this.props.lang,
                 tabIndex: 0,
                 onClick: this.onClickEvent,
                 className: this.props.className + checked,
                 ref: (link) => this.props.getRef(link),
-                onKeyDown: (e) => this.props.handleKeyDown(e, this.props.action, this.state.url)
-            }
+                onKeyDown: (e) => this.props.handleKeyDown(e, this.props.action, this.state.url),
+                role: "button",
+                title: this.props.title,
+            };
 
             rendu = <a  {...aHtmlProps} >{image} {this.props.label}  </a>;
         }
 
         return (
             <li> {rendu} </li>
-        )
+        );
     }
 }

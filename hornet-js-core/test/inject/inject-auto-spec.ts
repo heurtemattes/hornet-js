@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,31 +85,33 @@ Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "disableClustering": true,
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
-var expect:any = TestUtils.chai.expect;
+var expect: any = TestUtils.chai.expect;
 
 import { Injector } from "src/inject/injector";
 import { BeanServerInject } from "test/inject/bean-server-inject";
 import { Bean, BeanInject, BeanToInject, HOW_I_AM } from "test/inject/bean";
-import "test/inject/bean-auto"; // syntaxe pour ne pas que typescript supprime les imports non utilisés
 
-describe("Test of Inject* : ", () => {
+describe("Test of Inject lazy : ", () => {
 
     it("should auto create and inject a bean in constructor", (done) => {
-        let b = new BeanServerInject({howIAm: function() {throw(new Error())}});
+        require("test/inject/bean-auto");
+        let b = new BeanServerInject({ howIAm: function () { throw (new Error()) } });
         expect(b.howIAm).to.be.exist;
         expect(b.howIAm()).to.eql(HOW_I_AM);
+        Injector.getRegistered(BeanToInject);
+        expect((b.bean as any).count).to.eql(11);
         Injector.removeRegistered(BeanToInject);
         Injector.removeRegistered(BeanInject);
         done();

@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -148,5 +148,12 @@ export class CodesError {
      * code error BATCH 10700 - 10799
      */
     static BATCH_OPTIONS_UNDEFINED: number = 10700;
+
+    /**
+     * code error REFERENTIEL 10800 - 10899
+     */
+    static REFERENTIEL_TABLE_NOTFOUND: number = 10800;
+    static REFERENTIEL_HORNET_SEQUELIZE_MODEL_NOTFOUND: number = 10801;
+    static REFERENTIEL_HORNET_SEQUELIZE_ENTITY_NOTFOUND: number = 10802;
 
 }

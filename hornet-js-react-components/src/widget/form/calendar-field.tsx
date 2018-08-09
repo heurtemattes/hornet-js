@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,7 @@ import {
     AbstractField,
     HornetBasicFormFieldProps,
     HornetClickableProps,
-    HornetWrittableProps
+    HornetWrittableProps,
 } from "src/widget/form/abstract-field";
 import { Modal } from "src/widget/dialog/modal";
 import * as _ from "lodash";
@@ -98,7 +98,7 @@ import { KEYNAMES } from "hornet-js-components/src/event/key-codes";
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.calendar-fied");
 
 let RcCalendar = null;
-let defaultLocale = DateUtils.default_locale;
+const defaultLocale = DateUtils.default_locale;
 
 /**
  * Propriétés du composant calendrier.
@@ -118,16 +118,18 @@ export interface CalendarFieldProps extends InputFieldProps {
     /** validation lors du submot formulaire */
     valideOnForm?: boolean;
     onValueChange?: (value: string) => void;
+    /** définit si le champs peut être réinitialiser */
+    resettable?: boolean;
 }
 
 /**
  * Etat du composant calendrier
  */
 export interface CalendarFieldState {
-    isVisible?: boolean,
-    strValue?: string,
-    calendarLocale?: any,
-    inputSize?: number,
+    isVisible?: boolean;
+    strValue?: string;
+    calendarLocale?: any;
+    inputSize?: number;
     onValueChange?: (value: string) => void;
 }
 
@@ -136,7 +138,7 @@ if (!Utils.isServer) {
     logger.trace("Execution sur le CLIENT(NAVIGATEUR)");
     RcCalendar = require("rc-calendar");
     /* Patch de la méthode getTitleString utilisée pour afficher la date correspondant au jour survolé dans le calendrier */
-    let rcCalendarUtil = require("rc-calendar/lib/util/index");
+    const rcCalendarUtil = require("rc-calendar/lib/util/index");
 
     if (rcCalendarUtil && rcCalendarUtil.getTitleString) {
         rcCalendarUtil.getTitleString = (value?: string) => {
@@ -162,17 +164,19 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
     static defaultProps = _.assign(AbstractField.defaultProps, {
         disabled: false,
         isDatePicker: true,
-        valideOnForm: true
+        valideOnForm: true,
+        resettable: true,
+        resetTitle: "calendar.resetTitle",
     });
 
     constructor(props?: P, context?: any) {
         super(props, context);
 
-        let calendarLocale = Utils.getCls("hornet.internationalization") ?
-            this.i18n("calendar") : {"dateFormat": "DD/MM/YYYY"};
+        const calendarLocale = Utils.getCls("hornet.internationalization") ?
+            this.i18n("calendar") : { dateFormat: "DD/MM/YYYY" };
 
         /*récupération de la locale d'internationalisation*/
-        let internationalisation = Utils.getCls("hornet.internationalization");
+        const internationalisation = Utils.getCls("hornet.internationalization");
         let language: any;
         if (internationalisation) {
             language = internationalisation.locale;
@@ -181,25 +185,26 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         }
 
         /* attribut HTML size du champ de saisie */
-        let inputSize: number = calendarLocale.dateFormat.length;
+        const inputSize: number = calendarLocale.dateFormat.length;
 
-        this.state.isVisible = false;
-        this.state.calendarLocale = calendarLocale;
-        this.state.language = language;
-        this.state.inputSize = inputSize;
-        if (!props.placeHolder) {
-            this.state.placeHolder = this.i18n("calendar.placeHolder");
-        }
-        this.state.currentValue = "";
-        this.state.messageValidation = this.i18n("form.validation.format", {field: this.state.label});
+        this.state = {
+            ...this.state,
+            isVisible: false,
+            calendarLocale,
+            language,
+            inputSize,
+            placeHolder: (!props.placeHolder) ? this.i18n("calendar.placeHolder") : "",
+            currentValue: "",
+            messageValidation: this.i18n("form.validation.format", { field: this.state.label }),
+        };
     }
 
     /**
      * Récupère le format d'affichage des dates
      */
     protected getFormat() {
-        let internationalisation = Utils.getCls("hornet.internationalization");
-        let dateFormat = internationalisation.messages.calendar.dateFormat;
+        const internationalisation = Utils.getCls("hornet.internationalization");
+        const dateFormat = internationalisation.messages.calendar.dateFormat;
         return dateFormat;
     }
 
@@ -217,16 +222,16 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         if (this.state.isDatePicker) {
             reactIconTag =
                 <button className="agenda icon" type="button" onClick={this.showCalendar}
-                        title={this.state.title || this.state.calendarLocale.agendaTitle}
-                        disabled={this.state.readOnly || this.state.disabled} aria-haspopup={true} value="calendar"
+                    title={this.state.title || this.state.calendarLocale.agendaTitle}
+                    disabled={this.state.readOnly || this.state.disabled} aria-haspopup={true} value="calendar"
                 >
                     <img src={CalendarField.genUrlTheme("/img/calendar/icon_calendar.svg")}
-                         alt={this.state.title || this.state.calendarLocale.agendaTitle}/>
+                        alt={this.state.title || this.state.calendarLocale.agendaTitle} />
                 </button>;
 
 
             /*RcCalendar prend un Moment en paramètre*/
-            let date = _.clone(this.state.currentValue);
+            const date = _.clone(this.state.currentValue);
             let currentDate: any;
             if (!date) {
                 currentDate = moment();
@@ -239,14 +244,14 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             currentDate.locale(this.state.language);
             let format = this.getFormat();
             if (format instanceof Array) {
-                format = format[0];
+                format = format[ 0 ];
             }
 
             reactCalendarDialogueTag =
                 <Modal ref="maModal"
-                       underlayClickExits={true}
-                       escapeKeyExits={true}
-                       title={this.state.calendarLocale.choiceDate}
+                    underlayClickExits={true}
+                    escapeKeyExits={true}
+                    title={this.state.calendarLocale.choiceDate}
                 >
                     {!Utils.isServer ?
                         <RcCalendar
@@ -264,7 +269,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
         let htmlProps: __React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
 
-        let formatedValue = this.state.currentValue.length >= 1
+        const formatedValue = this.state.currentValue.length >= 1
             ? this.state.currentValue
             : "";
 
@@ -274,29 +279,30 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             value: formatedValue,
             onChange: this.handleInputChange,
             onKeyPress: this.handleInputKeyPress,
-            onBlur: this.handleInputLeave
+            onBlur: this.handleInputLeave,
         } as __React.HTMLAttributes<HTMLElement>);
 
-        if ((htmlProps as any).label == htmlProps.title) {
+        if ((htmlProps as any).label === htmlProps.title) {
             htmlProps.title = undefined;
         }
         (htmlProps as any).label = undefined;
 
-        let hasError = this.hasErrors() ? " has-error" : "";
+        const hasError = this.hasErrors() ? " has-error" : "";
 
-        let placeHolder = (!this.state.disabled && !this.state.readOnly)
+        const placeHolder = (!this.state.disabled && !this.state.readOnly)
             ? this.state.placeHolder
             : null
-        ;
+            ;
 
         return (
             <div className="calendar-container">
                 <input {...htmlProps}
-                       ref={(elt) => this.registerHtmlElement(elt)}
-                       className={"calendar-input" + hasError}
-                       placeholder={placeHolder}
+                    ref={(elt) => this.registerHtmlElement(elt)}
+                    className={"calendar-input" + hasError}
+                    placeholder={placeHolder}
                 />
-                {!this.state.readOnly && !this.state.disabled && this.state.currentValue ? this.renderResetButton() : null}
+                {!this.state.readOnly && !this.state.disabled && this.state.currentValue && this.state.resettable ?
+                     this.renderResetButton() : null}
                 {reactIconTag}
                 {reactCalendarDialogueTag}
             </div>
@@ -313,7 +319,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         } else if (value instanceof Date) {
             res = this.formatCalendarDate(value.getTime(), this.state.calendarLocale);
         }
-        this.setState({currentValue: res, valued: (value !== "" && value), errors: []}, () => {
+        this.setState({ currentValue: res, valued: (value !== "" && value), errors: undefined }, () => {
             if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
         });
         return this;
@@ -323,9 +329,9 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      * @override
      */
     resetValue(): void {
-        let res = this.formatCalendarDate(null, this.state.calendarLocale);
+        const res = this.formatCalendarDate(null, this.state.calendarLocale);
 
-        this.setState({currentValue: res, valued: false}, () => {
+        this.setState({ currentValue: res, valued: false }, () => {
             if (this.state.onSelect) {
                 if (this.state.onSelect) {
                     this.state.onSelect(res);
@@ -355,16 +361,16 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             this.state.onChange(e);
         }
 
-        let input: HTMLInputElement = e.target as HTMLInputElement;
+        const input: HTMLInputElement = e.target as HTMLInputElement;
 
         if (input.value && !this.state.valued) {
-            this.setState({valued: true});
+            this.setState({ valued: true });
         } else if (!input.value && this.state.valued) {
-            this.setState({valued: false});
+            this.setState({ valued: false });
         }
 
-        if (this.state.currentValue != input.value) {
-            this.setState({currentValue: input.value}, () => {
+        if (this.state.currentValue !== input.value) {
+            this.setState({ currentValue: input.value }, () => {
                 if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
             });
         }
@@ -376,35 +382,35 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      */
     protected handleInputLeave(e: React.SyntheticEvent<HTMLElement>): void {
         /* transforme la date au format définit */
-        let input: HTMLInputElement = e.target as HTMLInputElement;
-        let text = input.value;
+        const input: HTMLInputElement = e.target as HTMLInputElement;
+        const text = input.value;
 
         if (text.length > 0) {
-            let format = this.getFormat();
-            let time = moment(text, format, true);
+            const format = this.getFormat();
+            const time = moment(text, format, true);
             if (time.isValid()) {
                 if (format instanceof Array) {
-                    let newText = time.format(format[0]);
-                    this.setState({currentValue: newText}, () => {
+                    const newText = time.format(format[ 0 ]);
+                    this.setState({ currentValue: newText }, () => {
                         if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
                     });
                 } else {
-                    let newText = time.format(format);
-                    this.setState({currentValue: newText});
+                    const newText = time.format(format);
+                    this.setState({ currentValue: newText });
                 }
             } else {
                 if (this.state.valideOnForm) {
-                    this.setState({currentValue: text}, () => {
+                    this.setState({ currentValue: text }, () => {
                         if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
                     });
                 } else {
                     if (this.hasKeyPress) {
-                        this.setState({errors: [{field: this.state.name, text: this.state.messageValidation}]}, () => {
+                        this.setState({ errors: [ { field: this.state.name, text: this.state.messageValidation } ] }, () => {
                             this.htmlElement.focus();
                         });
                         this.hasKeyPress = false;
                     } else {
-                        this.setState({currentValue: "", errors: []}, () => {
+                        this.setState({ currentValue: "", errors: [] }, () => {
                             if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
                         });
                     }
@@ -423,45 +429,49 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      */
     protected handleInputKeyPress(e: React.KeyboardEvent<HTMLElement>): void {
 
-        let text = (e.target as HTMLInputElement).value;
-        let time = moment(text, this.getFormat());
+        const text = (e.target as HTMLInputElement).value;
+        const time = moment(text, this.getFormat());
 
         if (this.state.onKeyPress) {
             this.state.onKeyPress(event);
         }
 
-        let key: string = e.key;
+        const key: string = e.key;
 
-        if (key == KEYNAMES.ArrowDown) {
+        if (key === KEYNAMES.ArrowDown) {
 
             if (time.isValid()) {
                 time.add(1, "days");
-                this.setState({currentValue: time.toDate()}, () => {
+                this.setState({ currentValue: time.toDate() }, () => {
                     if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
                 });
             }
 
             e.preventDefault();
-        } else if (key == KEYNAMES.ArrowUp) {
+        } else if (key === KEYNAMES.ArrowUp) {
             if (time.isValid()) {
                 time.add(1, "days");
-                this.setState({currentValue: time.toDate()}, () => {
+                this.setState({ currentValue: time.toDate() }, () => {
                     if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
                 });
             }
             e.preventDefault();
-        } else if (key == KEYNAMES.Home) {
-            this.setState({currentValue: new Date()}, () => {
+        } else if (key === KEYNAMES.Home) {
+            this.setState({ currentValue: new Date() }, () => {
                 if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
             });
 
             e.preventDefault();
-        } else if ((/[-.\/]/.test(key)) || (/\d/.test(key))
-            || ((key.toUpperCase() == "A" || key.toUpperCase() == "C" || key.toUpperCase() == "V" || key.toUpperCase() == "X") && e.ctrlKey)) {
-            if (key != "Tab") {
+        } else if ((/[-.\/]/.test(key))
+            || (/\d/.test(key))
+            || ((key.toUpperCase() === "A"
+            || key.toUpperCase() === "C"
+            || key.toUpperCase() === "V"
+            || key.toUpperCase() === "X") && e.ctrlKey)) {
+            if (key !== "Tab") {
                 this.hasKeyPress = true;
             }
-        } else if (key != KEYNAMES.Enter) {
+        } else if (key !== KEYNAMES.Enter) {
             e.stopPropagation();
             e.preventDefault();
         }
@@ -475,7 +485,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         let strValue: string;
         try {
             if (time) {
-                let format = this.getFormat();
+                const format = this.getFormat();
                 strValue = moment(time).format(format);
 
             }
@@ -499,8 +509,8 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         if (value != null) {
             this.setState({
                 currentValue: this.formatCalendarDate(value, this.state.calendarLocale),
-                valued: value != ""
-            }, () => {
+                valued: value !== "",
+            },            () => {
                 this.hideCalendar();
                 if (this.state.onSelect) {
                     this.state.onSelect(value);
@@ -529,7 +539,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
     public setValue(value: any) {
         this.setState({
             currentValue: this.formatCalendarDate(value, this.state.calendarLocale),
-            valued: value != ""
+            valued: value !== "",
         });
         return this;
     }
@@ -555,11 +565,14 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         return this;
     }
 
-    getCurrentValue(): Date {
+    getCurrentValue(removeEmptyStrings: boolean = true): Date {
+        let val;
         if (this.state.valideOnForm) {
-            return Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS) || this.state.currentValue;
+            val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS) 
+            || this.state.currentValue;
         } else {
-            return Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS);
+            val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS);
         }
+        return (!removeEmptyStrings && this.props.nullable && val === "") ? null : val;
     }
 }

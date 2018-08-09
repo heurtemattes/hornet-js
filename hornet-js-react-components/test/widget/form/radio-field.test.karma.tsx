@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 import * as assert from "assert";
@@ -102,19 +102,22 @@ class RadioFieldTest extends BaseTest {
     protected dataSet: Array<any> = [
         {
             isClient: true,
-            libelle: "Client"
+            libelle: "Client",
         }, {
             isClient: false,
-            libelle: "Fournisseur"
-        }
-    ]
+            libelle: "Fournisseur",
+        }, {
+            isClient: "test",
+            libelle: "test",
+        },
+    ];
 
 
     @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
     @Decorators.it("Test radiofields sans datasource sans valeur par défaut")
     testRadioField1() {
@@ -136,14 +139,13 @@ class RadioFieldTest extends BaseTest {
 
         $element = this.renderIntoDocument(element, "main1");
         let htmlElement = document.getElementById("exampleRadio-1-Client");
-        debugger;
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Client n'a pas bien été généré");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-Client ne doit pas être sélectionné");
         htmlElement = document.getElementById("exampleRadio-1-Fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Fournisseur n'a pas bien été généré");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-Fournisseur ne doit pas être sélectionné");
         this.end();
-    };
+    }
 
     @Decorators.it("Test radiofields 2 sans datasource avec valeur par défaut premier item")
     testRadioField2() {
@@ -158,7 +160,7 @@ class RadioFieldTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[0]}
+                        defaultValue={this.dataSet[ 0 ]}
                     />
                 </Form>
             </div>
@@ -172,7 +174,7 @@ class RadioFieldTest extends BaseTest {
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-2-Fournisseur ne doit pas être sélectionné");
         this.end();
-    };
+    }
 
     @Decorators.it("Test radiofields 3 sans datasource avec valeur par défaut deuxième item")
     testRadioField3() {
@@ -187,7 +189,7 @@ class RadioFieldTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[1]}
+                        defaultValue={this.dataSet[ 1 ]}
                     />
                 </Form>
             </div>
@@ -202,7 +204,7 @@ class RadioFieldTest extends BaseTest {
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-3-Fournisseur doit être sélectionné");
 
         this.end();
-    };
+    }
 
     @Decorators.it("Test radiofields 4 sans datasource avec valeur par défaut deuxième item et gestion click")
     testRadioField4() {
@@ -217,7 +219,7 @@ class RadioFieldTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[1]}
+                        defaultValue={this.dataSet[ 1 ]}
                     />
                 </Form>
             </div>
@@ -237,11 +239,11 @@ class RadioFieldTest extends BaseTest {
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-4-Fournisseur doit être sélectionné");
 
         this.end();
-    };
+    }
 
 
 }
 
 
-//lancement des Tests
+// lancement des Tests
 runTest(new RadioFieldTest());

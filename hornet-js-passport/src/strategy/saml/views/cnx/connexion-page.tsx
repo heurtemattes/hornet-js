@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -91,12 +91,12 @@ import { styleCSS } from "src/strategy/saml/views/cnx/thumbnail-css";
 const logger: Logger = Utils.getLogger("hornet-js-passport.strategy.saml.views.connexion-page");
 
 export interface ConnexionSAMLPageProps extends HornetComponentProps {
-    errorMessage?: any,
-    previousUrl?: string,
-    staticUrl?: string,
-    idps?: any,
-    appTheme?: string,
-    fwkTheme?: string
+    errorMessage?: any;
+    previousUrl?: string;
+    staticUrl?: string;
+    idps?: any;
+    appTheme?: string;
+    fwkTheme?: string;
 }
 
 /**
@@ -110,12 +110,12 @@ export class ConnexionPage extends HornetComponent<ConnexionSAMLPageProps, any> 
     };
 
     _renderErrorDiv() {
-        var urlImgError = this.genUrlStatic("/img/error.gif");
+        const urlImgError = this.genUrlStatic("/img/error.gif");
 
         if (_.isArray(this.state.errorMessage) && this.state.errorMessage.length >= 1) {
             return (
                 <div className="errors" id="status">
-                    <img src={this.props.staticUrl + "/img/error.gif"} alt="Erreur : "/>
+                    <img src={this.props.staticUrl + "/img/error.gif"} alt="Erreur : " />
                     <span>{this.state.errorMessage}</span>
                 </div>
             );
@@ -130,33 +130,33 @@ export class ConnexionPage extends HornetComponent<ConnexionSAMLPageProps, any> 
     render(): JSX.Element {
         logger.trace("VIEW ConnexionPage SAML render ");
 
-        let h1Style = _.assign(styleCSS.tac, styleCSS.bgColorMain);
+        const h1Style = _.assign(styleCSS.tac, styleCSS.bgColorMain);
 
-        let headerStyle = styleCSS.header;
+        const headerStyle = styleCSS.header;
 
         return (
-            <html lang='fr'>
-            <head>
-                <title>{"Authentification SAML"}</title>
-                <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8"/>
-                <link rel="icon" type="image/png" href={this.genUrlStatic("/img/logoHornet.png")}/>
-                <link rel='stylesheet' type='text/css' href={this.genUrlStatic("/css/auth.css")}/>
-                <link rel="stylesheet" type="text/css" href={ConnexionPage.genUrlTheme(this.props.fwkTheme)}/>
-                <link rel="stylesheet" type="text/css" href={this.genUrlStatic(this.props.appTheme)}/>
-            </head>
-            <body id='auth'>
-            <div id="app">
-                <div id="site">
-                    <div id="content">
-                        <h1 id="app-name">{"Authentification"}</h1>
-                        <form id="fm1" className="fm-v" method="post" action="./login">
-                            <h2 style={{"borderBottom": "0px"}}>Sélection IDP</h2>
-                            {this.renderIDPButtons()}
-                        </form>
+            <html lang="fr">
+                <head>
+                    <title>{"Authentification SAML"}</title>
+                    <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
+                    <link rel="icon" type="image/png" href={this.genUrlStatic("/img/logoHornet.png")} />
+                    <link rel="stylesheet" type="text/css" href={this.genUrlStatic("/css/auth.css")} />
+                    <link rel="stylesheet" type="text/css" href={ConnexionPage.genUrlTheme(this.props.fwkTheme)} />
+                    <link rel="stylesheet" type="text/css" href={this.genUrlStatic(this.props.appTheme)} />
+                </head>
+                <body id="auth">
+                    <div id="app">
+                        <div id="site">
+                            <div id="content">
+                                <h1 id="app-name">{"Authentification"}</h1>
+                                <form id="fm1" className="fm-v" method="post" action="./login">
+                                    <h2 style={{ borderBottom: "0px" }}>Sélection IDP</h2>
+                                    {this.renderIDPButtons()}
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            </body>
+                </body>
             </html>
         );
     }
@@ -172,11 +172,11 @@ export class ConnexionPage extends HornetComponent<ConnexionSAMLPageProps, any> 
                 {this.props.idps.map((idp, i) => {
                     return (
                         <button key={"idp-button-" + i} type="submit" name="idp" value={JSON.stringify(idp)}
-                                className={"hornet-button"} style={styleCSS.bdr3}>{idp.name}</button>
-                    )
+                            className={"hornet-button"} style={styleCSS.bdr3}>{idp.name}</button>
+                    );
                 })
                 }
             </ButtonsArea>
-        )
+        );
     }
 }

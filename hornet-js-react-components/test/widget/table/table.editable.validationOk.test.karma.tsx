@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,7 +106,7 @@ import { NotificationManager, Notifications } from "hornet-js-core/src/notificat
 
 
 /** Tableau de liste de secteurs */
-let dataSource: DataSource<any>;
+let dataSourceTableEditable: DataSource<any>;
 let tableElement: JSX.Element;
 let table;
 let data;
@@ -124,7 +124,7 @@ class tableTest extends BaseTest {
             data.push({ id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++ });
         }
 
-        dataSource = new DataSource(data);
+        dataSourceTableEditable = new DataSource(data);
 
         schemaEditionTable = {
             "$schema": "http://json-schema.org/schema#",
@@ -157,21 +157,21 @@ class tableTest extends BaseTest {
 
         tableElement = (
             <div>
-                <Notification id="notifTest"/>
+                <Notification id="notifTest" />
                 <Table id="lite">
                     <Header title={"Tableau editable"}>
                     </Header>
-                    <Content dataSource={dataSource} notifId={"notifTest"} schema={schemaEditionTable} onSubmit={() => {
+                    <Content dataSource={dataSourceTableEditable} notifId={"notifTest"} schema={schemaEditionTable} onSubmit={() => {
                     }}>
                         <Columns>
                             <Column keyColumn="label" title={"libelle"} sortable={true} editable={true} />
                             <Column keyColumn="desc" title={"desc"} sortable={true} />
                             <EditionActionColumn keyColumn="id"
-                                                 titleEdit={"modif rapide"}
-                                                 titleSave={"Enregistrer"}
-                                                 titleCancel={"Annuler"}
-                                                 messageAlert={"Voulez vous annuler votre modification"}
-                                                 titleAlert={"Annuler"}
+                                titleEdit={"modif rapide"}
+                                titleSave={"Enregistrer"}
+                                titleCancel={"Annuler"}
+                                messageAlert={"Voulez vous annuler votre modification"}
+                                titleAlert={"Annuler"}
                             />
                         </Columns>
                     </Content>
@@ -181,15 +181,15 @@ class tableTest extends BaseTest {
 
 
         table = this.renderIntoDocument(tableElement, "main3");
-        dataSource.on("fetch", () => {
+        dataSourceTableEditable.on("fetch", () => {
 
             this.triggerMouseEvent(document.querySelector('#main3 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
 
             expect(document.querySelector("#main3 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
 
-            document.querySelector('#main3 #lite-0-colBody-0-0 input#label')["value"] = "new libelle";
+            document.querySelector('#main3 #lite-0-colBody-0-0 input#label')[ "value" ] = "new libelle";
 
-            document.querySelector("#main3 .form-table")["novalidate"] = "true";
+            document.querySelector("#main3 .form-table")[ "novalidate" ] = "true";
 
 
             /* TODO : faire un mock sur l'action de submit sinon le test tourne en boucle */
@@ -199,15 +199,15 @@ class tableTest extends BaseTest {
 
             this.end();
         });
-        dataSource.reload();
+        dataSourceTableEditable.reload();
     };
 
     submitLineForm = (item) => {
 
         NotificationManager.notify(null, null, null, Notifications.makeSingleNotification("", "Modification effectuée"));
-        data[0] = {id: 1, label: item.label, desc: item.desc}
-        dataSource.deleteAll();
-        dataSource.add(true, data);
+        data[ 0 ] = { id: 1, label: item.label, desc: item.desc }
+        dataSourceTableEditable.deleteAll();
+        dataSourceTableEditable.add(true, data);
 
     }
 

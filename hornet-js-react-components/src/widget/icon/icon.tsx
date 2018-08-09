@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -125,7 +125,7 @@ export const EMPTY_URL: string = "#";
 export class Icon extends HornetComponent<IconProps, any> {
 
     static defaultProps = {
-        url: EMPTY_URL
+        url: EMPTY_URL,
     };
 
     /**
@@ -151,7 +151,7 @@ export class Icon extends HornetComponent<IconProps, any> {
      */
     render(): JSX.Element {
         let result: JSX.Element;
-        if (this.state.url == null || this.state.url == EMPTY_URL) {
+        if (this.state.url == null || this.state.url === EMPTY_URL) {
             /* L'URL n'est pas valorisée : le comportement est celui d'un bouton (raccourci clavier : Entrée OU Espace )
              * (cf. https://www.w3.org/TR/wai-aria-practices/#button > "Keyboard Interaction")  */
             result = <button type="button" title={this.state.title} id={this.state.idLink}
@@ -161,7 +161,7 @@ export class Icon extends HornetComponent<IconProps, any> {
                 aria-haspopup={this.props.hasPopUp}>
                 <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
                     className={this.state.classImg} />
-            </button>
+            </button>;
         } else {
             /* L'URL est valorisée : le comportement est celui d'un lien (raccourci clavier : Entrée uniquement )*/
             result = <a href={this.state.url} title={this.state.title} id={this.state.idLink}
@@ -170,7 +170,7 @@ export class Icon extends HornetComponent<IconProps, any> {
                 tabIndex={this.props.tabIndex}>
                 <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
                     className={this.state.classImg} />
-            </a>
+            </a>;
         }
         return result;
     }

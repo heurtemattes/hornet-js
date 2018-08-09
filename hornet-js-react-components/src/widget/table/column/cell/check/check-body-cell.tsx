@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,6 +84,7 @@ import { Logger } from "hornet-js-utils/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
 import { CheckBox } from "src/widget/form/checkbox";
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.check.check-body-cell");
 
@@ -108,8 +109,8 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
      */
     shouldComponentUpdate(nextProps: CheckBodyCellProps, nextState: any) {
         return super.shouldComponentUpdate(nextProps, nextState)
-            || nextState.isSelected != this.state.isSelected
-            || nextState.isEditing != this.state.isEditing
+            || nextState.isSelected !== this.state.isSelected
+            || nextState.isEditing !== this.state.isEditing;
     }
 
     /**
@@ -123,13 +124,21 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
     /**
      * @inheritDoc
      */
+    componentWillReceiveProps(nextProps: CheckBodyCellProps) {
+        // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
+        this.state = {...this.state, ...nextProps};
+    }
+
+    /**
+     * @inheritDoc
+     */
     renderCell() {
 
         logger.trace("render checkBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        let title: string = this.state.isSelected ? this.props.altUnselect : this.props.altSelect;
+        const title: string = this.state.isSelected ? this.props.altUnselect : this.props.altSelect;
 
-        let checkBoxProps: any = {
+        const checkBoxProps: any = {
             ref: (instance) => {
                 this.checkBoxBodyRef = instance;
             },
@@ -139,7 +148,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
             name: "selectedItems-" + this.props.keyColumn,
             tabIndex: -1,
             disabled: this.setDisabled(),
-            title: title && this.i18n(title, this.props.value)
+            title: title && this.i18n(title, this.props.value),
         };
 
         return (
@@ -154,7 +163,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
     handleToggleCheckBox = (e: React.MouseEvent<HTMLElement>) => {
         this.props.toggleSelectLines(this.props.value);
         e.stopPropagation();
-    };
+    }
 
     /**
      * @inheritDoc
@@ -205,13 +214,25 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
      * @param selectedItems
      */
     handleChange = (selectedItems: any[]) => {
-        logger.trace("checkbodycell => handlChange", this.props.cellCoordinate);
+        logger.trace("checkbodycell => handlChange", this.props.coordinates);
+        // focus est calculé pour que le setState ne fasse pas perdre le focus a la case
+        const focus = (this.props.contentState.getFocusedCell() 
+            && (this.props.contentState.getFocusedCell().column === this.props.coordinates.column)
+            && (this.props.contentState.getFocusedCell().row === this.props.coordinates.row));
         if (this.checkBoxBodyRef) {
             if (ArrayUtils.getIndexById(selectedItems, this.props.value) !== -1) {
-                this.setState({ isSelected: true });
+                this.setState({ isSelected: true }, () => {
+                    if (focus) {
+                        this.props.contentState.setFocusOn(this.props.coordinates);
+                    }
+                });
             } else {
-                this.setState({ isSelected: false });
+                this.setState({ isSelected: false }, () => {
+                    if (focus) {
+                        this.props.contentState.setFocusOn(this.props.coordinates);
+                    }
+                });
             }
         }
-    };
+    }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,10 +94,9 @@ export interface LineProps extends HornetComponentProps {
  */
 export class Line<P extends LineProps, ColumnState> extends HornetComponent<P, ColumnState> {
     static defaultProps = {
-        displayed: false
-    };
+        displayed: false};
 
     render() {
-        return <div/>;
+        return <div />;
     }
 }

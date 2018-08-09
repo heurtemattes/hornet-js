@@ -73,13 +73,14 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import Sequelize = require("sequelize");
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
+import * as _ from "lodash";
 
 /**
  * Décorator pour entity.
@@ -87,19 +88,44 @@ import { DbConnect } from "src/sequelize/dbconnect-sequelize";
  * Si freezeTableName est activé, Sequelize prendra le nom de la table tableName tel quel
  * pour trouver la table dans la base de données.
  * La classe portant les annotations Entity doit implémenter IModelDAO
- * @param tableName : nom de la table cible
- * @param Model : type retourné par sequelize
- * @param freezeTableName : activer l'option freezeTableName de sequelize - [optionnel] [default = true]
+ * @param tableName : nom de la table cible [obligatoire]
+ * @param Model : type retourné par sequelize [obligatoire]
+ * @param options: objet de configuration pour Sequelize [optionnel]
+ * { 
+ *   freezeTableName : activer l'option freezeTableName de sequelize - [default = true]
+ *   schema : schema où se situe la table
+ *   ...
+ * }
  */
-export function Entity(tableName: string, Model: Sequelize.DefineAttributes, freezeTableName?: boolean) {
+export function Entity(tableName: string, Model: Sequelize.DefineAttributes, options?: any) {
     return (target: Object, propertyKey: string | symbol) => {
-        let _freezeTableName: boolean = (freezeTableName) ? freezeTableName : true;
+        let confOptions = options;
+        let conFreezeTableName: boolean;
+        if (!confOptions) {
+            confOptions = {};
+        }
+        conFreezeTableName = (options && options.freezeTableName) ? options.freezeTableName : true;
+        confOptions.freezeTableName = conFreezeTableName;
         Object.defineProperty(target, propertyKey.toString(), {
-            get: function() {
+            get: function () {
                 if (!target["inner" + propertyKey.toString()]) {
-                    target["inner" + propertyKey.toString()] = DbConnect.getGlobal(this["configDatabase"]).sequelize.define(target["config"][propertyKey.toString()].table, target["config"][propertyKey.toString()].Model, {
-                        freezeTableName: target["config"][propertyKey.toString()].freezeTableName
-                    })
+                    let innerOptions = {};
+                    const myEntity = target["config"][propertyKey.toString()];
+                    for (let i = 0; i < Object.keys(myEntity).length; i++) {
+                        if (Object.keys(myEntity)[i].toString() !== "table"
+                            && Object.keys(myEntity)[i].toString() !== "Model") {
+                            const tmpObject = {};
+                            tmpObject[Object.keys(myEntity)[i].toString()] = myEntity[Object.keys(myEntity)[i]];
+                            innerOptions = _.assignIn(innerOptions, tmpObject);
+                        }
+                    }
+                    target["inner" + propertyKey.toString()] = DbConnect.getGlobal(this["configDatabase"])
+                        .sequelize.define(myEntity.table, myEntity.Model, innerOptions);
+                    target["inner" + propertyKey.toString()].entityName = propertyKey.toString();
+
+                    if (innerOptions && innerOptions["schema"]) {
+                        target["inner" + propertyKey.toString()].schema(innerOptions["schema"]);
+                    }
                 }
                 return target["inner" + propertyKey.toString()];
             }, enumerable: true
@@ -107,7 +133,7 @@ export function Entity(tableName: string, Model: Sequelize.DefineAttributes, fre
         if (!target["config"]) {
             target["config"] = {};
         }
-        ;
-        target["config"][propertyKey.toString()] = {table: tableName, Model: Model, freezeTableName: _freezeTableName};
+        const myObject = _.assignIn({ table: tableName, Model: Model }, confOptions);
+        target["config"][propertyKey.toString()] = myObject;
     };
 }

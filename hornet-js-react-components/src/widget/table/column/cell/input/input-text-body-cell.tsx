@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,11 @@ export class InputTextBodyCell<P extends InputTextBodyCellProps, S> extends Abst
 
     constructor(props: P, context?: any) {
         super(props, context);
-        this.state.value = props.value[props.keyColumn];
+
+        this.state = {
+            ...this.state,
+            value: props.value[ props.keyColumn ],
+        };
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -104,10 +108,10 @@ export class InputTextBodyCell<P extends InputTextBodyCellProps, S> extends Abst
      * @inheritDoc
      */
     renderCell() {
-        logger.trace("render InputTextBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.cellCoordinate.row);
+        logger.trace("render InputTextBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        let inputTextProps: any = {
-            name: this.props.id + "." + this.props.cellCoordinate.row + "." + this.state.keyColumn,
+        const inputTextProps: any = {
+            name: this.props.id + "." + this.props.coordinates.row + "." + this.state.keyColumn,
             hideError: true,
             className: "table-cell-input",
             groupClass: "table-cell-container",
@@ -116,7 +120,7 @@ export class InputTextBodyCell<P extends InputTextBodyCellProps, S> extends Abst
             title: this.state.title,
             valued: this.state.value,
             readOnly: !this.state.editable,
-            disabled: !this.state.editable
+            disabled: !this.state.editable,
         };
 
         return (
@@ -146,7 +150,7 @@ export class InputTextBodyCell<P extends InputTextBodyCellProps, S> extends Abst
                 (tableCellRef as HTMLElement).focus();
 
             } else if (tableCellRef.children) {
-                this.handleCellFocus(tableCellRef.children[0]);
+                this.handleCellFocus(tableCellRef.children[ 0 ]);
             }
         }
     }

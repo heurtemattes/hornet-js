@@ -73,25 +73,37 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
-import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
 import * as Sequelize from "sequelize";
+import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 
+const logger: Logger = Utils.getLogger("hornet-js-database.src.sequelize.hornet-sequelize-entity");
+
+/**
+ * @deprecated Utiliser HornetDbConnector<T extends HornetSequelizeModel>
+ */
 export class HornetSequelizeEntity<T extends HornetSequelizeModel> {
-
     modelDAO: T;
 
     constructor(modelDAO: T) {
+        logger.deprecated("HornetSequelizeEntity est deprecated. Utilisez le composant HornetGenericDAO depuis vos DAO");
         DbConnect.init(modelDAO.configDatabase);
         this.modelDAO = modelDAO;
     }
 
+    /**
+     * @deprecated Utiliser SequelizeUtils.getQuery(confiName?: string)
+     * @param configName
+     */
     protected getQuery(configName?: string): Sequelize.Sequelize {
-        return DbConnect.global[configName || DbConnect.defaultConfigName].sequelize;
+        logger.deprecated("la méthode getQuery(confiName?: string) est deprecated. Utilisez SequelizeUtils.getQuery(confiName?: string)");
+        return DbConnect.global[ configName || DbConnect.defaultConfigName ].sequelize;
     }
 }

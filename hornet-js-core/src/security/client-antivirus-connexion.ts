@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,8 +88,8 @@ import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { Utils } from "hornet-js-utils";
 import { ClientInputChannel } from "src/security/client-input-channel";
-//fixme changer l'import var net...
-var net = require("net");
+// fixme changer l'import var net...
+const net = require("net");
 
 export interface ClientAntivirusConnexionProps {
 
@@ -138,7 +138,7 @@ export class ClientAntivirusConnexion {
         this.port = options ? options.port : undefined || Utils.config.getOrDefault("antivirus.port", 3310);
         this.host = options ? options.host : undefined || Utils.config.getOrDefault("antivirus.host", "localhost");
         this.timeout = options ? options.timeout : undefined || Utils.config.getOrDefault("antivirus.timeout", 60000);
-        this.complete = options ? options.complete : undefined || function (stream) { }
+        this.complete = options ? options.complete : undefined || function (stream) { };
     }
 
     /**
@@ -148,23 +148,24 @@ export class ClientAntivirusConnexion {
      */
     public scan(stream) {
         return new Promise((resolve, reject) => {
-            let socket = new net.Socket();
+            const socket = new net.Socket();
             socket.setTimeout(this.timeout);
             let status = "";
-            let buffers = [];
+            const buffers = [];
             let res;
             socket.connect(this.port, this.host, () => {
-                var channel = new ClientInputChannel();
+                const channel = new ClientInputChannel();
                 stream.on("data", (buffer) => {
                     buffers.push(buffer);
                 });
                 stream.on("end", () => {
-                    res = Buffer.concat(buffers)
+                    res = Buffer.concat(buffers);
                 });
                 stream.pipe(channel).pipe(socket).on("end", () => {
                     this.complete(stream);
                 }).on("error", (err) => {
-                    reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_UNKNOWN, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError(err)));
+                    reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_UNKNOWN, 
+                                              { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError(err)));
                     this.complete(stream);
                 });
             }).on("data", (data) => {
@@ -172,9 +173,10 @@ export class ClientAntivirusConnexion {
                 if (data.toString().indexOf("\n") !== -1) {
                     socket.destroy();
                     status = status.substring(0, status.indexOf("\n"));
-                    var result = status.match(/^stream: (.+) FOUND$/);
+                    let result = status.match(/^stream: (.+) FOUND$/);
                     if (result !== null) {
-                        reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_INFECTED, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError(result[ 1 ])));
+                        reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_INFECTED, 
+                                                  { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError(result[ 1 ])));
                     }
                     else if (status === "stream: OK") {
                         resolve(res);
@@ -182,21 +184,27 @@ export class ClientAntivirusConnexion {
                     else {
                         result = status.match(/^(.+) ERROR/);
                         if (result != null) {
-                            reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_UNKNOWN, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError("CLAMAV-SCAN-ERROR", [ { msg: result[ 1 ] }])));
+                            reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_UNKNOWN, 
+                                                      { errorMessage: CodesError.DEFAULT_ERROR_MSG }, 
+                                                      new SecurityError("CLAMAV-SCAN-ERROR", [ { msg: result[ 1 ] } ])));
                         }
                         else {
-                            reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_RESPONSE_MALFORMED, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError("CLAMAV-SCAN-ERROR")));
+                            reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_RESPONSE_MALFORMED, 
+                                                      { errorMessage: CodesError.DEFAULT_ERROR_MSG }, 
+                                                      new SecurityError("CLAMAV-SCAN-ERROR")));
                         }
                     }
                 }
             }).on("error", (err) => {
                 socket.destroy();
-                reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_RESPONSE_MALFORMED, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError(err)));
+                reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_RESPONSE_MALFORMED, 
+                                          { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError(err)));
             }).on("timeout", () => {
                 socket.destroy();
-                reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_TIMEOUT, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError("CLAMAV-SCAN-ERROR")));
+                reject(new TechnicalError("ERR_TECH_" + CodesError.CLAMAV_SCAN_TIMEOUT, 
+                                          { errorMessage: CodesError.DEFAULT_ERROR_MSG }, new SecurityError("CLAMAV-SCAN-ERROR")));
             }).on("close", () => { });
-        })
+        });
     }
 }
 

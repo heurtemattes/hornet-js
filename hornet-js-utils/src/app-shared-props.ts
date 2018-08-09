@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,7 @@ export class AppSharedProps {
      * @param value
      */
     static set(key: string, value: any) {
-        AppSharedProps.appSharedPropsObject[key] = value;
+        AppSharedProps.appSharedPropsObject[ key ] = value;
     }
 
     /**
@@ -96,12 +96,12 @@ export class AppSharedProps {
      * @returns {any}
      */
     static get(key: string): any {
-        return AppSharedProps.appSharedPropsObject[key];
+        return AppSharedProps.appSharedPropsObject[ key ];
     }
 
     static rehydrate(obj: any) {
-        for (let i in obj) {
-            AppSharedProps.appSharedPropsObject[i] = obj[i];
+        for (const i in obj) {
+            AppSharedProps.appSharedPropsObject[ i ] = obj[ i ];
         }
     }
 

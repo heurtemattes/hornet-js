@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,7 +92,7 @@ export class ExpandingLayout extends ServiceRequest {
             spinnerType: SpinnerType.Default,
             method: "post",
             url: Utils.buildContextPath("/setExpandedLayout"),
-            data: layoutObject
+            data: layoutObject,
         });
     }
 
@@ -101,7 +101,7 @@ export class ExpandingLayout extends ServiceRequest {
             spinnerType: SpinnerType.Default,
             noCached: true,
             method: "get",
-            url: Utils.buildContextPath("/isExpandedLayout")
+            url: Utils.buildContextPath("/isExpandedLayout"),
         });
     }
 }

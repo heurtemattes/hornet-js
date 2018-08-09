@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,46 +82,52 @@
 
 import { Utils } from "hornet-js-utils";
 import Sequelize = require("sequelize");
+import { Injector } from "hornet-js-core/src/inject/injector";
+import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
+import { DbConnect } from "src/sequelize/dbconnect-sequelize";
 
 const logger = Utils.getLogger("hornet-js-database.src.sequelize-utils");
+
+export interface HornetSequelizeModelMap {
+    name: string;
+    instance: HornetSequelizeModel;
+}
 
 /**
  * Interface HornetSequelizeOptions
  * Structure les différentes options pour sequelize-utils
  */
 export interface HornetSequelizeAssociationOptions {
-    /** fromEntity Entité correspondant au model portant la clé étrangère */
+    // fromEntity Entité correspondant au model portant la clé étrangère
     fromEntity: Sequelize.Model<any, any>;
-    /** toEntity Entité ciblée la clé étrangère */
+    // toEntity Entité ciblée la clé étrangère
     toEntity: Sequelize.Model<any, any>;
-    /** alias Nom à donner à l'attribut au sein de l'entité fromEntity portant la clé étrangère */
+    // alias Nom à donner à l'attribut au sein de l'entité fromEntity portant la clé étrangère
     alias: string;
-    /** nom du champs de la base de donnée portant la clé étrangère */
+    // nom du champs de la base de donnée portant la clé étrangère
     foreignKey: string;
-    /** Nom de la table issue de la relation multiple, portant une référence vers fromEntiy et une vers toEntity */
-    throughTable?: string;
-    /** otherKey Nom de l'attribut au sein de l'entité cible référence à l'entité courante (optionnel) */
-    otherKey?: string
-    /** Cible de clé primaire autre que celle par défaut */
+    // Nom de la table issue de la relation multiple, portant une référence vers fromEntiy et une vers toEntity
+    throughTable?: string | Sequelize.Model<any, any> | Sequelize.ThroughOptions;
+    // otherKey Nom de l'attribut au sein de l'entité cible référence à l'entité courante (optionnel)
+    otherKey?: string;
+    // Cible de clé primaire autre que celle par défaut
     targetKey?: string;
+    // Attribut source servant d'agrégat
+    sourceKey?: string;
 }
 
-export class SequelizeUtils {
-
+export module SequelizeUtils {
     /**
      * Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
      * @param {HornetSequelizeAssociationOptions} options
      */
-    static initRelationBelongsTo(options: HornetSequelizeAssociationOptions): void {
-
-        if (!(options.fromEntity as any).associations || ((options.fromEntity as any).associations && !(options.fromEntity as any).associations[options.alias])) {
-            options.fromEntity.belongsTo(options.toEntity,
-                {
-                    as: options.alias,
-                    foreignKey: options.foreignKey,
-                    targetKey: options.targetKey
-                }
-            );
+    export function initRelationBelongsTo(options: HornetSequelizeAssociationOptions): void {
+        if (!options.fromEntity["associations"] || (options.fromEntity["associations"]
+            && !options.fromEntity["associations"][options.alias])) {
+            options.fromEntity.belongsTo(options.toEntity, {
+                as: options.alias,
+                foreignKey: options.foreignKey,
+                targetKey: options.targetKey });
         }
     }
 
@@ -129,17 +135,16 @@ export class SequelizeUtils {
      * Initialise une relation multiple entre deux entités de la modélisation
      * @param {HornetSequelizeAssociationOptions} options
      */
-    static initRelationBelongsToMany(options: HornetSequelizeAssociationOptions): void {
+    export function initRelationBelongsToMany(options: HornetSequelizeAssociationOptions): void {
+        if (!options.fromEntity["associations"]
+            || (options.fromEntity["associations"] && !options.fromEntity["associations"][options.alias])) {
 
-        if (!(options.fromEntity as any).associations || ((options.fromEntity as any).associations && !(options.fromEntity as any).associations[options.alias])) {
-            options.fromEntity.belongsToMany(options.toEntity,
-                {
-                    as: options.alias,
-                    through: options.throughTable,
-                    foreignKey: options.foreignKey,
-                    otherKey: options.otherKey
-                }
-            );
+            options.fromEntity.belongsToMany(options.toEntity, {
+                as: options.alias,
+                through: options.throughTable,
+                foreignKey: options.foreignKey,
+                otherKey: options.otherKey,
+                sourceKey: options.sourceKey });
         }
     }
 
@@ -147,14 +152,13 @@ export class SequelizeUtils {
      * Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
      * @param {HornetSequelizeAssociationOptions} options
      */
-    static initRelationHasOne(options: HornetSequelizeAssociationOptions) {
-        if (!(options.fromEntity as any).associations || ((options.fromEntity as any).associations && !(options.fromEntity as any).associations[options.alias])) {
-            options.fromEntity.hasOne(options.toEntity,
-                {
-                    as: options.alias,
-                    foreignKey: options.foreignKey
-                }
-            );
+    export function initRelationHasOne(options: HornetSequelizeAssociationOptions) {
+        if (!options.fromEntity["associations"]
+            || (options.fromEntity["associations"] && !options.fromEntity["associations"][options.alias])) {
+            options.fromEntity.hasOne(options.toEntity, {
+                as: options.alias,
+                foreignKey: options.foreignKey,
+                sourceKey: options.sourceKey });
         }
     }
 
@@ -162,14 +166,52 @@ export class SequelizeUtils {
      * Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
      * @param {HornetSequelizeAssociationOptions} options
      */
-    static initRelationHasMany(options: HornetSequelizeAssociationOptions) {
-        if (!(options.fromEntity as any).associations || ((options.fromEntity as any).associations && !(options.fromEntity as any).associations[options.alias])) {
-            options.fromEntity.hasMany(options.toEntity,
-                {
-                    as: options.alias,
-                    foreignKey: options.foreignKey
-                }
-            );
+    export function initRelationHasMany(options: HornetSequelizeAssociationOptions) {
+        if (!options.fromEntity["associations"]
+            || (options.fromEntity["associations"] && !options.fromEntity["associations"][options.alias])) {
+            options.fromEntity.hasMany(options.toEntity, {
+                as: options.alias,
+                foreignKey: options.foreignKey,
+                sourceKey: options.sourceKey });
         }
+    }
+
+    /**
+     * Enregistre l'instance HornetSequelizeModel dans l'Injector
+     * clé : HornetSequelizeModels
+     * @param modelName Nom de la classe héritant de HornetSequelizeModel
+     */
+    export function registerModel(modelName: string, instance: HornetSequelizeModel) {
+        let models: HornetSequelizeModelMap[] = Injector.getRegistered("HornetSequelizeModels");
+        if (!models) {
+            models = [];
+        } else {
+            Injector.removeRegistered("HornetSequelizeModels");
+        }
+        models.push({ instance, name: modelName });
+        Injector.register("HornetSequelizeModels", models);
+    }
+
+    /**
+     * Enregistre l'entity dans l'Injector dans un tableau
+     * clé : HornetSequelizeEntities
+     * @param entity Instance de l'entity
+     */
+    export function registerEntity(entity: any) {
+        let entities = Injector.getRegistered("HornetSequelizeEntities");
+        if (!entities) {
+            entities = [];
+        } else {
+            Injector.removeRegistered("HornetSequelizeEntities");
+        }
+        entities.push(entity);
+        Injector.register("HornetSequelizeEntities", entities);
+    }
+
+    /**
+     * @param configName
+     */
+    export function getQuery(configName?: string): Sequelize.Sequelize {
+        return DbConnect.global[ configName || DbConnect.defaultConfigName ].sequelize;
     }
 }

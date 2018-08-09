@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,12 +87,12 @@ export class LazyClassLoader {
     static load(lazyClass) {
         let exportLazyClass;
         if (typeof lazyClass === "object") {
-            if (lazyClass["default"]) {
+            if (lazyClass[ "default" ]) {
                 // export default class myClass
-                exportLazyClass = lazyClass["default"];
+                exportLazyClass = lazyClass[ "default" ];
             } else {
                 // export class myClass
-                exportLazyClass = Object.keys(lazyClass).map(key => lazyClass[key])[0];
+                exportLazyClass = Object.keys(lazyClass).map(key => lazyClass[ key ])[ 0 ];
                 logger.warn("Loader take first class in file : ", lazyClass, ", prefere export default class");
             }
         } else if (typeof lazyClass === "function") {

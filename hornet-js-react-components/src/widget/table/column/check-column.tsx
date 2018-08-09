@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,9 +97,9 @@ export interface CheckColumnProps extends ColumnProps {
 export class CheckColumn<T extends CheckColumnProps, S extends ColumnState> extends Column<T, S> {
 
     static defaultProps = Column.mergeObjects(Column.defaultProps, {
-        defaultStyle: {"textAlign": "center", "paddingLeft": 0, "width": "2.5em"},
+        defaultStyle: { textAlign: "center", paddingLeft: 0, width: "2.5em" },
         sortable: false,
-        hiddenable: false
+        hiddenable: false,
     });
     readonly props: Readonly<CheckColumnProps>;
 
@@ -107,7 +107,7 @@ export class CheckColumn<T extends CheckColumnProps, S extends ColumnState> exte
     /**
      * @inheritDoc
      */
-    public getBodyCell(): Class<CheckBodyCell<BodyCellProps, any>> {
+    static getBodyCell(props): Class<CheckBodyCell<BodyCellProps, any>> {
         return CheckBodyCell;
     }
 
@@ -115,7 +115,10 @@ export class CheckColumn<T extends CheckColumnProps, S extends ColumnState> exte
      * Getter pour le composant générant le entête de colonne
      * @return Class<HeaderCell<HeaderCellProps, any>>
      */
-    public getHeaderCell(): Class<CheckHeaderCell<HeaderCellProps, any>> {
+    static getHeaderCell(): Class<CheckHeaderCell<HeaderCellProps, any>> {
         return CheckHeaderCell;
-    }
+    }    
 }
+
+(CheckColumn.prototype.getBodyCell as any).__deprecated__ = true;
+(CheckColumn.prototype.getHeaderCell as any).__deprecated__ = true;

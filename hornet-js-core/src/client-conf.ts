@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,6 +81,7 @@
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { AbstractRoutes, LazyRoutesAsyncClassResolver, DirectorClientConfiguration } from "src/routes/abstract-routes";
 import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
+import { AsyncElement } from "src/executor/async-element";
 
 export interface ClientConfiguration {
     /**
@@ -105,7 +106,7 @@ export interface ClientConfiguration {
      */
     routesLoaderfn: LazyRoutesAsyncClassResolver;
 
-    directorClientConfiguration?: DirectorClientConfiguration
+    directorClientConfiguration?: DirectorClientConfiguration & {initDynamicContext?: boolean}
 
     /**
      * Le composant HTML sur lequel monter le listener de clicks qui route les changements d'URL vers le routeur
@@ -121,4 +122,9 @@ export interface ClientConfiguration {
      * Méthode exécutée au chargement de la page
      */
     onload?: Function;
+
+    /**
+     * Gestion des accès User au niveau du client 
+     */
+    userAccessSecurityElement?: Class<AsyncElement>;
 }

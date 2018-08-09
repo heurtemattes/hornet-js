@@ -73,7 +73,7 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,7 +118,7 @@ export class NavigationUtils {
      * @returns {IMenuItem[]}
      */
     public static getFilteredConfigNavigation(items: IMenuItem[], user: UserInformations, isForPlan?: boolean, itemParent?: IMenuItem, level?: number): IMenuItem[] {
-        let currentItems: IMenuItem[] = [];
+        const currentItems: IMenuItem[] = [];
         let idParent: string = MenuConstants.MENU_ROOT.substring(0, MenuConstants.MENU_ROOT.length - 1);
         if (itemParent) {
             idParent = itemParent.id;
@@ -128,12 +128,14 @@ export class NavigationUtils {
         }
 
         for (let i = 0; i < items.length; i++) {
-            let item: IMenuItem = items[ i ];
-            if (!item.rolesAutorises || (item.rolesAutorises && AuthUtils.isAllowed(user, _.isArray(item.rolesAutorises) ? item.rolesAutorises as any : [ item.rolesAutorises ]))) {
-                let typeNavigation = (isForPlan) ? "visibleDansPlan" : "visibleDansMenu";
+            const item: IMenuItem = items[ i ];
+            if (!item.rolesAutorises 
+                || (item.rolesAutorises 
+                    && AuthUtils.isAllowed(user, _.isArray(item.rolesAutorises) ? item.rolesAutorises as any : [ item.rolesAutorises ]))) {
+                const typeNavigation = (isForPlan) ? "visibleDansPlan" : "visibleDansMenu";
                 if (item[ typeNavigation ]) {
                     logger.debug("L'utilisateur a accès au menu:", item.text);
-                    //item.index = indexParent + currentItems.length;
+                    // item.index = indexParent + currentItems.length;
                     item.id = idParent + MenuConstants.LVL_SEPARATOR + currentItems.length;
                     item.level = level;
                     if (item.submenu) {
@@ -158,7 +160,7 @@ export class NavigationUtils {
      * @return {NavigationItem|string}
      */
     static retrievePageTextKey(navigationData: Array<NavigationItem>, currentUrl: string): string {
-        let retour = NavigationUtils.retrievePageTextItem(navigationData, currentUrl);
+        const retour = NavigationUtils.retrievePageTextItem(navigationData, currentUrl);
         return retour && retour.text;
     }
 
@@ -178,14 +180,14 @@ export class NavigationUtils {
 
         if (navigationData && navigationData.length > 0) {
             for (let i = 0; i < navigationData.length; i++) {
-                let navigationItem = navigationData[ i ];
+                const navigationItem = navigationData[ i ];
 
                 logger.trace(navigationItem);
                 /* test pour voir si l'Url ne se finit pas par un nombre si c'est le cas on supprimer pour avoir le fil d'arianne *
                  - exemple /partenaire/editer/56  devient --> partenaire/editer
                  */
                 if (navigationItem.url && currentUrl.match(RegExp(navigationItem.url, "gi"))) {
-                    //On a un bon candidat
+                    // On a un bon candidat
                     logger.trace("Bon candidat");
                     currentNavigationItem = NavigationUtils.getItemWithLongerUrl(currentNavigationItem, navigationItem);
                 }
@@ -193,7 +195,7 @@ export class NavigationUtils {
                 // Un item peut ne pas avoir d'url mais ses fils oui, il faut donc aller regarder
                 if (navigationItem.submenu) {
                     logger.trace("parcours des sous menus");
-                    let tempNavigationData: NavigationItem = NavigationUtils.retrievePageTextItem(navigationItem.submenu, currentUrl);
+                    const tempNavigationData: NavigationItem = NavigationUtils.retrievePageTextItem(navigationItem.submenu, currentUrl);
                     currentNavigationItem = NavigationUtils.getItemWithLongerUrl(currentNavigationItem, tempNavigationData);
                 }
             }
@@ -226,7 +228,7 @@ export class NavigationUtils {
      */
     static applyTitlePageOnClient(titlePage: string): void {
         if (!Utils.isServer && titlePage) {
-            //côté client
+            // côté client
             document.title = titlePage;
         }
     }
@@ -274,20 +276,20 @@ export class NavigationUtils {
      * @param hideOthersNodesElements
      */
     public static rideDownElementAndToggle(element: HTMLElement, hideElement?: boolean, hideOthersNodesElements?: boolean): void {
-        let depth: number = element.id.replace(/[^0-9]/g, "").length;
-        let familyElementId: number = parseInt(element.id.replace(MenuConstants.MENU_ROOT, "").substr(0, 1));
-        let selector: string = MenuConstants.MENU_ROOT + familyElementId;
+        const depth: number = element.id.replace(/[^0-9]/g, "").length;
+        const familyElementId: number = parseInt(element.id.replace(MenuConstants.MENU_ROOT, "").substr(0, 1), 10);
+        const selector: string = MenuConstants.MENU_ROOT + familyElementId;
 
         /* Fermeture de tous les éléments autres que la branche sur laquelle on est positionné */
         if (hideOthersNodesElements) {
-            let configMenu: any = NavigationUtils.getConfigMenu(),
-                user: any = Utils.getCls("hornet.user"),
-                items = NavigationUtils.getFilteredConfigNavigation(configMenu, user),
-                nbMax = items.length + 1; // ajoute 1 pour infosComplémentaires
+            const configMenu: any = NavigationUtils.getConfigMenu();
+            const user: any = Utils.getCls("hornet.user");
+            const items = NavigationUtils.getFilteredConfigNavigation(configMenu, user);
+            const nbMax = items.length + 1; // ajoute 1 pour infosComplémentaires
 
             for (let i = 0; i < nbMax; i++) {
-                if (i != familyElementId) {
-                    let elementToHide = document.getElementById(MenuConstants.MENU_ROOT + i);
+                if (i !== familyElementId) {
+                    const elementToHide = document.getElementById(MenuConstants.MENU_ROOT + i);
                     if (elementToHide) {
                         NavigationUtils.rideDownElementAndToggle(elementToHide, true);
                     }
@@ -299,7 +301,7 @@ export class NavigationUtils {
         if (myElement) {
             for (let i = 0; i < depth; i++) {
                 if (myElement.classList && myElement.classList.contains(MenuConstants.HAVING_SUBMENU_CLASSNAME)) {
-                    if (myElement.nextSibling && myElement.nextSibling.localName == "li") {
+                    if (myElement.nextSibling && myElement.nextSibling.localName === "li") {
                         if (hideElement) {
                             // TODO à corriger : il faut aussi cacher les sous éléments (cf. mantis 58700)
                             NavigationUtils.hideElement(myElement.nextSibling);
@@ -333,7 +335,7 @@ export class NavigationUtils {
      * @param id identifiant HTML de l'élément
      */
     public static setFocus(id: string): void {
-        let element: HTMLElement = document.getElementById(id);
+        const element: HTMLElement = document.getElementById(id);
         if (element && element.focus) {
             element.focus();
 

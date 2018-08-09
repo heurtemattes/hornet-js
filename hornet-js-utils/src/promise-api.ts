@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,10 +87,10 @@ if (Utils.isServer) {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // wrap bluebird afin de sécuriser l'utilisation de "continuation-local-storage" (perte ou mix de contexte) //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    let shimmer = require("shimmer");
-    let proto = Promise && Promise.prototype;
-    let ns = Utils.getContinuationStorage();
-    shimmer.wrap(proto, "_addCallbacks", function(_addCallbacks) {
+    const shimmer = require("shimmer");
+    const proto = Promise && Promise.prototype;
+    const ns = Utils.getContinuationStorage();
+    shimmer.wrap(proto, "_addCallbacks", function (_addCallbacks) {
         return function ns_addCallbacks(fulfill, reject, progress, promise, receiver, domain) {
             if (typeof fulfill === "function") {
                 fulfill = ns.bind(fulfill);

@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-react-components-dts",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "license": "CECILL-2.1",
   "description": "Définition Typescript du module hornet-js-core",
   "bugs": {

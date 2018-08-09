@@ -1,14 +1,18 @@
 {
-  "appenders": {
-      "console": {
-      "type": "console",
-      "layout": {
-          "type": "pattern",
-          "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-      }
-      }
-  },
-  "categories": {
-      "default": { "appenders": ["console"], "level": "INFO" }
-  }
+    "disableClustering": true,
+    "appenders": {
+        "console": {
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
+        }
+    },
+    "categories": {
+        "default": {
+            "appenders": ["console"],
+            "level": "INFO"
+        }
+    }
 }

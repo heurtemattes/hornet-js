@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,28 +90,55 @@ export interface DateBodyCellProps extends AbstractBodyCellProps {
     /** format d'affichage de la valeur */
     format?: string;
     /** Format de la valeur en entrée si besoin de parser */
-    inputFormat?: string;
+    inputFormat?: moment.MomentFormatSpecification;
 }
 
 export class DateBodyCell<P extends DateBodyCellProps, S> extends AbstractBodyCell<P, any> {
 
     constructor(props: P, context?: any) {
         super(props, context);
-        if (this.state.value) {
-            if (this.state.value instanceof Date || this.state.value instanceof Number) {
-                this.state.value = this.state.value;
-            } else if (!isNaN(this.state.value) && isFinite(this.state.value)) {
-                this.state.value = Number(this.state.value); // nombre de milliseconds
-            } else if (props.inputFormat) {
-                let mom = moment(this.state.value, props.inputFormat, true);
-                if (mom.isValid()) {
-                    this.state.value = mom.toDate(); // nombre de milliseconds
-                }
-            } else {
-                logger.error("Format date not supported ", this.props.keyColumn, " - line:", this.props.coordinates.row);
-                this.state.value = undefined;
-            }
+        if (props.value) {
+
+            const value = DateBodyCell.getDateValue(this.state);
+
+            this.state = {
+                ...this.state,
+                value,
+            };
         }
+    }
+
+    componentWillReceiveProps(nextProps: P, nextContext: any): void {
+        const value = DateBodyCell.getTemplatedValue(nextProps);
+        const props = _.assign({}, {...(nextProps as any), value});
+
+
+        if (value !== this.state.value) {
+            this.setState({
+                value: DateBodyCell.getDateValue(props),
+            });
+        }
+    }
+
+    static getDateValue(props):any {
+
+        let value;
+        if (props.value instanceof Date || props.value instanceof Number) {
+            value = props.value;
+        } else if (!isNaN(props.value) && isFinite(props.value)) {
+            value = Number(props.value); // nombre de milliseconds
+        } else if (props.inputFormat) {
+            const mom = moment(props.value, props.inputFormat, true);
+            if (mom.isValid()) {
+                value = mom.toDate(); // nombre de milliseconds
+            }
+        } else {
+            logger.error("Format date not supported ", props.keyColumn, " - line:", props.coordinates.row);
+            value = undefined;
+        }
+
+        return value;
+
     }
 
     /**
@@ -122,7 +149,7 @@ export class DateBodyCell<P extends DateBodyCellProps, S> extends AbstractBodyCe
         return (
             !this.state.value ? "" :
                 Utils.dateUtils.formatInTZ(this.state.value, this.props.format || this.i18n("calendar.dateFormat"),
-                    Utils.dateUtils.TZ_EUROPE_PARIS)
+                                           Utils.dateUtils.TZ_EUROPE_PARIS)
         );
     }
 }

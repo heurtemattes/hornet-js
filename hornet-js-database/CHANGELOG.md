@@ -1,3 +1,28 @@
+# hornet-js-database 5.2.0
+
+- EVOL - hornet-js-database : Ajout des loggers deprecated
+- EVOL - [S169-571] - hornet-js-database : Intégration generic DAO
+- EVOL - [S169-571] - hornet-js-database : Intégration generic DAO dans appliTuto
+- EVOL - [GenericDAO] - hornet-js-database : Renommage Generic
+- EVOL - [S130] - hornet-js-database - Mise en place genericDAO + refacto + include
+- EVOL - hornet-js-database : ajout d'autre options pour le throughtable des relation belongstomany sequelize (possibilité de mettre les Entity)
+- EVOL - hornet-js-database : Mise en place des DAO générique dans appliTuto
+- EVOL - hornet-js-database : Mise en place des attributes sur DAO générique
+- EVOL - [Pagination]: Mise en place pagination sur DAO générique
+- EVOL - [S130]: CRUD Referentiel
+- EVOL - [S130-453]: CRUD Referentiel - selectAll selector
+- EVOL - [S130-455]: CRUD Referentiel - deleteById avec genericEntity
+- EVOL - [S130-455]: CRUD Referentiel - SelectById avec genericEntity
+- EVOL - [S130-457]: CRUD Referentiel - updateById avec genericEntity
+- EVOL - [S130-451]: CRUD Referentiel
+- EVOL - [S130-451]: CRUD Referentiel - Injector model/entity
+- FIX  - [Support]: Refactor SequelizeUtils
+- FIX  - [Support]: Prise en compte de sourceKey dans Sequelize.hasMany et SequelizeUtils
+- EVOL - [S153-448] : Gestion configuration Sequelize pour @Entity
+- EVOL - [S130]: CRUD Referentiel - insert avec genericEntity
+- EVOL - [S130]: CRUD Referentiel - entityName gérer par Entity
+- EVOL - [S130]: CRUD Referentiel - Generic entity
+
 # hornet-js-database 5.1.1
 
 -	EVOL: peram class dao sequelize

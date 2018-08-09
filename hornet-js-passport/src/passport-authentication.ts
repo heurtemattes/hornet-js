@@ -73,14 +73,14 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { AbstractHornetMiddleware } from "hornet-js-core/src/middleware/middlewares";
-var flash = require("connect-flash");
+const flash = require("connect-flash");
 import { Request, Response } from "express";
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
@@ -104,8 +104,8 @@ export class PassportAuthentication {
     }
 
     public getMiddleware(): Class<AbstractHornetMiddleware> {
-        var passport = this.passport;
-        var createMiddleware = this.createMiddleware.bind(this);
+        const passport = this.passport;
+        const createMiddleware = this.createMiddleware.bind(this);
 
         return class extends AbstractHornetMiddleware {
             insertMiddleware(app) {
@@ -139,7 +139,7 @@ export class PassportAuthentication {
      * @returns middleware express {function(express.Request, express.Response, any)}
      */
     protected createMiddleware(): any {
-        var _self = this;
+        const _self = this;
 
         /* Renvoie d'un middleware gèrent la deconnexion, la connexion et la verification */
         return function ensureAuthenticated(req, res: Response, next: any) {
@@ -151,27 +151,39 @@ export class PassportAuthentication {
                 return;
             }
 
-            if (!req.isAuthenticated()) {
+
+            const user = _self.getUser(req);
+            let validateEndSession = true;
+
+            if(user && user.SessionNotOnOrAfter && _self.configuration.idpSessionTimeout) {
+                const dateEndSession = user.SessionNotOnOrAfter;
+                if(dateEndSession) {
+                    validateEndSession = (dateEndSession - Date.now()) > 0;
+                }
+            }
+
+            if (!req.isAuthenticated() || !validateEndSession) {
                 if (Object.keys(_self.strategies).length == 1) {
                     _self.strategies[ Object.keys(_self.strategies)[ 0 ] ].connect(_self.passport, req, res, next);
                 } else if (Object.keys(_self.strategies).length >= 1 && req.query.strategy) {
                     _self.strategies[ req.query.strategy ].connect(_self.passport, req, res, next);
                 } else {
-                    next(Object.keys(_self.strategies).length == 0 ? new Error("No strategy defined") : new Error("No strategy passed for authentication"));
+                    next(Object.keys(_self.strategies).length === 0 
+                    ? new Error("No strategy defined") 
+                    : new Error("No strategy passed for authentication"));
                 }
             } else {
                 // Traitement désynchro session applicative / session CAS :
                 // si le user est déconnecté du CAS, mais toujours authentifié sur l'appli (cookie session node existant)
                 // alors, lors de la reconnexion au CAS, quand le nouveau ticket arrive (requête = login?ticket=xxx)
                 // il faut relancer tout le processus d'authentification (afin d'effacer/re-créer la session applicative existante)
-                let user = _self.getUser(req);
                 if (AuthenticationUtils.isUrl(req, Utils.buildContextPath(_self.configuration.appLoginPath)) && user && user.strategy && _self.strategies[ user.strategy ].isRequestForStrategie(req)) {
                     _self.strategies[ user.strategy ].connect(_self.passport, req, res, next);
                 } else {
                     next();
                 }
             }
-        }
+        };
     }
 
 
@@ -181,7 +193,7 @@ export class PassportAuthentication {
      * @return Middleware Express
      */
     protected disconnectMiddleware(): any {
-        var _self = this;
+        const _self = this;
 
         return function disconnect(req: Request, res: Response, next): void {
 
@@ -212,7 +224,7 @@ export class PassportAuthentication {
         let user = undefined;
 
         if (this.passport) {
-            user = req[ this.passport._userProperty || 'user' ];
+            user = req[ this.passport._userProperty || "user" ];
         }
 
         return user;

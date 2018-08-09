@@ -95,7 +95,7 @@ declare module "hornet-js-database/src/decorators/dec-seq-entity" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -106,11 +106,16 @@ declare module "hornet-js-database/src/decorators/dec-seq-entity" {
 	 * Si freezeTableName est activé, Sequelize prendra le nom de la table tableName tel quel
 	 * pour trouver la table dans la base de données.
 	 * La classe portant les annotations Entity doit implémenter IModelDAO
-	 * @param tableName : nom de la table cible
-	 * @param Model : type retourné par sequelize
-	 * @param freezeTableName : activer l'option freezeTableName de sequelize - [optionnel] [default = true]
+	 * @param tableName : nom de la table cible [obligatoire]
+	 * @param Model : type retourné par sequelize [obligatoire]
+	 * @param options: objet de configuration pour Sequelize [optionnel]
+	 * {
+	 *   freezeTableName : activer l'option freezeTableName de sequelize - [default = true]
+	 *   schema : schema où se situe la table
+	 *   ...
+	 * }
 	 */
-	export function Entity(tableName: string, Model: Sequelize.DefineAttributes, freezeTableName?: boolean): (target: Object, propertyKey: string | symbol) => void;
+	export function Entity(tableName: string, Model: Sequelize.DefineAttributes, options?: any): (target: Object, propertyKey: string | symbol) => void;
 	
 }
 
@@ -128,95 +133,11 @@ declare module "hornet-js-database/src/decorators/dec-transactional" {
 	
 }
 
-declare module "hornet-js-database/src/interfaces/interface-model-dao" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
-	 *
-	 * @author
-	 * @version v5.1.1
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	export interface IModelDAO {
-	    configDatabase: string;
-	}
-	
-}
-
 declare module "hornet-js-database/src/middleware/middleware" {
 	import { AbstractHornetMiddleware } from "hornet-js-core/src/middleware/middlewares";
+	import { Logger } from "hornet-js-utils/src/logger";
 	export class DataBaseErrorMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	
@@ -297,16 +218,16 @@ declare module "hornet-js-database/src/sequelize/database" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { Configuration }  from "hornet-js-database/src/configuration";
 	import Sequelize = require("sequelize");
 	export class Database {
-	    private _config;
-	    private _sequelize;
-	    private _namespace;
+	    protected _config: Configuration;
+	    protected _sequelize: Sequelize.Sequelize;
+	    protected _namespace: any;
 	    /**
 	     * @param configName Nom de la configuration de la base de données
 	     */
@@ -397,7 +318,7 @@ declare module "hornet-js-database/src/sequelize/dbconnect-sequelize" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -413,6 +334,110 @@ declare module "hornet-js-database/src/sequelize/dbconnect-sequelize" {
 	    static init(configName: string, namespace?: string): void;
 	    static getConfiguration(configName?: string): Configuration;
 	    static getGlobal(configName: string): Database;
+	}
+	
+}
+
+declare module "hornet-js-database/src/sequelize/hornet-db-connector" {
+	import { HornetSequelizeModel }  from "hornet-js-database/src/sequelize/hornet-sequelize-model";
+	export class HornetDbConnector<T extends HornetSequelizeModel> {
+	    modelDAO: T;
+	    constructor(modelDAO: T);
+	}
+	
+}
+
+declare module "hornet-js-database/src/sequelize/hornet-generic-dao-table-structure" {
+	import { Class } from "hornet-js-utils/src/typescript-utils";
+	import { HornetSequelizeEntityAttributes }  from "hornet-js-database/src/sequelize/hornet-sequelize-attributes";
+	import { HornetGenericDAO }  from "hornet-js-database/src/sequelize/hornet-generic-dao";
+	import { HornetSequelizeModel }  from "hornet-js-database/src/sequelize/hornet-sequelize-model";
+	export class HornetGenericDAOTableStructure<T extends HornetSequelizeModel, ENTITY extends HornetSequelizeEntityAttributes> extends HornetGenericDAO<T, ENTITY> {
+	    constructor(entity: Class<ENTITY>, modelDAO?: T);
+	    selectInfoFromTable(): Promise<any>;
+	}
+	
+}
+
+declare module "hornet-js-database/src/sequelize/hornet-generic-dao" {
+	import { Class } from "hornet-js-utils/src/typescript-utils";
+	import { HornetSequelizeEntityAttributes }  from "hornet-js-database/src/sequelize/hornet-sequelize-attributes";
+	import { HornetSequelizeModel }  from "hornet-js-database/src/sequelize/hornet-sequelize-model";
+	import { HornetDbConnector }  from "hornet-js-database/src/sequelize/hornet-db-connector";
+	export interface Paginate {
+	    pageIndex: number;
+	    itemsPerPage: number;
+	}
+	export interface Criteria {
+	    attributes?: string[];
+	    where?: any;
+	    paginate?: Paginate;
+	    include?: any[];
+	    order?: any[];
+	    id?: any;
+	}
+	export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY extends HornetSequelizeEntityAttributes> extends HornetDbConnector<T> {
+	    protected classEntity: Class<ENTITY>;
+	    entity: ENTITY;
+	    constructor(entity: Class<ENTITY>, modelDAO?: T);
+	    /**
+	     * Méthode d'insertion de données reposant sur le create de Sequelize
+	     * @param data Données pour créer l'instance
+	     */
+	    insertGeneric<M>(data: M): Promise<ENTITY>;
+	    /**
+	     * Méthode de sélection d'un ensemble de données reposant sur le
+	     * findAll de Sequelize
+	     * M est un type dynamique lié au paramètre bean indiquant le type retour
+	     * contenu dans la promesse
+	     * @param criteres : critères de sélections
+	     * @param bean : Type dans lequel convertir les données retournées
+	     */
+	    findAllGeneric<M>(criteres?: Criteria, bean?: Class<M>): Promise<M[]>;
+	    /**
+	     * Méthode de sélection d'une instance reposant sur le
+	     * findOne de Sequelize
+	     * M est un type dynamique lié au paramètre bean indiquant le type retour
+	     * contenu dans la promesse
+	     * @param id : identifiant critère de sélection
+	     * @param bean : Type dans lequel convertir l'instance retournée
+	     */
+	    findByIdGeneric<M>(id: any, bean?: Class<M>): Promise<M>;
+	    /**
+	     * Méthode de suppression reposant sur le destroy de Sequelize
+	     * @param id : identifiant ou ensemble d'identifiant à supprimer
+	     */
+	    deleteByIdGeneric(id: any): Promise<number>;
+	    /**
+	     * Méthode de modification reposant sur l'update de Sequelize
+	     * @param id : identifiant ou ensemble d'identifiant à modifier
+	     */
+	    updateByIdGeneric<M>(id: any, data: M): Promise<any>;
+	    protected computeId(id: any): {};
+	    /**
+	     * Transforme un Paginate en conf pagination/limiting pour Sequelize
+	     * @param paginate Configuration de type Paginate
+	     */
+	    protected getPaginationConf(paginate: Paginate): any;
+	    /**
+	     * Transforme un tableau d'attributs en liste d'attributs
+	     * à requêter par Sequelize
+	     * @param attributes
+	     */
+	    protected getAttributesConf(attributes: string[]): any;
+	    /**
+	     * Utilise les informations fournies pour préparer les critères
+	     * de la requête utilisés par Sequelize
+	     * @param where
+	     */
+	    protected getWhereConf(where: Partial<ENTITY>): any;
+	    protected getIncludeConf(include: any[]): any;
+	    protected getOrderConf(order: any[]): any;
+	    /**
+	     * Construit l'objet passé à la méthode de requêtage sequelize
+	     * @param criteres
+	     */
+	    protected getQueryObject(criteres: Criteria): any;
 	}
 	
 }
@@ -492,110 +517,42 @@ declare module "hornet-js-database/src/sequelize/hornet-sequelize-attributes" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { Model } from "sequelize";
 	export interface HornetSequelizeAttributes {
 	}
-	export interface HornetSequelizeInstanceModel<T extends HornetSequelizeAttributes> extends Model<any, T> {
+	export interface HornetSequelizeEntityAttributes {
+	    idName?: string;
+	    entityName?: string;
+	}
+	export interface HornetSequelizeInstanceModel<T extends HornetSequelizeAttributes> extends Model<any, T>, HornetSequelizeEntityAttributes {
 	}
 	
 }
 
 declare module "hornet-js-database/src/sequelize/hornet-sequelize-entity" {
-	import { HornetSequelizeModel }  from "hornet-js-database/src/sequelize/hornet-sequelize-model";
 	import * as Sequelize from "sequelize";
+	import { HornetSequelizeModel }  from "hornet-js-database/src/sequelize/hornet-sequelize-model";
+	/**
+	 * @deprecated Utiliser HornetDbConnector<T extends HornetSequelizeModel>
+	 */
 	export class HornetSequelizeEntity<T extends HornetSequelizeModel> {
 	    modelDAO: T;
 	    constructor(modelDAO: T);
+	    /**
+	     * @deprecated Utiliser SequelizeUtils.getQuery(confiName?: string)
+	     * @param configName
+	     */
 	    protected getQuery(configName?: string): Sequelize.Sequelize;
 	}
 	
 }
 
 declare module "hornet-js-database/src/sequelize/hornet-sequelize-model" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
-	 *
-	 * @author
-	 * @version v5.1.1
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	import { IModelDAO }  from "hornet-js-database/src/interfaces/interface-model-dao";
-	export class HornetSequelizeModel implements IModelDAO {
+	export class HornetSequelizeModel {
 	    configDatabase: string;
 	    constructor(configDatabase?: string, namespace?: string);
 	}
@@ -604,35 +561,62 @@ declare module "hornet-js-database/src/sequelize/hornet-sequelize-model" {
 
 declare module "hornet-js-database/src/sequelize/sequelize-utils" {
 	import Sequelize = require("sequelize");
-	export class SequelizeUtils {
-	    /**
-	     *  Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
-	     * @param fromEntity Entité correspondant au model portant la clé étrangère
-	     * @param toEntity Entité ciblée la clé étrangère
-	     * @param alias Nom à donner à l'attribut au sein de l'entité fromEntity portant la clé étrangère
-	     * @param foreignKey nom du champs de la base de donnée portant la clé étrangère
-	     */
-	    static initRelationBelongsTo(fromEntity: Sequelize.Model<any, any>, toEntity: Sequelize.Model<any, any>, alias: string, foreignKey: string): void;
-	    /**
-	     * Initialise une relation multiple entre deux entités de la modélisation
-	     * @param fromEntity Entité servant de point de départ à la relation
-	     * @param toEntity  Entité servant de cible à la relation
-	     * @param alias Nom à donner à l'attribut au sein de l'entité fromEntity portant la relation
-	     * @param foreignKey Nom de l'attribut portant la clé étrangère vers fromEntity dans le model "entité issue de la relation"
-	     * @param throughTable Nom de la table issue de la relation multiple, portant une référence vers fromEntiy et une vers toEntity
-	     * @param otherKey Nom de l'attribut au sein de l'entité cible référence à l'entité courante (optionnel)
-	     */
-	    static initRelationBelongsToMany(fromEntity: Sequelize.Model<any, any>, toEntity: Sequelize.Model<any, any>, alias: string, foreignKey: string, throughTable: string, otherKey?: string): void;
+	import { HornetSequelizeModel }  from "hornet-js-database/src/sequelize/hornet-sequelize-model";
+	export interface HornetSequelizeModelMap {
+	    name: string;
+	    instance: HornetSequelizeModel;
+	}
+	/**
+	 * Interface HornetSequelizeOptions
+	 * Structure les différentes options pour sequelize-utils
+	 */
+	export interface HornetSequelizeAssociationOptions {
+	    fromEntity: Sequelize.Model<any, any>;
+	    toEntity: Sequelize.Model<any, any>;
+	    alias: string;
+	    foreignKey: string;
+	    throughTable?: string | Sequelize.Model<any, any> | Sequelize.ThroughOptions;
+	    otherKey?: string;
+	    targetKey?: string;
+	    sourceKey?: string;
+	}
+	export module SequelizeUtils {
 	    /**
 	     * Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
-	     *
-	     * @param fromEntity Entité source de la relation
-	     * @param toEntity Entité ciblée de la relation, elle porte la clé étrangère
-	     * @param alias Nom à donner à l'attribut au sein de l'entité fromEntity portant la clé étrangère
-	     * @param foreignKey nom du champs de la base de donnée portant la clé étrangère
+	     * @param {HornetSequelizeAssociationOptions} options
 	     */
-	    static initRelationHasOne(fromEntity: Sequelize.Model<any, any>, toEntity: Sequelize.Model<any, any>, alias: string, foreignKey: string): void;
-	    static initRelationHasMany(fromEntity: Sequelize.Model<any, any>, toEntity: Sequelize.Model<any, any>, alias: string, foreignKey: string): void;
+	    function initRelationBelongsTo(options: HornetSequelizeAssociationOptions): void;
+	    /**
+	     * Initialise une relation multiple entre deux entités de la modélisation
+	     * @param {HornetSequelizeAssociationOptions} options
+	     */
+	    function initRelationBelongsToMany(options: HornetSequelizeAssociationOptions): void;
+	    /**
+	     * Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
+	     * @param {HornetSequelizeAssociationOptions} options
+	     */
+	    function initRelationHasOne(options: HornetSequelizeAssociationOptions): void;
+	    /**
+	     * Initialise une relation entre deux entités de la modélisation connectées par une clé étrangère
+	     * @param {HornetSequelizeAssociationOptions} options
+	     */
+	    function initRelationHasMany(options: HornetSequelizeAssociationOptions): void;
+	    /**
+	     * Enregistre l'instance HornetSequelizeModel dans l'Injector
+	     * clé : HornetSequelizeModels
+	     * @param modelName Nom de la classe héritant de HornetSequelizeModel
+	     */
+	    function registerModel(modelName: string, instance: HornetSequelizeModel): void;
+	    /**
+	     * Enregistre l'entity dans l'Injector dans un tableau
+	     * clé : HornetSequelizeEntities
+	     * @param entity Instance de l'entity
+	     */
+	    function registerEntity(entity: any): void;
+	    /**
+	     * @param configName
+	     */
+	    function getQuery(configName?: string): Sequelize.Sequelize;
 	}
 	
 }

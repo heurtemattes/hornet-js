@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-'use strict';
-var chai = require('chai');
+"use strict";
+const chai = require("chai");
 const expect = chai.expect;
 import * as _ from "lodash";
 import * as React from "react";
@@ -101,12 +101,12 @@ import { Columns } from "hornet-js-react-components/src/widget/table/columns";
 import { CheckColumn } from "src/widget/table/column/check-column";
 
 /** Tableau de liste de secteurs */
-let dataSource: DataSource<any>;
+let dataSourceTriTable: DataSource<any>;
 let tableElement: JSX.Element;
 let table;
 let data;
 
-@Decorators.describe('Test Karma table selection')
+@Decorators.describe("Test Karma table selection")
 class tableTest extends BaseTest {
 
     @Decorators.beforeEach
@@ -114,15 +114,15 @@ class tableTest extends BaseTest {
         data = [];
         let step = 1;
         for (let i: number = 1; i < 10; i++) {
-            data.push({ id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++ });
+            data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
-        dataSource = new DataSource(data);
+        dataSourceTriTable = new DataSource(data);
 
         tableElement = (
             <Table id="lite">
                 <Header title={"Secteurs"}>
                 </Header>
-                <Content dataSource={dataSource}>
+                <Content dataSource={dataSourceTriTable}>
                     <Columns>
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
@@ -131,87 +131,95 @@ class tableTest extends BaseTest {
                 </Content>
             </Table>
         );
-    };
+    }
 
-    @Decorators.it('Test OK')
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('selectionner un element dans le tableau')
+    @Decorators.it("selectionner un element dans le tableau")
     selectionUnElement() {
-        table = this.renderIntoDocument(tableElement, "main1111111");
-        dataSource.on("fetch", () => {
-            this.triggerMouseEvent(document.querySelector('#main1111111 #lite-0-colBody-1-0 input'), "click");
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
+        dataSourceTriTable.on("fetch", () => {
+            this.triggerMouseEvent(document.querySelector(`#${id} #lite-0-colBody-1-0 input`), "click");
         });
-        dataSource.on("select", () => {
-            expect(_.isEqual(dataSource.selected[ 0 ], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
+        dataSourceTriTable.on("select", () => {
+            expect(_.isEqual(dataSourceTriTable.selected[0], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
             this.end();
 
         });
-        dataSource.reload();
-    };
+        dataSourceTriTable.reload();
+    }
 
-    @Decorators.it('afficher un tableau avec des elements déjà sélectionnés')
+    @Decorators.it("afficher un tableau avec des elements déjà sélectionnés")
     affichageElementSelectionne() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
+        dataSourceTriTable.select([{ id: 2, label: "libelle2" }, { id: 4, label: "libelle4" }]);
 
-        table = this.renderIntoDocument(tableElement, "main11111112");
-        dataSource.select([ { id: 2, label: "libelle2" }, { id: 4, label: "libelle4" }]);
 
+        dataSourceTriTable.on("fetch", (value) => {
 
-        dataSource.on("fetch", (value) => {
-
-            expect(document.querySelector('#main11111112 #lite-0-colBody-1-0 input:checked')).to.exist;
-            expect(document.querySelector('#main11111112 #lite-0-colBody-3-0 input:checked')).to.exist;
+            expect(document.querySelector(`#${id} #lite-0-colBody-1-0 input:checked`)).to.exist;
+            expect(document.querySelector(`#${id} #lite-0-colBody-3-0 input:checked`)).to.exist;
             this.end();
 
         });
-        dataSource.reload();
-    };
+        dataSourceTriTable.reload();
+    }
 
-    @Decorators.it('trier un tableau sur une colonne')
+    @Decorators.it("trier un tableau sur une colonne")
     triSimple() {
-        table = this.renderIntoDocument(tableElement, "main11111113");
-        dataSource.on("sort", () => {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
+        dataSourceTriTable.on("sort", () => {
 
-            expect((document.querySelector("#main11111113 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle9");
+            expect((document.querySelector(`#${id} #lite-0-colBody-0-1`) as any).innerText).to.be.equal("libelle9");
             this.end();
 
         });
 
-        dataSource.sort({sortDatas:[new SortData('label', SortDirection.DESC)]});
-    };
+        dataSourceTriTable.sort({ sortDatas: [new SortData("label", SortDirection.DESC)] });
+    }
 
-    @Decorators.it('trier un tableau sur plusieurs colonnes part1')
+    @Decorators.it("trier un tableau sur plusieurs colonnes part1")
     triMultiple1() {
-        table = this.renderIntoDocument(tableElement, "main44444");
-        dataSource.on("sort", () => {
-
-            expect((document.querySelector("#main44444 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle3");
-            expect((document.querySelector("#main44444 #lite-0-colBody-6-1") as any).innerText).to.be.equal("libelle9");
-            expect((document.querySelector("#main44444 #lite-0-colBody-7-1") as any).innerText).to.be.equal("libelle1");
-            expect((document.querySelector("#main44444 #lite-0-colBody-8-1") as any).innerText).to.be.equal("libelle2");
-            this.end();
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
+        dataSourceTriTable.on("sort", () => {
+            setTimeout(() => {
+                expect((document.querySelector(`#${id} #lite-0-colBody-0-1`) as any).innerText).to.be.equal("libelle3");
+                expect((document.querySelector(`#${id} #lite-0-colBody-6-1`) as any).innerText).to.be.equal("libelle9");
+                expect((document.querySelector(`#${id} #lite-0-colBody-7-1`) as any).innerText).to.be.equal("libelle1");
+                expect((document.querySelector(`#${id} #lite-0-colBody-8-1`) as any).innerText).to.be.equal("libelle2");
+                this.end();
+            }, 500);
 
         });
-        dataSource.sort({sortDatas:[new SortData('desc', SortDirection.ASC), new SortData('label', SortDirection.ASC)]});
-    };
+        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.ASC), new SortData("label", SortDirection.ASC)] });
+    }
 
-    @Decorators.it('trier un tableau sur plusieurs colonnes part2')
+    @Decorators.it("trier un tableau sur plusieurs colonnes part2")
     triMultiple2() {
-        table = this.renderIntoDocument(tableElement, "main55555");
-        dataSource.on("sort", () => {
-            expect((document.querySelector("#main55555 #lite-0-colBody-0-1") as any).innerText).to.be.equal("libelle2");
-            expect((document.querySelector("#main55555 #lite-0-colBody-1-1") as any).innerText).to.be.equal("libelle1");
-            expect((document.querySelector("#main55555 #lite-0-colBody-2-1") as any).innerText).to.be.equal("libelle9");
-            expect((document.querySelector("#main55555 #lite-0-colBody-8-1") as any).innerText).to.be.equal("libelle3");
-            this.end();
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
+        dataSourceTriTable.on("sort", () => {
+            setTimeout(() => {
+                expect((document.querySelector(`#${id} #lite-0-colBody-0-1`) as any).innerText).to.be.equal("libelle2");
+                expect((document.querySelector(`#${id} #lite-0-colBody-1-1`) as any).innerText).to.be.equal("libelle1");
+                expect((document.querySelector(`#${id} #lite-0-colBody-2-1`) as any).innerText).to.be.equal("libelle9");
+                expect((document.querySelector(`#${id} #lite-0-colBody-8-1`) as any).innerText).to.be.equal("libelle3");
+                this.end();
+            }, 500);
         });
-        dataSource.sort({sortDatas:[new SortData('desc', SortDirection.DESC), new SortData('label', SortDirection.DESC)]});
-    };
+        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.DESC), new SortData("label", SortDirection.DESC)] });
+    }
 
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new tableTest());
+

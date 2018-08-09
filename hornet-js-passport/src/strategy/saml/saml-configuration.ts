@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -110,7 +110,7 @@ export class SamlConfiguration {
     /* Certificat applicatif à fournir à l'idp */
     appCert: string;
     entryPoint: string;
-    idp:IdentityProviderProps;
+    idp: IdentityProviderProps;
     validateInResponseTo: boolean;
     disableRequestedAuthnContext: boolean;
     signatureAlgorithm: string;
@@ -150,8 +150,8 @@ export class SamlConfiguration {
         this.acceptedClockSkewMs = this.acceptedClockSkewMs || -1;
 
 
-        if(Array.isArray(this.availableIdp) && this.availableIdp.length === 1) {
-            this.idp = this.availableIdp[0];
+        if (Array.isArray(this.availableIdp) && this.availableIdp.length === 1) {
+            this.idp = this.availableIdp[ 0 ];
         }
     }
 }

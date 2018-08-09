@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -245,16 +245,16 @@ export class Paginator<T> {
      * @param {number} totalItems nombre total d'items (pagination serveur)
      */
     public preparePagination(itemsTot: Array<T>, totalItems?: number): void {
+        let currentPageIndex:number = this._pagination.pageIndex || Direction.FIRST;
         this.paginate(Direction.FIRST);
 
         while (this.extractPage(itemsTot, true).length == this._pagination.itemsPerPage) {
             this.paginate(Direction.NEXT);
         }
 
-        this.paginate(Direction.FIRST);
         this._pagination.totalItems = totalItems || itemsTot.length;
-        //this._pagination.nbPages = this.items.length / this._pagination.itemsPerPage;
         this._pagination.nbPages = this.calculateNbPages();
+        this.paginate(currentPageIndex <= this._pagination.nbPages ? currentPageIndex:this._pagination.nbPages );
     }
 
     /**
@@ -282,7 +282,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
 
     /***
      * composant de pagination
-     * @instance 
+     * @instance
      */
     protected _paginator: Paginator<T>;
 
@@ -364,7 +364,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
 
     /***
      * @inheritdoc
-     * @param {boolean} reloadPage indicateur pour recharger la page en cours, sinon ce sera la première page. 
+     * @param {boolean} reloadPage indicateur pour recharger la page en cours, sinon ce sera la première page.
      */
     public reload(reloadPage: boolean = false, forceUpdate: boolean = false) {
         this.initSort();
@@ -458,7 +458,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
     }
 
     /***
-     * Renvoie un sous-ensemble des resultats filtrés
+     * Déclenche l'event filter qui renvoie un sous-ensemble des resultats filtrés
      * @param config correspond soit aux critères de filtrage soit à une fonction (appelée à chaque itération) {@link https://lodash.com/docs/#filter}
      * @param cancelFilterHistory false si on souhaite garder un historique des filtres true sinon. false par défaut
      * @example
@@ -516,7 +516,11 @@ export class PaginateDataSource<T> extends DataSource<T>{
      * @void
      */
     public add(triggerFetch: Boolean = false, ...items: (T | T[])[]): void {
-        this.addData(false, ...items).catch((e) => {
+        this.addData(false, ...items).then((result) => {
+            let page = this.pagination.pageIndex || Direction.FIRST;
+            this.emit("add", this._paginator.paginate(page));
+            return this.results;
+        }).catch((e) => {
             let error = new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_DELETE_ERROR, null, e);
             this.emit("error", error);
         })
@@ -541,7 +545,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
     protected deleteData(triggerFetch: Boolean = false, ...items: (T | T[])[]): Promise<Array<any>> {
         return super.deleteData(triggerFetch, ...items).then((result: Array<any>) => {
             this.updatePaginator(this.datasourceResults);
-            this.goToPage(Direction.FIRST);
+            this.goToPage(this.pagination.pageIndex || Direction.FIRST);
             return result;
         });
     }
@@ -550,18 +554,19 @@ export class PaginateDataSource<T> extends DataSource<T>{
      * enlève un élément ou des éléments au result du datasource
      * cette action déclenche l'évènement delete
      * @param {Boolean} triggerFetch param inutilisé, cette fonction déclenchera un évènement "pagination" .
-     * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
+     * @param {(T|T[])[]} items correspond aux données à supprimer, un appel à la méthode {@link DataSource#transformData} sera effectué
      * @void
      */
     public delete(triggerFetch: Boolean, ...items: (T | T[])[]): void {
         this.deleteData(triggerFetch, ...items).then((results) => {
             this.emit("delete", results);
+            this.emit("pagination", { list: this._paginator.paginate(this._paginator.pagination.pageIndex), pagination: this._paginator.pagination });
         });
     }
 
     /**
      * navigue vers une page
-     * @param {(number|Direction)} page la page a extraire 
+     * @param {(number|Direction)} page la page a extraire
      */
     public goToPage(page: number | Direction): void {
         if (this.isDataSourceArray) {

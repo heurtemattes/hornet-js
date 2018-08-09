@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -111,7 +111,7 @@ export class TableState extends events.EventEmitter {
             if (items === contentState.items) {
                 this.index = index;
                 this.emit(TableState.INDEX_CHANGE_EVENT,
-                    null, this.contentsState[ index ].items
+                          null, this.contentsState[ index ].items,
                 );
             }
         });
@@ -166,7 +166,7 @@ export class ContentState extends events.EventEmitter {
     }
 
     public setFirstVisibleColumnState(columnState: ColumnState) {
-        if (columnState != this.firstVisibleColumnState) {
+        if (columnState !== this.firstVisibleColumnState) {
             this.oldFirstVisibleColumnState = this.firstVisibleColumnState;
             this.firstVisibleColumnState = columnState;
         }
@@ -178,5 +178,9 @@ export class ContentState extends events.EventEmitter {
 
     public setKeycolumnMassSelection(keyColumn: string) {
         this.keyColumnMassSelection = keyColumn;
+    }
+
+    public getFocusedCell() {
+        return this.focusedCell;
     }
 }

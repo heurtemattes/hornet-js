@@ -70,126 +70,104 @@
  */
 
 /**
- * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+ * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { TestUtils } from "hornet-js-test/src/test-utils";
-import { DataSource } from "src/component/datasource/datasource";
-import { SortData, SortDirection } from "src/component/sort-data";
+import { Utils } from "hornet-js-utils";
+import * as React from "react";
+import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
+import { runTest } from "hornet-js-test/src/test-run";
+import { Pager } from "hornet-js-react-components/src/widget/pager/pager";
+import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
+import { DefaultSort } from "hornet-js-core/src/component/datasource/options/datasource-option";
+import { Decorators } from "hornet-js-test/src/decorators";
+import { Table } from "hornet-js-react-components/src/widget/table/table";
+import { Header } from "hornet-js-react-components/src/widget/table/header";
+/* Composant Content */
+import { Content } from "hornet-js-react-components/src/widget/table/content";
+/*  Colonne du tableau */
+import { Column } from "hornet-js-react-components/src/widget/table/column";
+import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import * as assert from "assert";
 
-var expect: any = TestUtils.chai.expect;
 
-export class Test {
-    constructor(public attr1: number, public attr2: string, public attr3: any[], public attr4: {}) {
+var chai = require('chai');
+const expect = chai.expect;
+
+
+const logger = Utils.getLogger("hornet-js-react-components.test.pager.pager");
+let element: JSX.Element;
+let $element;
+
+
+@Decorators.describe("Test Karma Pager")
+class PagerTest extends HornetReactTest {
+    @Decorators.beforeEach
+    beforeEach() {
+        let data = [];
+
+        for (let i: number = 1; i < 150; i++) {
+            data.push({ key: "a" + i, value: "aaa" + i });
+        }
+
+        const source = new PaginateDataSource(data, { itemsPerPage: 10 }, {});
+
+        element = (<div >(<Table id="table-test">
+            <Header title={"data test"}>
+            </Header>
+            <Content dataSource={source}>
+                <Columns>
+                    <Column keyColumn="key" title={"ID"} sortable={true} />
+                    <Column keyColumn="value" title={"libelle"} sortable={true} />
+                </Columns>
+            </Content>
+        </Table>
+            <Pager dataSource={source} id="pager-test" />
+        </div>);
+    }
+
+    @Decorators.it("Test OK")
+    testOk() {
+        assert.equal(1, 1);
+        this.end();
+    }
+
+    @Decorators.it("Test Affichage Pager")
+    testAffichage() {
+        $element = this.renderIntoDocument(element, "main1");
+        /* Existance du boutton dropdown */
+        expect(document.querySelector("#main1 .datatable-pagination"), "Problème élément Label non trouvé").to.exist;
+        expect(document.querySelector("#main1 .datatable-pagination-input")[ "max" ]).to.equal("15");
+        this.end();
+    }
+
+    @Decorators.it("Test navigation Pager")
+    testNavigationPager() {
+        $element = this.renderIntoDocument(element, "main2");
+
+        /* Existance du boutton dropdown */
+        expect(document.querySelector("#main2 .datatable-pagination"), "Problème élément Label non trouvé").to.exist;
+        this.triggerMouseEvent(document.querySelector("#main2 .datatable-pagination-button-nextpage"),
+            "click");
+
+        expect(document.querySelector("#main2 .datatable-pagination-input")[ "value" ]).to.equal("2");
+        setTimeout(() => {
+            document.querySelector("#main2 .datatable-pagination-input")[ "value" ] = "";
+            this.triggerKeyPressEvent(document.querySelector("#main2 .datatable-pagination-input"), "3", "3".charCodeAt(0), true);
+            this.triggerKeydownEvent(document.querySelector("#main2 .datatable-pagination-input"), "Enter", 13, false); // Appuie de la touche Entrer
+            expect(document.querySelector(" #main2 .datatable-pagination-input")[ "value" ]).to.equal("3");
+            expect(document.querySelector("#main2 > div:nth-child(1) > button:nth-child(5)")[ "title" ]).to.equal("[page 4/15] table.nextPage");
+
+        }, 2000);
+
+        this.end();
     }
 }
 
-var instance1 = new Test(1, "1", ["1"], {1: 1});
-
-let data: any[] = [
-    {
-        key: 4,
-        value: "d"
-    }, {
-        key: 5,
-        value: "e"
-    }, {
-        key: 2,
-        value: "b"
-    }, {
-        key: 1,
-        value: "a"
-    }, {
-        key: 3,
-        value: "c"
-    }
-];
-
-let dataForCustomSort: any[] = [
-    {
-        key: 402,
-        value: "d"
-    }, {
-        key: 54,
-        value: "e"
-    }, {
-        key: 2018,
-        value: "b"
-    }, {
-        key: 100,
-        value: "a"
-    }, {
-        key: 37,
-        value: "c"
-    }
-];
-
-describe("Test of datasource : ", () => {
-
-    beforeEach(() => {
-    });
-
-    it.skip("should create a datasource array", (done) => {
-
-        /* TODO MFR : snippet
-         this.dataSource = new DataSource<Test>(
-            [new Test(5,"Allemagne","allemande"),
-                new Test(3,"Marshall","marshallaise")],
-            {value : "id", text : "nationalite"});
-        this.dataSource.on("fetch", (result)=>{
-            debugger
-        })
-        this.dataSource1 = new DataSourceMaster<Test>(
-            [new Test(5,"Allemagne","allemande"), new Test(3,"Marshall","marshallaise")],
-            {value : "id", text : "nationalite"});
-        this.dataSource1.addSlave(this.dataSource);
-
-        this.dataSource2 = new DataSourceLinked<Test>([new Test(5,"Allemagne","allemande"), new Test(3,"Marshall","marshallaise")]);
-
-        this.dataSource3 = new DataSourceLinked<Test>(
-            [new Test(5,"Allemagne","allemande"), new Test(3,"Marshall","marshallaise")],
-            {value : "id", text : "nationalite"});
-
-        this.dataSource4 = new DataSourceLinked<Test>(
-            [new Test(5,"Allemagne","allemande"), new Test(3,"Marshall","marshallaise")],
-            {value : "id", text : "nationalite"});
-
-        this.dataSource2.connectTo(this.dataSource3).connectTo(this.dataSource4).connectTo(this.dataSource2)
-
-        /*this.dataSource.addElts(true, [new Test(15,"Allemagnjkhjke","allemahjkghjnde"), new Test(13,"Marsghjkghjhall","marshallhjkghjlaise")])
-        debugger
-        this.dataSource.delElts(false, new Test(15,"Allemagnjkhjke","allemahjkghjnde"), new Test(13,"Marsghjkghjhall","marshallhjkghjlaise"))
-        this.dataSource3.insert(false, new Test(5,"Allemagne","allemande"));
-        */
-        /* BeanUtils.serializeObject(User, array).then((result)=> {
-             expect(result).not.empty;
-             expect(result.length).to.be.eq(array.length);
-             _.map(result, function (item) {
-                 expect(item).to.be.an.instanceOf(User)
-             });
-             for (var i = 0; i < result.length; i++) {
-                 expect(result[i].id).to.be.undefined;
-                 expect(array[i].id).to.be.exist;
-                 expect(result[i].name).to.be.eq(array[i].name);
-                 expect(result[i].password).to.be.eq(array[i].password);
-                 expect(result[i].adress.label).to.be.eq(array[i].adress.label);
-
-                 expect(result[i].list.length).to.be.eq(array[i].list.length);
-                 for (var j = 0; j < result[i].list.length; j++) {
-                     expect(result[i].list[j].id).to.be.undefined;
-                     expect(array[i].list[j].id).to.be.exist;
-                     expect(result[i].list[j].label).to.be.eq(array[i].list[j].label);
-                 }
-             }
-             done();
-         }).catch((error)=> {
-             done(error);
-         });*/
-    });
-
-})
+//lancement des Tests
+runTest(new PagerTest());

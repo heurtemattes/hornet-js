@@ -74,30 +74,35 @@ declare module "hornet-js-batch/src/core/batch-executor" {
 	     * Contient la liste des batchs en cours de traitement
 	     * @instance
 	     */
-	    private static processing;
+	    protected static processing: {};
 	    /***
 	     * Contient la liste des batchs dans la file d'attente
 	     * @instance
 	     */
-	    private static queue;
+	    protected static queue: {};
 	    /***
-	     * Contient l'historique la liste des batchs qui ont été executés la durée de vie est la même que l'instance du serveur [aucune persistance]
+	     * Contient l'historique la liste des batchs qui ont été executés la durée de vie est la
+	     * même que l'instance du serveur [aucune persistance]
 	     * @instance
 	     */
 	    static summary: {};
-	    private static _instance;
-	    private constructor();
+	    protected static _instance: BatchExecutor;
+	    protected constructor();
 	    static readonly Instance: BatchExecutor;
+	    /**
+	     *
+	     * @param {Batch} batch
+	     */
 	    addToSummary(batch: Batch): void;
 	    /***
 	     * Renvoie le batch associé au BatchUnit qu'il soit en cours de traitement ou dans la file d'attente.
 	     * S'il ne le trouve pas il en crée un qu'il place dans la file d'attente.
-	     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
+	     * @param unit {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
 	     * @return un batch trouvé ou un nouveau.
 	     */
 	    getBatch(unit: BatchUnit): Batch;
 	    /***
-	     * @param une route.
+	     * @param route une route.
 	     * @returns {boolean} true si une action de type batch est en cours d'execution
 	     */
 	    isBatchActionExist(route: string): any;
@@ -108,7 +113,7 @@ declare module "hornet-js-batch/src/core/batch-executor" {
 	    removeBatch(batch: Batch): void;
 	    /***
 	     * Lance un Batch
-	     * @param un BatchUnit see{@link BatchUnit}
+	     * @param unit un BatchUnit see{@link BatchUnit}
 	     * @return renvoie une promesse du BatchUnit traité
 	     */
 	    runBatch(unit: BatchUnit): Promise<any>;
@@ -191,7 +196,7 @@ declare module "hornet-js-batch/src/core/batch-options" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -236,22 +241,31 @@ declare module "hornet-js-batch/src/core/batch-options" {
 	/**
 	 * @see CSV Parser Project http://csv.adaltas.com/parse/
 	 * auto_parse (boolean) If true, the parser will attempt to convert input string to native types.
-	 * auto_parse_date (boolean) If true, the parser will attempt to convert input string to dates. It requires the "auto_parse" option. Be careful, it relies on Date.parse.
-	 * columns (array|boolean|function)List of fields as an array, a user defined callback accepting the first line and returning the column names, or true if autodiscovered in the first CSV line. Defaults to null. Affects the result data set in the sense that records will be objects instead of arrays. A value "false" skips the all column.
+	 * auto_parse_date (boolean) If true, the parser will attempt to convert input string to dates.
+	 * It requires the "auto_parse" option. Be careful, it relies on Date.parse.
+	 * columns (array|boolean|function)List of fields as an array, a user defined callback accepting the first line
+	 * and returning the column names, or true if autodiscovered in the first CSV line. Defaults to null.
+	 * Affects the result data set in the sense that records will be objects instead of arrays. A value "false" skips the all column.
 	 * comment (char) Treat all the characters after this one as a comment. Defaults to '' (disabled).
 	 * delimiter (char) Set the field delimiter. One character only. Defaults to "," (comma).
 	 * escape (char) Set the escape character. One character only. Defaults to double quote.
 	 * from, (number) Start returning records from a particular line.
-	 * ltrim (boolean) If true, ignore whitespace immediately following the delimiter (i.e. left-trim all fields). Defaults to false. Does not remove whitespace in a quoted field.
-	 * max_limit_on_data_read (int) Maximum numer of characters to be contained in the field and line buffers before an exception is raised. Used to guard against a wrong delimiter or rowDelimiter. Default to 128,000 characters.
+	 * ltrim (boolean) If true, ignore whitespace immediately following the delimiter (i.e. left-trim all fields).
+	 * Defaults to false. Does not remove whitespace in a quoted field.
+	 * max_limit_on_data_read (int) Maximum numer of characters to be contained in the field and line buffers before an exception is raised.
+	 * Used to guard against a wrong delimiter or rowDelimiter. Default to 128,000 characters.
 	 * objname (string) Name of header-record title to name objects by.
 	 * quote (char) Optional character surrounding a field. One character only. Defaults to double quote.
 	 * relax (boolean) Preserve quotes inside unquoted field.
 	 * relax_column_count (boolean) Discard inconsistent columns count. Default to false.
-	 * rowDelimiter (chars|constant) String used to delimit record rows or a special constant; special constants are 'auto', 'unix', 'mac', 'windows', 'unicode'; defaults to 'auto' (discovered in source or 'unix' if no source is specified).
-	 * rtrim (boolean) If true, ignore whitespace immediately preceding the delimiter (i.e. right-trim all fields). Defaults to false. Does not remove whitespace in a quoted field.
+	 * rowDelimiter (chars|constant) String used to delimit record rows or a special constant;
+	 * special constants are 'auto', 'unix', 'mac', 'windows', 'unicode';
+	 * defaults to 'auto' (discovered in source or 'unix' if no source is specified).
+	 * rtrim (boolean) If true, ignore whitespace immediately preceding the delimiter (i.e. right-trim all fields).
+	 * Defaults to false. Does not remove whitespace in a quoted field.
 	 * skip_empty_lines (boolean) Don't generate records for empty lines (line matching /\s* /, defaults to false.
-	 *   skip_lines_with_empty_values (boolean) Don't generate records for lines containing empty column values (column matching /\s* /), defaults to false.
+	 *   skip_lines_with_empty_values (boolean) Don't generate records for lines containing empty column values (column matching /\s* /),
+	 * defaults to false.
 	 * to, (number) Stop returning records after a particular line.
 	 * trim If true, ignore whitespace immediately around the delimiter. Defaults to false. Does not remove whitespace in a quoted field.
 	 * noHeader : is the csv file contains a header
@@ -403,7 +417,7 @@ declare module "hornet-js-batch/src/core/batch-status" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -516,7 +530,8 @@ declare module "hornet-js-batch/src/core/batch-unit" {
 	    call(service: Function, scope: RouteActionBatch<any, IService> | RouteActionBatchMulti<any, IService>): BatchUnit;
 	    /**
 	     * Méthode qui ajoute un appel de service au traitement.
-	     * Les `foreach` sont des classes de type BatchService qui vont executer l'appel de service en bouclant sur la liste des paramètres qu'ils ont en entrée.
+	     * Les `foreach` sont des classes de type BatchService qui vont executer l'appel de service en bouclant
+	     * sur la liste des paramètres qu'ils ont en entrée.
 	     * @param {Function} service le serie d'appel au service (boucle sur les arguments)
 	     * @param {RouteActionBatch|RouteActionBatchMulti} scope l'action de type batch
 	     * @returns l'instance batchUnit {BatchUnit} en cours
@@ -606,14 +621,15 @@ declare module "hornet-js-batch/src/middleware/middlewares" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { AbstractHornetMiddleware } from "hornet-js-core/src/middleware/middlewares";
 	import { Class } from "hornet-js-utils/src/typescript-utils";
+	import { Logger } from "hornet-js-utils/src/logger";
 	export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export const DEFAULT_HORNET_BATCH_MIDDLEWARES: Array<Class<AbstractHornetMiddleware>>;
@@ -712,7 +728,7 @@ declare module "hornet-js-batch/src/routes/abstract-batch-routes" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -804,7 +820,7 @@ declare module "hornet-js-batch/src/core/filter/batch-filter" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -909,7 +925,7 @@ declare module "hornet-js-batch/src/core/mapper/batch-mapper" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -998,7 +1014,7 @@ declare module "hornet-js-batch/src/core/parameters/parameters" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1087,7 +1103,7 @@ declare module "hornet-js-batch/src/core/reader/batch-reader" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1122,7 +1138,7 @@ declare module "hornet-js-batch/src/core/reader/data-reader" {
 	import { Promise } from "hornet-js-utils/src/promise-api";
 	import { BatchReader }  from "hornet-js-batch/src/core/reader/batch-reader";
 	import { BatchProcess }  from "hornet-js-batch/src/core/batch-process";
-	/**
+	/**let
 	* @classdesc Classe de type Batch Reader qui récupère des données dans un objet {@see IService}
 	* @class
 	*/
@@ -1231,7 +1247,7 @@ declare module "hornet-js-batch/src/core/service/batch-service" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1351,7 +1367,7 @@ declare module "hornet-js-batch/src/core/transform/batch-transform" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1456,7 +1472,7 @@ declare module "hornet-js-batch/src/core/writer/batch-writer" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

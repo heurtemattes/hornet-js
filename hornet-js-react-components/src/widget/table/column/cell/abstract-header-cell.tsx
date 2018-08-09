@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,7 +88,7 @@ import * as classNames from "classnames";
 import { ContentState } from "hornet-js-react-components/src/widget/table/table-state";
 
 export interface SortTitleInformations {
-    ariasort: string;
+    ariasort: "none" | "ascending" | "descending" | "other";
     title: string;
 }
 
@@ -100,7 +100,7 @@ export interface AbstractHeaderCellProps extends AbstractCellProps {
     /** Tri en cours sur le tableau */
     sortData?: SortData;
     /** Texte complet lorsque le titre est un acronyme. La propriété lang devrait être valorisée dans ce cas. */
-    abbr?: string
+    abbr?: string;
     /** Propriétés de tri sur la colonne */
     sort?: boolean;
     /** indique que le header est fixe */
@@ -110,7 +110,11 @@ export interface AbstractHeaderCellProps extends AbstractCellProps {
     sortable?: boolean;
     sortByTitle?: boolean;
     className?: string;
-    compareMethod?:(sortData:SortData, a, b) => void;
+    compareMethod?: (sortData: SortData, a, b) => void;
+    /** Label de substitution dans le cas d'un tri custom ascendant */
+    orderByLabelUp?: string;
+    /** Label de substitution dans le cas d'un tri custom descendant */
+    orderByLabelDown?: string;
 }
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-header-cell");
@@ -147,9 +151,9 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
      */
     render(): JSX.Element {
         logger.trace("render AbstractHeaderCell -> column:", this.props.coordinates.column, " - line:",
-            this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
+                     this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
         return (
-            <th {...this.getDefaultThProps(-1) }>
+            <th {...this.getDefaultThProps(-1)}>
                 {this.renderCell()}
             </th>
         );
@@ -169,24 +173,23 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
 
         logger.trace("Rendu Header column Tableau");
 
-        let classes: ClassDictionary = { "datatable-header": true, "fixed": (this.props.headerFixed) };
+        const classes: ClassDictionary = { "datatable-header": true, fixed: (this.props.headerFixed) };
 
         if (this.props.className) {
             classes[ this.props.className ] = true;
         }
 
-        let ariasort: string = "none";
-        let title: string;
+        let ariasort: "none" | "ascending" | "descending" | "other" = "none";
         if (this.props.sortable && !this.props.contentState.itemInEdition) {
 
-            let isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
+            const isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
 
             // Gestion de la classe de l'entête th
             classes[ "datatable-header-sortable-column" ] = true;
             if (isTriActifSurColonne) {
                 classes[ "datatable-header-sorted" ] = true;
 
-                if (this.props.sortData.dir == SortDirection.DESC) {
+                if (this.props.sortData.dir === SortDirection.DESC) {
                     classes[ "datatable-header-sorted-desc" ] = true;
                 } else {
                     classes[ "datatable-header-sorted-asc" ] = true;
@@ -196,16 +199,14 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
             classes[ "datatable-cell-custom" ] = true;
             classes[ "datatable-cell-custom-" + this.props.keyColumn ] = true;
 
-            let titleObject: SortTitleInformations = this.handleSortTitle(isTriActifSurColonne, ariasort);
+            const titleObject: SortTitleInformations = this.handleSortTitle(isTriActifSurColonne, ariasort);
             ariasort = titleObject.ariasort;
-            title = titleObject.title;
         }
 
         classes[ this.props.id + "-" + this.props.keyColumn ] = true;
 
         classes[ "is_disabled" ] = this.props.contentState.itemInEdition !== undefined && this.props.contentState.itemInEdition !== null;
-        let key = this.props.id + "-colHeader-0-" + this.props.coordinates.column;
-        let tabIndex = this.getTabIndexFullKind();
+        const key = this.props.id + "-colHeader-0-" + this.props.coordinates.column;
 
         return ({
             ref: (instance: HTMLTableCellElement) => {
@@ -218,21 +219,20 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
             onBlur: this.handleBlur.bind(this),
             onKeyDown: this.handleKeyDown.bind(this),
             style: this.props.style,
-            key: key,
-            title: title ? title : this.state.title,
-            "aria-sort": ariasort,
+            key,
             id: key,
-            tabIndex: tabIndex
+            scope: "col",
         });
     }
 
-    protected handleSortTitle(isTriActifSurColonne: boolean, ariasort: string): SortTitleInformations {
+    protected handleSortTitle(isTriActifSurColonne: boolean,
+                              ariasort: "none" | "ascending" | "descending" | "other"): SortTitleInformations {
         // Gestion du title
         let sortDirection: string;
         if (isTriActifSurColonne) {
             /* Le tri est actif sur la colonne : on indique donc le sens de tri qui s'appliquera au prochain tri.
              * L'attribut aria-sort indique par contre le sens de tri courant (cf. https://www.w3.org/TR/wai-aria-1.1/#aria-sort) */
-            if (this.props.sortData.dir == SortDirection.DESC) {
+            if (this.props.sortData.dir === SortDirection.DESC) {
                 sortDirection = this.i18n("table.ascending");
                 ariasort = "descending";
             } else {
@@ -243,8 +243,8 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
             sortDirection = this.i18n("table.ascending");
             /* Pas de tri actif : on ne doit pas valoriser l'attribut aria-sort */
         }
-        let title = this.getSortByTitle(this.props.title, sortDirection);
-        return { ariasort: ariasort, title: title };
+        const title = this.getSortByTitle(this.props.title, sortDirection, isTriActifSurColonne);
+        return { ariasort, title };
     }
 
     /**
@@ -252,12 +252,31 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
      * @param columnTitle titre de la colonne
      * @param sortDirection description de la direction du tri
      */
-    protected getSortByTitle(columnTitle: string | JSX.ElementClass, sortDirection: string): string {
-        return this.i18n((this.props.sortByTitle) || this.i18n("table.sortByTitle"),
-            {
-                "columnTitle": (columnTitle as JSX.ElementClass).render ?
+    protected getSortByTitle(columnTitle: string | JSX.ElementClass, sortDirection: string, isTriActifSurColonne): string {
+
+        let message: string = this.props.sortByTitle || this.i18n("table.sortByTitle");
+
+        if (this.props.orderByLabelUp && this.props.orderByLabelDown) {
+
+            if (isTriActifSurColonne) {
+                /* Le tri est actif sur la colonne : on indique donc le sens de tri qui s'appliquera au prochain tri.
+                 * L'attribut aria-sort indique par contre le sens de tri courant (cf. https://www.w3.org/TR/wai-aria-1.1/#aria-sort) */
+                if (this.props.sortData.dir === SortDirection.DESC) {
+                    message = this.props.orderByLabelUp;
+                } else {
+                    message = this.props.orderByLabelDown;
+                }
+            } else {
+                message = this.props.orderByLabelUp;
+                /* Pas de tri actif : on ne doit pas valoriser l'attribut aria-sort */
+            }
+        }
+
+        return this.i18n(message,
+                         {
+                columnTitle: (columnTitle as JSX.ElementClass).render ?
                     (columnTitle as JSX.ElementClass).render() : columnTitle as string,
-                "sortTitle": sortDirection
+                sortTitle: sortDirection,
             }) as string;
     }
 
@@ -287,18 +306,18 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
      * @returns valeur pour l'index de tabulation
      */
     protected getTabIndexFullKind(): number {
-        let firstVisibleCoord = this.props.contentState.firstVisibleColumnState.coordinates;
-        return (this.props.coordinates.column == firstVisibleCoord) ? 0 : -1;
+        const firstVisibleCoord = this.props.contentState.firstVisibleColumnState.coordinates;
+        return (this.props.coordinates.column === firstVisibleCoord) ? 0 : -1;
     }
 
     /**
      * Gestion des tabulations pour la première colonne visible
      */
     protected handleChangeHiddenColumns(hiddenColumns, firstVisibleColumnState: ColumnState, oldFirstiVisibleColumnState: ColumnState): void {
-        if (firstVisibleColumnState.coordinates == this.props.coordinates.column) {
+        if (firstVisibleColumnState.coordinates === this.props.coordinates.column && this.tableCellRef) {
             this.tableCellRef.tabIndex = 0;
         }
-        if (oldFirstiVisibleColumnState && oldFirstiVisibleColumnState.coordinates == this.props.coordinates.column) {
+        if (oldFirstiVisibleColumnState && oldFirstiVisibleColumnState.coordinates === this.props.coordinates.column && this.tableCellRef) {
             this.tableCellRef.tabIndex = -1;
         }
     }

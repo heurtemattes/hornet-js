@@ -1,3 +1,5 @@
+# hornet-js-batch 5.2.0
+
 # hornet-js-batch-5.1.0
 
 -	213191	-	Maj regex tsconfig

@@ -73,29 +73,29 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
-let mainBlueColor = "#007ba7";
+const mainBlueColor = "#007ba7";
 
 
-export let styleCSS =  {
+export let styleCSS = {
     bdr3: {
-        borderRadius: '3px'
+        borderRadius: "3px",
     },
 
     bgColorMain: {
-        backgroundColor: mainBlueColor
+        backgroundColor: mainBlueColor,
     },
     tac: {
-        textAlign: "center"
+        textAlign: "center",
     },
     appWidth: {
-        "maxWidth": "45.334em"
+        maxWidth: "45.334em",
     },
     header: {
-        "paddingTop": "34%"
-    }
-}
+        paddingTop: "34%",
+    },
+};

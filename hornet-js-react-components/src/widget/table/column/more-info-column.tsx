@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,19 +91,21 @@ import * as _ from "lodash";
 export class MoreInfoColumn<T extends ActionColumnProps, S extends ColumnState> extends ActionColumn<T, S> {
 
     static defaultProps = ActionColumn.mergeObjects(ActionColumn.defaultProps, {
-        defaultStyle: {"textAlign": "center", "paddingLeft": 0, "width": "2em"},
+        defaultStyle: { textAlign: "center", paddingLeft: 0, width: "2.4em" },
         sortable: false,
-        hiddenable: false
+        hiddenable: false,
     });
 
     constructor(props: T, context: any) {
         super(props, context);
     }
 
-    /**
+        /**
      * @inheritDoc
      */
-    public getBodyCell(): Class<MoreInfoBodyCell<BodyCellProps, any>> {
+    static getBodyCell(props): Class<MoreInfoBodyCell<BodyCellProps, any>> {
         return MoreInfoBodyCell;
     }
 }
+
+(MoreInfoColumn.prototype.getBodyCell as any).__deprecated__ = true;

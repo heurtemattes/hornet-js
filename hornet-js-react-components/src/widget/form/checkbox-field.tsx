@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,14 +84,15 @@ import {
     AbstractField,
     HornetBasicFormFieldProps,
     HornetClickableProps,
-    InlineStyle
+    InlineStyle,
+    AbstractFieldProps,
 } from "src/widget/form/abstract-field";
 import * as _ from "lodash";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 
 
-export interface CheckBoxFieldProps extends HornetClickableProps,
+export interface CheckBoxFieldProps extends AbstractFieldProps, HornetClickableProps,
     HornetBasicFormFieldProps {
     /* Valeur booléenne pour un champ de type case à cocher */
     currentChecked?: boolean;
@@ -110,7 +111,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
     public state: any;
 
     static defaultProps = _.assign(AbstractField.defaultProps, {
-        switch: false
+        switch: false,
     });
 
     constructor(props?: CheckBoxFieldProps, context?: any) {
@@ -124,8 +125,8 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         if (!this.props.labelOnOff) {
             this.state.labelOnOff = {
-                "on": this.i18n("form.checkbox.booleanOui"),
-                "off": this.i18n("form.checkbox.booleanNon")
+                on: this.i18n("form.checkbox.booleanOui"),
+                off: this.i18n("form.checkbox.booleanNon"),
             };
         }
     }
@@ -137,18 +138,18 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      */
     renderWidget(): JSX.Element {
 
-        let cx = classNames(
+        const cx = classNames(
             this.state.groupClass,
             "checkbox-container",
             {
-                "inline": this.state.inline == InlineStyle.ALL || this.state.inline == InlineStyle.FIELD,
-                "readonly": this.state.readOnly
-            }
+                inline: this.state.inline === InlineStyle.ALL || this.state.inline === InlineStyle.FIELD,
+                readonly: this.state.readOnly,
+            },
         );
 
-        let htmlProps = this.getHtmlProps();
+        const htmlProps = this.getHtmlProps();
         if (this.state.currentChecked != null) {
-            _.assign(htmlProps, { "defaultChecked": this.state.currentChecked });
+            _.assign(htmlProps, { defaultChecked: this.state.currentChecked });
         }
 
         if (this.state.readOnly && !this.state.disabled) {
@@ -156,8 +157,8 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
         }
 
         let element: JSX.Element;
-        if (this.state.readOnly) {
-            delete htmlProps[ "onChange" ];
+        if (this.state.readOnly || this.state.disabled) {
+            delete htmlProps["onChange"];
         }
         if (this.state.switch) {
             element = this.renderSwitch(htmlProps);
@@ -177,11 +178,11 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      * @returns {any}
      */
     renderSwitch(htmlProps): JSX.Element {
-        let labelOn = this.state.labelOnOff.on;
-        let labelOff = this.state.labelOnOff.off;
+        const labelOn = this.state.labelOnOff.on;
+        const labelOff = this.state.labelOnOff.off;
         return (
             <div className="switch-content">
-                <label className="switch" onKeyDown={this.handleKeyDown}>
+                <label className="switch" onKeyDown={this.handleKeyDown} onClick={this.handleClick}>
                     <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"
                         className="switch-input" {...htmlProps} value="true" />
                     <span data-off={labelOff} data-on={labelOn} className="switch-label"></span>
@@ -197,9 +198,10 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      */
     renderCheckbox(htmlProps): JSX.Element {
 
-        let classNamesSpan: ClassDictionary = {
+        const classNamesSpan: ClassDictionary = {
             check: true,
-            readonly: this.state.readOnly
+            readonly: this.state.readOnly || this.state.disabled,
+            "has-error":this.hasErrors(), 
         };
 
         return (
@@ -215,14 +217,22 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
     }
 
     /**
-     * prise en compte de la navigation clavier pour les touches entrée et espace
+     * Prise en compte de la navigation clavier pour les touches entrée et espace
      * @param e
      */
     protected handleKeyDown(e) {
-        if (e.keyCode == KeyCodes.ENTER) {
+        if (e.keyCode === KeyCodes.ENTER) {
             this.setCurrentChecked(!this.getCurrentValue());
             e.preventDefault();
             e.stopPropagation();
         }
+    }
+
+    /**
+     * Gestion du clic sur le switch pour gérer l'ajout et suppression de l'attribut checked sur le switch
+     * @param e
+     */
+    protected handleClick(e) {
+        this.setCurrentChecked(!this.getCurrentValue());
     }
 }

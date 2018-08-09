@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,9 +89,9 @@ const uuid = require("uuid");
 const logger: Logger = Utils.getLogger("hornet-js-batch.batch-process");
 
 export interface Process {
-    execute(...args)
-    result()
-    options()
+    execute(...args);
+    result();
+    options();
 }
 
 
@@ -107,82 +107,82 @@ export abstract class BatchProcess implements Process {
 
     constructor(config: any) {
         this._options.config = config;
-    };
+    }
 
     set result(result: any) {
         this._result = result;
-    };
+    }
 
     get result(): any {
         return this._result;
-    };
+    }
 
     set total(total: number) {
         this._total = total;
-    };
+    }
 
     get total(): number {
         return this._total;
-    };
+    }
 
 
     set list(list: Array<any>) {
         this._list = list;
-    };
+    }
 
     get list(): Array<any> {
         return this._list;
-    };
+    }
 
     set name(name: any) {
         this._name = name;
-    };
+    }
 
     get name(): any {
         return this._name || this.constructor[ "name" ];
-    };
+    }
 
     set idBatch(id: any) {
         this._idBatch = id;
-    };
+    }
 
     get idBatch(): any {
         return this._idBatch;
-    };
+    }
 
     set batch(batch: Batch) {
         this._batch = batch;
-    };
+    }
 
     get batch(): Batch {
         return this._batch;
-    };
+    }
     set options(options: any) {
         this._options = options;
-    };
+    }
 
     get options(): any {
         return this._options;
-    };
+    }
 
     set status(status: STATUS) {
         this._status = status;
         this._batch.updateStatus();
-        if (status == STATUS.FAILED || status == STATUS.SUCCEEDED) {
+        if (status === STATUS.FAILED || status === STATUS.SUCCEEDED) {
             if (this.timer) {
-                clearInterval(this.timer)
+                clearInterval(this.timer);
             }
         }
-    };
+    }
 
     get status(): STATUS {
         return this._status;
-    };
+    }
 
     protected print() {
         if (this.list && this._total) {
-            let calc = 100 - ((100.0 * this.list.length) / this._total);
-            logger.trace(this.name + " " + calc.toFixed(2))
+            const calc = 100 - ((100.0 * this.list.length) / this._total);
+            logger.trace(this.name + " " + calc.toFixed(2));
         }
     }
 
@@ -190,7 +190,7 @@ export abstract class BatchProcess implements Process {
     timer;
 
     public execute(): Promise<any> {
-        let timer = Utils.config.getOrDefault("batch.printTimer", 500);
+        const timer = Utils.config.getOrDefault("batch.printTimer", 500);
         this.status = STATUS.RUNNING;
         this.timer = setInterval(this.print.bind(this), timer);
         return this.treatment();
@@ -201,7 +201,7 @@ export abstract class BatchProcess implements Process {
 
 export class BatchProcessParent extends BatchProcess implements Process {
 
-    constructor(readonly child: BatchProcess[]) {
+    constructor(readonly child: BatchProcess[]) {                          
         super(null);
     }
 
@@ -209,35 +209,34 @@ export class BatchProcessParent extends BatchProcess implements Process {
         this.child.forEach((value) => {
             value.idBatch = id;
         });
-        this._idBatch = "ProcessParent"
-    };
+        this._idBatch = "ProcessParent";
+    }
 
     set batch(batch: Batch) {
         this.child.forEach((value) => {
             value.batch = batch;
         });
-        this._batch = batch
-    };
-
+        this._batch = batch;
+    }
 
     updateStatus() {
-        let res = this.child.reduce((result, process: BatchProcess) => {
+        const res = this.child.reduce((result, process: BatchProcess) => {
             let res = false;
-            let status = process.status;
-            if (status == STATUS.SUCCEEDED) {
+            const status = process.status;
+            if (status === STATUS.SUCCEEDED) {
                 res = true;
             } else {
-                this.status = status
+                this.status = status;
             }
             return result && res;
-        }, true);
+        },                            true);
         if (res) {
-            this.status = STATUS.SUCCEEDED
+            this.status = STATUS.SUCCEEDED;
         }
     }
 
     protected treatment(): Promise<any> {
-        let promises = [];
+        const promises = [];
         //
         this.child.forEach((value) => {
             value.options.arg = this.options.args;
@@ -248,9 +247,9 @@ export class BatchProcessParent extends BatchProcess implements Process {
             result.forEach((value, index) => {
                 res = res.concat(value);
             });
-            this.status = STATUS.SUCCEEDED
+            this.status = STATUS.SUCCEEDED;
             this.result = res;
             return this.result;
-        })
+        });
     }
 }

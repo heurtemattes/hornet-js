@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,13 +87,13 @@ import { HornetComponent } from "src/widget/component/hornet-component";
 import {
     HornetComponentProps,
     IHornetComponentAsync,
-    IHornetComponentDatasource
+    IHornetComponentDatasource,
 } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { Confirm } from "src/widget/dialog/confirm";
 import { SpinnerLoader, SpinnerOverlay, SpinnerTableProps } from "src/widget/table/spinner-table";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
+import { PaginateDataSource, Pagination } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { ColumnProps } from "src/widget/table/column";
 import { Columns } from "src/widget/table/columns";
 import { ColumnState } from "src/widget/table/column";
@@ -123,7 +123,7 @@ export enum KeyboardInteractionMode {
     NAVIGATION = 0,
     /** Edition : même si les cellules ne sont pas éditables, des boutons d'édition peuvent être disponibles.
      * Ils sont accédés via la tabulation */
-    ACTIONABLE = 1
+    ACTIONABLE = 1,
 }
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.content");
@@ -149,7 +149,7 @@ export interface ContentProps extends HornetComponentProps, HornetComponentDatas
     title?: string;
 
     /** gestion des events emit du content State */
-    contentState?: ContentState; //from table.tsx
+    contentState?: ContentState; // from table.tsx
     /** Détermine si des colonnes sont cachées par défaut */
     hiddenColumns?: any;  // from ToggleColumnsButton.tsx
 
@@ -161,6 +161,8 @@ export interface ContentProps extends HornetComponentProps, HornetComponentDatas
     headerHidden?: boolean;
 
     summary?: string;
+    /** permet de surchager le coportement par défaut d'affichage de la ligne "Aucune information à présenter." */
+    emptyResult?: string | React.Component;
 }
 
 /**
@@ -183,6 +185,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     /** colonnes masquées */
     protected hiddenColumns: any;
 
+    protected spinnerLoader: any;
+
+    protected spinnerOverlay: any;
+
     /** Collection de colonne avec coordonnées et état */
     protected columnsWithVisibilityMap: Array<ColumnState> = new Array<ColumnState>();
 
@@ -190,24 +196,25 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         super(props, context);
         this.props.contentState.setMaxListeners(Infinity);
         this.props.dataSource && this.props.dataSource.setMaxListeners(Infinity);
-        this.state.keyboardMode = KeyboardInteractionMode.NAVIGATION;
-        this.state.items = [];
-        this.state.inProgress = false;
-        this.state.isContentVisible = true;
 
-        let result = this.props.dataSource && this.props.dataSource.results;
+        const result = this.props.dataSource && this.props.dataSource.results;
         if (result) {
-            this.state.items = this.props.dataSource instanceof PaginateDataSource ?
-                this.props.dataSource.getItemsByPage(this.props.dataSource.pagination.pageIndex || Direction.FIRST) : result;
             this.props.dataSource.select([]);
         }
 
-        this.state.spinner = false;
+        this.state = {
+            ...this.state,
+            keyboardMode: KeyboardInteractionMode.NAVIGATION,
+            items: result ? this.props.dataSource instanceof PaginateDataSource ? this.props.dataSource.getItemsByPage(this.props.dataSource.pagination.pageIndex || Direction.FIRST) : result : [],
+            inProgress: false,
+            isContentVisible: true,
+            spinner: false,
+            actionMassEnabled: this.hasChildrenOfComponentTypeOf(Columns, CheckColumn),
+        };
 
-        this.state.actionMassEnabled = this.hasChildrenOfComponentTypeOf(Columns, CheckColumn);
-        let columnKeyActionMass = null;
+        const columnKeyActionMass = null;
         this.hiddenColumns = props.hiddenColumns;
-        this.totalColumns = this.getTotalColumnsVisible();
+        this.totalColumns = this.getTotalColumnsVisibleFromState();
         this.props.contentState.on(ContentState.TOGGLE_COLUMNS_EVENT, this.handleChangeHiddenColumns);
 
         if (this.props.dataSource && this.props.dataSource.getDefaultSort()) {
@@ -219,6 +226,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         this.props.contentState.on(ContentState.EDITION_CLIC_EVENT, this.handleEdition);
 
         this.initializeColumnVisibilityWithCoord();
+        this.handleChangeHiddenColumns(this.hiddenColumns);
     }
 
     /**
@@ -226,7 +234,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     componentDidMount() {
         super.componentDidMount();
-        let result = this.props.dataSource.results;
+        const result = this.props.dataSource.results;
         if (result) {
 
             if (this.props.dataSource instanceof PaginateDataSource) {
@@ -284,24 +292,13 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         );
     }
 
-    /**
-     * Calcule le nombre de colonnes à afficher
-     * @returns {number}
-     */
-    getTotalColumnsVisible(): number {
-        let nbColumns: number = this.getChildrenOf(Columns).length;
-        if (this.hiddenColumns) {
-            nbColumns -= _.keys(_.pickBy(this.hiddenColumns, _.identity)).length;
-        }
-        return nbColumns;
-    }
 
     /**
      * Calcule le nombre de colonnes à afficher
      * @returns {number}
      */
-    getTotalColumnsVisibleFromState() {
-        let visibleColumnState = this.columnsWithVisibilityMap.filter((columnState) => {
+    getTotalColumnsVisibleFromState(): number {
+        const visibleColumnState = this.columnsWithVisibilityMap.filter((columnState) => {
             if (columnState.isVisible) {
                 return true;
             }
@@ -315,18 +312,45 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     handleChangeHiddenColumns(hiddenColumns) {
         this.hiddenColumns = hiddenColumns;
-        this.totalColumns = this.getTotalColumnsVisible();
+        // this.columnsWithVisibilityMap.push({
+            this.columnsWithVisibilityMap.forEach((column, index) => {
+                if (!_.isUndefined(hiddenColumns[ this.columnsWithVisibilityMap[ index ].column ])) {
+                    this.columnsWithVisibilityMap[ index ].isVisible = !hiddenColumns[ this.columnsWithVisibilityMap[ index ].column ];
+                }
+            });
+            this.totalColumns = this.getTotalColumnsVisibleFromState();
+            this.updateExpandableCellsColSpan();
+            if(this.spinnerLoader) {
+                this.spinnerLoader.setState({nbColumns: this.totalColumns});
+            }
     }
 
     /**
-     * met a true la props isEditing a true lorsque la cellule est en cours d'edition
+     * Met à jour le colSpan des expandable cells 
+     */
+    private updateExpandableCellsColSpan() {
+        if (!Utils.isServer && document) {
+            const expandableCells = document.getElementsByClassName(`expandable-line-cell-${this.state.id}`);
+            if (expandableCells) {
+                for (let i = 0; i < expandableCells.length; i++) {
+                    const expandableCell = expandableCells[i];
+                    if (expandableCell) {
+                        expandableCell.setAttribute("colSpan", `${this.totalColumns}`);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Met la props isEditing à true lorsque la cellule est en cours d'edition
      * @param lineIndex
      */
     public handleEdition(lineIndex: number) {
         if (Array.isArray(this.tableTrsRef)) {
             this.tableTrsRef.map((tr: any, index: number) => {
                 if (tr.instance && tr.instance.classList) {
-                    let list = tr.instance.classList;
+                    const list = tr.instance.classList;
                     (index === lineIndex) ? list.add("datatable-line-selected") : list.remove("datatable-line-selected");
                 }
             });
@@ -378,12 +402,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         this.props.contentState.setItems(result);
         this.sortData = sortData;
         this.setState({ items: result }, () => {
-            if(this.thElementToFocus) {
+            if (this.thElementToFocus) {
                 AbstractCell.setCellTabIndex(this.thElementToFocus, 0, true);
             }
         });
-
-
     }
 
     /**
@@ -402,9 +424,9 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     handleSubmit(data: any): void {
 
         if (this.state.onSubmit) {
-            let item = this.props.contentState.itemInEdition;
+            const item = this.props.contentState.itemInEdition;
             // merge les data avec l'item
-            for (let name in data) {
+            for (const name in data) {
                 if (item[ name ]) {
                     item[ name ] = data[ name ];
                 }
@@ -426,28 +448,21 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     renderContent(): JSX.Element {
         logger.trace("renderContent ");
-        let columns = this.initColumnsProps();
+        const columns = this.initColumnsProps();
 
-
-        if (this.props.dataSource.results.length > 500) {
-
-            console.log("TROP DE DATA POUR LE TABLEAU");
-        }
-
-        let tableProps: any = {
-            role: "grid",
+        const tableProps: any = {
             "aria-readonly": "true",
             key: this.props.id,
-            id: this.props.id
+            id: this.props.id,
         };
 
-        let headerTable = this.state.isContentVisible ? this.renderTHeader(columns) : null;
+        const headerTable = this.state.isContentVisible ? this.renderTHeader(columns) : null;
 
         return (
             <div className="datatable-content" tabIndex={this.state.tabIndex}>
-                <SpinnerOverlay ref="spinnerOverlay" isVisible={this.state.spinner}
+                <SpinnerOverlay ref={(elt) => this.spinnerOverlay=elt} isVisible={this.state.spinner}
                     onHideSpinner={this.onHideSpinner}
-                    nbColumns={this.getTotalColumnsVisible()}
+                    nbColumns={this.getTotalColumnsVisibleFromState()}
                     width={this.props.width} />
                 <table {...tableProps} summary={this.props.summary}>
                     {this.renderCaption(columns)}
@@ -469,13 +484,20 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     renderCaption(columns): JSX.Element {
         let title: string = this.props.title;
+
+        let pagin:Pagination = this.props.dataSource && this.props.dataSource instanceof PaginateDataSource ? {...this.props.dataSource.pagination} : {} as any;
+        if(!pagin.nbPages || pagin.nbPages === 0) {
+            pagin.nbPages = Math.max(1, Math.ceil(pagin.totalItems / pagin.itemsPerPage)) || 0;
+        }
+        title = this.i18n(title, pagin);
+
         if (this.sortData) {
             columns.map((column) => {
                 if (column.props) {
-                    let sortColumn = _.find(this.sortData, { key: column.props.keyColumn });
+                    const sortColumn = _.find(this.sortData, { key: column.props.keyColumn });
                     if (sortColumn) {
                         title += ":" + this.i18n("table.sortedByTitle", { columnTitle: column.props.title }) + " ";
-                        title += sortColumn.dir == SortDirection.ASC ? this.i18n("table.ascending") : this.i18n("table.descending");
+                        title += sortColumn.dir === SortDirection.ASC ? this.i18n("table.ascending") : this.i18n("table.descending");
                     }
                 }
             });
@@ -490,9 +512,9 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * Evènement permettant de déclencher le tri
      * @param sortData
      */
-    public onSort(sortData: SortData, thElement, compareMethod?:Function) {
+    public onSort(sortData: SortData, thElement, compareMethod?: Function) {
 
-        let conf: any = sortData;
+        const conf: any = sortData;
         this.sortData = [ sortData ];
 
         if (this.state.clientSideSorting) {
@@ -500,10 +522,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         }
 
         this.thElementToFocus = thElement;
-        let options = {sortDatas: [ sortData ]};
+        const options = { sortDatas: [ sortData ] };
 
-        if(compareMethod) {
-            options["compare"] = compareMethod;
+        if (compareMethod) {
+            options[ "compare" ] = compareMethod;
         }
 
 
@@ -517,16 +539,16 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     renderTHeader(columns): JSX.Element {
 
-        let classnameThead = classNames({
+        const classnameThead = classNames({
             "datatable-columns": !this.state.headerFixed,
             "datatable-columns-fixed": this.state.headerFixed && this.state.items.length > 0,
-            "datatable-columns-disabled": this.state.items.length == 0,
-            "datatale-columns-hidden": this.props.headerHidden ? true : false
+            "datatable-columns-disabled": this.state.items.length === 0,
+            "datatale-columns-hidden": this.props.headerHidden ? true : false,
         });
 
-        let tHeadProps: any = {
+        const tHeadProps: any = {
             className: classnameThead,
-            id: this.props.id + "-thead"
+            id: this.props.id + "-thead",
         };
 
         return (
@@ -534,10 +556,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 <tr id={this.props.id + "-tr-header"}>
                     {this.renderRowHeader(columns)}
                 </tr>
-                <SpinnerLoader ref="spinnerLoader"
+                <SpinnerLoader ref={(elt) => this.spinnerLoader=elt}
                     isVisible={this.state.spinner}
                     className={this.props.id}
-                    nbColumns={this.getTotalColumnsVisible()}
+                    nbColumns={this.getTotalColumnsVisibleFromState()}
                 />
             </thead>
         );
@@ -549,32 +571,39 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {any}
      */
     renderRowHeader(columns: Array<React.ReactElement<any>>) {
-        let Ths = [];
+        const Ths = [];
         logger.trace("renderRowHeader ");
 
-        let selectedElements = this.props.dataSource ? this.props.dataSource.selected : [];
+        const selectedElements = this.props.dataSource ? this.props.dataSource.selected : [];
 
         columns.map((column: any, index: number) => {
 
-            let props: any = this.getColProps(columns, index);
-            let sortColumn = _.find(this.sortData, { key: (column.props as ColumnProps).keyColumn });
+            const props: any = this.getColProps(columns, index);
+            const sortColumn = _.find(this.sortData, { key: (column.props as ColumnProps).keyColumn });
             if (this.sortData && sortColumn) {
                 (props as ColumnProps).sortData = sortColumn;
             }
             // si la colonne ne contient que le checkBox, on applique pas (text-overflow: ellipsis;)
-            if ((column as React.ReactElement<any>).type == CheckColumn) {
+            if ((column as React.ReactElement<any>).type === CheckColumn) {
                 props.className = classNames({ "datatable-header-no-text-overflow": true });
             }
 
             props.isSelected = ArrayUtils.isInclude(this.props.contentState.items, selectedElements);
             props.onSort = this.onSort.bind(this);
-            props.cellCoordinate = new CellCoordinates(index, -1);
+            props.coordinates = new CellCoordinates(index, -1);
             props.isHeader = true;
             props.style = props.style || column.props.style;
-            props.key = this.state.id + "-" + props.cellCoordinate.row + "-" + props.cellCoordinate.column + "-wrapped";
-            let Wrapped = HornetComponent.wrap(column.type, column, props, column.props);
-            let col = <Wrapped key={"wc-" + props.key} />;
-            Ths.push(col);
+            props.key = this.state.id + "-" + props.coordinates.row + "-" + props.coordinates.column;
+
+            const columnsProps: any = _.merge({}, column.props);
+            if (columnsProps.style && props.style.display === "none") columnsProps.style.display = props.style.display;
+            if (!column.type.prototype.getHeaderCell.__deprecated__) {
+                logger.deprecated("DEPRECATED", "Pour des raison de performance, il est préconisé d'utiliser des méthodes static - cf.UPGRADING.md");
+                const Wrapped = HornetComponent.wrap(column.type, column, props, columnsProps);
+                Ths.push(<Wrapped key={"wc-" + props.key} />);
+            } else {
+                Ths.push(React.createElement(column.type.getHeaderCell({ ...props, ...columnsProps }), { ...props, ...columnsProps }));
+            }
         });
 
         return Ths;
@@ -582,13 +611,13 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
 
     renderDatatableMessage(content): JSX.Element {
         logger.trace("renderDatatableMessage ");
-        let tdProps: React.AllHTMLAttributes<HTMLElement> = {};
+        const tdProps: React.AllHTMLAttributes<HTMLElement> = {};
         tdProps.colSpan = this.totalColumns;
-        tdProps.className = classNames({ "datatable-message-content": true, "txtcenter": true });
+        tdProps.className = classNames({ "datatable-message-content": true, txtcenter: true });
         tdProps.style = { width: this.state.width + UNIT_SIZE };
         return (
             <tr key="emptyRow">
-                <td {...tdProps}>{content}</td>
+                <td {...tdProps}><span role="alert">{content}</span></td>
             </tr>);
     }
 
@@ -599,40 +628,35 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     renderTBody(columns): JSX.Element {
         logger.trace("renderTBody ");
-        let rows = [];
+        const rows = [];
         if (!(this.state.items && this.state.items.length > 0 && this.state.isContentVisible)) {
             // Cas d'un tableau sans résultats
             rows.push(this.renderDatatableMessage(this.state.emptyResult || this.i18n("table.emptyResult")));
         } else {
             this.state.items.map((item, lineIndex) => {
 
-                let rowBefore = this.renderExpandableRow(item, columns, lineIndex, true);
+                const rowBefore = this.renderExpandableRow(item, columns, lineIndex, true);
                 if (rowBefore) {
                     rows.push(rowBefore);
                 }
 
                 rows.push(this.renderRowBody(item, columns, lineIndex));
 
-                let rowAfter = this.renderExpandableRow(item, columns, lineIndex);
+                const rowAfter = this.renderExpandableRow(item, columns, lineIndex);
                 if (rowAfter) {
                     rows.push(rowAfter);
                 }
             });
         }
 
-        let classNameTbody = classNames({
+        const classNameTbody = classNames({
             "datatable-data": !this.props.headerFixed,
-            "datatable-data-fixed": this.state.headerFixed && this.state.items.length > 0
+            "datatable-data-fixed": this.state.headerFixed && this.state.items.length > 0,
         });
-        let tBodyProps: any = {
+        const tBodyProps: any = {
             className: classNameTbody,
-            ref: (element) => this.tBodyRef = element
+            ref: (element) => this.tBodyRef = element,
         };
-        // if (!this.props.headerFixed) {
-        //     tBodyProps.style = {
-        //         width: this.props.width + UNIT_SIZE
-        //     }
-        // }
 
         return (
             <tbody {...tBodyProps} >{rows}</tbody>);
@@ -648,65 +672,71 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     renderExpandableRow(item: any, columns: Array<React.ReactElement<any>>, lineIndex: number, isBefore?: boolean): JSX.Element {
         logger.trace("renderExpandableRow ");
-        let ComponentType = isBefore ? LineBefore : LineAfter;
-        let rowType: string = isBefore ? "before" : "after";
-        let cells = [], row = null;
+        const ComponentType = isBefore ? LineBefore : LineAfter;
+        const rowType: string = isBefore ? "before" : "after";
+        const cells = [];
+        let row = null;
 
         columns.map((column, index) => {
 
-            let children: any[] = Content.getChildrenFrom(column, ComponentType);
-            let props = this.getColProps(columns, index);
-            props.cellCoordinate = new CellCoordinates(index, lineIndex);
+            const children: any[] = Content.getChildrenFrom(column, ComponentType);
+            const props = this.getColProps(columns, index);
+            props.coordinates = new CellCoordinates(index, lineIndex);
 
             if (children && Array.isArray(children) && children.length > 0) {
-                let LineComponent: any = Content.getComponentFromParentBy(column, ComponentType);
+                const LineComponent: any = Content.getComponentFromParentBy(column, ComponentType);
 
                 let headersHtmlAttr = "";
 
                 if (column.props.headers && Array.isArray(column.props.headers)) {
                     column.props.headers.map((headerKey) => {
-                        let idx = _.findIndex(columns, { props: { keyColumn: headerKey } })
+                        const idx = _.findIndex(columns, { props: { keyColumn: headerKey } });
                         if (idx > -1) headersHtmlAttr += props.key = this.props.id + "-colHeader-0-" + idx + " ";
-                    })
+                    });
                 } else {
                     headersHtmlAttr = column.props.headers;
                 }
 
                 if (!LineComponent.props.visible || (LineComponent.props.visible && LineComponent.props.visible(item))) {
-                    let colSpan: number = this.totalColumns;
+                    const colSpan: number = this.totalColumns;
 
-                    let kids = [];
-
+                    const kids = [];
                     children.map((child, i) => {
-                        let Wrapped = Content.wrap(
-                            child.type,
-                            child,
-                            child.props,
-                            {
-                                value: item,
-                                rowType: rowType,
-                                key: this.props.id + "expandable-line-wrapped" + index + "-" + i + "-" + lineIndex
-                            });
-                        kids.push(<Wrapped />);
+                        /*                        const Wrapped = Content.wrap(
+                                                    child.type,
+                                                    child,
+                                                    child.props,
+                                                    {
+                                                        value: item,
+                                                        rowType,
+                                                        key: this.props.id + "expandable-line-wrapped" + index + "-" + i + "-" + lineIndex,
+                                                    });
+                                                kids.push(<Wrapped />);*/
+                        const props = {
+                            ...child.props, value: item,
+                            rowType,
+                            key: this.props.id + "expandable-line" + index + "-" + i + "-" + lineIndex,
+                        };
+                        kids.push(React.createElement(child.type, props));
                     });
 
                     cells.push(
-                        <td colSpan={colSpan} headers={headersHtmlAttr}
+                        <td colSpan={colSpan} headers={headersHtmlAttr} className={`expandable-line-cell-${this.state.id}`}
                             key={this.props.id + "-expandable-line-cell" + rowType + "-" + lineIndex}>
                             <div>{kids}</div>
                         </td>);
 
-                    let key: string = this.props.id + "-expandable-line-" + rowType + "-" + lineIndex;
+                    const key: string = this.props.id + "-expandable-line-" + rowType + "-" + lineIndex;
 
-                    let TrClassName: ClassDictionary = {
+                    const trClassName: ClassDictionary = {
                         "datatable-expandable-line": true,
                         "datatable-expandable-line-hidden": !LineComponent.props.displayed,
-                        "datatable-expandable-line-displayed": LineComponent.props.displayed
+                        "datatable-expandable-line-displayed": LineComponent.props.displayed,
                     };
 
-                    TrClassName[ this.props.id + "-tr-with-colspan" ] = true;
+                    trClassName[ this.props.id + "-tr-with-colspan" ] = true;
 
-                    let trProps: any = {
+                    const trProps: any = {
                         ref: (instance: HTMLTableCellElement) => {
                             if (instance) {
                                 // referme les lignes expanded.
@@ -716,8 +746,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                         },
                         style: {},
                         id: key,
-                        key: key,
-                        className: classNames(TrClassName)
+                        key,
+                        className: classNames(trClassName),
                     };
 
                     row = <tr {...trProps}>{cells}</tr>;
@@ -738,26 +768,26 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     renderRowBody(item: any, columns: Array<React.ReactElement<any>>, lineIndex: number) {
         logger.trace("renderRowBody ");
 
-        let tds = [];
+        const tds = [];
 
         let classNamesRow: ClassDictionary = {};
 
-        let isSelected = ArrayUtils.getIndexById(this.props.dataSource.selected, item) !== -1;
+        const isSelected = ArrayUtils.getIndexById(this.props.dataSource.selected, item) !== -1;
 
         // Injection de la class CSS surchargée
         if (this.state.customRowsClass) {
             classNamesRow = this.state.customRowsClass(item);
         }
-        classNamesRow[ "datatable-odd" ] = (lineIndex % 2) != 0;
-        classNamesRow[ "datatable-even" ] = (lineIndex % 2) == 0;
+        classNamesRow[ "datatable-odd" ] = (lineIndex % 2) !== 0;
+        classNamesRow[ "datatable-even" ] = (lineIndex % 2) === 0;
 
         columns.map((column: any, index) => {
 
-            let props = this.getColProps(columns, index);
+            const props = this.getColProps(columns, index);
             props.value = item;
             props.isSelected = isSelected;
-            props.cellCoordinate = new CellCoordinates(index, lineIndex);
-            props.key = this.props.id + "-columns-colBody-" + props.cellCoordinate.row + "-" + props.cellCoordinate.column + "-wrapped";
+            props.coordinates = new CellCoordinates(index, lineIndex);
+            props.key = this.props.id + "-columns-colBody-" + props.coordinates.row + "-" + props.coordinates.column;
             props.style = props.style || column.props.style;
 
             // TODO: voi si on peut accéder aux propriétés d'un ActionColumn et s'assurer qu'elles matchent avec l'interface
@@ -766,21 +796,32 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 props.showAlert = this.showAlert;
             }
 
-            let Wrapped = HornetComponent.wrap(column.type, column, props, column.props);
-            let wrappedElement = <Wrapped key={"wc-" + props.key} />;
-            tds.push(wrappedElement);
+            const columnsProps: any = _.merge({}, column.props);
+            if (columnsProps.style && props.style.display === "none") columnsProps.style.display = props.style.display;
+
+
+            if (!column.type.prototype.getBodyCell.__deprecated__) {
+                logger.deprecated(`DEPRECATED - ${column.type.name} - Pour des raisons de performance, il est préconisé d'utiliser la méthodes static - cf.UPGRADING.md`);
+                const Wrapped = HornetComponent.wrap(column.type, column, props, columnsProps);
+                const wrappedElement = <Wrapped key={"wc-" + props.key} />;
+                tds.push(wrappedElement);
+            } else {
+                const masterProps = { ...props, ...columnsProps };
+                tds.push(React.createElement(column.type.getBodyCell({ ...masterProps, ...column.type.getCellProps(masterProps) }), masterProps));
+            }
+
         });
 
-        let trProps: any = {
+        const trProps: any = {
             ref: (instance: HTMLTableCellElement) => {
                 if (instance) {
-                    this.tableTrsRef.push({ "instance": instance, "value": item });
+                    this.tableTrsRef.push({ instance, value: item });
                     Content.updateClasslistSelectedLine(instance, isSelected);
                 }
             },
             key: this.props.id + "-line-" + lineIndex,
             className: classNames(classNamesRow),
-            role: "row"
+            role: "row",
         };
 
         return (
@@ -796,7 +837,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     handleChangeSelectedItems(selectedItems: any[]) {
         this.tableTrsRef.map((element: any) => {
             if (element && element.instance.classList) {
-                if (_.findIndex(selectedItems, { "id": element.value.id }) !== -1) {
+                if (_.findIndex(selectedItems, { id: element.value.id }) !== -1) {
                     if (!element.instance.classList.contains("datatable-line-selected")) {
                         element.instance.classList.add("datatable-line-selected");
                     }
@@ -808,11 +849,11 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     }
 
     /**
-     * Initialisation des colonnes et des propriétés associées
+     * Initialisation des colonnes et des propriétés associéesev
      * @returns {columns}
      */
     initColumnsProps() {
-        logger.trace("initColumnsProps ");
+        logger.trace("initColumnsProps");
         let columns = this.getChildrenOf(Columns);
         if (this.props.headerFixed) {
             columns = this.fixColumnsWidth(columns);
@@ -839,7 +880,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             }
         });
 
-        let defaultColumnWidth = totalColumnWidth / nbColumnsWithoutDefaultWidth;
+        const defaultColumnWidth = totalColumnWidth / nbColumnsWithoutDefaultWidth;
 
         columns.map((cell, index) => {
             if (!cell.props.width) {
@@ -856,9 +897,9 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     protected handleChangeKeyboardMode(mode: KeyboardInteractionMode): void {
         /* La condition permet d'éviter de mettre à jour inutilement l'état React et ainsi de déclencher un rendu complet */
-        if (mode != this.state.keyboardMode) {
+        if (mode !== this.state.keyboardMode) {
             this.setState({
-                keyboardMode: mode
+                keyboardMode: mode,
             });
         }
     }
@@ -868,8 +909,12 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {Table}
      */
     showSpinnerComponent(): this {
-        (this.refs.spinnerLoader as SpinnerLoader<SpinnerTableProps, SpinnerTableProps>).progress(true);
-        (this.refs.spinnerOverlay as SpinnerOverlay<SpinnerTableProps, SpinnerTableProps>).progress(true);
+        if(this.spinnerLoader) {
+            this.spinnerLoader.progress(true);
+        }
+        if(this.spinnerOverlay) {
+            this.spinnerOverlay.progress(true);
+        }
         return this;
     }
 
@@ -878,8 +923,12 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {Table}
      */
     hideSpinnerComponent(): this {
-        (this.refs.spinnerLoader as SpinnerLoader<SpinnerTableProps, SpinnerTableProps>).progress(false);
-        (this.refs.spinnerOverlay as SpinnerOverlay<SpinnerTableProps, SpinnerTableProps>).progress(false);
+        if(this.spinnerLoader) {
+            this.spinnerLoader.progress(false);
+        }
+        if(this.spinnerOverlay) {
+            this.spinnerOverlay.progress(false);
+        }
         return this;
     }
 
@@ -919,20 +968,20 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     protected toggleSelectLines(item: any) {
         if (this.state.contentState.hasCheckColumnMassSelection) {
 
-            let items = _.cloneDeep(this.state.items);
+            const items = _.cloneDeep(this.state.items);
 
             // recupere la liste des items selectionnés sur la page courante
             let selectedItems: any[] = ArrayUtils.intersectionWith(this.props.dataSource.selected, this.props.dataSource.results, this.state.contentState.keyColumnMassSelection);
             if (item) { // si on a un item, on met a jour la liste des items selectionés sur la page
                 this.removeOrPush(selectedItems, item, true);
-            } else if (selectedItems.length != items.length) { // sinon s'il faut sélectionner tous les items
+            } else if (selectedItems.length !== items.length) { // sinon s'il faut sélectionner tous les items
                 // si le tableau porte une sélection multiple
                 selectedItems = items;
             } else {
-                let data = items;
+                const data = items;
                 selectedItems = selectedItems;
-                for(let i = 0; i < data.length; i++) {
-                    this.removeOrPush(selectedItems, data[i]);
+                for (let i = 0; i < data.length; i++) {
+                    this.removeOrPush(selectedItems, data[ i ]);
                 }
             }
             this.props.dataSource.select(selectedItems);
@@ -947,9 +996,9 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {any[]}
      */
     intersectionWith(object: any[], other: any[]): any[] {
-        let listResult: any[] = _.intersectionWith(object, other,
-            (item1, item2) => {
-                return item1[this.state.contentState.keyColumnMassSelection] === item2[this.state.contentState.keyColumnMassSelection];
+        const listResult: any[] = _.intersectionWith(object, other,
+                                                     (item1, item2) => {
+                return item1[ this.state.contentState.keyColumnMassSelection ] === item2[ this.state.contentState.keyColumnMassSelection ];
             });
 
         return listResult;
@@ -962,8 +1011,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {any[]}
      */
     static intersectionWith(object: any[], other: any[]): any[] {
-        let listResult: any[] = _.intersectionWith(object, other,
-            (item1, item2) => {
+        const listResult: any[] = _.intersectionWith(object, other,
+                                                     (item1, item2) => {
                 return item1.id === item2.id;
             });
 
@@ -981,7 +1030,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         let targetColumn: number;
         let columnState: ColumnState;
         switch (direction) {
-            case NavigateDirection.BOTOM:
+            case NavigateDirection.BOTTOM:
                 focusCell = new CellCoordinates(coordinates.column, Math.min(this.state.items.length, coordinates.row + 1));
                 break;
             case NavigateDirection.TOP:
@@ -1031,13 +1080,13 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 focusCell = new CellCoordinates(coordinates.column, 0);
                 break;
             case NavigateDirection.END_LINE:
-                let items = this.state.items;
+                const items = this.state.items;
                 focusCell = new CellCoordinates(coordinates.column, items.length - 1);
                 break;
         }
 
-        //verifier que la table n'est pas en edition
-        //sinon verifier que la cellule n'est pas disabled
+        // verifier que la table n'est pas en edition
+        // sinon verifier que la cellule n'est pas disabled
         if (!this.props.contentState.itemInEdition) {
             this.props.contentState.setFocusOn(focusCell);
         } else if (focusCell.row === this.props.contentState.itemInEdition.row) {
@@ -1054,7 +1103,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     getColProps(columns: any, columnIndex: number): any {
         logger.trace("getColProps ");
 
-        let props: any = {};
+        const props: any = {};
 
         props.coordinates = { column: columnIndex };
         props.handleChangeKeyboardMode = this.handleChangeKeyboardMode;
@@ -1069,7 +1118,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         props.id = this.props.id;
 
 
-        let style: any = Content.mergeObjects({}, columns[ columnIndex ].props.style);
+        const style: any = Content.mergeObjects({}, columns[ columnIndex ].props.style);
 
         if (columns[ columnIndex ].props.width) {
             style[ "width" ] = columns[ columnIndex ].props.width;
@@ -1096,7 +1145,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @param orPush
      */
     protected removeOrPush(selectedItems: any[], item: any, orPush?: boolean) {
-        let indexOf = ArrayUtils.getIndexById(selectedItems, item);
+        const indexOf = ArrayUtils.getIndexById(selectedItems, item);
         if (indexOf !== -1) {
             selectedItems.splice(indexOf, 1);
             this.props.dataSource.removeUnSelectedItem(item);
@@ -1125,14 +1174,14 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     protected updateColumnVisibility(ev: HornetEvent<ColumnState | string>) {
         this.columnsWithVisibilityMap.map((state) => {
-            if (typeof ev.detail == "string") {
-                if (state.column == ev.detail) {
+            if (typeof ev.detail === "string") {
+                if (state.column === ev.detail) {
                     state.isVisible = !state.isVisible;
                 }
 
             } else {
-                let myObject: ColumnState = (ev.detail as ColumnState);
-                if (state.column == myObject.column) {
+                const myObject: ColumnState = (ev.detail as ColumnState);
+                if (state.column === myObject.column) {
                     state.isVisible = myObject.isVisible;
                 }
             }
@@ -1148,13 +1197,13 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * ne sont pas gérées dans le ToggleColumnsButton
      */
     protected initializeColumnVisibilityWithCoord() {
-        let columns: any[] = this.getChildrenOf(Columns);
+        const columns: any[] = this.getChildrenOf(Columns);
         columns.forEach((column, index) => {
             if (column) {
                 this.columnsWithVisibilityMap.push({
                     column: column.props.keyColumn,
                     coordinates: index,
-                    isVisible: true
+                    isVisible: true,
                 });
             }
         });
@@ -1166,7 +1215,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      *
      */
     protected setFirstVisibleColumnState(): void {
-        let visibleColumnStates = this.columnsWithVisibilityMap.filter((column) => {
+        const visibleColumnStates = this.columnsWithVisibilityMap.filter((column) => {
             if (column.isVisible) {
                 return true;
             }
@@ -1177,10 +1226,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     /**
      * méthode appelée lors de l'effacement du spinner
      */
-    protected onHideSpinner():void{
-        if(this.thElementToFocus) {
+    protected onHideSpinner(): void {
+        if (this.thElementToFocus) {
             this.thElementToFocus = document.getElementById(this.thElementToFocus.id);
-            if(this.thElementToFocus) {
+            if (this.thElementToFocus) {
                 AbstractCell.setCellTabIndex(this.thElementToFocus, 0, true);
             }
         }

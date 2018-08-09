@@ -73,13 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-'use strict';
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 
@@ -88,7 +87,6 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { Table } from "hornet-js-react-components/src/widget/table/table";
 import { Header } from "hornet-js-react-components/src/widget/table/header";
 /* Composant Content */
@@ -98,54 +96,40 @@ import { Column } from "hornet-js-react-components/src/widget/table/column";
 import { Columns } from "hornet-js-react-components/src/widget/table/columns";
 import { CheckColumn } from "src/widget/table/column/check-column";
 
+import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 
 import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
 import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
 import { TabContent } from "src/widget/tab/tab-content";
+import * as _ from "lodash";
 
 import { TabHeader } from "src/widget/tab/tab-header";
 
 
-let dataSource: DataSource<any>;
 let tabsElement: JSX.Element;
 let tabs;
-let data;
-let fnt;
 let beforeHideTabCount = 0;
 let afterShowTabCount = 0;
 let onSelectCount = 0;
 let addDiv;
 
-@Decorators.describe('Test Karma tabs add button')
+@Decorators.describe("Test Karma tabs add button")
 class tabsAddButtonTest extends BaseTest {
-
     @Decorators.beforeEach
     beforeEach() {
-        data = [];
         tabs = null;
-
         beforeHideTabCount = 0;
         afterShowTabCount = 0;
         onSelectCount = 0;
 
-        let step = 1;
-        for (let i: number = 1; i < 10; i++) {
-            data.push({id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++});
-        }
-        dataSource = new DataSource(data);
-        fnt = () => {
-            if (!dataSource.status) {
-                dataSource.init();
-            }
-        };
         tabsElement = (
             <Tabs id="tabs" selectedTabIndex={0} beforeHideTab={() => {
-                beforeHideTabCount++
+                beforeHideTabCount++;
             }} afterShowTab={() => {
-                afterShowTabCount++
+                afterShowTabCount++;
             }}
-                  addTabFunction={this.addFunction.bind(this)}
-                  addButtonTtitle={"test"}
+                addTabFunction={this.addFunction}
+                addButtonTtitle={"test"}
             >
                 <Tab title="tab1">
                     <div>TabContent1</div>
@@ -156,44 +140,48 @@ class tabsAddButtonTest extends BaseTest {
             </Tabs>
         );
 
-        addDiv = <div id={"testAdd"}></div>
-    };
-
-    addFunction() {
-        this.renderIntoDocument(addDiv, "main851");
+        addDiv = <div id={"testAdd"} />;
     }
 
-    @Decorators.it('Test OK')
+    addFunction = () => {
+        this.renderIntoDocument(addDiv, "main999999");
+    }
+
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('affichage du bouton add')
+    @Decorators.it("affichage du bouton add")
     testAddButtonExist() {
-        tabs = this.renderIntoDocument(tabsElement, "main850");
-        expect(document.querySelector('#main850 #tabs-add-button')).to.exist;
-        this.end();
-    };
+        const id = this.generateMainId();
 
-    @Decorators.it('affichage du title')
+        tabs = this.renderIntoDocument(tabsElement, id);
+        expect(document.querySelector(`#${id} #tabs-add-button`)).to.exist;
+        this.end();
+    }
+
+    @Decorators.it("affichage du title")
     testTitleAddButtonExist() {
-        tabs = this.renderIntoDocument(tabsElement, "main852");
-        expect(document.querySelector('#main852 #tabs-add-button[title="test"]')).to.exist;
+        const id = this.generateMainId();
+        tabs = this.renderIntoDocument(tabsElement, id);
+        expect(document.querySelector(`#${id} #tabs-add-button[title='test']`)).to.exist;
         this.end();
-    };
+    }
 
-    @Decorators.it('click sur le bouton d\'ajout')
+    @Decorators.it("click sur le bouton d'ajout")
     clickOnAddButton() {
-        tabs = this.renderIntoDocument(tabsElement, "main851");
-        this.triggerMouseEvent(document.querySelector('#main851 #tabs-add-button'), "click");
+        const id = this.generateMainId();
+        tabs = this.renderIntoDocument(tabsElement, id);
+        this.triggerMouseEvent(document.querySelector(`#${id} #tabs-add-button`), "click");
         setTimeout(() => {
-            expect(document.querySelector('#main851 #testAdd')).to.exist;
+            expect(document.querySelector(`#main999999 #testAdd`)).to.exist;
             this.end();
-        }, 500);
-    };
+        }, 1000);
+    }
 
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new tabsAddButtonTest());

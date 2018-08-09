@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ import * as _ from "lodash";
 
 // pas d'utilisation du mot clé import pour TestUtils pour pouvoir compiler le fichier
 let expect = TestUtils.chai.expect;
-let sinon:any = TestUtils.sinon;
+let sinon: any = TestUtils.sinon;
 let assert = TestUtils.chai.assert;
 
 let proxyquire = require("proxyquire").noCallThru();
@@ -95,7 +95,7 @@ let superAgentPlugins = proxyquire("src/services/superagent-hornet-plugins", {
 });
 
 // NOTE: event name is camelCase as per node convention
-process.on("unhandledRejection", function(reason, promise) {
+process.on("unhandledRejection", function (reason, promise) {
     console.error("superagent-hornet-plugins", reason);
     throw reason;
 });
@@ -218,8 +218,8 @@ describe.skip("superagent-hornet-plugins", () => {
             //expect(mockRequest.callback).to.not.equals(mockRequestCallback);
             // expect(mockRequestCallback).to.be.calledWith(undefined, mockResponse);
             expect(mockResponse.get).to.be.calledWith("x-is-login-page");
-//          expect(global.window.location.href).to.be.equals("/" + configObj.contextPath
-//              + configObj.authentication.loginUrl + '?previousUrl=spy');
+            //          expect(global.window.location.href).to.be.equals("/" + configObj.contextPath
+            //              + configObj.authentication.loginUrl + '?previousUrl=spy');
         });
 
         it("Should not modify if server", () => {
@@ -258,11 +258,11 @@ describe.skip("superagent-hornet-plugins", () => {
                 superAgentPlugins.CachePlugin._getMethodeEndForCache.restore();
             });
 
-            it("should find in cache", function(done) {
+            it("should find in cache", function (done) {
                 // Arrange
                 var timeToLiveInCache = 10;
                 var stubResponse = TestUtils.randomString();
-                HornetCacheStubInstance.then = function(callbackFn) {
+                HornetCacheStubInstance.then = function (callbackFn) {
                     setTimeout(() => {
                         callbackFn(stubResponse);
                     }, 10);
@@ -270,7 +270,7 @@ describe.skip("superagent-hornet-plugins", () => {
                     return HornetCacheStubInstance;
                 };
 
-                var callbackEndMethod = function(err, res) {
+                var callbackEndMethod = function (err, res) {
                     // Assert
                     expect(err).to.be.undefined;
                     expect(res).to.be.equals(stubResponse);
@@ -291,10 +291,10 @@ describe.skip("superagent-hornet-plugins", () => {
                 done();
             });
 
-            it("should not find in cache", function(done) {
+            it("should not find in cache", function (done) {
                 // Arrange
                 var timeToLiveInCache = 10;
-                HornetCacheStubInstance.catch = function(callbackFn) {
+                HornetCacheStubInstance.catch = function (callbackFn) {
                     setTimeout(() => {
                         callbackFn();
                     }, 10);
@@ -305,7 +305,7 @@ describe.skip("superagent-hornet-plugins", () => {
                 var stubRequest = sinon.spy();
                 stubRequest.url = TestUtils.randomString();
                 stubRequest.abort = sinon.spy();
-                stubRequest.end = function(callbackFn) {
+                stubRequest.end = function (callbackFn) {
                     // Assert
                     expect(this).to.be.equals(stubRequest);
                     expect(callbackFn).to.be.equals(stubRequest.url);// C'est juste le bouchon qui retourne ca
@@ -321,10 +321,10 @@ describe.skip("superagent-hornet-plugins", () => {
                 stubRequest.end(callbackEndMethod);
             });
 
-            it("should not find and store headers", function(done) {
+            it("should not find and store headers", function (done) {
                 // Arrange
                 var timeToLiveInCache = 10;
-                HornetCacheStubInstance.catch = function(callbackFn) {
+                HornetCacheStubInstance.catch = function (callbackFn) {
                     setTimeout(() => {
                         callbackFn();
                     }, 10);
@@ -358,9 +358,9 @@ describe.skip("superagent-hornet-plugins", () => {
                 stubRequest.end(callbackEndMethod);
             });
 
-            it("should set default time to live", function(done) {
+            it("should set default time to live", function (done) {
                 // Arrange
-                HornetCacheStubInstance.catch = function(callbackFn) {
+                HornetCacheStubInstance.catch = function (callbackFn) {
                     setTimeout(() => {
                         callbackFn();
                     }, 10);
@@ -370,7 +370,7 @@ describe.skip("superagent-hornet-plugins", () => {
 
                 var stubRequest = sinon.spy();
                 stubRequest.url = TestUtils.randomString();
-                stubRequest.end = function(callbackFn) {
+                stubRequest.end = function (callbackFn) {
                     // Assert
                     expect(this).to.be.equals(stubRequest);
                     expect(callbackFn).to.be.equals(stubRequest.url);// C'est juste le bouchon qui retourne ca
@@ -420,13 +420,13 @@ describe.skip("superagent-hornet-plugins", () => {
                 expect(callbackEndMethod).to.be.calledWith(error, response);
             });
 
-            it("should cache good request", function(done) {
+            it("should cache good request", function (done) {
                 // Arrange
                 var url = TestUtils.randomString();
                 var timeToLiveInCache = 10;
                 var response = sinon.spy();
 
-                var callbackEndMethod = function(err, res) {
+                var callbackEndMethod = function (err, res) {
                     // Assert
                     expect(err).to.be.undefined;
                     expect(res).to.be.equals(response);
@@ -453,7 +453,7 @@ describe.skip("superagent-hornet-plugins", () => {
                     type: TestUtils.randomString()
                 };
                 var expectedRequest = _.cloneDeep(mockRequest);
-                mockRequest[TestUtils.randomString()] = TestUtils.randomString();
+                mockRequest[ TestUtils.randomString() ] = TestUtils.randomString();
 
                 // Act
                 var clonedRequest = superAgentPlugins.CachePlugin._cloneResponse(mockRequest);

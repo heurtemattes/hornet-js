@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,7 +89,7 @@ export class CellCoordinates {
 
     isSame(coord: CellCoordinates) {
         if (coord) {
-            if (coord.column == this.column && coord.row == this.row) {
+            if (coord.column === this.column && coord.row === this.row) {
                 return true;
             }
         }

@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -90,7 +90,7 @@ export interface AuthenticationStrategy extends Strategy {
      * @param {Response} reponse
      * @param [next] - fonction d'appel middleware express suivant
      */
-    connect(passport:any, req:Request, res:Response, next:(err?: Error) => void);
+    connect(passport: any, req: Request, res: Response, next: (err?: Error) => void);
 
     /**
      * fonction de déconnexion associée à la statégie
@@ -99,12 +99,12 @@ export interface AuthenticationStrategy extends Strategy {
      * @param {Response} reponse
      * @param [next] - fonction d'appel middleware express suivant
      */
-    disconnect(passport:any, req:Request, res:Response, next:(err?: Error) => void);
+    disconnect(passport: any, req: Request, res: Response, next: (err?: Error) => void);
 
     /**
      * Indique si cette requête est prise en charge par la stratégie
      * @param {Request} requete
      */
-    isRequestForStrategie(req:Request) : boolean;
+    isRequestForStrategie(req: Request): boolean;
 
 }

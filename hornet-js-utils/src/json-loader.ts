@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,15 +87,15 @@ export class JSONLoader {
      * Surcharge JSON.parse en permettant l'utilisation du format JSON5.
      */
     static allowJSON5() {
-        if (!JSON["__oldParse"]) {
+        if (!JSON[ "__oldParse" ]) {
             // autorise les : require("monFichierJson") avec extension .json5
             require("json5/lib/require");
 
             // surcharge JSON.parse
-            JSON["__oldParse"] = JSON.parse;
-            JSON.parse = function() {
+            JSON[ "__oldParse" ] = JSON.parse;
+            JSON.parse = function () {
                 try {
-                    return JSON["__oldParse"].apply(JSON, arguments);
+                    return JSON[ "__oldParse" ].apply(JSON, arguments);
                 } catch (e) {
                     return JSON5.parse.apply(JSON5, arguments);
                 }

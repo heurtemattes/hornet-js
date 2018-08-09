@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-react-components",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants web React de base de hornet-js",
   "bugs": {
@@ -15,31 +15,29 @@
     "react"
   ],
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.1.1",
-    "hornet-js-utils-dts": "5.1.1",
-    "hornet-js-components-dts": "5.1.1",
-    "hornet-js-core-dts": "5.1.1",
-    "hornet-js-test-dts": "5.1.1"
+    "hornet-js-ts-typings": "5.2.0",
+    "hornet-js-utils-dts": "5.2.0",
+    "hornet-js-components-dts": "5.2.0",
+    "hornet-js-core-dts": "5.2.0",
+    "hornet-js-test-dts": "5.2.0"
   },
   "appDependencies": {
-    "hornet-js-components": "5.1.1",
-    "hornet-js-core": "5.1.1",
-    "hornet-js-utils": "5.1.1",
+    "hornet-js-components": "5.2.0",
+    "hornet-js-core": "5.2.0",
+    "hornet-js-utils": "5.2.0",
     "classnames": "2.2.5",
     "no-scroll": "2.1.0",
     "prop-types": "15.6.0",
-    "rc-calendar": "9.5.0",
-    "react": "16.2.0",
-    "react-dom": "16.2.0",
+    "rc-calendar": "9.6.2",
+    "react": "16.4.2",
+    "react-dom": "16.4.2",
     "react-draggable": "3.0.3",
     "tabbable": "1.1.2",
     "rc-util": "4.3.1"
   },
-  "buildDependencies": {
-    "typescript": "2.5.2"
-  },
+  "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.1.1"
+    "hornet-js-test": "5.2.0"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

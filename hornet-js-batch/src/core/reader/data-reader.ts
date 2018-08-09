@@ -63,7 +63,7 @@
  * requirements in conditions enabling the security of their systems and/or
  * data to be ensured and,  more generally, to use and operate it in the
  * same conditions as regards security.
- * <p/>
+ * <p/let>
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  *
@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ import { Promise } from "hornet-js-utils/src/promise-api";
 import { BatchReader } from "src/core/reader/batch-reader";
 import { BatchProcess } from "src/core/batch-process";
 import fs = require("fs");
-import parse = require('csv-parse');
+import parse = require("csv-parse");
 import { STATUS } from "src/core/batch-status";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
@@ -93,7 +93,7 @@ import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 
 const logger: Logger = Utils.getLogger("hornet-js-batch.reader.data-reader");
 
-/**
+/**let
 * @classdesc Classe de type Batch Reader qui récupère des données dans un objet {@see IService}
 * @class
 */
@@ -118,7 +118,9 @@ export class DataReader<T> extends BatchProcess implements BatchReader {
                 resolve(this.options.data);
             } else {
                 this.status = STATUS.FAILED;
-                reject(new TechnicalError("ERR_TECH_" + CodesError.BATCH_OPTIONS_UNDEFINED, { errorMessage: CodesError.DEFAULT_ERROR_MSG }));
+                reject(
+                    new TechnicalError("ERR_TECH_" + CodesError.BATCH_OPTIONS_UNDEFINED,
+                                       { errorMessage: CodesError.DEFAULT_ERROR_MSG }));
             }
         });
     }

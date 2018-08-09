@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,14 +118,14 @@ export interface AutoCompleteSelectorProps extends HornetComponentProps {
 export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorProps, any> {
 
     static defaultProps = {
-        onOptionSelected: function (event: __React.MouseEvent<HTMLElement>, choice: any): void {
+        onOptionSelected (event: __React.MouseEvent<HTMLElement>, choice: any): void {
             event.preventDefault();
         },
         currentTypedText: "",
         showComponent: true,
         choices: [],
         readOnly: false,
-        disabled: false
+        disabled: false,
     };
 
     protected liElts: HTMLElement[];
@@ -136,11 +136,15 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
     constructor(props, context?: any) {
         super(props, context);
-        this.state.maxLengthItem = 0;
         this.props.autoCompleteState.on(AutoCompleteState.FOCUS_CHANGE_EVENT, this.handleFocus);
         this.liElts = [];
         this.liReact = [];
         this.choicesSelected = [];
+
+        this.state = {
+            ...this.state,
+            maxLengthItem: 0,
+        };
     }
     shouldComponentUpdate(nextProps: AutoCompleteSelectorProps, nextState: any, nextContext: any) {
         super.componentWillUpdate(nextProps, nextState, nextContext);
@@ -158,7 +162,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     }
 
     setCurrentTypedText(currentTypedText: string, callback?: () => any): this {
-        this.setState({ currentTypedText: currentTypedText }, callback);
+        this.setState({ currentTypedText }, callback);
         return this;
     }
 
@@ -182,7 +186,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      **/
     protected onListClick(event: __React.MouseEvent<HTMLElement>, choice: any) {
         event.preventDefault();
-        this.state.onListClick = true;
+        (this.state as any).onListClick = true;
         return this.state.onOptionSelected(event, choice);
     }
 
@@ -190,8 +194,8 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         event.stopPropagation();
         event.preventDefault();
 
-        if (event.button == 0) {
-            this.state.onListClick = true;
+        if (event.button === 0) {
+            (this.state as any).onListClick = true;
             return this.state.onOptionSelected(event, choice);
         }
     }
@@ -273,18 +277,18 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      **/
     scrollToElement(checkedElement: HTMLElement) {
 
-        let element = document.getElementById(this.state.selectorId);
+        const element = document.getElementById(this.state.selectorId);
         if (this.isBefore(element, checkedElement)) {
             if (this.hasBigGap(element, checkedElement)) {
-                this.goToElement(element, checkedElement)
+                this.goToElement(element, checkedElement);
             } else {
-                this.scrollUp(element, checkedElement)
+                this.scrollUp(element, checkedElement);
             }
         } else if (this.isAfter(element, checkedElement)) {
             if (this.hasBigGap(element, checkedElement)) {
-                this.goToElement(element, checkedElement)
+                this.goToElement(element, checkedElement);
             } else {
-                this.scrollDown(element, checkedElement)
+                this.scrollDown(element, checkedElement);
             }
         }
         this.setActive(checkedElement);
@@ -294,11 +298,11 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      * Fonction appelée pour déselectionner
      **/
     protected cleanActived() {
-        let lastCheckedElement = document.querySelectorAll("#" + _.replace(this.state.selectorId, ".", "\\.") + " .autocomplete-item-active");
+        const lastCheckedElement = document.querySelectorAll("#" + _.replace(this.state.selectorId, ".", "\\.") + " .autocomplete-item-active");
         if (lastCheckedElement) {
             _.forEach(lastCheckedElement, (item) => {
                 item.className = "autocomplete-item";
-            })
+            });
         }
     }
 
@@ -319,7 +323,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      * @param {string} id l'élément sélectionné
      **/
     scrollToElementById(id: string) {
-        let checkedElement = document.getElementById(id);
+        const checkedElement = document.getElementById(id);
         this.scrollToElement(checkedElement);
     }
 
@@ -328,12 +332,12 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      */
     componentDidUpdate() {
         this.cleanActived();
-        let element = document.getElementById(this.state.selectorId);
+        const element = document.getElementById(this.state.selectorId);
         if (!this.state.onListClick) {
             if (this.state.autoCompleteState.choiceFocused !== undefined) {
-                let idToScroll = this.state.selectorId + "_" + this.state.autoCompleteState.choiceFocused;
-                let checkedElement = document.getElementById(idToScroll);
-                this.setActive(checkedElement)
+                const idToScroll = this.state.selectorId + "_" + this.state.autoCompleteState.choiceFocused;
+                const checkedElement = document.getElementById(idToScroll);
+                this.setActive(checkedElement);
                 if (checkedElement) {
                     checkedElement.className = "autocomplete-item autocomplete-item-active";
                     this.scrollToElement(checkedElement);
@@ -342,7 +346,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
                 element.scrollTop = 5;
             }
         }
-        this.state.onListClick = false
+        (this.state as any).onListClick = false;
     }
 
 
@@ -351,37 +355,37 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      **/
     protected renderOptionList(): JSX.Element[] {
         logger.trace("render AutoCompleteSelector option list");
-        let res: JSX.Element[] = [];
+        const res: JSX.Element[] = [];
 
         if (this.state.choices) {
             this.state.choices.forEach((choice, indexTab) => {
                 if (choice) {
-                    let choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
-                    let currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
+                    const choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
+                    const currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
                     let index = choiceTextFormatted.indexOf(currentTextFormatted);
                     if (index === -1) {
-                        if (currentTextFormatted != "") {
+                        if (currentTextFormatted !== "") {
                             return null;
                         } else {
                             index = 0;
                         } // Valeur saisie non présente
                     }
 
-                    let classes: ClassDictionary = {
+                    const classes: ClassDictionary = {
                         "autocomplete-item": true,
-                        //"autocomplete-item-active": this.props.autoCompleteState.choiceFocused === indexTab
+                        // "autocomplete-item-active": this.props.autoCompleteState.choiceFocused === indexTab
                     };
 
-                    let classList: string = classNames(classes);
-                    let checkboxChecked: boolean = false;
+                    const classList: string = classNames(classes);
+                    const checkboxChecked: boolean = false;
                     res.push((
                         <li onMouseDown={!this.props.readOnly && !this.props.disabled ? (event) => this.onListClick(event, choice) : null}
                             id={this.state.selectorId + "_" + indexTab}
                             className={classList}
-                            aria-selected={this.state.choicesSelected == choice.value}
+                            aria-selected={this.state.choicesSelected === choice.value}
                             data-real-value={choice.value}
                             role="option"
-                            key={"autocomplete-" + choice.text + "-" + choice.value}
+                            key={this.state.selectorId + "autocomplete-" + choice.text + "-" + choice.value}
                             ref={(liElt) => {
                                 if (liElt != null) this.liElts.push(liElt);
                             }}>
@@ -395,7 +399,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
                         </li>
                     ));
                 }
-            })
+            });
         }
         return res;
     }
@@ -404,7 +408,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      * indique un clic sur une checkbox
      **/
     multiClick(event) {
-        this.state.onListClick = true;
+        (this.state as any).onListClick = true;
     }
 
 
@@ -414,34 +418,34 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     protected renderOptionMultipleList(): JSX.Element[] {
 
         logger.trace("render AutoCompleteSelector option multiple");
-        let res: JSX.Element[] = [];
+        const res: JSX.Element[] = [];
         if (this.state.choices) {
             this.state.choices.forEach((choice, indexTab) => {
                 if (choice) {
 
-                    let choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
-                    let currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
+                    const choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
+                    const currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
 
-                    let index = choiceTextFormatted.indexOf(currentTextFormatted);
+                    const index = choiceTextFormatted.indexOf(currentTextFormatted);
                     if (index === -1) return null; // Valeur saisie non présente
 
-                    let classes: ClassDictionary = {
+                    const classes: ClassDictionary = {
                         "autocomplete-item": true,
-                        "autocomplete-item-active": this.props.autoCompleteState.choiceFocused === indexTab
+                        "autocomplete-item-active": this.props.autoCompleteState.choiceFocused === indexTab,
                     };
 
                     let checkboxChecked: boolean = false;
 
-                    if (_.indexOf(this.props.choicesSelected, choice.value.toString()) > -1) {
+                    if (_.indexOf(this.props.choicesSelected, choice.value.toString()) > -1 || _.indexOf(this.props.choicesSelected, choice.value) > -1) {
                         checkboxChecked = true;
                     }
-                    let classList: string = classNames(classes);
+                    const classList: string = classNames(classes);
                     res.push((
                         <li
-                            onMouseDown={!this.props.readOnly && !this.props.disabled ? (e) => { this.onListClickMulti(e, indexTab, choice) } : null}
+                            onMouseDown={!this.props.readOnly && !this.props.disabled ? (e) => { this.onListClickMulti(e, indexTab, choice); } : null}
                             id={this.state.selectorId + "_" + indexTab}
                             onKeyDown={!this.props.readOnly && !this.props.disabled ? (e) => {
-                                this.onListClickMulti(e, indexTab, choice)
+                                this.onListClickMulti(e, indexTab, choice);
                             } : null}
                             className={classList}
                             data-real-value={choice.value}
@@ -455,16 +459,16 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
                         >
                             <CheckBox id={"autocomplete-selector-checkbox-" + indexTab}
-                                      key={"autocomplete-selector-checkbox-" + indexTab + "-" + checkboxChecked}
-                                      checked={checkboxChecked}
-                                      label={choice.text}
-                                      onChange={() => { }}
-                                      readOnly={this.props.readOnly}
-                                      disabled={this.props.disabled} />
+                                key={"autocomplete-selector-checkbox-" + indexTab + "-" + checkboxChecked}
+                                checked={checkboxChecked}
+                                label={choice.text}
+                                onChange={() => { }}
+                                readOnly={this.props.readOnly}
+                                disabled={this.props.disabled} />
                         </li>
                     ));
                 }
-            })
+            });
         }
         return res;
     }
@@ -478,31 +482,31 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         this.liReact = (this.props.isMultiple) ? this.renderOptionMultipleList() : this.renderOptionList();
 
         // On construit le ul englobant
-        let classes: ClassDictionary = {
+        const classes: ClassDictionary = {
             "autocomplete-selector": true,
             "widget-positioned": true,
-            "autocomplete-selector-hidden": this.state.showComponent === false
+            "autocomplete-selector-hidden": this.state.showComponent === false,
         };
-        let classList: string = classNames(classes);
+        const classList: string = classNames(classes);
 
-        let styleUl: CSSProperties = {
-            "minWidth": "100%",
-            "maxHeight": this.props.maxHeight ? this.props.maxHeight + "px" : "none"
+        const styleUl: CSSProperties = {
+            minWidth: "100%",
+            maxHeight: this.props.maxHeight ? this.props.maxHeight + "px" : "none",
         };
 
         if (this.props.maxHeight) {
-            styleUl.overflow = "auto"
+            styleUl.overflow = "auto";
         }
 
-        let classesContent: ClassDictionary = {
-            "autocomplete-content-selector": true
+        const classesContent: ClassDictionary = {
+            "autocomplete-content-selector": true,
         };
 
-        let no_result: JSX.Element = (
+        const no_result: JSX.Element = (
             <div style={{ fontStyle: "italic" }}>{this.state.noResultLabel ? this.state.noResultLabel : this.noResultLabelDefault}</div>
-        )
+        );
 
-        let classContentList: string = classNames(classesContent);
+        const classContentList: string = classNames(classesContent);
         return (
             <div className={classList}>
                 <div className={classContentList}>
@@ -523,16 +527,16 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      **/
     handleFocus(oldChoiceFocused, newChoiceFocused, value: string, index: number) {
         if (value && value.length > 0) {
-            let elmt = document.querySelector("#" + _.replace(this.state.selectorId, ".", "\\.") + " [data-real-value='" + value + "']");
+            const elmt = document.querySelector("#" + _.replace(this.state.selectorId, ".", "\\.") + " [data-real-value='" + value + "']");
             if (elmt) {
                 this.scrollToElement(elmt as HTMLElement);
-                let _index = _.findIndex(this.liElts, elmt);
+                const _index = _.findIndex(this.liElts, elmt);
                 this.state.autoCompleteState.choiceFocused = _index;
                 this.setFocusElement(elmt as HTMLElement);
             }
         } else {
             if (newChoiceFocused !== undefined && newChoiceFocused != null && newChoiceFocused >= 0 && this.liElts.length > 0) {
-                let elmt = this.liElts[ newChoiceFocused ];
+                const elmt = this.liElts[ newChoiceFocused ];
                 if (elmt && this.props.isMultiple) {
                     this.setFocusElement(elmt);
                 } else {

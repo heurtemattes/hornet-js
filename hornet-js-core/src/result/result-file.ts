@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,10 +100,10 @@ export class ResultFile extends HornetResult {
      */
     protected configure(res: Response): boolean {
 
-        let buffer: Buffer = this.options.data instanceof Buffer ? this.options.data : new Buffer(this.options.data);
-        let headers = {
+        const buffer: Buffer = Buffer.isBuffer(this.options.data) ? this.options.data : Buffer.from(this.options.data);
+        const headers = {
             "Content-Type": this.mediaType.MIME,
-            "Content-Length": buffer.length
+            "Content-Length": buffer.length,
         };
 
 

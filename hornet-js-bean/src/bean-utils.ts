@@ -73,12 +73,12 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {TechnicalError} from "hornet-js-utils/src/exception/technical-error";
+import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import * as _ from "lodash";
 import { Register } from "hornet-js-utils/src/common-register";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
@@ -87,84 +87,88 @@ import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 enum Methods {
     serialize,
     map,
-    clone
+    clone,
 }
 
-var logger = Register.getLogger("hornet-js-utils.bean-utils");
+const logger = Register.getLogger("hornet-js-utils.bean-utils");
 export class BeanUtils {
 
     protected static _call(options) {
-        let object : Object = options.object;
-        let method : Methods = options.method;
-        let clazz = options.clazz;
+        const object: Object = options.object;
+        const method: Methods = options.method;
+        const clazz = options.clazz;
         let result;
 
-        //dans le cas du clone, il n'y a pas de mapping vers une autre classe
-        let target = (method == Methods.clone) ? object : new clazz();
+        // dans le cas du clone, il n'y a pas de mapping vers une autre classe
+        const target = (method === Methods.clone) ? object : new clazz();
 
-        //appel aux fonctions de mapping
-        //et (petite) gestion des erreurs
-        if (object instanceof Object){
-            let fn = target[Methods[method]];
-            if (typeof fn === 'function') {
-                result = fn.apply(target, [options]);
+        // appel aux fonctions de mapping
+        // et (petite) gestion des erreurs
+        if (object instanceof Object) {
+            const fn = target[ Methods[ method ] ];
+            if (typeof fn === "function") {
+                result = fn.apply(target, [ options ]);
             } else {
-                if (typeof target.pull != 'function'){
-                    let msg: string = _.join(['Cannot find @Bean for object :', clazz ? clazz.name : '', '.So, we cannot transform it to an object'], ' ');
+                if (typeof target.pull !== "function") {
+                    const msg: string = _.join(
+                        [ "Cannot find @Bean for object :", clazz ? clazz.name : "", ".So, we cannot transform it to an object" ],
+                        " ");
                     logger.error(msg);
-                    throw new TechnicalError('ERR_TECH_' + CodesError.BINDING_ERROR, {errorMessage: CodesError.DEFAULT_ERROR_MSG});
-                }else {
+                    throw new TechnicalError("ERR_TECH_" + CodesError.BINDING_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
+                } else {
                     result = target.pull(options);
                 }
             }
         } else {
-            let msg: string = _.join(['Cannot find @Bean for object :', object, '.So, we cannot transform it to an object', clazz ? clazz.name : ''], ' ');
+            const msg: string = _.join(
+                [ "Cannot find @Bean for object :", object, ".So, we cannot transform it to an object", clazz ? clazz.name : "" ],
+                " ");
             logger.error(msg);
-            throw new TechnicalError('ERR_TECH_' + CodesError.BINDING_ERROR, {errorMessage: CodesError.DEFAULT_ERROR_MSG});
+            throw new TechnicalError("ERR_TECH_" + CodesError.BINDING_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
         }
         return result;
     }
 
-    protected static _beforeCall(options){
-        //création d'une promesse
-        return new Promise((resolve, reject)=> {
+    protected static _beforeCall(options) {
+        // création d'une promesse
+        return new Promise((resolve, reject) => {
 
-            let method: Methods = options.method;
-            let clazz = options.clazz;
-            let object: Object = options.object;
-            let config: Object = options.config;
+            const method: Methods = options.method;
+            const clazz = options.clazz;
+            const object: Object = options.object;
+            const config: Object = options.config;
 
             try {
 
                 let result;
-                //Cas particuliers qui doivent retourner undefined
-                if (!clazz && method!=Methods.clone || !object || typeof  object == 'function') {
+                // Cas particuliers qui doivent retourner undefined
+                if (!clazz && method !== Methods.clone || !object || typeof object === "function") {
                     resolve();
                     return;
                 }
 
 
                 if (object instanceof Array) {
-                    //Mapping pour un Array
+                    // Mapping pour un Array
                     result = [];
                     object.forEach(res => {
-                        result.push(BeanUtils._call({method :method, clazz : clazz, object : res, config : config}));
-                    })
+                        result.push(BeanUtils._call({ method, clazz, object: res, config }));
+                    });
                 } else {
-                    //Mapping pour un object
-                    result = BeanUtils._call({method :method, clazz : clazz, object : object, config : config});
+                    // Mapping pour un object
+                    result = BeanUtils._call({ method, clazz, object, config });
                 }
-                 resolve(result);
-            }catch (e) {
+                resolve(result);
+            } catch (e) {
                 let error = e;
-                if (!(e instanceof TechnicalError)){
-                    let msg: string = _.join(['Cannot bind', object, 'to an object', clazz.name], ' ');
-                    error = new TechnicalError('ERR_TECH_BINDING', {message: msg}, e);
+                if (!(e instanceof TechnicalError)) {
+                    const msg: string = _.join([ "Cannot bind", object, "to an object", clazz.name ], " ");
+                    error = new TechnicalError("ERR_TECH_BINDING", { message: msg }, e);
                 }
                 logger.error(e);
-                reject(error)
+                reject(error);
             }
-        })
+        });
     }
 
     /**
@@ -174,9 +178,9 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static mapObject(targetClass, source, options?) : Promise<any>{
-        return BeanUtils.map(targetClass, source, options)
-        
+    static mapObject(targetClass, source, options?): Promise<any> {
+        return BeanUtils.map(targetClass, source, options);
+
     }
 
     /**
@@ -186,8 +190,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static mapArray(targetClass, source, options?) : Promise<any>{
-        return BeanUtils.mapObject(targetClass, source, options)
+    static mapArray(targetClass, source, options?): Promise<any> {
+        return BeanUtils.mapObject(targetClass, source, options);
     }
 
     /**
@@ -197,8 +201,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static map(targetClass, source, options?) : Promise<any>{
-        return BeanUtils._beforeCall({method :Methods.map, clazz : targetClass, object : source, config : options});
+    static map(targetClass, source, options?): Promise<any> {
+        return BeanUtils._beforeCall({ method: Methods.map, clazz: targetClass, object: source, config: options });
     }
 
     /**
@@ -208,8 +212,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static serializeObject(targetClass, source, options?) : Promise<any>{
-        return BeanUtils.serialize(targetClass, source, options)
+    static serializeObject(targetClass, source, options?): Promise<any> {
+        return BeanUtils.serialize(targetClass, source, options);
     }
 
     /**
@@ -219,8 +223,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static serializeArray(targetClass, source, options?) : Promise<any>{
-        return BeanUtils.serializeObject(targetClass, source, options)
+    static serializeArray(targetClass, source, options?): Promise<any> {
+        return BeanUtils.serializeObject(targetClass, source, options);
     }
 
     /**
@@ -230,8 +234,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static serialize(targetClass, source, options?) : Promise<any>{
-        return BeanUtils._beforeCall({method :Methods.serialize, clazz : targetClass, object : source, config : options});
+    static serialize(targetClass, source, options?): Promise<any> {
+        return BeanUtils._beforeCall({ method: Methods.serialize, clazz: targetClass, object: source, config: options });
     }
 
     /**
@@ -240,8 +244,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static cloneObject(source, options?) : Promise<any>{
-        return BeanUtils.clone(source, options)
+    static cloneObject(source, options?): Promise<any> {
+        return BeanUtils.clone(source, options);
 
     }
 
@@ -251,8 +255,8 @@ export class BeanUtils {
      * @param options : options
      * vers un tableau de type <targetClass>@returns Promise
      */
-    static cloneArray(array, options?) : Promise<any>{
-        return BeanUtils.cloneObject(array, options)
+    static cloneArray(array, options?): Promise<any> {
+        return BeanUtils.cloneObject(array, options);
     }
 
     /**
@@ -261,8 +265,8 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static clone(source, options?) : Promise<any>{
-        return BeanUtils._beforeCall({method :Methods.clone, object : source, config : options});
+    static clone(source, options?): Promise<any> {
+        return BeanUtils._beforeCall({ method: Methods.clone, object: source, config: options });
     }
-
+    
 }

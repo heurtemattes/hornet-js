@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,7 +98,7 @@ export interface FieldErrorProps extends HornetComponentProps {
 export class FieldError extends HornetComponent<FieldErrorProps, any> {
 
     static defaultProps: any = {
-        errors: new Array<INotificationType>(0)
+        errors: new Array<INotificationType>(0),
     };
 
     /**
@@ -108,18 +108,18 @@ export class FieldError extends HornetComponent<FieldErrorProps, any> {
         /* Filtrage des erreurs correspondant au nom du champ*/
         let fieldErrors: INotificationType[];
         if (this.state.errors) {
-            fieldErrors = this.state.errors.filter(function(error: INotificationType): boolean {
-                return (error.field == this.state.fieldName && !this.state.hideError);
-            }, this);
+            fieldErrors = this.state.errors.filter(function (error: INotificationType): boolean {
+                return (error.field === this.state.fieldName && !this.state.hideError);
+            },                                     this);
         } else {
             fieldErrors = new Array<INotificationType>(0);
         }
         return (
             fieldErrors.length > 0 ?
                 <div className="fielderror-container">
-                    {fieldErrors.map((error: INotificationType) => {
+                    {fieldErrors.map((error: INotificationType, i: number) => {
                         return <div key={error.id} className="fielderror-content formmgr-message-text"
-                                    id={`${this.props.fieldName}-error`}>{error.text}</div>;
+                            id={`${this.props.fieldName}-${error.id}-error`}>{error.text}</div>;
                     })}
                 </div> : null
         );

@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,15 +87,14 @@ import {
     LoggerUserMiddleware,
     RouterServerMiddleware,
     UserAccessSecurityMiddleware,
-    DataRenderingMiddleware
+    DataRenderingMiddleware,
 } from "hornet-js-core/src/middleware/middlewares";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import { Request } from "express";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
-import { RouteInfos, DataRouteInfos } from "hornet-js-core/src/routes/abstract-routes";
+import { RouteInfos, DataRouteInfos, RouteType } from "hornet-js-core/src/routes/abstract-routes";
 import { HornetResult } from "hornet-js-core/src/result/hornet-result";
 import { RouteActionBatch } from "../routes/abstract-batch-routes";
 import { BatchExecutor } from "src/core/batch-executor";
@@ -105,7 +104,6 @@ import { AsyncExecutor } from "hornet-js-core/src/executor/async-executor";
 import { AsyncElement } from "hornet-js-core/src/executor/async-element";
 import { ValidationError } from "hornet-js-utils/src/exception/validation-error";
 import * as _ from "lodash";
-import { RouteType } from "hornet-js-core/src/routes/abstract-routes";
 
 
 
@@ -120,49 +118,57 @@ export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
         super((req: Request, res: Response, next: Function) => {
             BatchRenderingMiddleware.logger.trace("===========>", req.originalUrl);
             try {
-                let routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
+                const routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
 
                 // route de type 'DATA' uniquement
                 if (Utils.getCls("hornet.routeType") === RouteType.DATA) {
 
-                    let dataRouteInfos = routeInfos as DataRouteInfos;
+                    const dataRouteInfos = routeInfos as DataRouteInfos;
 
                     if (!dataRouteInfos) {
-                        let mess = "DataRouteInfos inexistant pour l'url : " + req.originalUrl;
+                        const mess = "DataRouteInfos inexistant pour l'url : " + req.originalUrl;
                         BatchRenderingMiddleware.logger.warn(mess);
                         throw new TechnicalError("ERR_TECH_UNKNOWN", { errorMessage: mess, httpStatus: 200 });
 
                     } else {
 
 
-                        let executor = new AsyncExecutor();
+                        const executor = new AsyncExecutor();
                         executor.addElement(new AsyncElement((next: (err?: any, data?: any) => void) => {
-                            let action = new (dataRouteInfos.getAction())();
+                            const action = new (dataRouteInfos.getAction())();
                             action.req = req;
                             action.res = res;
                             action.attributes = routeInfos.getAttributes();
-                            if (dataRouteInfos.getService()) {
-                                action.service = new (dataRouteInfos.getService() as Class<any>)();
+                            const actionService = dataRouteInfos.getService();
+                            if (actionService) {
+                                if (!(actionService as any).prototype) {
+                                    action.service = actionService;
+                                } else {
+                                    BatchRenderingMiddleware.logger.deprecated("Les services doivent être instanciés afin de pouvoir être utilisés par le composant BatchRenderingMiddleware. Les services non instanciés ne seront bientôt plus supportés. Voir l'utilisation de l'injector avec un scope SINGLETON par exemple ou l'instanciation dans la déclaration de vos routes");
+                                    action.service = new (actionService as Class<any>)();
+                                }
                             }
 
-                            let validator = action.getDataValidator();
+                            const validator = action.getDataValidator();
                             if (validator) {
-                                let data = _.cloneDeep(action.getPayload());
+                                const data = _.cloneDeep(action.getPayload());
 
-                                let validationRes = validator.validate(data);
+                                const validationRes = validator.validate(data);
 
                                 if (!validationRes.valid) {
-                                    BatchRenderingMiddleware.logger.warn("Données invalides (la validation aurait dû être effectuée côté client) : ", validationRes.errors);
+                                    BatchRenderingMiddleware.logger.warn(
+                                        "Données invalides (la validation aurait dû être effectuée côté client) : ", 
+                                        validationRes.errors);
                                     throw new ValidationError();
                                 }
                             }
 
                             BatchRenderingMiddleware.logger.debug(req.originalUrl + " req");
                             let exec: Promise<any>;
-                            let query = BatchExecutor.Instance.isBatchActionExist(req.originalUrl);
-                            let isBusy = query[ "isBusy" ];
+                            const query = BatchExecutor.Instance.isBatchActionExist(req.originalUrl);
+                            const isBusy = query[ "isBusy" ];
                             if (action instanceof RouteActionBatch && isBusy) {
-                                exec = Promise.resolve(new ResultBatch({ isExist: isBusy }))
+                                exec = Promise.resolve(new ResultBatch({ isExist: isBusy }));
                             } else {
                                 exec = action.execute();
                             }
@@ -172,15 +178,16 @@ export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
 
                                 BatchRenderingMiddleware.logger.debug(req.originalUrl + " res");
                                 if (result instanceof HornetResult) {
-                                    let _data = result.options[ "data" ]
+                                    let _data = result.options[ "data" ];
                                     if (!_data) {
-                                        _data = {}
+                                        _data = {};
                                     }
                                     _data[ "history" ] = query[ "history" ];
                                 } else {
                                     result[ "history" ] = query[ "history" ];
                                 }
-                                let newResult: HornetResult = (result instanceof HornetResult) ? result : new ResultJSON({ data: result });
+                                const newResult: HornetResult = (result instanceof HornetResult) ? 
+                                result : new ResultJSON({ data: result });
                                 return newResult.manageResponse(res);
                             }).then((send) => {
                                 if (send) {

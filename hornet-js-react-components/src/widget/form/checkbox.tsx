@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,18 +81,20 @@
 import * as React from "react";
 
 import { HornetComponent } from "src/widget/component/hornet-component";
+import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import {
     ReactFormDOMAttributes,
     HTMLStandardConfigAttributes,
-    ReactBasicMouseDOMAttributes
+    ReactBasicMouseDOMAttributes,
 } from "src/widget/form/abstract-field";
-var ReactDOM = require('react-dom');
+const ReactDOM = require("react-dom");
 
 export interface CheckboxProps {
     label?: string;
     title?: string;
     id?: string;
     checked?: boolean;
+    tabIndex?: number;
 }
 
 /**
@@ -100,8 +102,9 @@ export interface CheckboxProps {
  */
 export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttributes & HTMLStandardConfigAttributes & ReactBasicMouseDOMAttributes, any> {
 
-    protected inputRef:any;
+    protected inputRef: any;
     protected checked;
+    protected spanRef: any;
 
     constructor(props?: CheckboxProps, context?: any) {
         super(props, context);
@@ -111,9 +114,9 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
     /**
      * @inheritDoc
      */
-    componentDidMount(){
+    componentDidMount() {
         super.componentDidMount();
-        let checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
+        const checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
         checkbox.checked = this.checked;
     }
 
@@ -122,11 +125,12 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
      */
     componentWillReceiveProps(nextProps, nextState) {
         this.checked = nextProps.checked;
-        let checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
+        const checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
         if (checkbox) {
             checkbox.checked = this.checked;
         }
 
+        this.setState({disabled: nextProps.disabled});
     }
 
     /**
@@ -134,24 +138,29 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
      */
     render(): React.ReactElement<CheckboxProps> {
 
-        let labelProps: any = {
+        const labelProps: any = {
             className: "checkbox-content",
             disabled: this.props.disabled,
-            title: this.props.title
+            title: this.props.title,
         };
 
-        let inputProps = {
+        const inputProps = {
             onChange: this.onChange,
             title: this.props.title,
             name: this.props.name,
-            id: this.props.id
+            id: this.props.id,
+            tabIndex: this.props.tabIndex ?  this.props.tabIndex : 0,
+        };
+
+        if (this.state.disabled) {
+            inputProps["disabled"] = true;
         }
 
         return (
-            <label {...labelProps} onKeyDown={this.onClick}>
-                <input type="checkbox" value="true" {...inputProps} ref={(ref)=>{this.inputRef = ref}} />
+            <label {...labelProps}>
+                <input type="checkbox" value="true" {...inputProps} ref={(ref) => { this.inputRef = ref; }} />
                 <span className="checkbox-material">
-                    <span className="check"></span>
+                    <span className="check" ref= {(span) => {this.spanRef = span;}}></span>
                 </span>
                 {(this.state.label) ? this.state.label : ""}
             </label>
@@ -159,21 +168,21 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
     }
 
     /**
-     * fonction appelée au clic sur la checkbox
-     * @param e
-     */
-    onClick(e) {
-        let checkbox: HTMLInputElement = ReactDOM.findDOMNode(this.inputRef);
-        checkbox.checked = !checkbox.checked;
-    }
-
-    /**
      * fonction appelée au changement de valeur de la checkbox
      * @param e
      */
     onChange(e) {
-        if(this.props.onChange){
-            this.props.onChange(e)
+        if (this.props.onChange) {
+            this.props.onChange(e);
+        }
+    }
+
+    /**
+     * mets le focus sur la checkbox
+     */
+    setFocus() {
+        if (this.spanRef) {
+            this.spanRef.focus();
         }
     }
 

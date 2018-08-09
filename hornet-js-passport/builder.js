@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.1.0-rc.4
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -91,5 +91,8 @@ module.exports = {
 
     externalModules: {
         enabled: false
+    },
+    config: {
+        autoGenerateIndex: true
     }
 };

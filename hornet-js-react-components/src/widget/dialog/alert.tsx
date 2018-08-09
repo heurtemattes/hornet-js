@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,7 +109,7 @@ export class Alert extends HornetComponent<AlertProps, any> {
     static defaultProps = {
         isVisible: false,
         underlayClickExits: false,
-        escapeKeyExits: true
+        escapeKeyExits: true,
     };
 
     constructor(props?: AlertProps, context?: any) {
@@ -117,37 +117,37 @@ export class Alert extends HornetComponent<AlertProps, any> {
     }
 
     setTitle(title: string, cb?) {
-        this.setState({title: title}, cb);
+        this.setState({ title }, cb);
         return this;
     }
 
     setMessage(message: string, cb?) {
-        this.setState({message: message}, cb);
+        this.setState({ message }, cb);
         return this;
     }
 
     setOnClickOk(onClickOk: React.MouseEventHandler<HTMLInputElement>, cb?) {
-        this.setState({onClickOk: onClickOk}, cb);
+        this.setState({ onClickOk }, cb);
         return this;
     }
 
     setOnClickCancel(onClickCancel: Function, cb?) {
-        this.setState({onClickCancel: onClickCancel}, cb);
+        this.setState({ onClickCancel }, cb);
         return this;
     }
 
     setOnClickClose(onClickClose: Function, cb?) {
-        this.setState({onClickClose: onClickClose}, cb);
+        this.setState({ onClickClose }, cb);
         return this;
     }
 
     open(cb?) {
-        this.setState({isVisible: true}, cb);
+        this.setState({ isVisible: true }, cb);
         return this;
     }
 
     close(cb?) {
-        this.setState({isVisible: false}, cb);
+        this.setState({ isVisible: false }, cb);
         return this;
     }
 
@@ -157,18 +157,18 @@ export class Alert extends HornetComponent<AlertProps, any> {
     render(): JSX.Element {
         if (!this.state.isVisible) return null;
 
-        let notificationId: string = this.state.notificationId || "nAlert";
+        const notificationId: string = this.state.notificationId || "nAlert";
 
         return (
             <Modal alert={true} isVisible={true}
-                   onClickClose={this.state.onClickClose}
-                   underlayClickExits={this.state.underlayClickExits}
-                   escapeKeyExits={this.state.escapeKeyExits}
-                   title={this.state.title}
-                   dialogId={this.state.dialogId}
+                onClickClose={this.state.onClickClose}
+                underlayClickExits={this.state.underlayClickExits}
+                escapeKeyExits={this.state.escapeKeyExits}
+                title={this.state.title}
+                dialogId={this.state.dialogId}
             >
-                <Notification id={notificationId}/>
-                <div className="widget-alert-body" aria-labelledby="dialogue-title">
+                <Notification id={notificationId} />
+                <div className="widget-alert-body" id="widget-alert-body">
                     {this.state.message}
                 </div>
                 <div className="widget-dialogue-footer">
@@ -203,7 +203,7 @@ export class Alert extends HornetComponent<AlertProps, any> {
             className: "hornet-button hornet-alert-button-ok",
             label: this.getValid(),
             title: this.getValidTitle(),
-            onClick: this.state.onClickOk
+            onClick: this.state.onClickOk,
         };
     }
 

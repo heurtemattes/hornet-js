@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,7 +95,7 @@ export interface SpinnerTableProps extends SpinnerProps {
  * Composant représentant un tableau en cours de chargement
  * dans une fenêtre modale en attendant la fin d'une action longue.
  */
-export class SpinnerLoader<P extends SpinnerTableProps, S extends SpinnerTableProps>  extends SpinnerComponent<P, S> {
+export class SpinnerLoader<P extends SpinnerTableProps, S extends SpinnerTableProps> extends SpinnerComponent<P, S> {
 
     readonly props: Readonly<SpinnerTableProps>;
 
@@ -107,22 +107,28 @@ export class SpinnerLoader<P extends SpinnerTableProps, S extends SpinnerTablePr
      * @inheritDoc
      */
     render(): JSX.Element {
+        return (
+            this.state.isVisible ? this.renderLoader() : null
+        );
+    }
 
-        let classDiv: ClassDictionary = {
+    /**
+     * Render spinner
+     */
+    renderLoader(): JSX.Element {
+        const classDiv: ClassDictionary = {
             "datatable-loader": this.state.isVisible && this.count > 0,
-            "datatable-loaded": !this.state.isVisible
+            "datatable-loaded": !this.state.isVisible,
         };
 
-        let classTr: ClassDictionary = {
-            "datatable-line-loader": true
-        };
-        classTr[this.props["className"] + "-line-loader"] = true;
-        classTr[this.props["className"] + "-tr-with-colspan"] = true;
+        const classTr: ClassDictionary = { "datatable-line-loader": true };
+        classTr[ this.props[ "className" ] + "-line-loader" ] = true;
+        classTr[ this.props[ "className" ] + "-tr-with-colspan" ] = true;
 
         return (
             <tr className={classNames(classTr)}>
-                <th colSpan={this.state["nbColumns"]} style={{width: this.props["width"] + UNIT_SIZE}}>
-                    <div className={classNames(classDiv)}/>
+                <th colSpan={this.state[ "nbColumns" ]} style={{ width: this.props[ "width" ] + UNIT_SIZE }}>
+                    <div className={classNames(classDiv)} />
                 </th>
             </tr>
         );
@@ -133,21 +139,21 @@ export class SpinnerOverlay<P extends SpinnerTableProps, S extends SpinnerTableP
 
     readonly props: Readonly<SpinnerTableProps>;
 
-    protected visibilityChange : boolean = false;
+    protected visibilityChange: boolean = false;
 
     constructor(props?: P, context?: any) {
         super(props, context);
     }
 
-    componentWillUpdate(nextProps: any, nextState: any, nextContext: any){
-        if(this.state.isVisible != nextState.isVisible && nextState.isVisible == false){
-            this.visibilityChange = true
+    componentWillUpdate(nextProps: any, nextState: any, nextContext: any) {
+        if (this.state.isVisible !== nextState.isVisible && nextState.isVisible === false) {
+            this.visibilityChange = true;
         }
     }
 
-    componentDidUpdate(nextProps: any, nextState: any, nextContext: any){
-        if(this.visibilityChange){
-            if(this.props.onHideSpinner) {
+    componentDidUpdate(nextProps: any, nextState: any, nextContext: any) {
+        if (this.visibilityChange) {
+            if (this.props.onHideSpinner) {
                 this.props.onHideSpinner();
             }
             this.visibilityChange = false;
@@ -163,12 +169,12 @@ export class SpinnerOverlay<P extends SpinnerTableProps, S extends SpinnerTableP
 
         if (this.state.isVisible && this.count > 0) {
             props = {
-                className: classNames({"datatable-overlay": this.state.isVisible && this.count > 0})
+                className: classNames({ "datatable-overlay": this.state.isVisible && this.count > 0 }),
             };
         }
 
         return (
-            <div {...props}/>
+            <div {...props} />
         );
     }
 }

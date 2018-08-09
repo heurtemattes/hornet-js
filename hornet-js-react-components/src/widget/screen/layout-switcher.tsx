@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,7 +110,11 @@ export class LayoutSwitcher<LayoutSwitcherProps, S> extends HornetComponent<any,
      */
     constructor(props, context?: any) {
         super(props, context);
-        this.state.modeFullscreen = Utils.appSharedProps.get("isExpandedLayout") || false;
+
+        this.state = {
+            ...this.state,
+            modeFullscreen: Utils.appSharedProps.get("isExpandedLayout") || false
+        };
     }
 
     /**
@@ -123,13 +127,13 @@ export class LayoutSwitcher<LayoutSwitcherProps, S> extends HornetComponent<any,
 
         return (
             <div className="larger-screen"
-                 tabIndex={0}
-                 onClick={() => this.handleExpandPageToogle()}
-                 onKeyDown={this.handleScreenButtonKeyDown}
-                 role="button"
-                 title={title}
-                 id={this.props.id}>
-                <img src={srcImg} alt={title}/>
+                tabIndex={0}
+                onClick={() => this.handleExpandPageToogle()}
+                onKeyDown={this.handleScreenButtonKeyDown}
+                role="button"
+                title={title}
+                id={this.props.id}>
+                <img src={srcImg} alt={title} />
             </div>
         );
     }

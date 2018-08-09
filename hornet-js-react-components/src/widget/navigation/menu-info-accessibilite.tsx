@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,40 +102,44 @@ export class MenuInfoAccessibilite extends ButtonInfoAccessibilite<MenuInfoAcces
 
     constructor(props: MenuInfoAccessibiliteProps, context) {
         super(props, context);
-        this.state.shortcutDescriptions = [
-            {
-                shortcuts: ["Enter", "Space"],
-                or: true,
-                description: HornetComponent.getI18n("menu.shortcuts.enterSpace")
-            },
-            {
-                shortcuts: ["Echap"],
-                description: HornetComponent.getI18n("menu.shortcuts.escape")
-            },
-            {
-                shortcuts: ["←"],
-                description: HornetComponent.getI18n("menu.shortcuts.arrowLeft")
-            },
-            {
-                shortcuts: ["↑"],
-                description: HornetComponent.getI18n("menu.shortcuts.arrowUp")
-            },
-            {
-                shortcuts: ["→"],
-                description: HornetComponent.getI18n("menu.shortcuts.arrowRight")
-            },
-            {
-                shortcuts: ["↓"],
-                description: HornetComponent.getI18n("menu.shortcuts.arrowDown")
-            },
-            {
-                shortcuts: ["shift", "tab"],
-                description: HornetComponent.getI18n("menu.shortcuts.shiftTab")
-            },
-            {
-                shortcuts: ["tab"],
-                description: HornetComponent.getI18n("menu.shortcuts.tab")
-            }
-        ];
+
+        this.state = {
+            ...this.state,
+            shortcutDescriptions: [
+                {
+                    shortcuts: ["Enter", "Space"],
+                    or: true,
+                    description: HornetComponent.getI18n("menu.shortcuts.enterSpace"),
+                },
+                {
+                    shortcuts: ["Echap"],
+                    description: HornetComponent.getI18n("menu.shortcuts.escape"),
+                },
+                {
+                    shortcuts: ["←"],
+                    description: HornetComponent.getI18n("menu.shortcuts.arrowLeft"),
+                },
+                {
+                    shortcuts: ["↑"],
+                    description: HornetComponent.getI18n("menu.shortcuts.arrowUp"),
+                },
+                {
+                    shortcuts: ["→"],
+                    description: HornetComponent.getI18n("menu.shortcuts.arrowRight"),
+                },
+                {
+                    shortcuts: ["↓"],
+                    description: HornetComponent.getI18n("menu.shortcuts.arrowDown"),
+                },
+                {
+                    shortcuts: ["shift", "tab"],
+                    description: HornetComponent.getI18n("menu.shortcuts.shiftTab"),
+                },
+                {
+                    shortcuts: ["tab"],
+                    description: HornetComponent.getI18n("menu.shortcuts.tab"),
+                },
+            ],
+        };
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,18 +81,17 @@
 import { BeanInject, BeanToInject } from "test/inject/bean"
 import { injectable, Side } from "src/inject/injectable";
 import { inject } from "src/inject/inject";
-import { Class } from "hornet-js-utils/src/typescript-utils";
 
 @injectable(BeanInject, undefined, Side.SERVER)
 export class BeanServerInject extends BeanInject {
-    bean:BeanToInject
+    bean: BeanToInject
 
-    constructor(@inject(BeanToInject) bean:BeanToInject) {
+    constructor(@inject(BeanToInject) bean: BeanToInject) {
         super();
         this.bean = bean;
     }
 
-    howIAm():string {
+    howIAm(): string {
         return this.bean.howIAm();
     }
 

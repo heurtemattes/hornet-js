@@ -73,21 +73,19 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import { HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps } from "src/widget/form/abstract-field";
+import { HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps, AbstractFieldProps } from "src/widget/form/abstract-field";
 
 import { AutoCompleteField, AutoCompleteFieldProps } from "src/widget/form/auto-complete-field";
 import { AutoCompleteSelector } from "src/widget/form/auto-complete-selector";
 import * as _ from "lodash";
-import {
-    HornetComponentChoicesProps
-} from "hornet-js-components/src/component/ihornet-component";
+import { HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 
@@ -103,7 +101,7 @@ const logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-comp
 /**
  * Propriétés du composant d'auto-complétion
  */
-export interface AutoCompleteMultiFieldProps extends HornetWrittableProps,
+export interface AutoCompleteMultiFieldProps extends AbstractFieldProps, HornetWrittableProps,
     HornetClickableProps,
     HornetBasicFormFieldProps,
     HornetComponentDatasourceProps,
@@ -126,7 +124,7 @@ export interface AutoCompleteMultiFieldProps extends HornetWrittableProps,
     /*message qui s'affiche lors de la selection des items **/
     itemSelectedLabel?: string;
     /** force de nettoyage de la zone de saisie sur la sortie du champ **/
-    cleanFilterOnBlur?: boolean
+    cleanFilterOnBlur?: boolean;
     /** surcharge du label lors qu'on a pas de resultat **/
     noResultLabel?: String;
 }
@@ -142,8 +140,12 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
 
     constructor(props: P, context?: any) {
         super(props, context);
-        this.state.itemSelectedLabel = "";
-        this.state.multiple = true
+
+        this.state = {
+            ...this.state,
+            itemSelectedLabel: "",
+            multiple: true,
+        };
     }
 
     /**
@@ -153,8 +155,8 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      * @param nextContext
      */
     componentWillUpdate(nextProps: AutoCompleteFieldProps, nextState: any, nextContext: any): void {
-        super.componentWillUpdate(nextProps, nextState, nextContext)
-        if (this.state.delay != nextState.delay) {
+        super.componentWillUpdate(nextProps, nextState, nextContext);
+        if (this.state.delay !== nextState.delay) {
             /* Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec _.throttle */
             this._throttledTriggerAction = _.throttle(this.triggerAction, nextState.delay);
         }
@@ -165,8 +167,9 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      */
     componentDidMount() {
         super.componentDidMount();
-        if (this.textInput && this.textInput.placeholder == "") {
-            this.textInput.placeholder = this.state.itemSelectedLabel.replace('{count}', 0) || this.i18n("form.autoCompleteField.selectedItem", { "count": 0 });
+        if (this.textInput && this.textInput.placeholder === "") {
+            this.textInput.placeholder = this.state.itemSelectedLabel.replace("{count}", 0)
+                || this.i18n("form.autoCompleteField.selectedItem", { count: 0 });
         }
     }
 
@@ -174,9 +177,9 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      * ferme la liste de choix de l'autocomplete lors d'un clic en dehors
      */
     eventClickListener(): void {
-        let focus = document.activeElement;
-        let container = this.autocompleteContainer;
-        if (container && focus && focus != container) {
+        const focus = document.activeElement;
+        const container = this.autocompleteContainer;
+        if (container && focus && focus !== container) {
             if (!container.contains(focus)) {
                 this.hideChoices();
             }
@@ -189,9 +192,9 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      */
     renderWidget(): JSX.Element {
         logger.trace("auto-complete multiple render");
-        let shouldShow: boolean = this.shouldShowChoices();
+        const shouldShow: boolean = this.shouldShowChoices();
 
-        let hasError = this.hasErrors() ? " has-error" : "";
+        const hasError = this.hasErrors() ? " has-error" : "";
         let className = " autocomplete-content" + hasError;
         if (this.state.className) {
             className += " " + this.state.className;
@@ -199,28 +202,28 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
 
         let htmlProps: HTMLAttributes<HTMLElement> = this.getHtmlProps();
         htmlProps = _.assign(htmlProps, {
-            "onKeyDown": this.handleOnKeyDown,
-            "onFocus": this.handleOnFocus,
-            "onBlur": this.handleOnBlur,
-            "onDoubleClick": this.handleOnFocus,
-            "onClick": this.handleOnFocus,
-            "onChange": this.handleChangeTextInput,
-            "autoComplete": "off",
+            onKeyDown: this.handleOnKeyDown,
+            onFocus: this.handleOnFocus,
+            onBlur: this.handleOnBlur,
+            onDoubleClick: this.handleOnFocus,
+            onClick: this.handleOnFocus,
+            onChange: this.handleChangeTextInput,
+            autoComplete: "off",
             "aria-autocomplete": "list",
             "aria-expanded": shouldShow,
             "aria-owns": this.state.ariaSelectorId,
             "aria-activedescendant": shouldShow ? this.state.ariaSelectorId + "_" + this.state.selectedIndex : undefined,
             "aria-multiselectable": true,
-            "id": this.state.id ? this.state.id : this.getFreeTypingFieldName(),
-            "type": "text",
-            "name": this.getFreeTypingFieldName(),
-            "className": className
+            id: this.state.id ? this.state.id : this.getFreeTypingFieldName(),
+            type: "text",
+            name: this.getFreeTypingFieldName(),
+            className,
         } as HTMLAttributes<HTMLElement>);
 
         let classNameContainer = "autocomplete-container";
-        //if (this.getTotalSelectedItems() != 0 && this.state.listDefaultValue && this.state.listDefaultValue.length > 0) {
-        if (this.getTotalSelectedItems() != 0 && this.textInput && this.textInput.value != "" && this.textInput.value.length > 0) {
-            classNameContainer += " badge-autocomplete-selected-items-before"
+        // if (this.getTotalSelectedItems() != 0 && this.state.listDefaultValue && this.state.listDefaultValue.length > 0) {
+        if (this.getTotalSelectedItems() !== 0 && this.textInput && this.textInput.value !== "" && this.textInput.value.length > 0) {
+            classNameContainer += " badge-autocomplete-selected-items-before";
         }
         /* Le champ caché contient l'identifiant de l'élément sélectionné. C'est cet identifiant qui est ensuite
          utilisé par les actions. */
@@ -263,17 +266,17 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
     protected navigateInChoices(delta: number) {
 
         let newIndex: number = this.state.selectedIndex === null ? (delta === 1 ? 0 : delta) : this.state.selectedIndex + delta;
-        let choicesLength: number = this.state.choices ? this.state.choices.length : 0;
+        const choicesLength: number = this.state.choices ? this.state.choices.length : 0;
 
         if (newIndex < 0) {
-            //On va à la fin
+            // On va à la fin
             newIndex += choicesLength;
         } else if (newIndex >= choicesLength) {
-            //On retourne au début
+            // On retourne au début
             newIndex = 0;
         }
 
-        //on sélectionne le choix sur lequel on se trouve
+        // on sélectionne le choix sur lequel on se trouve
         this.setState({ selectedIndex: newIndex }, () => {
             this.selectCurrentIndex();
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, newIndex);
@@ -283,7 +286,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
         // On s'assure de l'affichage de la liste déroulante
         if (this.state.shouldShowChoices) {
             this.showChoices();
-        };
+        }
     }
 
     /**
@@ -297,10 +300,10 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             this.state.onKeyDown(event);
         }
 
-        let key: number = e.keyCode;
-        let shouldShow: boolean = this.state.shouldShowChoices === true;
+        const key: number = e.keyCode;
+        const shouldShow: boolean = this.state.shouldShowChoices === true;
 
-        if (key == KeyCodes.DOWN_ARROW) {
+        if (key === KeyCodes.DOWN_ARROW) {
             if (this.isValidText(this.textInput.value)) {
                 if (e.altKey) {
                     this.handleOnFocus(e);
@@ -315,21 +318,21 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 }
             }
             e.preventDefault();
-        } else if (key == KeyCodes.UP_ARROW) {
+        } else if (key === KeyCodes.UP_ARROW) {
             if (e.altKey) {
                 this.hideChoices();
             } else {
                 this.navigateInChoices(-1);
             }
             e.preventDefault();
-        } else if (key == KeyCodes.ESCAPE) {
+        } else if (key === KeyCodes.ESCAPE) {
             this.hideChoices();
             e.preventDefault();
-        } else if (e.keyCode == KeyCodes.SPACEBAR && !this.state.writable) {
+        } else if (e.keyCode === KeyCodes.SPACEBAR && !this.state.writable) {
 
             if (shouldShow && !this.state.readOnly && !this.state.disabled) {
-                let indexSelected: number = this.autoCompleteState.choiceFocused;
-                let listDefaultValue: number[] = (this.state.listDefaultValue) ? _.cloneDeep(this.state.listDefaultValue) : [];
+                const indexSelected: number = this.autoCompleteState.choiceFocused;
+                const listDefaultValue: number[] = (this.state.listDefaultValue) ? _.cloneDeep(this.state.listDefaultValue) : [];
                 let itemSelected;
 
                 this.state.choices.map((item, index) => {
@@ -343,10 +346,10 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 }
             }
             e.preventDefault();
-        } else if (e.keyCode == KeyCodes.ENTER && this.state.writable) {
+        } else if (e.keyCode === KeyCodes.ENTER && this.state.writable) {
             if (shouldShow && !this.state.readOnly && !this.state.disabled) {
-                let indexSelected: number = this.autoCompleteState.choiceFocused;
-                let listDefaultValue: number[] = (this.state.listDefaultValue) ? _.cloneDeep(this.state.listDefaultValue) : [];
+                const indexSelected: number = this.autoCompleteState.choiceFocused;
+                const listDefaultValue: number[] = (this.state.listDefaultValue) ? _.cloneDeep(this.state.listDefaultValue) : [];
                 let itemSelected;
 
                 this.state.choices.map((item, index) => {
@@ -362,25 +365,25 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 this.showChoices();
             }
             e.preventDefault();
-        } else if (key == KeyCodes.TAB) {
+        } else if (key === KeyCodes.TAB) {
             this.selectCurrentIndex();
             this.hideChoices();
-        } else if (key == KeyCodes.HOME) {
+        } else if (key === KeyCodes.HOME) {
             if (shouldShow) {
-                this.state.selectedIndex = null;
+                (this.state as any).selectedIndex = null;
                 this.navigateInChoices(1);
             } else {
-                this.state.selectedIndex = 0;
+                (this.state as any).selectedIndex = 0;
                 this.selectCurrentIndex();
                 this.hideChoices();
             }
             e.preventDefault();
-        } else if (key == KeyCodes.END) {
+        } else if (key === KeyCodes.END) {
             if (shouldShow) {
-                this.state.selectedIndex = null;
+                (this.state as any).selectedIndex = null;
                 this.navigateInChoices(-1);
             } else {
-                this.state.selectedIndex = this.state.choices.length - 1;
+                (this.state as any).selectedIndex = this.state.choices.length - 1;
                 this.selectCurrentIndex();
                 this.hideChoices();
             }
@@ -389,13 +392,15 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
 
         // Action lorsqu'on appuie la touche controle
         if (e.ctrlKey) {
-            if (e.keyCode == 65) {
+            if (e.keyCode === 65) {
 
                 logger.trace(" Autocomplete multiple ctrl+A ");
 
-                let listDefaultValue: string[] = (this.state.listDefaultValue && this.state.listDefaultValue instanceof Array) ? _.cloneDeep(this.state.listDefaultValue) : [];
+                let listDefaultValue: string[] = (this.state.listDefaultValue && this.state.listDefaultValue instanceof Array)
+                    ? _.cloneDeep(this.state.listDefaultValue)
+                    : [];
 
-                if (listDefaultValue.length == (this.refs.selector as AutoCompleteSelector).props.choices.length) {
+                if (listDefaultValue.length === (this.refs.selector as AutoCompleteSelector).props.choices.length) {
                     listDefaultValue = [];
                     this.changeSelectedChoice();
                     this.setState({ listDefaultValue: [] });
@@ -406,12 +411,12 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                     }
 
                     (this.refs.selector as AutoCompleteSelector).props.choices.map((item) => {
-                        if (typeof (listDefaultValue.push) == "function") {
+                        if (typeof (listDefaultValue.push) === "function") {
                             listDefaultValue.push(item.value);
                         }
                     });
 
-                    this.setState({ listDefaultValue: listDefaultValue });
+                    this.setState({ listDefaultValue });
                     this.changeSelectedChoice();
                 }
                 this.setCurrentValue(listDefaultValue);
@@ -432,7 +437,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             this.state.onChange(event);
         }
 
-        let newText: string = this.getCurrentText();
+        const newText: string = this.getCurrentText();
 
         if (this.refs.selector) {
             (this.refs.selector as AutoCompleteSelector).setCurrentTypedText(newText);
@@ -447,11 +452,13 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             this.hideChoices();
         }
 
-        if (this.state.choices[ 0 ] && this.state.choices.length === 1 && _.deburr(newText).toLowerCase() == _.deburr(this.state.choices[ 0 ].text).toLowerCase()) {
+        if (this.state.choices[ 0 ]
+            && this.state.choices.length === 1
+            && _.deburr(newText).toLowerCase() === _.deburr(this.state.choices[ 0 ].text).toLowerCase()) {
             this.changeSelectedChoice();
         }
-        if (newText.length == 0) {
-            this.setChoices(this.state.allChoices, () => { //setState
+        if (newText.length === 0) {
+            this.setChoices(this.state.allChoices, () => { // setState
                 if (this.state.allChoices.length > 0) {
                     this.showChoices();
                 }
@@ -470,9 +477,11 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
         if ((value as any) instanceof Array) {
             res = value;
         } else {
-            let listDefaultValue: string[] = (this.state.listDefaultValue && this.state.listDefaultValue instanceof Array) ? _.cloneDeep(this.state.listDefaultValue) : [];
+            let listDefaultValue: string[] = (this.state.listDefaultValue && this.state.listDefaultValue instanceof Array)
+                ? _.cloneDeep(this.state.listDefaultValue)
+                : [];
             if (value) {
-                let index = listDefaultValue.indexOf(value);
+                const index = listDefaultValue.indexOf(value);
                 if (index !== -1) {
                     listDefaultValue.splice(index, 1);
                 } else {
@@ -494,17 +503,18 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
         if (this.textInput) {
-            this.textInput.placeholder = this.state.itemSelectedLabel.replace('{count}', value ? value.length : 0) || this.i18n("form.autoCompleteField.selectedItem", { "count": value ? value.length : 0 });
+            this.textInput.placeholder = this.state.itemSelectedLabel.replace("{count}", value ? value.length : 0)
+                || this.i18n("form.autoCompleteField.selectedItem", { count: value ? value.length : 0 });
         }
         this.changeSelectedChoice();
 
         if (value) {
-            let res = value.map((item) => {
-                return _.find(this.props.dataSource.results, { value: item })
-            })
+            const res = value.map((item) => {
+                return _.find(this.props.dataSource.results, { value: item });
+            });
             this.props.dataSource.select(res);
         } else {
-            this.props.dataSource.selectClean(true)
+            this.props.dataSource.selectClean(true);
         }
 
         return this;
@@ -526,7 +536,11 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      */
     public showChoices(): void {
         if (this.state.shouldShowChoices !== true && this.state.focused) {
-            if (this.isValidText(this.textInput.value) || this.textInput.value.length == 0 || !this.props.writable || this.state.readOnly || this.state.disabled) {
+            if (this.isValidText(this.textInput.value)
+                || this.textInput.value.length === 0
+                || !this.props.writable
+                || this.state.readOnly
+                || this.state.disabled) {
                 this.setState({ shouldShowChoices: true }, () => {
                     window.addEventListener("click", this.eventClickListener);
                 });
@@ -556,7 +570,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             this.hideChoices();
         }
         this.typedValueOnFocus = this.getCurrentText();
-        this.state.focused = true;
+        (this.state as any).focused = true;
 
         this.showChoices();
         /* L'attribut DOM onBlur est éventuellement aussi renseigné sur le composant auto-complete */
@@ -571,7 +585,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 this.changeSelectedChoiceWhenOneChoice(this.typedValueOnFocus);
             } else {
 
-                this.setChoices(this.state.allChoices, () => { //setState
+                this.setChoices(this.state.allChoices, () => { // setState
                     if (this.state.allChoices.length > 0) {
                         this.showChoices();
                     }
@@ -580,7 +594,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
         } else {
             this.showChoices();
         }
-        if (!this.hiddenInput || this.hiddenInput.value.length == 0) {
+        if (!this.hiddenInput || this.hiddenInput.value.length === 0) {
             this.clearFilterData();
         } else {
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, null);
@@ -593,20 +607,20 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      */
     protected handleOnBlur(event: React.FocusEvent<HTMLElement>): void {
         if (this.state.onSelected) {
-            this.state.onSelected = false;
+            (this.state as any).onSelected = false;
         } else {
-            this.state.focused = false;
+            (this.state as any).focused = false;
             /* L'attribut DOM onBlur est éventuellement aussi renseigné sur ce composant auto-complete */
             if (this.state.onBlur) {
                 this.state.onBlur(event);
             }
 
-            let currentText = this.getCurrentText();
+            const currentText = this.getCurrentText();
             if (this.state.allChoices) {
                 this.state.allChoices.filter((choice: any) => {
                     let res = false;
                     if (!choice.text) {
-                        res = choice.text.toLowerCase() === currentText.toLowerCase()
+                        res = choice.text.toLowerCase() === currentText.toLowerCase();
                     }
                     return res;
                 });
@@ -615,11 +629,11 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             this.isUpdated = false;
         }
 
-        if (this.getTotalSelectedItems() == 0 || this.props.cleanFilterOnBlur) {
-            //supprime la saisie pour voir le placeholder et reinitialisation du selecteur,
+        if (this.getTotalSelectedItems() === 0 || this.props.cleanFilterOnBlur) {
+            // supprime la saisie pour voir le placeholder et reinitialisation du selecteur,
             // equivalent this.resetSelectedText(), mais ne provoque pas de nouveau rendu
             this.textInput.value = "";
-            (this.refs.selector as AutoCompleteSelector).state.currentTypedText = "";
+            ((this.refs.selector as AutoCompleteSelector).state as any).currentTypedText = "";
         }
 
         /* if (this.refs.selector) {
@@ -646,9 +660,9 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      */
     protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
         logger.trace("Selection Multiple click");
-        let selectedValue = choice.value;
+        const selectedValue = choice.value;
         if (event.target !== event.currentTarget) {
-            this.state.onSelected = true;
+            (this.state as any).onSelected = true;
         }
         this.computeCurrentValues(selectedValue);
         event.nativeEvent.preventDefault();

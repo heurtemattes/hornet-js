@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -96,14 +96,14 @@ describe("Logger", () => {
     it("should log complexe pattern", () => {
         logger.trace("Trace !", new Error("My Error Message"));
         logger.debug("Debug !", "second message");
-        logger.info("Info !", {debug: "it works"});
-        logger.warn("Warn !", {debug: "it works"});
+        logger.info("Info !", { debug: "it works" });
+        logger.warn("Warn !", { debug: "it works" });
         logger.error("Error !", "Test error");
-        logger.fatal("Fatal !", {debug: "it works"});
+        logger.fatal("Fatal !", { debug: "it works" });
         logger.log("inexistantLevel", "Default: Error", "Test default");
     });
 
     it("should log complexe pattern with log fn", () => {
-        logger.log("debug", {debug: "it works"}, new Error("has expected"));
+        logger.log("debug", { debug: "it works" }, new Error("has expected"));
     });
 });

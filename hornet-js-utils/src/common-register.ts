@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,12 +86,12 @@ export class Register {
     static getLogger: (category: any, buildLoggerFn?: (category: string) => void) => Logger;
 
     static registerGlobal<T>(paramName: string, value: T): T {
-        if (!Register.global[paramName]) {
-            Register.global[paramName] = value;
+        if (!Register.global[ paramName ]) {
+            Register.global[ paramName ] = value;
         }
 
         // Dans tous les cas on remonte la variable globale
-        return Register.global[paramName];
+        return Register.global[ paramName ];
     }
 }
 
@@ -106,7 +106,7 @@ if (Register.isServer) {
     Register.global = (global as any).hornetClient;
 } else {
     // Sur le browser on utilise window
-    let untypedWindow: any = window;
+    const untypedWindow: any = window;
     if (!untypedWindow.hornetClient) {
         untypedWindow.hornetClient = {};
     }

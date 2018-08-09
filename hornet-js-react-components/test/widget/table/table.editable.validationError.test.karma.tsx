@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ const expect = chai.expect;
 import * as _ from "lodash";
 import * as React from "react";
 
-import { BaseTest } from "hornet-js-test/src/base-test";
+import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
@@ -102,98 +102,101 @@ import { CheckColumn } from "src/widget/table/column/check-column";
 import { EditionActionColumn } from "hornet-js-react-components/src/widget/table/column/edition-action-column";
 import { Notification } from "hornet-js-react-components/src/widget/notification/notification";
 import { NotificationManager, Notifications } from "hornet-js-core/src/notification/notification-manager";
-
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
 
 /** Tableau de liste de secteurs */
-let dataSource: DataSource<any>;
+let dataSourceTableEditable: DataSource<any>;
 let tableElement: JSX.Element;
 let table;
 let data;
 let schemaEditionTable;
 
 @Decorators.describe('Test Karma table editable validationError')
-class tableTest extends BaseTest {
+class tableTest extends HornetReactTest {
 
 
     @Decorators.beforeEach
     beforeEach() {
+        Utils.setCls("hornet.internationalization", { messages: messages});
         data = [];
         let step = 1;
         for (let i: number = 1; i < 2; i++) {
             data.push({ id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++ });
         }
 
-        dataSource = new DataSource(data);
+        dataSourceTableEditable = new DataSource(data);
 
         schemaEditionTable = {
             "$schema": "http://json-schema.org/schema#",
             "title": "Test tableau editable",
             "description": "Validation des données de formulaire test tableau editable",
             "type": "object",
-            "properties": {
-                "label": {
-                    "description": "champ libelle",
-                    "type": "string",
-                    "maxLength": 50,
-                    "required": true
-                }
-            }
+            properties: {
+                label: {
+                    description: "champ libelle",
+                    type: "string",
+                    maxLength: 50,
+                    required: true,
+                },
+            },
         };
 
 
         tableElement = (
             <div>
-                <Notification id="notifTest"/>
+                <Notification id="notifTest" />
                 <Table id="lite">
                     <Header title={"Tableau editable"}>
                     </Header>
-                    <Content dataSource={dataSource} notifId={"notifTest"} onSubmit={this.submitLineForm}
-                             schema={schemaEditionTable}>
+                    <Content dataSource={dataSourceTableEditable} notifId={"notifTest"} onSubmit={this.submitLineForm}
+                        schema={schemaEditionTable}>
                         <Columns>
                             <Column keyColumn="label" title={"libelle"} sortable={true} editable={true} />
                             <Column keyColumn="desc" title={"desc"} sortable={true} />
                             <EditionActionColumn keyColumn="id"
-                                                 titleEdit={"modif rapide"}
-                                                 titleSave={"Enregistrer"}
-                                                 titleCancel={"Annuler"}
-                                                 messageAlert={"Voulez vous annuler votre modification"}
-                                                 titleAlert={"Annuler"}
+                                titleEdit={"modif rapide"}
+                                titleSave={"Enregistrer"}
+                                titleCancel={"Annuler"}
+                                messageAlert={"Voulez vous annuler votre modification"}
+                                titleAlert={"Annuler"}
                             />
                         </Columns>
                     </Content>
                 </Table>
             </div>
         );
-    };
+    }
 
 
-    @Decorators.it('Test OK')
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
 
-    @Decorators.it('Valider modification cellule editable avec erreur')
+    @Decorators.it("Valider modification cellule editable avec erreur")
     validerElement() {
         table = this.renderIntoDocument(tableElement, "main99999");
 
-        this.triggerMouseEvent(document.querySelector('#main99999 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
+        this.triggerMouseEvent(document.querySelector("#main99999 #lite-0-colBody-0-2 .edition-button-action-before"), "click");
 
         expect(document.querySelector("#main99999 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
 
-         document.querySelector('#main99999 #lite-0-colBody-0-0 input#label')["value"] = "";
+        document.querySelector("#main99999 #lite-0-colBody-0-0 input#label")[ "value" ] = "";
 
         this.triggerMouseEvent(document.querySelector("#main99999 #lite-0-colBody-0-2 button[title='Enregistrer']"), "click");
         setTimeout(() => {
             expect(document.querySelector("#main99999 .error-message-list")).to.exist;
             expect(document.querySelectorAll("#main99999 .error-message-list li").length).to.equal(1);
-            expect((document.querySelector("#main99999 a.error-message-text") as any ).text).to.equal("should have required property 'label'");
+            expect((document.querySelector("#main99999 a.error-message-text") as any).text).to.equal("Le champ « label » est obligatoire. Veuillez saisir ce champ.");
             this.end();
-        }, 500)
+        },         500);
 
-    };
+    }
 
     submitLineForm = (item) => {
 
@@ -203,5 +206,5 @@ class tableTest extends BaseTest {
 
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new tableTest());

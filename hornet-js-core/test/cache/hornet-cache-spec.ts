@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,22 +82,22 @@ import { TestLogger } from "hornet-js-test/src/test-logger";
 import { TestUtils } from "hornet-js-test/src/test-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "appenders": {
-        "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
-        }
+    appenders: {
+        console: {
+            type: "console",
+            layout: {
+                type: "pattern",
+                pattern: "%[%d{ISO8601}|%p|%c|%m%]",
+            },
+        },
     },
-    "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
-    }
+    categories: {
+        default: { appenders: [ "console" ], level: "INFO" },
+    },
 });
 
-var expect = TestUtils.chai.expect;
-var sinon = TestUtils.sinon;
+const expect = TestUtils.chai.expect;
+const sinon = TestUtils.sinon;
 
 import { HornetCache } from "src/cache/hornet-cache";
 
@@ -117,15 +117,15 @@ describe("Hornet Cache", () => {
 
     });
 
-    it("should get the data from cache", function(testDone) {
+    it("should get the data from cache", function (testDone) {
         // Arrange
-        var data: string = TestUtils.randomString();
-        var key: string = TestUtils.randomString();
-        var cache = HornetCache.getInstance();
+        const data: string = TestUtils.randomString();
+        const key: string = TestUtils.randomString();
+        const cache = HornetCache.getInstance();
 
         // Act
         cache.setCacheAsynchrone(key, data).then(() => {
-            cache.getItem(key).then(function(result) {
+            cache.getItem(key).then(function (result) {
                 try {
                     // Assert
                     expect(result).to.be.equal(data);
@@ -138,19 +138,19 @@ describe("Hornet Cache", () => {
 
     });
 
-    it("should NOT get the data from cache because of EXPECTED TIME", function(testDone) {
+    it("should NOT get the data from cache because of EXPECTED TIME", function (testDone) {
         // Test asynchrone
-        var data: string = TestUtils.randomString();
-        var key: string = TestUtils.randomString();
-        var timeInCache: number = 2; // 2 secondes
+        const data: string = TestUtils.randomString();
+        const key: string = TestUtils.randomString();
+        const timeInCache: number = 2; // 2 secondes
 
-        var clock = sinon.useFakeTimers();
+        const clock = sinon.useFakeTimers();
 
-        var cache: HornetCache = HornetCache.getInstance();
+        const cache: HornetCache = HornetCache.getInstance();
         cache.setCacheAsynchrone(key, data, timeInCache).then(() => {
             clock.tick(6000);
             cache.getItem(key)
-                .catch(function(error) {
+                .catch(function (error) {
                     try {
                         clock.restore();
                         // expect(error).to.be.equal('Cache is missing');

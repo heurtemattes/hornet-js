@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,15 +86,14 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { IService } from "hornet-js-core/src/services/service-api";
-import { CHANGE_URL_WITH_DATA_EVENT, HornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { UPDATE_PAGE_EXPAND } from "src/widget/screen/layout-switcher";
+import { CHANGE_URL_WITH_DATA_EVENT, HornetEvent, fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
+import { UPDATE_PAGE_EXPAND, UPDATE_PAGE_EXPAND_MENU } from "src/widget/screen/layout-switcher";
 import { URL_CHANGE_EVENT } from "hornet-js-core/src/routes/router-client-async-elements";
 import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { ExpandingLayout } from "hornet-js-core/src/services/default/expanding-layout";
-import { UPDATE_PAGE_EXPAND_MENU } from "src/widget/screen/layout-switcher";
+import { ServiceRequest } from "hornet-js-core/src/services/service-request";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.component.hornet-page");
 
@@ -156,9 +155,9 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      */
     protected getRouteInfos(): RouteInfos {
         return Utils.getCls("hornet.routeInfos") || {
-            getAttributes: function () {
+            getAttributes: () => {
                 return {};
-            }
+            },
         };
     }
 
@@ -180,9 +179,15 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
 
     constructor(props?: P, context?: any) {
         super(props, context);
+
         this.attributes = _.assign({}, this.getRouteInfos().getAttributes());
         if (this.getRouteInfos().getService && this.getRouteInfos().getService()) {
-            this.service = new (this.getRouteInfos().getService() as Class<T>)() as T;
+            if (!(this.getRouteInfos().getService() as any).prototype) {
+                this.service = this.getRouteInfos().getService() as any;
+            } else {
+                this.service = new (this.getRouteInfos().getService() as Class<T>)() as T;
+                logger.deprecated("Les services doivent être instanciés afin de pouvoir être utilisés par le composant HornetPage. Les services non instanciés ne seront bientôt plus supportés. Voir l'utilisation de l'injector avec un scope SINGLETON par exemple ou l'instanciation dans la déclaration de vos routes");
+            }
         }
         if (!this.props.workingZoneWidth) {
             this.copyInitialPropsToState({ workingZoneWidth: "1200px" }, this.state);
@@ -220,14 +225,14 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     }
 
     componentDidCatch(error, info) {
-        this.setState({ hasError: true, error: error });
-        let errorReport = {
+        this.setState({ hasError: true, error });
+        const errorReport = {
             componentName: this.constructor[ "name" ],
             method: "render",
             methodArguments: arguments,
             props: this.props,
             state: this.state,
-            error: error
+            error,
         };
         this.getErrorHandler()(errorReport, this.getErrorComponent());
         // You can also log the error to an error reporting service
@@ -244,7 +249,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * renvoie le service de la page
      */
     getService(): T {
-        return this.service as T
+        return this.service as T;
     }
 
     /**
@@ -254,7 +259,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     listenUpdatePageExpandEvent(): void {
         this.listen(UPDATE_PAGE_EXPAND, (ev: HornetEvent<boolean>) => {
             this.layoutService.isExpandedLayout().then((retourApi: any) => {
-                let body = retourApi.body;
+                const body = retourApi.body;
                 if (body && body.isExpandedLayout) {
                     this.fetchHtmlElementsToSetClassBy("mainLayoutClassNameExpanded", "mainLayoutClassName", this.state.workingZoneWidth);
                     this.setIsLayoutExpandedThroughService(false);
@@ -274,9 +279,9 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      */
     protected fetchHtmlElementsToSetClassBy(currentClassName: string, newClassName: string, specifiedMaxWidth?: string): void {
         if (!Utils.isServer) {
-            let htmlElements: HTMLCollectionOf<Element> = document.getElementsByClassName(currentClassName);
+            const htmlElements: HTMLCollectionOf<Element> = document.getElementsByClassName(currentClassName);
             if (htmlElements && htmlElements.length > 0) {
-                for (var i = htmlElements.length - 1; i >= 0; --i) {
+                for (let i = htmlElements.length - 1; i >= 0; --i) {
                     this.majCssStyleExpand(htmlElements, i, currentClassName, newClassName, specifiedMaxWidth);
                 }
             }
@@ -292,10 +297,10 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * @param specifiedMaxWidth
      */
     protected majCssStyleExpand(htmlElements: HTMLCollectionOf<Element>, i: number, currentClassName: string, newClassName: string, specifiedMaxWidth?: string) {
-        let element = document.getElementById(htmlElements[ i ].id);
+        const element = document.getElementById(htmlElements[ i ].id);
 
         if (element && element.classList) {
-            let elementClasses = element.classList;
+            const elementClasses = element.classList;
             elementClasses.remove(currentClassName);
             elementClasses.add(newClassName);
 
@@ -313,10 +318,10 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     listenUrlChangeEvent(): void {
         this.listen(URL_CHANGE_EVENT, (ev) => {
 
-            let currentPath = ev.detail.newPath,
-                title = NavigationUtils.retrievePageTextKey(NavigationUtils.getConfigMenu(), currentPath);
+            const currentPath = ev.detail.newPath;
+            const title = NavigationUtils.retrievePageTextKey(NavigationUtils.getConfigMenu(), currentPath);
 
-            NavigationUtils.applyTitlePageOnClient(this.i18n(title));
+            NavigationUtils.applyTitlePageOnClient(this.i18n(title) + " | " + this.i18n("applicationTitle"));
         });
     }
 
@@ -348,8 +353,8 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
         }
         this.copyInitialPropsToState({
             currentWorkingZoneWidth: maxWidth,
-            classNameExpanded: classNameExpanded
-        }, this.state);
+            classNameExpanded,
+        },                           this.state);
     }
 
     /**
@@ -359,7 +364,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
      * @param {() => void} cb - callback
      */
     protected navigateTo(url: string, data: any, cb: () => void) {
-        this.fire(CHANGE_URL_WITH_DATA_EVENT.withData({ url: url, data: data, cb: cb }));
+        this.fire(CHANGE_URL_WITH_DATA_EVENT.withData({ url, data, cb }));
     }
 
     /**

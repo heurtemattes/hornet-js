@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Column, ColumnProps, ColumnState } from "src/widget/table/column";
 import {
     EditionActionBodyCell,
-    EditionActionBodyCellProps
+    EditionActionBodyCellProps,
 } from "src/widget/table/column/cell/action/edition-action-body-cell";
 import { ActionHeaderCell, ActionHeaderCellProps } from "src/widget/table/column/cell/action/action-header-cell";
 import { Class } from "hornet-js-utils/src/typescript-utils";
@@ -111,26 +111,29 @@ export interface EditionActionColumnProps extends ColumnProps {
 export class EditionActionColumn<T extends EditionActionColumnProps, S extends ColumnState> extends Column<T, S> {
 
     static defaultProps = Column.mergeObjects(Column.defaultProps, {
-        defaultStyle: {"width": "4em"},
+        defaultStyle: { width: "4em" },
         sortable: false,
-        hiddenable: false
+        hiddenable: false,
     });
 
     public readonly props: Readonly<EditionActionColumnProps>;
 
-    /**
+        /**
      * Getter pour le composant générant le entête de colonne
      * @return Class<HeaderCell<HeaderCellProps, any>>
      */
-    public getHeaderCell(): Class<ActionHeaderCell<ActionHeaderCellProps, any>> {
+    static getHeaderCell(): Class<ActionHeaderCell<ActionHeaderCellProps, any>> {
         return ActionHeaderCell;
     }
 
     /**
      * @inheritDoc
      */
-    public getBodyCell(): Class<EditionActionBodyCell<EditionActionBodyCellProps, any>> {
+    static getBodyCell(props): Class<EditionActionBodyCell<EditionActionBodyCellProps, any>> {
         return EditionActionBodyCell;
     }
 
 }
+
+(EditionActionColumn.prototype.getBodyCell as any).__deprecated__ = true;
+(EditionActionColumn.prototype.getHeaderCell as any).__deprecated__ = true;

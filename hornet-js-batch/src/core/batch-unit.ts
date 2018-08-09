@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -188,9 +188,9 @@ export class BatchUnit implements BatchUnit {
      * @returns l'instance batchUnit {BatchUnit} en cours
      */
     public filter(filter: Function): BatchUnit {
-        let newFilter: BatchProcess = new Filter();
+        const newFilter: BatchProcess = new Filter();
         newFilter.name = this._name + ".filter";
-        let batch = BatchExecutor.Instance.getBatch(this)
+        const batch = BatchExecutor.Instance.getBatch(this);
         newFilter.options.service = filter;
         BatchExecutor.Instance.getBatch(this).roadmap.push(newFilter);
         return this;
@@ -203,7 +203,7 @@ export class BatchUnit implements BatchUnit {
      * @returns l'instance batchUnit {BatchUnit} en cours
      */
     public transform(transformer: Function): BatchUnit {
-        let newTransformer: BatchProcess = new Transformer();
+        const newTransformer: BatchProcess = new Transformer();
         newTransformer.name = this._name + ".transform";
         newTransformer.options.service = transformer;
         BatchExecutor.Instance.getBatch(this).roadmap.push(newTransformer);
@@ -229,8 +229,8 @@ export class BatchUnit implements BatchUnit {
      * @returns l'instance batchUnit {BatchUnit} en cours
      */
     public call(service: Function, scope: RouteActionBatch<any, IService> | RouteActionBatchMulti<any, IService>): BatchUnit {
-        let newCall: BatchProcess = new Call();
-        newCall.name=this._name + ".call";
+        const newCall: BatchProcess = new Call();
+        newCall.name = this._name + ".call";
         newCall.options.service = service;
         newCall.options.scope = scope;
         BatchExecutor.Instance.getBatch(this).roadmap.push(newCall);
@@ -239,14 +239,15 @@ export class BatchUnit implements BatchUnit {
 
     /**
      * Méthode qui ajoute un appel de service au traitement.
-     * Les `foreach` sont des classes de type BatchService qui vont executer l'appel de service en bouclant sur la liste des paramètres qu'ils ont en entrée.
+     * Les `foreach` sont des classes de type BatchService qui vont executer l'appel de service en bouclant 
+     * sur la liste des paramètres qu'ils ont en entrée.
      * @param {Function} service le serie d'appel au service (boucle sur les arguments)
      * @param {RouteActionBatch|RouteActionBatchMulti} scope l'action de type batch
      * @returns l'instance batchUnit {BatchUnit} en cours
      */
     public foreach(service: Function, scope?: any): BatchUnit {
-        let newForEach: BatchProcess = new ForEach();
-        newForEach.name=this._name + ".foreach";
+        const newForEach: BatchProcess = new ForEach();
+        newForEach.name = this._name + ".foreach";
         newForEach.options.service = service;
         newForEach.options.scope = scope;
         BatchExecutor.Instance.getBatch(this).roadmap.push(newForEach);
@@ -258,6 +259,6 @@ export class BatchUnit implements BatchUnit {
     * @returns une promesse de type {@see BatchUnit} traité.
     */
     public run(): Promise<any> {
-        return BatchExecutor.Instance.runBatch(this)
+        return BatchExecutor.Instance.runBatch(this);
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,8 +99,8 @@ class HornetTestAssertKarma extends BaseTest {
         let expected2 = 2;
         HornetTestAssert.assertEquals(expected2, value2, "Les numériques identiques ne sont pas considérés comme tel");
 
-        let value3 = {label: "titi", value: 2};
-        let expected3 = {label: "titi", value: 2};
+        let value3 = { label: "titi", value: 2 };
+        let expected3 = { label: "titi", value: 2 };
         HornetTestAssert.assertEquals(expected3, value3, "Les objets identiques ne sont pas considérés comme tel");
         this.end();
     };
@@ -111,8 +111,8 @@ class HornetTestAssertKarma extends BaseTest {
         let expected1 = "toto";
         let value2 = 2;
         let expected2 = 22;
-        let value3 = {label: "titi", value: 2};
-        let expected3 = {label: "titi", value: 44};
+        let value3 = { label: "titi", value: 2 };
+        let expected3 = { label: "titi", value: 44 };
 
         HornetTestAssert.assertNotEquals(expected1, value1, "Les chaines de caractères différentes sont considérées comme identiques");
         HornetTestAssert.assertNotEquals(expected2, value2, "Les numériques différents sont considérés comme identiques");
@@ -130,13 +130,13 @@ class HornetTestAssertKarma extends BaseTest {
     assertNotNullTest() {
         HornetTestAssert.assertNotNull(1, "1 est comme considéré comme null");
         HornetTestAssert.assertNotNull("titi", "la chaîne de caractère est comme considérée comme null");
-        HornetTestAssert.assertNotNull({label: "titi", value: 2}, "l'objet est comme considérée comme null");
+        HornetTestAssert.assertNotNull({ label: "titi", value: 2 }, "l'objet est comme considérée comme null");
         this.end();
     };
 
     @Decorators.it("Tests pour assertTrue")
     assertTrueTest() {
-        let obj = {label: "titi", value: 2};
+        let obj = { label: "titi", value: 2 };
         HornetTestAssert.assertTrue(true, "true n'est pas considéré comme true");
         HornetTestAssert.assertTrue(1 == 1, "1 == 1 n'est pas considéré comme true");
         HornetTestAssert.assertTrue("titi" == "titi", "titi == titi n'est pas considéré comme true");
@@ -146,8 +146,8 @@ class HornetTestAssertKarma extends BaseTest {
 
     @Decorators.it("Tests pour assertFalse")
     assertFalseTest() {
-        let obj1 = {label: "titi", value: 2};
-        let obj2 = {label: "toto", value: 5};
+        let obj1 = { label: "titi", value: 2 };
+        let obj2 = { label: "toto", value: 5 };
         let value1 = 1;
         let value2 = 2;
         let value3 = "titi";
@@ -161,13 +161,13 @@ class HornetTestAssertKarma extends BaseTest {
 
     @Decorators.it("Tests pour assertGreaterThan")
     assertGreaterThanTest() {
-        HornetTestAssert.assertGreaterThan(1,2, "2 n'est pas plus grand que 1");
+        HornetTestAssert.assertGreaterThan(1, 2, "2 n'est pas plus grand que 1");
         this.end();
     };
 
     @Decorators.it("Tests pour assertLesserThan")
     assertLesserThanTest() {
-        HornetTestAssert.assertLesserThan(2,1, "2 n'est pas plus grand que 1");
+        HornetTestAssert.assertLesserThan(2, 1, "2 n'est pas plus grand que 1");
         this.end();
     };
 }

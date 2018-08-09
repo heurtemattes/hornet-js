@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,8 +87,9 @@ import { DispositionType } from "src/result/disposition-type";
  */
 export interface Options {
     data?: any;
-    filename? : string;
-    encoding? : string;
+    filename?: string;
+    encoding?: string;
+    status?: number;
 }
 
 export interface OptionsFiles extends Options {
@@ -97,8 +98,8 @@ export interface OptionsFiles extends Options {
 }
 
 export interface OptionsPDF extends OptionsFiles {
-    definition: {},
-    fonts?:{}
+    definition: {};
+    fonts?: {};
 }
 
 export interface OptionsFiles extends Options {

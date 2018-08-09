@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,25 +107,28 @@ export class CSVReader extends BatchProcess implements BatchReader {
 
 
     reader(): Promise<any> {
-        //reader file
+        // reader file
         return new Promise<any>((resolve, reject) => {
             try {
-                let parser = parse(this.options.config, (err, data) => {
+                const parser = parse(this.options.config, (err, data) => {
                     if (err) {
-                        reject(err)
+                        reject(err);
                     }
                     this.result = (this.options.config.noHeader) ? data : data.slice(1, data.length);
                     this.status = STATUS.SUCCEEDED;
-                    resolve(this.result)
+                    resolve(this.result);
                 });
-                let read = fs.createReadStream(this.options.config.path);
-                read.on('error', (e) => { this.status = STATUS.FAILED; reject(e) });
+                const read = fs.createReadStream(this.options.config.path);
+                read.on("error", (e) => { 
+                    this.status = STATUS.FAILED;
+                    reject(e);
+                 });
                 read.pipe(parser);
 
             } catch (e) {
                 this.status = STATUS.FAILED;
-                reject(e)
+                reject(e);
             }
-        })
+        });
     }
 }

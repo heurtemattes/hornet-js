@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Liste des secteurs",
+  "description": "Validation des données de formulaire d'un secteur",
+  "type": "object",
+  "required": [
+    "nom",
+    "desc"
+  ],
+  "properties": {
+    "nom": {
+      "description": "Nom du secteur",
+      "type": "string",
+      "maxLength": 50
+    },
+    "desc": {
+      "description": "Description du secteur",
+      "type": "string",
+      "maxLength": 200
+    }
+  }
+}

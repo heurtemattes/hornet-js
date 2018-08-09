@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,7 +102,7 @@ export class BodyCell<P extends BodyCellProps, S> extends AbstractBodyCell<P, S>
      */
     renderCell(): JSX.Element {
         logger.trace("render BodyCell -> column:", this.props.coordinates.column, " - line:",
-            this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
+                     this.props.coordinates.row, "- isFocused:", this.state.isFocused, "- tabIndex:", this.state.tabIndex);
         return (
             this.state.value
         );

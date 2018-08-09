@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -111,19 +111,21 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     before() {
         formElement = (
             <div>
-                <Notification id="notifZone"/>
+                <Notification id="notifZone" />
                 <Modal ref={(modal: Modal) => {
-                    maModal1 = modal}}
-                       withoutOverflow={true} underlayClickExits={false}
-                       focusDialog={false} onClickClose={this.closeModal1}>
+                    maModal1 = modal
+                }}
+                    withoutOverflow={true} underlayClickExits={false}
+                    focusDialog={false} onClickClose={this.closeModal1}>
                     <Form id={"modalForm1"} onSubmit={this.onSubmitModalForm1}>
                         {this.renderButtons("modalForm1")}
                     </Form>
                 </Modal>
                 <Modal ref={(modal: Modal) => {
-                    maModal2 = modal}}
-                       withoutOverflow={true} underlayClickExits={false}
-                       focusDialog={false} onClickClose={this.closeModal2}>
+                    maModal2 = modal
+                }}
+                    withoutOverflow={true} underlayClickExits={false}
+                    focusDialog={false} onClickClose={this.closeModal2}>
                     <Form id={"modalForm2"} onSubmit={this.onSubmitModalForm2} schema={schema2}>
                         <InputField
                             name={"input6"}
@@ -151,24 +153,24 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     protected onSubmitModalForm1() {
         maModal1.close();
         NotificationManager.cleanAll();
-        NotificationManager.notify(null, null,null,
+        NotificationManager.notify(null, null, null,
             Notifications.makeSingleNotification("", "Formulaire 1 Validé"));
     }
 
     protected onSubmitModalForm2() {
         maModal2.close();
         NotificationManager.cleanAll();
-        NotificationManager.notify(null, null,null,
+        NotificationManager.notify(null, null, null,
             Notifications.makeSingleNotification("", "Formulaire 2 Validé"));
     }
 
     protected renderButtons(formName: string): JSX.Element {
         return (
             <ButtonsArea>
-                <Button type="submit" id={"envoi-"+formName} name={"action:"+formName} className="hornet-button"
-                        value={"valider"}
-                        label={"valider"}
-                        title={"valider"} />
+                <Button type="submit" id={"envoi-" + formName} name={"action:" + formName} className="hornet-button"
+                    value={"valider"}
+                    label={"valider"}
+                    title={"valider"} />
             </ButtonsArea>
         );
     }
@@ -205,11 +207,11 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     validerKOPopInForm() {
         maModal2.open();
         setTimeout(() => {
-           this.triggerMouseEvent(document.querySelector("#envoi-modalForm2"), "click");
+            this.triggerMouseEvent(document.querySelector("#envoi-modalForm2"), "click");
             setTimeout(() => {
                 HornetTestAssert.assertTrue(maModal2.state.isVisible, "Le modal maModal2 doit être visible");
                 let element = this.getNotificationMessageListForm("Form-1", "error-message-list");
-                HornetTestAssert.assertEquals(1,  element.length, "La zone de notification doit contenir un message d'error");
+                HornetTestAssert.assertEquals(1, element.length, "La zone de notification doit contenir un message d'error");
                 this.end();
             }, 500);
         }, 500);
@@ -217,7 +219,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
 
     protected getNotificationMessageListForm(form: string, className: string) {
         let formElement = document.getElementById(form);
-        let messageList = formElement.getElementsByClassName(className)[0];
+        let messageList = formElement.getElementsByClassName(className)[ 0 ];
         return (messageList) ? messageList.children : null;
     }
 }

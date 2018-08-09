@@ -73,15 +73,15 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as _ from "lodash";
-import {MediaTypes} from "src/protocol/media-type";
-import {ResultFile} from "src/result/result-file";
-import {OptionsCSV} from "src/result/hornet-result-interface";
+import { MediaTypes } from "src/protocol/media-type";
+import { ResultFile } from "src/result/result-file";
+import { OptionsCSV } from "src/result/hornet-result-interface";
 
 
 // ------------------------------------------------------------------------------------------------------------------- //
@@ -89,7 +89,7 @@ import {OptionsCSV} from "src/result/hornet-result-interface";
 // ------------------------------------------------------------------------------------------------------------------- //
 
 
-var json2csv = require('json2csv');
+const json2csv = require("json2csv");
 
 /**
  * @class
@@ -98,22 +98,22 @@ var json2csv = require('json2csv');
 export class ResultCSV extends ResultFile {
 
 
-    constructor(options : OptionsCSV){
+    constructor(options: OptionsCSV) {
         super(options, MediaTypes.CSV);
-        this.options = _.extend({data : null, del:";"}, options)
+        this.options = _.extend({ data: null, del: ";" }, options);
     }
 
     /*
      *@inheritdoc
      */
-    protected compute() : Promise<any> {
-        return new Promise((resolve, reject)=>{
-            try{
-                this.options.data = json2csv(_.extend(this.options, {data:JSON.parse(JSON.stringify(this.options.data))}));
-                resolve(true)
-            }catch(e){
-                reject(e)
+    protected compute(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            try {
+                this.options.data = json2csv(_.extend(this.options, { data: JSON.parse(JSON.stringify(this.options.data)) }));
+                resolve(true);
+            } catch (e) {
+                reject(e);
             }
-        })
+        });
     }
 }

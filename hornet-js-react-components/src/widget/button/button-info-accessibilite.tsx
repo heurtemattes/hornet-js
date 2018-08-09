@@ -73,14 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import * as ReactDOM from 'react-dom';
+import * as ReactDOM from "react-dom";
 import { Logger } from "hornet-js-utils/src/logger";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -125,7 +125,7 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
 
     static defaultProps = {
         message: "",
-        shortcutDescriptions: []
+        shortcutDescriptions: [],
     };
 
     /**
@@ -142,7 +142,7 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
                     src={this.props.srcImg || ButtonInfoAccessibilite.genUrlTheme() + "/img/button/icon_info.svg"}
                     classLink="button-info-accessibilite-button button-action"
                     hasPopUp={true}
-                    ref={(icon) => { this.htmlIcon = icon }}
+                    ref={(icon) => { this.htmlIcon = icon; }}
                 />
                 {this.renderModal()}
             </div>
@@ -159,8 +159,8 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
                 <div className="widget-shortcuts-body">
                     <div className="widget-shortcuts-content">
                         <div className="shortCutsList">
-                            <h4>{this.state.message.shortcuts ?
-                                this.state.message.shortcuts.modalContentTitle : this.shortcutsI18n.modalContentTitle}</h4>
+                            <h2 className={"modal-title"}>{this.state.message.shortcuts ?
+                                this.state.message.shortcuts.modalContentTitle : this.shortcutsI18n.modalContentTitle}</h2>
                             <ul>
                                 {this.state.shortcutDescriptions.map(this.renderShortCut.bind(this))}
                             </ul>
@@ -172,11 +172,11 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
     }
 
     protected renderShortCut(item, index) {
-        let separator = (item.and) ? "+" : "/";
-        let shortcuts = [];
+        const separator = (item.and) ? "+" : "/";
+        const shortcuts = [];
         item.shortcuts.map(function (shortcut, i) {
             shortcuts.push(
-                <kbd key={"shortcut-" + shortcut + "-" + i}>{shortcut}</kbd>
+                <kbd key={"shortcut-" + shortcut + "-" + i}>{shortcut}</kbd>,
             );
 
             if ((i + 1) !== item.shortcuts.length) {
@@ -201,7 +201,7 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
     protected handleClickClose(t) {
 
         (this.refs.modal as Modal).close(() => {
-            let el = ReactDOM.findDOMNode(this.htmlIcon);
+            const el = ReactDOM.findDOMNode(this.htmlIcon);
             if (el && el instanceof HTMLElement && el.focus) {
                 el.tabIndex = 0;
                 el.focus();

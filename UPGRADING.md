@@ -1,3 +1,56 @@
+# Montée de version vers Hornet.js 5.2.0
+
+## Injection de service dans l'injector context
+
+ATTENTION : Breaking change silencieux !!!
+
+Pour fonctionner, l'injector doit maintenant retourner des services data ou services pages instanciés. Ce ne sont plus le middleware et hornet-page qui prennent en charge l'instanciation.
+
+Il devient nécessaire lors de l'ajout dans l'injector de soit instancier le service avant de l'enregistrer avec un scope VALUE, soit d'utiliser les scopes SINGLETON ou PROTOTYPE qui se chargeront de gérer l'instanciation. Dans l'applitutoriel nous avons défini le scope sur SINGLETON pour nos services pages et services data.
+
+exemple 5.1.1 :
+
+```
+Injector.register(AdministrationSecteurServiceData, SecteurServiceImpl);
+```
+
+exemple 5.2.0 :
+
+```
+Injector.register(AdministrationSecteurServiceData, SecteurServiceImpl, Scope.SINGLETON);
+```
+
+En laissant le scope VALUE (explicite ou par défaut), le service ne sera pas instancié.
+
+## Appel de services
+
+L'attribut **manageBusiness** a été supprimé du type `HornetRequest` et remplacé par l'attribut **manageError** qui peut prendre plusieurs valeurs:
+```JavaScript
+ErrorManagementType.None
+ErrorManagementType.Business
+ErrorManagementType.Technical
+ErrorManagementType.All
+```
+
+## hornet-js-react-components
+
+### CustomColumn
+
+les méthodes `getHeaderCell` et `getBodyCell` ont changé de signature, et sont devenues des méthodes static. Elle renvoient directement le composant `HeaderCell`/`BodyCell`.
+
+```Javascript
+
+    public static getHeaderCell(props): Class<AbstractHeaderCell<AbstractHeaderCellProps, any>> {
+        return HeaderCell;
+    }
+
+    public static getBodyCell(props): Class<AbstractBodyCell<AbstractBodyCellProps, any>> {
+        return BodyCell;
+    }
+
+```
+
+
 # Montée de version vers Hornet.js 5.1.1
 
 # Configuration d'un projet
@@ -41,7 +94,7 @@ Dans les fichiers de configuration json des applications basées sur hornet, le 
 
 ### Form
 
-La version 5.1.1 d'hornet-js-react-components apporte un nouveau props pour le composant Form : id
+La version 5.1.1 d `hornet-js-react-components` apporte un nouveau props pour le composant Form : id
 
 Il est obligatoire de renseigner un id pour les formulaires. Ce props est une chaine de caractère.
 
@@ -139,7 +192,7 @@ export interface FormProps extends AbstractFormProps {
 }
 ```
 
-### AutocompleteField & autocompleteMutilple
+### AutocompleteField & autocompleteMutiple
 Changements liés à la sélection des items dans un autocomplete. Lorsqu'un ou plusieurs éléments sont sélectionnés
 le composant ne se contente plus de mettre uniquement la value dans la selection datasource mais il met tout l'objet
 5.1.0 :

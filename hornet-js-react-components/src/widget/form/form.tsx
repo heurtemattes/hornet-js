@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,7 +91,7 @@ import { AutoCompleteField, AutoCompleteFieldProps } from "src/widget/form/auto-
 import {
     INotificationType,
     Notifications,
-    NotificationManager
+    NotificationManager,
 } from "hornet-js-core/src/notification/notification-manager";
 import { CheckBoxField } from "src/widget/form/checkbox-field";
 import { IValidationResult, ICustomValidation, DataValidator } from "hornet-js-core/src/validation/data-validator";
@@ -152,6 +152,8 @@ export interface FormProps extends AbstractFormProps {
     notifId?: string;
     /** Lorsqu'égal à true, les boutons de validation ne sont pas affichés */
     hideButtons?: boolean;
+    // Ignorer ou non les informations non valorisées du formulaire
+    omitNull?: boolean;
 }
 
 
@@ -171,7 +173,8 @@ export class Form extends AbstractForm<FormProps, any> {
         subTitle: null,
         className: "formRecherche",
         customValidators: [],
-        validationOptions: DataValidator.DEFAULT_VALIDATION_OPTIONS
+        validationOptions: DataValidator.DEFAULT_VALIDATION_OPTIONS,
+        omitNull: true,
     });
 
     constructor(props?: FormProps, context?: any) {
@@ -184,12 +187,15 @@ export class Form extends AbstractForm<FormProps, any> {
 
         /* Messages génériques */
         /* Configuration locale des calendriers et dates */
-        this.state.calendarLocale = calendarLocale;
-        this.state.customNotif = props.notifId != null;
-        this.state.notifId = props.notifId != null ? props.notifId : "Form-" + (Form.idx++);
+        this.state = {
+            ...this.state,
+            calendarLocale,
+            customNotif: props.notifId != null,
+            notifId: props.notifId != null ? props.notifId : "Form-" + (Form.idx++),
+        };
 
         this.listen(VALUE_CHANGED_EVENT, (ev: HornetEvent<any>) => {
-            if (ev.detail.form.id == this.state.id && this.state.onFormChange) {
+            if (ev.detail.form.id === this.state.id && this.state.onFormChange) {
                 this.state.onFormChange();
             }
         });
@@ -303,10 +309,10 @@ export class Form extends AbstractForm<FormProps, any> {
      * @return ce formulaire
      */
     protected updateMarkRequiredFields(isMarkRequired: boolean): this {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         /* Met à jour l'affichage de chaque champ en cas de readOnly*/
         Object.keys(fields).every(function (key: string): boolean {
-            let field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[ key ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setMarkRequired(isMarkRequired);
             }
@@ -321,9 +327,9 @@ export class Form extends AbstractForm<FormProps, any> {
      * @return ce formulaire
      */
     protected updateImagFilePathFields(imgFilePath: string): this {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            let field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[ key ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setImgFilePath(imgFilePath);
             }
@@ -337,29 +343,23 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param data données du formulaire (clé : nom du champ -> valeur du champ)
      */
     updateFields(data: any): void {
-        let fields = this.extractFields();
+        const fields = this.extractFields();
         this.propagateParentState();
-        for (let nameField in fields) {
-            let val = _.get(data, nameField);
+        for (const nameField in fields) {
+            const val = _.get(data, nameField);
             if (val != null) {
                 if (fields[ nameField ] instanceof CheckBoxField) {
-                    /* Traitement spécifique pour une checkbox : on affecte currentChecked lorsque la valeur est booléenne*/
-                    // if (val === true || val === false) {
-                    //     fields[name].setCurrentValue("");
                     fields[ nameField ].setCurrentChecked(val as boolean);
-                    // } else {
-                    //     fields[name].setCurrentValue(val);
-                    // }
                 } else {
                     if (fields[ nameField ] instanceof SelectField || fields[ nameField ] instanceof AutoCompleteField) {
                         if (val instanceof Array) {
-                            let choices = [];
+                            const choices = [];
                             /** TODO : a deplace dans le composant autocompleteField */
                             if (fields[ nameField ].state.multiple) {
                                 for (let i = 0; i < fields[ nameField ].state.allChoices.length; i++) {
-                                    let choice = fields[ nameField ].state.allChoices[ i ];
+                                    const choice = fields[ nameField ].state.allChoices[ i ];
                                     for (let j = 0; j < val.length; j++) {
-                                        if (val[ j ].toString() == choice[ "value" ]) {
+                                        if (val[ j ].toString() === choice[ "value" ]) {
                                             choices.push(choice[ "value" ]);
                                             break;
                                         }
@@ -367,9 +367,9 @@ export class Form extends AbstractForm<FormProps, any> {
                                 }
                             } else {
                                 for (let i = 0; i < fields[ nameField ].state.dataSource.length; i++) {
-                                    let choice = fields[ nameField ].state.dataSource[ i ];
+                                    const choice = fields[ nameField ].state.dataSource[ i ];
                                     for (let j = 0; j < val.length; j++) {
-                                        if (val[ j ].toString() == choice[ fields[ nameField ].state.valueKey ]) {
+                                        if (val[ j ].toString() === choice[ fields[ nameField ].state.valueKey ]) {
                                             choices.push(choice[ fields[ nameField ].state.valueKey ]);
                                             break;
                                         }
@@ -385,8 +385,8 @@ export class Form extends AbstractForm<FormProps, any> {
                         if ((fields[ nameField ].state.choices) && (this.state.readOnly || fields[ nameField ].state.readOnly)) {
 
                             for (let i = 0; i < fields[ nameField ].state.dataSource.length; i++) {
-                                let choice = fields[ nameField ].state.dataSource[ i ];
-                                if (val.toString() == choice[ fields[ nameField ].state.valueKey ]) {
+                                const choice = fields[ nameField ].state.dataSource[ i ];
+                                if (val.toString() === choice[ fields[ nameField ].state.valueKey ]) {
                                     fields[ nameField ].setCurrentValue(choice[ fields[ nameField ].state.valueKey ]);
                                     break;
                                 }
@@ -412,17 +412,16 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param notifs notifications d'erreurs de validation
      */
     protected processAutocompleteErrors(fields: { [ key: string ]: DomAdapter<any, any> }, notifs: Notifications): void {
-        let processedNotifs: Array<INotificationType> = notifs.getNotifications().map(
+        const processedNotifs: Array<INotificationType> = notifs.getNotifications().map(
             function (notif: INotificationType): INotificationType {
                 /* Parcours de tous les champs */
                 Object.keys(fields).every(function (key: string): boolean {
-                    let field: DomAdapter<any, any> = fields[ key ];
+                    const field: DomAdapter<any, any> = fields[ key ];
                     if (field instanceof AutoCompleteField) {
-                        let autoField: AutoCompleteField<AutoCompleteFieldProps> = field as AutoCompleteField<AutoCompleteFieldProps>;
+                        const autoField: AutoCompleteField<AutoCompleteFieldProps> = field as AutoCompleteField<AutoCompleteFieldProps>;
                         /* La notification référence le nom global du champ d'auto-complétion
                          ou bien le champ caché contenant la valeur :
                          on modifie cette référence pour pointer vers le champ de saisie libre */
-                        // if (notif.field == autoField.getAttribute("name") ||
                         if (notif.field == autoField.state.name ||
                             notif.field == (autoField.getValueFieldName())) {
                             notif.field = autoField.getFreeTypingFieldName();
@@ -444,18 +443,18 @@ export class Form extends AbstractForm<FormProps, any> {
      */
     protected notifyErrors(errors: Array<ErrorObject>): void {
         if (errors) {
-            let fieldsMessages = this.state.formMessages && this.state.formMessages.fields;
-            let genericValidationMessages = this.i18n("form.validation");
-            let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+            const fieldsMessages = this.state.formMessages && this.state.formMessages.fields;
+            const genericValidationMessages = this.i18n("form.validation");
+            const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
 
-            let notificationsError: Notifications = FormUtils.getErrors(errors, fields, fieldsMessages, genericValidationMessages);
+            const notificationsError: Notifications = FormUtils.getErrors(errors, fields, fieldsMessages, genericValidationMessages);
 
             /* Post-traitement des notifications concernant les champs d'autocomplétion */
             this.processAutocompleteErrors(fields, notificationsError);
 
             /* Met à jour les erreurs affichées par chaque composant champ */
             Object.keys(fields).every(function (key: string): boolean {
-                let field: DomAdapter<any, any> = fields[ key ];
+                const field: DomAdapter<any, any> = fields[ key ];
                 if (field instanceof AbstractField) {
                     field.setErrors(notificationsError.getNotifications());
                 }
@@ -477,17 +476,17 @@ export class Form extends AbstractForm<FormProps, any> {
      */
     protected transformDatesToISO(schema: any, data: any): void {
         if (schema && schema.properties && data) {
-            let propNames: string[] = Object.keys(schema.properties);
+            const propNames: string[] = Object.keys(schema.properties);
             let property: any, propName: string;
             for (let i: number = 0; i < propNames.length; i++) {
                 propName = propNames[ i ];
                 property = schema.properties[ propName ];
-                if (property.type == "object") {
+                if (property.type === "object") {
                     /* Appel récursif sur les éventuelles propriétés incluses dans le sous-schéma */
                     this.transformDatesToISO(property, data[ propName ]);
-                } else if (property.format == "date-time") {
+                } else if (property.format === "date-time") {
                     if (data[ propName ]) {
-                        let date: Date = Utils.dateUtils.parseInTZ(data[ propName ], this.state.calendarLocale.dateFormat);
+                        const date: Date = Utils.dateUtils.parseInTZ(data[ propName ], this.state.calendarLocale.dateFormat, this.state.calendarLocale.timeZone);
                         if (date) {
                             /* La chaîne de caractères est une date valide pour la locale : on convertit en représentation ISO 8601.*/
                             data[ propName ] = date.toISOString();
@@ -499,7 +498,6 @@ export class Form extends AbstractForm<FormProps, any> {
         }
     }
 
-
     /**
      * Déclenche la validation du formulaire, notifie les erreurs éventuelles et exécute la fonction
      * onSubmit présente dans les propriétés s'il n'y a pas d'erreurs
@@ -509,36 +507,61 @@ export class Form extends AbstractForm<FormProps, any> {
         if (this.formElement) {
             logger.trace("Validation et envoi du formulaire");
 
-            let data = this.extractData();
+            const data = this.extractData(this.state.omitNull);
+            const schema = DataValidator.transformRequiredStrings(this.state.schema);
 
-            if (this.state.onBeforeSubmit) {
-                this.state.onBeforeSubmit(data);
-            }
-
-            let options: ajv.Options = this.state.validationOptions;
-            let schema = DataValidator.transformRequiredStrings(this.state.schema);
-
-            this.transformDatesToISO(this.state.schema, data);
-            let validationRes: IValidationResult = new DataValidator(schema, this.state.customValidators, options).validate(data);
+            const validationRes: IValidationResult = this.getValidationResult(schema, data);
 
             if (!validationRes.valid) {
                 this.notifyErrors(validationRes.errors);
             } else {
                 this.cleanFormErrors();
                 if (this.state.onSubmit) {
+                    this.transformDatesToISO(schema, data);
                     this.state.onSubmit(data);
                 }
             }
         }
     }
 
+
+
+    /**
+     * Retourne le résultat de la validation et ses éventuelles erreurs
+     * @param schema : schéma de validation, par défaut celui du formulaire
+     * @param data: data extraites du formulaire à valider
+     */
+    public getValidationResult(schema = DataValidator.transformRequiredStrings(this.state.schema), dataTovalidate?: any)
+    : IValidationResult {
+        const data = dataTovalidate || this.extractData(this.state.omitNull);
+        if (this.state.onBeforeSubmit) {
+            this.state.onBeforeSubmit(data);
+        }
+        const options: ajv.Options = this.state.validationOptions;
+        this.transformDatesToISO(schema, data);
+        return new DataValidator(schema, this.state.customValidators, options).validate(data);
+    }
+
+    /**
+     * Déclenche une validation du formulaire basée sur un schéma précis ou celui défini pour le formulaire
+     * @param schema : schéma de validation, par défaut celui du formulaire
+     */
+    public validate(notifyErrors: boolean, schema = DataValidator.transformRequiredStrings(this.state.schema)): boolean {
+        const validation: IValidationResult = this.getValidationResult(schema);
+        if (notifyErrors && !validation.valid) {
+            this.notifyErrors(validation.errors);
+        }
+        return validation.valid;
+    }
+
+
     /**
      * Supprime les nofifications d'erreurs et les erreurs associées à chaque champ de ce formulaire
      */
     cleanFormErrors(): void {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
-        for (let fieldName in fields) {
-            let field: DomAdapter<any, any> = fields[ fieldName ];
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        for (const fieldName in fields) {
+            const field: DomAdapter<any, any> = fields[ fieldName ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setErrors(null);
             }
@@ -572,9 +595,9 @@ export class Form extends AbstractForm<FormProps, any> {
     protected propagateParentState(): void {
         /* Le composant parent se charge de propager les propriétés readOnly et disabled */
         super.propagateParentState();
-        let fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            let field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[ key ];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setMarkRequired(this.state.markRequired);
                 (field as AbstractField<any, any>).setImgFilePath(this.state.imgFilePath);
@@ -585,11 +608,11 @@ export class Form extends AbstractForm<FormProps, any> {
 
     /** @override */
     protected extractFields(): { [ key: string ]: DomAdapter<any, any> } {
-        let fields: { [ key: string ]: DomAdapter<any, any> } = {};
+        const fields: { [ key: string ]: DomAdapter<any, any> } = {};
         if (this.formElement) {
             for (let index = 0; index < this.formElement.elements.length; index++) {
 
-                let item: Element = this.formElement.elements[ index ];
+                const item: Element = this.formElement.elements[ index ];
                 if (item[ "name" ]) {
                     if (item[ "__component" ]) {
                         fields[ item[ "name" ] ] = item[ "__component" ];
@@ -639,32 +662,18 @@ export class Form extends AbstractForm<FormProps, any> {
      * @returns {boolean}
      */
     protected isOneRequired(items: Array<React.ReactChild>): boolean {
-
-        let isOneRequired: boolean = false;
-        React.Children.map(items, (child: React.ReactChild) => {
-            if (!isOneRequired) {
-                if (child != null) {
-                    if (child[ "props" ] && child[ "props" ].children) {
-                        isOneRequired = this.isOneRequired(child[ "props" ].children);
-                    }
-                    if (!isOneRequired && (child as any).props && (child as any).props.required == true) {
-                        isOneRequired = true;
-                    }
-                }
-            }
-        });
-        return isOneRequired;
+        return true;
     }
 
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
-        let classes: ClassDictionary = {
-            "form": true,
-            "clear": true,
+        const classes: ClassDictionary = {
+            form: true,
+            clear: true,
             /* Application du style CSS readonly à tout le bloc lorsque tous les champs sont en lecture seule */
-            "readonly": this.state.readOnly
+            readonly: this.state.readOnly,
         };
 
         logger.trace("render(), HornetForm ");
@@ -677,7 +686,7 @@ export class Form extends AbstractForm<FormProps, any> {
         /* La validation de formulaire HTML 5 est désactivée (noValidate="true") :
          on s'appuie uniquement sur la validation à la soumission et on a ainsi un rendu cohérent entre navigateurs. */
 
-        let formProps = {
+        const formProps = {
             id: this.state.id,
             name: this.state.name,
             className: this.state.className,
@@ -685,16 +694,16 @@ export class Form extends AbstractForm<FormProps, any> {
             onSubmit: this._submitHornetForm,
             noValidate: true,
             onChange: this.state.onFormChange ? this.state.onFormChange : undefined,
-            ref: this.registerForm
+            ref: this.registerForm,
         };
 
         if (this.isMultiPartForm(this.state.children)) {
             formProps[ "encType" ] = "multipart/form-data";
         }
 
-        let textHtmlProps = {
-            lang: this.props.textLang ? this.props.textLang : null
-        }
+        const textHtmlProps = {
+            lang: this.props.textLang ? this.props.textLang : null,
+        };
         return (
             <section className="form-container">
                 {customNotif}
@@ -729,7 +738,7 @@ export class Form extends AbstractForm<FormProps, any> {
      * @returns {Array<any>}
      */
     protected getButtonsArea(children): Array<any> {
-        let tableauButtonsArea: Array<any> = [];
+        const tableauButtonsArea: Array<any> = [];
         React.Children.map(children, function (child: any) {
             if (child.type === ButtonsArea) {
                 tableauButtonsArea.push(child);

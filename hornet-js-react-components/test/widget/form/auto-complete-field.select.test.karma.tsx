@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 import * as assert from "assert";
@@ -93,18 +93,18 @@ import { AutoCompleteField } from "src/widget/form/auto-complete-field";
 let dataSource: DataSource<any>;
 let element: JSX.Element;
 let autocomplete;
+let elementDisabled: JSX.Element;
+let autocomp;
 
 
 
-
-
-@Decorators.describe("Test Karma auto-complete-multi-field")
+@Decorators.describe("Test Karma auto-complete-field")
 class AutoCompleteFieldTest extends BaseTest {
 
 
     @Decorators.beforeEach
     beforeEach() {
-        let data = [];
+        const data = [];
         for (let i: number = 1; i < 50; i++) {
             data.push({ id: i, label: "libelle" + i });
         }
@@ -118,15 +118,26 @@ class AutoCompleteFieldTest extends BaseTest {
                 required={true}
                 labelKey="libelle"
                 valueKey="id"
+            />);
 
-            />)
-    };
+            elementDisabled = (
+                <AutoCompleteField dataSource={dataSource}
+                    maxHeight={200}
+                    name="civilite"
+                    label="civilite"
+                    required={true}
+                    labelKey="libelle"
+                    valueKey="id"
+                    ref = {(value) => autocomp = value}
+                />);
+        
+    }
 
     @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
     @Decorators.it("selectionner un element dans l'autocomplete")
     testselect() {
@@ -134,23 +145,37 @@ class AutoCompleteFieldTest extends BaseTest {
         dataSource.on("select", () => {
             index++;
             expect(_.isEqual(dataSource.selected.value, index), ("L'élément sélectionner dans le datasource " + dataSource.selected.value + " doit être identique à l'element suivant : " + index)).to.be.true;
-            if (index == dataSource.results.length - 1) this.end();
+            if (index === dataSource.results.length - 1) this.end();
         });
 
         autocomplete = this.renderIntoDocument(element, "main1");
 
         dataSource.on("fetch", () => {
             (document.querySelector("#civilite") as any).click();
-            let elts = document.querySelectorAll("#main1 .autocomplete-item");
+            const elts = document.querySelectorAll("#main1 .autocomplete-item");
             dataSource.results.forEach((value, index) => {
                 this.triggerMouseEvent(elts[ index ], "mousedown");
-            })
+            });
         });
 
         dataSource.reload();
-    };
+    }
 
-};
+    @Decorators.it("croix de suppression pour autocomplete disabled")
+    testdisabled() {
+        const id = this.generateMainId();
+        autocomplete = this.renderIntoDocument(elementDisabled, id);
+        setTimeout( () => { 
+            autocomp.setDisabled(true).setReadOnly(true);
+            setTimeout( () => { 
+                const croix = document.querySelector("#" + id + " #civiliteResetButton");
+                expect(croix).to.be.null;
+                this.end();
+            },          250);
+        },          250);
+    }
 
-//lancement des Tests
+}
+
+// lancement des Tests
 runTest(new AutoCompleteFieldTest());

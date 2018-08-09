@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -515,15 +515,19 @@ export interface HornetFormFieldProps {
 
     // gestion des champs sur une ligne
     inline?: InlineStyle;
+    // Indique si le label doit être affiché avant le field
+    reverseLabel?: boolean;
 }
 
 export enum InlineStyle {
     NONE,
     FIELD,
-    ALL
+    ALL,
 }
 
 export interface AbstractFieldProps extends HornetBasicFormFieldProps {
+    // Lorsque le field n'a pas eu de valeur renseignée retourne null au lieu d'une chaine vide
+    nullable?: boolean;
 
 }
 
@@ -541,15 +545,18 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         icoToolTip: "/img/tooltip/tooltip.svg",
         markRequired: true,
         errorComponent: FieldError,
-        lang: (Utils.getCls("hornet.internationalization") && Utils.getCls("hornet.internationalization").lang) ? Utils.getCls("hornet.internationalization").lang : "fr",
-        inline: InlineStyle
+        lang: (Utils.getCls("hornet.internationalization") && Utils.getCls("hornet.internationalization").lang)
+            ? Utils.getCls("hornet.internationalization").lang : "fr",
+        inline: InlineStyle,
+        reverseLabel: false,
+        nullable: false,
     };
 
     static Inline = InlineStyle;
 
     constructor(props?: AbstractFieldProps, context?: any) {
         super(props, context);
-        this.makeState(this.state);
+        this.makeState(this.state as any);
     }
 
 
@@ -559,8 +566,8 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
             this.htmlElement.addEventListener("focus", this.handleSimulateScroll);
         } else {
             if (this.multipleElement) {
-                for (let element in this.multipleElement) {
-                    this.multipleElement[ element ].addEventListener("focus", this.handleSimulateScroll);
+                for (const element in this.multipleElement) {
+                    this.multipleElement[element].addEventListener("focus", this.handleSimulateScroll);
                 }
             }
         }
@@ -572,11 +579,82 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
             this.htmlElement.removeEventListener("focus", this.handleSimulateScroll);
         } else {
             if (this.multipleElement) {
-                for (let element in this.multipleElement) {
-                    this.multipleElement[ element ].removeEventListener("focus", this.handleSimulateScroll);
+                for (const element in this.multipleElement) {
+                    this.multipleElement[element].removeEventListener("focus", this.handleSimulateScroll);
                 }
             }
         }
+    }
+
+    /**
+     * Met à jour l'état interne avec les nouvelles propriétés.
+     * Surcharge la méthode parente : les attributs HTML standards sont initialisés via la fonction générique setAttribute.
+     * @param nextProps nouvelles propriétés
+     * @param nextContext nouveau contexte
+     * @override
+     */
+    componentWillReceiveProps(nextProps: any, nextContext: any): void {
+        for (const key in nextProps) {
+            /* On doit s'assurer que chaque propriété a effectivement changé, car componentWillReceiveProps peut aussi
+             * être appelée alors qu'aucune propriété n'a changé 
+             * (cf.http://facebook.github.io/react/blog/2016/01/08/A-implies-B-does-not-imply-B-implies-A.html)
+             * Dans ce cas cela poserait problème, car l'état pourrait avaoir été modifié
+             * via un setter alors que la propriété utilisée initialement pour le constructeur n'a pas changé.*/
+            if (this.props[key] !== nextProps[key]) {
+                if (key in HTML_ATTRIBUTES) {
+                    /* Propriété HTML standard */
+                    this.setAttribute(key, nextProps[key]);
+                } else {
+                    /* Propriété spécifique hornet : un 'setter' est certainement présent */
+                    const setterName: string = _.camelCase("set " + (key));
+                    if (this[setterName]) {
+                        this[setterName](nextProps[key]);
+                    } else {
+                        const state = {};
+                        state[key] = nextProps[key];
+                        this.setState(state);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+      * @inheritDoc
+      */
+    render(): JSX.Element {
+
+        let type: string = this.state.type;
+        if (type) {
+            type = type.toLowerCase();
+        }
+
+        const cx = classNames(
+            this.state.groupClass,
+            "abstractfield-container",
+            {
+                inline: this.state.inline === InlineStyle.ALL,
+                readonly: this.state.readOnly,
+            },
+        );
+
+        /* On ne génère pas le rendu du label et des div conteneurs lorsque le champ est caché */
+        return ((type === "hidden") ? this.renderWidget() :
+            this.props.reverseLabel ?
+                <div className={`${cx} abstractfield-container-reverse-label`}>
+                    {this.renderField()}
+                    {this.state.label
+                        ? this.renderLabel(this.state.id, this.state.name, this.state.label, this.state.required)
+                        : null}
+                </div> :
+                <div className={cx}>
+                    {this.state.label
+                        ? this.renderLabel(this.state.id, this.state.name, this.state.label, this.state.required)
+                        : null}
+                    {this.renderField()}
+                </div>
+        );
     }
 
     /**
@@ -587,93 +665,105 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         this.processHtmlProps(state);
     }
 
+    /**
+     * @inheritDoc
+     * @param removeEmptyStrings {boolean} si false et le champs nullable alors renvoie null
+     */
+    getCurrentValue(removeEmptyStrings: boolean = true): any {
+        let currentValue = super.getCurrentValue();
+        if (!removeEmptyStrings && this.props.nullable && currentValue === "") {
+            currentValue = null;
+        }
+        return currentValue;
+    }
+
     // Setters
 
     setAbbr(abbr: string, callback?: () => any): this {
-        if(abbr !== this.state.abbr) {
-            this.setState({ abbr: abbr }, callback);
+        if (abbr !== this.state.abbr) {
+            this.setState({ abbr }, callback);
         }
         return this;
     }
 
     setGroupClass(groupClass: string, callback?: () => any): this {
-        if(groupClass !== this.state.groupClass) {
-            this.setState({ groupClass: groupClass }, callback);
+        if (groupClass !== this.state.groupClass) {
+            this.setState({ groupClass }, callback);
         }
         return this;
     }
 
     setLabelClass(labelClass: string, callback?: () => any): this {
-        if(labelClass !== this.state.labelClass) {
-            this.setState({ labelClass: labelClass }, callback);
+        if (labelClass !== this.state.labelClass) {
+            this.setState({ labelClass }, callback);
         }
         return this;
     }
 
     setFieldClass(fieldClass: string, callback?: () => any): this {
-        if(fieldClass !== this.state.fieldClass) {
-            this.setState({ fieldClass: fieldClass }, callback);
+        if (fieldClass !== this.state.fieldClass) {
+            this.setState({ fieldClass }, callback);
         }
         return this;
     }
 
     setToolTip(toolTip: string, callback?: () => any): this {
-        if(toolTip !== this.state.toolTip) {
-            this.setState({ toolTip: toolTip }, callback);
+        if (toolTip !== this.state.toolTip) {
+            this.setState({ toolTip }, callback);
         }
         return this;
     }
 
     setIcoToolTip(icoToolTip: string, callback?: () => any): this {
-        if(icoToolTip !== this.state.icoToolTip) {
-            this.setState({ icoToolTip: icoToolTip }, callback);
+        if (icoToolTip !== this.state.icoToolTip) {
+            this.setState({ icoToolTip }, callback);
         }
         return this;
     }
 
     setPrefix(prefix: any, callback?: () => any): this {
-        if(prefix !== this.state.prefix) {
-            this.setState({ prefix: prefix }, callback);
+        if (prefix !== this.state.prefix) {
+            this.setState({ prefix }, callback);
         }
         return this;
     }
 
     setSuffix(suffix: any, callback?: () => any): this {
-        if(suffix !== this.state.suffix) {
-            this.setState({ suffix: suffix }, callback);
+        if (suffix !== this.state.suffix) {
+            this.setState({ suffix }, callback);
         }
         return this;
     }
 
     setMarkRequired(markRequired: boolean, callback?: () => any): this {
-        if(this.state.markRequired === markRequired) return this;
-        this.setState({ markRequired: markRequired }, callback);
+        if (this.state.markRequired === markRequired) return this;
+        this.setState({ markRequired }, callback);
         return this;
     }
 
     setrequiredLabel(requiredLabel: string, callback?: () => any): this {
-        if(requiredLabel !== this.state.requiredLabel) {
-            this.setState({ requiredLabel: requiredLabel }, callback);
+        if (requiredLabel !== this.state.requiredLabel) {
+            this.setState({ requiredLabel }, callback);
         }
         return this;
     }
 
     setImgFilePath(imgFilePath: string, callback?: () => any): this {
-        if(imgFilePath !== this.state.imgFilePath) {
-            this.setState({ imgFilePath: imgFilePath }, callback);
+        if (imgFilePath !== this.state.imgFilePath) {
+            this.setState({ imgFilePath }, callback);
         }
         return this;
     }
 
 
     setErrorComponent(errorComponent: ComponentClass<FieldErrorProps>, callback?: () => any): this {
-        this.setState({ errorComponent: errorComponent }, callback);
+        this.setState({ errorComponent }, callback);
         return this;
     }
 
     setErrors(errors: INotificationType[], callback?: () => any): this {
-        if(!this.state.errors && !errors) return this;
-        this.setState({ errors: errors }, callback);
+        if ((!this.state.errors || this.state.errors.length === 0) && (!errors || errors.length === 0)) return this;
+        this.setState({ errors }, callback);
         return this;
     }
 
@@ -683,9 +773,9 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
     setAttribute(name: string, value: any): this {
         super.setAttribute(name, value);
         /* L'adaptateur DOM met à jour l'élément dans le DOM : on met ici à jour l'état interne du composant */
-        let newState = {};
-        newState[ name ] = value;
-        if(newState[ name ] !== this.state[ name ]) {
+        const newState = {};
+        newState[name] = value;
+        if (newState[name] !== this.state[name]) {
             this.setState(newState);
         }
         return this;
@@ -715,7 +805,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      * @override
      */
     setReadOnly(value: any): this {
-        if(this.state.readOnly === value) return this;
+        if (this.state.readOnly === value) return this;
         this.setState({ readOnly: value });
         return this;
     }
@@ -724,17 +814,24 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      * @override
      */
     setDisabled(value: any): this {
-        if(this.state.disabled === value) return this;
+        if (this.state.disabled === value) return this;
         this.setState({ disabled: value });
         return this;
     }
 
+    /**
+     * le champ est-il en erreur
+     */
     hasErrors(): boolean {
         let fieldErrors: INotificationType[] = null;
         if (this.state.errors) {
-            fieldErrors = this.state.errors.filter(function (error: INotificationType): boolean {
-                return (error.field == this.state.name || error.additionalInfos.linkedFieldsName == this.state.name);
-            }, this);
+            fieldErrors = this.state.errors.filter((error: INotificationType): boolean => {
+                return (error.field === this.state.name || error.field === this.state.name + "." + this.state.labelKey
+                    || (error.additionalInfos
+                        && error.additionalInfos.linkedFieldsName
+                        && error.additionalInfos.linkedFieldsName.indexOf(this.state.name) > -1)
+                );
+            });
         }
         if (fieldErrors && (fieldErrors.length > 0)) {
             return true;
@@ -743,77 +840,40 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
     }
 
     /**
-     * @inheritDoc
+     * Renvoie un tableau de champs en erreur: lui-même ou un champ lié ?
      */
-    render(): JSX.Element {
-
-        let type: string = this.state.type;
-        if (type) {
-            type = type.toLowerCase();
-        }
-
-        let cx = classNames(
-            this.state.groupClass,
-            "abstractfield-container",
-            {
-                "inline": this.state.inline == InlineStyle.ALL,
-                "readonly": this.state.readOnly
-            }
-        );
-
-        /* On ne génère pas le rendu du label et des div conteneurs lorsque le champ est caché */
-        return ((type == "hidden") ? this.renderWidget() :
-            <div className={cx}>
-                {this.state.label ? this.renderLabel(this.state.id,
-                    this.state.name, this.state.label, this.state.required) : null}
-                {this.renderField()}
-            </div>
-        );
-    }
-
-    /**
-     * Met à jour l'état interne avec les nouvelles propriétés.
-     * Surcharge la méthode parente : les attributs HTML standards sont initialisés via la fonction générique setAttribute.
-     * @param nextProps nouvelles propriétés
-     * @param nextContext nouveau contexte
-     * @override
-     */
-    componentWillReceiveProps(nextProps: any, nextContext: any): void {
-        for (let key in nextProps) {
-            /* On doit s'assurer que chaque propriété a effectivement changé, car componentWillReceiveProps peut aussi
-             * être appelée alors qu'aucune propriété n'a changé (cf.http://facebook.github.io/react/blog/2016/01/08/A-implies-B-does-not-imply-B-implies-A.html)
-             * Dans ce cas cela poserait problème, car l'état pourrait avaoir été modifié
-             * via un setter alors que la propriété utilisée initialement pour le constructeur n'a pas changé.*/
-            if (this.props[ key ] != nextProps[ key ]) {
-                if (key in HTML_ATTRIBUTES) {
-                    /* Propriété HTML standard */
-                    this.setAttribute(key, nextProps[ key ]);
-                } else {
-                    /* Propriété spécifique hornet : un 'setter' est certainement présent */
-                    let setterName: string = _.camelCase("set " + (key));
-                    if (this[ setterName ]) {
-                        this[ setterName ](nextProps[ key ]);
-                    } else {
-                        let state: S;
-                        state[ key ] = nextProps[ key ];
-                        this.setState(state);
-                    }
-                }
+    getNamesFieldsError(): string[] {
+        const fieldErrors = [];
+        if (this.state.errors) {
+            const errors = this.state.errors.filter((error: INotificationType): boolean => {
+                return (error.field === this.state.name || error.field === this.state.name + "." + this.state.labelKey
+                    || (error.additionalInfos
+                        && error.additionalInfos.linkedFieldsName
+                        && error.additionalInfos.linkedFieldsName.indexOf(this.state.name) > -1)
+                );
+            });
+            if (errors && errors.length > 0) {
+                errors.map((error) => {
+                    fieldErrors.push(`${error.field}-${error.id}`);
+                });
+            } else {
+                fieldErrors.push(this.state.name);
             }
         }
+        return fieldErrors;
     }
 
     /**
      * Génère le rendu des erreurs de validation éventuelles
      */
     renderErrors(): ReactElement<FieldErrorProps> {
-        let fieldErrorProps: FieldErrorProps = {
+        const fieldErrorProps: FieldErrorProps = {
             errors: this.state.errors,
             fieldName: this.state.name,
-            hideError: this.state.hideError
+            hideError: this.state.hideError,
         };
         // get the field error component by state ?
-        let Error = this.state.errorComponent;
+        const Error = this.state.errorComponent;
         return <Error {...fieldErrorProps} />;
     }
 
@@ -826,23 +886,23 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      * @returns {any}
      */
     renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
-        let urlTheme = this.state.imgFilePath || AbstractField.genUrlTheme(),
-            urlIcoTooltip = urlTheme + this.state.icoToolTip;
+        const urlTheme = this.state.imgFilePath || AbstractField.genUrlTheme();
+        const urlIcoTooltip = urlTheme + this.state.icoToolTip;
 
         if ((this.state as any).abbr && !this.state.lang) {
             logger.warn("Field ", fieldName, " Must have lang with abbr configuration");
         }
 
-        let ariaDescribedby = { "aria-describedby": fieldName + "Tooltip" };
+        const ariaDescribedby = { "aria-describedby": fieldName + "Tooltip" };
 
         return (
-            <div className={this.state.labelClass + " label-container"}>
+            <div className={this.state.labelClass + " label-container label-row-inline"}>
                 <label htmlFor={fieldId} id={fieldName + "Label"}
                     className="label-content" {...this.state.toolTip ? ariaDescribedby : null}>
                     {(this.state.abbr) ?
                         <abbr lang={this.state.lang} title={this.state.abbr}>
-                            <span className="label-abbr">{label}</span>
-                        </abbr> : <span className="label">{label}</span>}
+                            <span className="label-abbr" id={fieldName + "-span-label"}>{label}</span>
+                        </abbr> : <span className="label" id={fieldName + "-span-label"}>{label}</span>}
 
                     {required && this.state.markRequired ?
                         <span className="label-required"><abbr title={this.getRequiredLabel()}>*</abbr></span> : null}
@@ -857,7 +917,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
     protected getRequiredLabel(): string {
         let requiredLabel: string = this.state.requiredLabel;
         if (!requiredLabel) {
-            let i18nRequiredLabel = this.i18n("form.requiredLabel");
+            const i18nRequiredLabel = this.i18n("form.requiredLabel");
             if (i18nRequiredLabel) {
                 requiredLabel = i18nRequiredLabel;
             } else {
@@ -892,19 +952,24 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      */
     getHtmlProps(): AbstractFieldProps {
         /* On n'inclut pas les propriétés spécifiques qui ne concernent pas un champ HTML standard */
-        let htmlProps: AbstractFieldProps = { name: "" };
-        for (let key in this.state) {
+        const htmlProps: AbstractFieldProps = { name: "" };
+        for (const key in this.state) {
             if (key in HTML_ATTRIBUTES) {
-                htmlProps[ key ] = this.state[ key ];
+                htmlProps[key] = this.state[key];
             }
         }
 
         if (this.hasErrors()) {
-            htmlProps[ "aria-describedby" ] = `${this.state.name}-error`;
+            htmlProps["aria-describedby"] = "";
+            const errors = this.getNamesFieldsError();
+            for (let i = 0; i < errors.length; i++) {
+                htmlProps["aria-describedby"] += `${errors[i]}-error `;
+            }
+            htmlProps["aria-describedby"] =  htmlProps["aria-describedby"].trim();
         }
 
         this.processHtmlProps(htmlProps);
-        delete htmlProps[ "label" ];
+        delete htmlProps["label"];
         return htmlProps;
     }
 
@@ -935,8 +1000,10 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      */
     handleSimulateScroll() {
         if (this.htmlElement || this.multipleElement) {
-            let elementWithFocusPosTop = this.htmlElement ? this.htmlElement.getBoundingClientRect().top : this.multipleElement[0].getBoundingClientRect().top;
-            let stickyElmtPos = (document.getElementById("banner")) ? document.getElementById("banner").offsetHeight : null;
+            const elementWithFocusPosTop = this.htmlElement
+                ? this.htmlElement.getBoundingClientRect().top
+                : this.multipleElement[0].getBoundingClientRect().top;
+            const stickyElmtPos = (document.getElementById("banner")) ? document.getElementById("banner").offsetHeight : null;
 
             if (elementWithFocusPosTop <= stickyElmtPos) {
                 window.scrollBy(0, -(window.innerHeight / 2));

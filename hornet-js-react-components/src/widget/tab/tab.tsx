@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,9 +81,8 @@
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import * as classNames from "classnames";
-import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+import { HornetComponentProps, IHornetComponentAsync } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
-import { IHornetComponentAsync } from "hornet-js-components/src/component/ihornet-component";
 import { SpinnerComponentInput } from "src/widget/spinner/spinner-component-input";
 import { SpinnerProps } from "src/widget/spinner/spinner-component";
 
@@ -108,6 +107,7 @@ export interface TabProps extends HornetComponentProps {
     isDeletable?: boolean;
     deleteButtonTitle?: string;
     deleteTabFunction?: void | Function;
+    style?: any;
 }
 
 /**
@@ -119,7 +119,7 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
         id: "tab",
         forceRender: false,
         spinner: false,
-        mount: true
+        mount: true,
     };
 
     _status: boolean;
@@ -127,11 +127,16 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
     constructor(props?: TabProps, context?: any) {
         super(props, context);
         if (!this.props.mount) {
-            this.state.spinner = true;
+
+            this.state = {
+                ...this.state,
+                spinner: true,
+            };
+
             if (this.state.children && this.state.children.props && this.state.children.props.dataSource) {
                 if (!this.state.children.props.dataSource.status) {
                     this.state.children.props.dataSource.on("loadingData", (value) => {
-                        this.setState({ spinner: value });
+                        this.setState({spinner: value});
                     });
                 }
             }
@@ -154,7 +159,7 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
      */
     componentWillUpdate(nextProps: TabProps, nextState: any, nextContext: any): void {
         super.componentWillUpdate(nextProps, nextState, nextContext);
-        if (this.props.onSelect && this.state.isVisible != nextState.isVisible && nextState.isVisible === false) {
+        if (this.props.onSelect && this.state.isVisible !== nextState.isVisible && nextState.isVisible === false) {
             this.props.onSelect(this, false);
         }
     }
@@ -162,42 +167,44 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
     displaySpinner(flag: boolean) {
         flag ? this.showSpinnerComponent() : this.hideSpinnerComponent();
     }
+
     /**
      * Méthode qui permet d'afficher le spinner du composant plutot que celui de la page.
      */
     showSpinnerComponent(): void {
-        this.state.spinner = true;
-    };
+        (this.state as any).spinner = true;
+    }
+
     /**
      * Méthode qui permet de cacher le spinner du composant plutot que celui de la page.
      */
     hideSpinnerComponent(): void {
-        this.state.spinner = false;
-    };
+        (this.state as any).spinner = false;
+    }
 
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
-        let classNameContent = classNames({
+        const classNameContent = classNames({
             "tab-panel": true,
-            "tab-panel-selected": this.state.isVisible
+            "tab-panel-selected": this.state.isVisible,
         });
 
         return (
             <section key={this.props.prefixId + "sectionTabPanel-" + this.props.index}
-                style={{ "display": this.state.isVisible ? "block" : "none" }}
-                id={this.props.prefixId + "sectionTabPanel-" + this.props.index}
-                role="tabpanel"
-                aria-hidden={!this.state.isVisible}
-                aria-labelledby={this.props.prefixId + "tabList-item-" + this.props.index}>
-                <SpinnerComponentInput ref="spinnerComponent" isVisible={this.state.spinner && this.state.isVisible} />
+                     style={{display: this.state.isVisible ? "block" : "none"}}
+                     id={this.props.prefixId + "sectionTabPanel-" + this.props.index}
+                     role="tabpanel"
+                     aria-hidden={!this.state.isVisible}
+                     aria-labelledby={this.props.prefixId + "tabList-item-" + this.props.index}>
+                <SpinnerComponentInput ref="spinnerComponent" isVisible={this.state.spinner && this.state.isVisible}/>
                 {this.state.mount ?
                     <div id={this.state.panelId}
-                        className={classNameContent}>
+                         className={classNameContent}>
                         {this.state.children}
                     </div>
                     : null}
-            </section>)
+            </section>);
     }
 }

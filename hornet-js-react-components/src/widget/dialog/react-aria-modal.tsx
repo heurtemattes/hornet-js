@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -275,17 +275,16 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
 
 
         let props = null;
+        const labelledby = "dialogue-title".concat(this.state.alert ? " widget-alert-body" : "");
 
-        let modal = (
+        const modal = (
             <div role={this.state.alert ? "alertdialog" : "dialog"}
-                 aria-labelledby={"dialogue-title"}
-                 aria-describedby={"dialogue-body-content"}
-                 aria-label={this.state.titleText}
-                 id={this.state.dialogId}
-                 className={this.state.dialogClass + " dialog-content-alert"}
-                 style={style}
-                 onClick={this.onClick}
-                 tabIndex={this.state.focusDialog ? -1 : undefined}>
+                aria-labelledby={labelledby}
+                id={this.state.dialogId}
+                className={this.state.dialogClass ?  this.state.dialogClass + " dialog-content-alert" :"dialog-content-alert"}
+                style={style}
+                onClick={this.onClick}
+                tabIndex={this.state.focusDialog ? -1 : undefined}>
                 {this.state.children}
             </div>
         );
@@ -338,8 +337,8 @@ export class ReactAriaModal extends HornetComponent<any, any> {
     static number = 0;
 
     renderModal() {
-        if (!this.state.container) this.state.container = document.createElement("div");
-        if (!this.state.idx) this.state.idx = ++ReactAriaModal.number;
+        if (!this.state.container) (this.state as any).container = document.createElement("div");
+        if (!this.state.idx) (this.state as any).idx = ++ReactAriaModal.number;
         let nProps = {};
         for (let prop in this.props) {
             nProps[ prop ] = this.props[ prop ];
@@ -348,7 +347,7 @@ export class ReactAriaModal extends HornetComponent<any, any> {
         nProps[ "idx" ] = this.state.idx;
         if (!this.state.firstRender) {
             document.body.appendChild(this.state.container);
-            this.state.firstRender = true;
+            (this.state as any).firstRender = true;
         }
         /* On est obligé de forcer le passage du contexte (context={(this.context)}) car ces composants sont créés en tant que
          noeuds fils du conteneur dom, qui n'a pas de contexte react. */
@@ -368,8 +367,8 @@ export class ReactAriaModal extends HornetComponent<any, any> {
         if (this.state.container) {
             ReactDOM.unmountComponentAtNode(this.state.container);
             this.state.container.parentNode.removeChild(this.state.container);
-            this.state.firstRender = false;
-            delete this.state.container;
+            (this.state as any).firstRender = false;
+            delete (this.state as any).container;
         }
     }
 

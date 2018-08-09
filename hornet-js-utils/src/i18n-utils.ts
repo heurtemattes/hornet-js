@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,12 +85,16 @@ import { Utils } from "src/index";
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const src$utils$$ = require("intl-messageformat/lib/utils");
 const IntlMessageFormat = require("intl-messageformat");
-IntlMessageFormat.prototype._format = function(pattern, values) {
-    let result = "",
-        i, len, part, id, value;
+IntlMessageFormat.prototype._format = function (pattern, values) {
+    let result = "";
+    let i;
+    let len;
+    let part;
+    let id;
+    let value;
 
     for (i = 0, len = pattern.length; i < len; i += 1) {
-        part = pattern[i];
+        part = pattern[ i ];
 
         // Exist early for string parts.
         if (typeof part === "string") {
@@ -102,10 +106,10 @@ IntlMessageFormat.prototype._format = function(pattern, values) {
 
         // Enforce that all required values are provided by the caller.
         if (!(values && src$utils$$.hop.call(values, id))) {
-            values[id] = "{" + id + "}";
+            values[ id ] = "{" + id + "}";
         }
 
-        value = values[id];
+        value = values[ id ];
 
         // Recursively format plural and select parts' option — which can be a
         // nested pattern structure. The choosing of the option to use is
@@ -137,11 +141,11 @@ export class I18nUtils {
         if (keysString && internationalization) {
             currentMessages = internationalization.messages;
 
-            let keyArray: string[] = keysString.split(".");
+            const keyArray: string[] = keysString.split(".");
 
-            keyArray.every(function(key, index, array) {
+            keyArray.every(function (key, index, array) {
                 // descend dans l'arborescence
-                currentMessages = currentMessages[key];
+                currentMessages = currentMessages[ key ];
 
                 if (currentMessages === undefined) {
                     return false; // non défini
@@ -153,8 +157,10 @@ export class I18nUtils {
         }
 
         if (values) {
-            let message = (currentMessages === undefined) ? keysString : currentMessages;
-            let msg = (internationalization) ? new IntlMessageFormat(message, internationalization.locale) : new IntlMessageFormat(message);
+            const message = (currentMessages === undefined) ? keysString : currentMessages;
+            const msg = (internationalization)
+                ? new IntlMessageFormat(message, internationalization.locale)
+                : new IntlMessageFormat(message);
             return msg.format(values);
         }
         return currentMessages !== undefined ? currentMessages : keysString;

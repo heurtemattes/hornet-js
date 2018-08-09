@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,28 +102,30 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
     constructor(config?: ServerConfiguration) {
         super((req, res, next) => {
             try {
-                let routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
+                const includeCls:{[key: string]: string[]} = _.merge(config && config.includeClsKey || {}, {"hornet.user": ["SessionNotOnOrAfter", "Profil", "Nom","Prenom", "name","Mail", "Login", "roles"]});
+                const includeSession:{[key: string]: string[]} = _.merge(config && config.includeSessionKey || {}, {passport: [], strategy: []});
+                const routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
 
                 // route de type 'PAGE' uniquement
                 if (Utils.getContinuationStorage().get("hornet.routeType") === RouteType.PAGE) {
 
-                    let pageRouteInfos = routeInfos as PageRouteInfos;
+                    const pageRouteInfos = routeInfos as PageRouteInfos;
 
-                    //On expose la sérialisation de la conf aux clients
-                    let clientConfig = {
+                    // On expose la sérialisation de la conf aux clients
+                    const clientConfig = {
                         shared: Utils.config.getOrDefault("shared", ""),
                         themeUrl: HornetComponent.genUrlTheme(),
                         themeHost: Utils.config.getIfExists("themeHost"),
                         themeName: Utils.config.get("themeName"),
                         fullSpa: Utils.config.getOrDefault("fullSpa", {
-                            "enabled": false,
-                            "host": "",
-                            "name": "/services"
+                            enabled: false,
+                            host: "",
+                            name: "/services",
                         }),
                         contextPath: Utils.config.getOrDefault("contextPath", ""),
                         request: Utils.config.getIfExists("request"),
                         logClient: Utils.config.getOrDefault("logClient", {}),
-                        welcomePage: Utils.config.getOrDefault("welcomePage", "/")
+                        welcomePage: Utils.config.getOrDefault("welcomePage", "/"),
                     };
                     res.expose(clientConfig, "Config");
 
@@ -134,32 +136,55 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
                     res.expose(process.env.NODE_ENV, "Mode");
 
                     // On expose le CLS sans ce qui est spécifique serveur
-                    let cls = _.clone(Utils.getContinuationStorage().active);
+                    const cls = _.clone(Utils.getContinuationStorage().active);
                     delete cls[ "hornet.request" ];
                     delete cls[ "hornet.response" ];
                     delete cls[ "hornet.routeInfos" ];
                     delete cls[ "hornet.routeAuthorization" ];
+                    delete cls[ "passport" ];
+                    cls[ "currenDate" ] = Date.now();
 
-                    let sessionData = req.getSession().getData();
-                    for (let i in sessionData) {
-                        cls[ i ] = sessionData[ i ];
+                    Object.keys(includeCls).forEach((key) => {
+                        delete cls[key];
+                        if (includeCls[key] && includeCls[key].length && includeCls[key].length > 0 && Utils.getContinuationStorage().active[key]) {
+                            cls[key] = {};
+                            includeCls[key].forEach((keyToCopy) => {
+                                cls[key][keyToCopy] = Utils.getContinuationStorage().active[key][keyToCopy];
+                            });
+                        }
+                    });
+
+                    const sessionData = req.getSession().getData();
+                    for (const i in sessionData) {
+                        if (includeSession[i]) {
+                            if (includeSession[i] && includeSession[i].length && includeSession[i].length > 0 && sessionData[i]) {
+                                cls[i] = {};
+                                includeSession[i].forEach((keyToCopy) => {
+                                    cls[i][keyToCopy] = sessionData[i][keyToCopy];
+                                });
+                            }
+                        } else {
+                            cls[i] = sessionData[i];
+                        }
                     }
+
+                    delete cls[ "hornet.request" ];
 
                     res.expose(cls, "HornetCLS");
 
                     PageRenderingMiddleware.logger.trace("renderToString");
-                    let htmlApp: string = ReactDOMServer.renderToString(
+                    const htmlApp: string = ReactDOMServer.renderToString(
                         React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).appComponent as Class<HornetPage<any, any, any>>)({
-                            content: pageRouteInfos.getViewComponent()
-                        }) as any
+                            content: pageRouteInfos.getViewComponent(),
+                        }) as any,
                     );
 
                     // On rend la page entière en y intégrant l"appComponent rendu précédemment
-                    let html: string = ReactDOMServer.renderToStaticMarkup(
+                    const html: string = ReactDOMServer.renderToStaticMarkup(
                         React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).layoutComponent as Class<HornetPage<any, any, any>>)({
                             content: htmlApp,
-                            state: res.locals.state
-                        }) as any
+                            state: res.locals.state,
+                        }) as any,
                     );
                     res.send("<!DOCTYPE html>" + html);
                     res.end();
@@ -170,7 +195,7 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
             } finally {
                 next();
             }
-        }, null, config);
+        },    null, config);
     }
 }
 
@@ -200,19 +225,19 @@ export class UnmanagedViewErrorMiddleware extends AbstractHornetSubMiddleware {
 
                 Utils.getContinuationStorage().set("hornet.currentError", err);
 
-                let htmlApp: string = ReactDOMServer.renderToString(
+                const htmlApp: string = ReactDOMServer.renderToString(
                     React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).appComponent as Class<HornetPage<any, any, any>>)({
-                        content: (this.config || AbstractHornetMiddleware.APP_CONFIG).errorComponent
-                    }) as any
+                        content: (this.config || AbstractHornetMiddleware.APP_CONFIG).errorComponent,
+                    }) as any,
                 );
 
                 // On rend la page entière en y intégrant l"appComponent rendu précédemment
-                let html: string = ReactDOMServer.renderToStaticMarkup(
+                const html: string = ReactDOMServer.renderToStaticMarkup(
                     React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).layoutComponent as Class<HornetPage<any, any, any>>)({
                         content: htmlApp,
                         state: res.locals.state,
-                        nojavascript: true
-                    }) as any
+                        nojavascript: true,
+                    }) as any,
                 );
 
                 if (err.status && typeof err.status === "number") {
@@ -227,7 +252,7 @@ export class UnmanagedViewErrorMiddleware extends AbstractHornetSubMiddleware {
             } else {
                 next(err);
             }
-        }, null, config)
+        },    null, config);
     }
 }
 

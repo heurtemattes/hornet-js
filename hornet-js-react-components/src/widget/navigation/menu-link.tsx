@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,15 +92,14 @@ import {
     DOWN_ARROW_IMG,
     RIGHT_ARROW_IMG_HOVER,
     RIGHT_ARROW_IMG,
-    IMG_PATH
+    IMG_PATH,
 } from "hornet-js-components/src/utils/menu-constantes";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
+import { HornetEvent, fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-link");
 
-export var MENU_LINK_ACTIVATED = new HornetEvent<any>("MENU_LINK_ACTIVATED");
+export let MENU_LINK_ACTIVATED = new HornetEvent<any>("MENU_LINK_ACTIVATED");
 
 export interface MenuLinkProps extends HornetComponentProps {
     /* Object représentant l'élément de menu */
@@ -127,23 +126,22 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
 
     static defaultProps = {
         item: {},
-        dataPassThru: false
+        dataPassThru: false,
     };
 
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
-        let item = this.state.item;
+        const item = this.state.item;
         logger.debug("MenuLink.render item.id : ", item.id);
-        let attributesA = {};
+        const attributesA = {};
 
-        let hasSubMenu = NavigationUtils.hasVisibleSubMenu(item);
+        const hasSubMenu = NavigationUtils.hasVisibleSubMenu(item);
         attributesA[ "href" ] = (item.url) && !(hasSubMenu) ? this.genUrl(item.url) : "#";
         attributesA[ "className" ] = hasSubMenu ? HAVING_SUBMENU_CLASSNAME : null;
         attributesA[ "id" ] = item.id;
         attributesA[ "data-indice" ] = item.id;
-        attributesA[ "role" ] = "menuitem";
         if (this.state.dataPassThru) {
             attributesA[ "data-pass-thru" ] = "true";
         }
@@ -152,12 +150,11 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
         attributesA[ "onMouseEnter" ] = this.handleMouseEnter;
         attributesA[ "onMouseLeave" ] = this.handleMouseLeave;
         /* On n'accède pas aux éléments de menu (autres que le premier) via la tabulation */
-        if (item.id == MENU_ROOT + "0") {
+        if (item.id === MENU_ROOT + "0") {
             attributesA[ "tabIndex" ] = 0;
         } else {
             attributesA[ "tabIndex" ] = -1;
         }
-        let subMenuLibelle = this.i18n("navigation.submenu");
         return (
             <a {...attributesA} onKeyDown={this.handleKeyDown} onClick={this.activateLink}>
                 <span className="menulink-title">
@@ -171,9 +168,9 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * @param event
      */
     protected handleKeyDown(event): void {
-        if (event.keyCode == KeyCodes.ENTER || event.keyCode == KeyCodes.SPACEBAR) {
-            let item = this.state.item;
-            let url = (item.url) ? this.genUrl(item.url) : "#";
+        if (event.keyCode === KeyCodes.ENTER || event.keyCode === KeyCodes.SPACEBAR) {
+            const item = this.state.item;
+            const url = (item.url) ? this.genUrl(item.url) : "#";
             window.router.setRoute(this.genUrl(url));
             fireHornetEvent(MENU_LINK_ACTIVATED);
             if (this.props.closeOnLinkClick) {
@@ -197,8 +194,8 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * Méthode appelée pour femer le menu
      */
     protected closeMenu() {
-        let item = this.state.item;
-        let hasSubMenu = NavigationUtils.hasVisibleSubMenu(item);
+        const item = this.state.item;
+        const hasSubMenu = NavigationUtils.hasVisibleSubMenu(item);
         if (!hasSubMenu) {
             this.state.closeMenu();
         }
@@ -209,11 +206,10 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * Gestion de l'évènement d'entrée de la souris sur l'élément
      */
     protected handleMouseEnter() {
-        let element = document.getElementById(this.state.item.id);
+        const element = document.getElementById(this.state.item.id);
 
         /* On affiche tous les éléments parents de l'élément sélectionné en partant du root */
         NavigationUtils.rideDownElementAndToggle(element);
-
 
         if (element && element.focus) {
             element.focus();
@@ -225,7 +221,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
      * @protected
      */
     protected handleMouseLeave() {
-        let element = document.getElementById(this.state.item.id);
+        const element = document.getElementById(this.state.item.id);
 
         /* On masque tous les éléments parents en partant du parent */
         NavigationUtils.rideDownElementAndToggle(element, true);
@@ -248,7 +244,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
         let imgSubMenu = <div></div>;
 
         if (item.submenu && NavigationUtils.hasVisibleSubMenu(item)) {
-            let props = {};
+            const props = {};
 
             props[ "alt" ] = libelle + this.i18n(item.text);
             props[ "className" ] = "subnav-0";
@@ -272,7 +268,7 @@ export class MenuLink extends HornetComponent<MenuLinkProps, any> {
         if (item.level > 0) {
             srcImg = (hover) ? RIGHT_ARROW_IMG_HOVER : RIGHT_ARROW_IMG;
         }
-        let urlTheme = this.state.imgFilePath || HornetComponent.genUrlTheme();
+        const urlTheme = this.state.imgFilePath || HornetComponent.genUrlTheme();
 
         return urlTheme + IMG_PATH + srcImg;
     }

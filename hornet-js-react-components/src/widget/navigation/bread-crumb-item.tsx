@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,13 +100,13 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
      */
     render(): JSX.Element {
 
-        let { maxIndice, item, currentIndice } = this.state.data;
+        const { maxIndice, item, currentIndice } = this.state.data;
 
-        let liClass = (currentIndice == 1) ? "fil-ariane-racine" : (currentIndice == maxIndice) ? "fil-ariane-courant" : "fil-ariane-parent";
-        let ariaProps = (currentIndice == maxIndice) ? { "aria-current": "page" } : null;
-        let labelElement = ((item.url) && (currentIndice != maxIndice)) ? this.makeLink(item, currentIndice) : (currentIndice == maxIndice) ? BreadCrumbItem.makeSpan(BreadCrumbItem.makeStrong(this.i18n(item.text)), ariaProps) : this.i18n(item.text);
+        const liClass = (currentIndice === 1) ? "fil-ariane-racine" : (currentIndice === maxIndice) ? "fil-ariane-courant" : "fil-ariane-parent";
+        const ariaProps = (currentIndice === maxIndice) ? { "aria-current": "page" } : null;
+        const labelElement = ((item.url) && (currentIndice !== maxIndice)) ? this.makeLink(item, currentIndice) : (currentIndice === maxIndice) ? BreadCrumbItem.makeSpan(BreadCrumbItem.makeStrong(this.i18n(item.text)), ariaProps) : this.i18n(item.text);
 
-        let isChevron = (currentIndice > 1) || (currentIndice == maxIndice);
+        const isChevron = (currentIndice > 1) || (currentIndice === maxIndice);
 
         return (
             <li className={liClass}>
@@ -114,7 +114,7 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
                 {labelElement}
             </li>
         );
-    };
+    }
 
     /**
      * Méthode de génaration d'un lien
@@ -124,10 +124,10 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
      * @protected
      */
     protected makeLink(item: MenuItemConfig, indice: number) {
-        let props = { href: this.genUrl(item.url) };
-        (indice == 1) ? props[ "id" ] = "root" : null;
+        const props = { href: this.genUrl(item.url) };
+        (indice === 1) ? props[ "id" ] = "root" : null;
         return <a {...props}>{BreadCrumbItem.makeSpan(this.i18n(item.text), null)}</a>;
-    };
+    }
 
     /**
      * Méthode de génération d'une balise de type span
@@ -138,7 +138,7 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
      */
     protected static makeSpan(labelElement, htmlProps) {
         return <span {...htmlProps}>{labelElement}</span>;
-    };
+    }
 
     /**
      * Méthode de génération d'un chevron
@@ -147,7 +147,7 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
      */
     protected static makeChevron() {
         return <span className="fil-ariane-chevron" aria-hidden="true" />;
-    };
+    }
 
     /**
      * Permet de mettre en gras du texte
@@ -157,5 +157,5 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
      */
     protected static makeStrong(text: string) {
         return <span className="fil-ariane-strong">{text}</span>;
-    };
+    }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,6 +100,9 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
         this.props.dataSource.on("select", this.handleChange);
     }
 
+    /**
+     * @inheritDoc
+     */
     componentWillUnmount() {
         super.componentWillUnmount();
         this.props.dataSource.removeListener("select", this.handleChange);
@@ -108,19 +111,27 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
     /**
      * @inheritDoc
      */
+    componentWillReceiveProps(nextProps: CheckHeaderCellProps) {
+        // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
+        this.state = {...this.state, ...nextProps};
+    }
+
+    /**
+     * @inheritDoc
+     */
     renderCell() {
         logger.trace("render CheckHeaderCell-> column:",
-            this.props.coordinates.column, " - line:", this.props.coordinates.row, "checked =>", this.props.isSelected);
+                     this.props.coordinates.column, " - line:", this.props.coordinates.row, "checked =>", this.props.isSelected);
 
         // todo: rajouter title à la checkbox action de masse
 
-        let functionToggleAll: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
+        const functionToggleAll: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
             this.props.toggleSelectLines(null);
         };
 
-        let title: string = this.state.isSelected ? "table.deselectedAllTitle" : "table.selectedAllTitle";
+        const title: string = this.state.isSelected ? "table.deselectedAllTitle" : "table.selectedAllTitle";
 
-        let checkBoxProps: any = {
+        const checkBoxProps: any = {
             ref: (instance: any) => {
                 if (instance) this.checkBoxRef = instance;
             },
@@ -128,7 +139,7 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
             onChange: functionToggleAll,
             title: title && this.i18n(title),
             name: this.state.value ? "selectedItems-" + this.state.value : "selectedItems-none",
-            disabled: this.props.contentState.items.length === 0 || this.props.contentState.itemInEdition
+            disabled: this.props.contentState.items.length === 0 || this.props.contentState.itemInEdition,
         };
 
         return (
@@ -174,7 +185,8 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
      */
     handleChange(selectedItems: any[], all: boolean) {
         if (this.checkBoxRef) {
-            if (ArrayUtils.isInclude(this.props.contentState.items, selectedItems)) {
+            if (ArrayUtils.isInclude(this.props.contentState.items, selectedItems) 
+            && !(this.props.contentState.items.length === 0 && selectedItems.length > 0)) {
                 this.setState({ isSelected: true });
             } else {
                 this.setState({ isSelected: false });

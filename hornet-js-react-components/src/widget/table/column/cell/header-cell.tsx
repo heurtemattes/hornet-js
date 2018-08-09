@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import * as React from "react";
-import { AbstractHeaderCell, AbstractHeaderCellProps } from "src/widget/table/column/cell/abstract-header-cell";
+import { AbstractHeaderCell, AbstractHeaderCellProps, SortTitleInformations } from "src/widget/table/column/cell/abstract-header-cell";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
 
@@ -104,7 +104,7 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
     }
 
     static defaultProps = {
-        sort: false
+        sort: false,
     };
 
 
@@ -121,16 +121,16 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
     renderCell(): JSX.Element {
         logger.trace("render HeaderCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         // Gestion du titre de l'entête
-        let isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
+        const isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
         let urlImgArrow: string = "/img/tableau/ic_arrow_upward_black.svg";
-        let imgClassName: ClassDictionary = {"arrow-sort": true};
-        if (this.state.sortData && this.state.sortData.dir == SortDirection.DESC) {
+        const imgClassName: ClassDictionary = { "arrow-sort": true };
+        if (this.state.sortData && this.state.sortData.dir === SortDirection.DESC) {
             urlImgArrow = "/img/tableau/ic_arrow_downward_black.svg";
         }
-        let title: string = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none").title;
+        const title: string = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none").title;
         let titleDesc: any = isTriActifSurColonne && this.state.edition ?
             <div>{this.props.title}
-                <img src={HeaderCell.genUrlTheme(urlImgArrow)} className={classNames(imgClassName)} alt={title}/>
+                <img src={HeaderCell.genUrlTheme(urlImgArrow)} className={classNames(imgClassName)} alt={title} />
             </div> : <div>{this.props.title}</div>;
 
         if (this.props.sortable && !this.props.contentState.itemInEdition) {
@@ -148,37 +148,38 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
     protected getColumnTriComponent(): JSX.Element | JSX.ElementClass {
         logger.trace("getColumnTriComponent");
 
-        let sort = this.props.sortData;
+        const sort = this.props.sortData;
         /*let sortType: SortType = (this.state.sort as SortData).type || this.state.sort as SortType || DEFAULT_SORT_TYPE;*/
-        let sortKey: string = (sort && sort.key) as string || this.props.keyColumn;
+        const sortKey: string = (sort && sort.key) as string || this.props.keyColumn;
 
         /* Calcul du sens prochain sens de tri */
-        let nextSortDir: SortDirection = SortDirection.ASC,
-            columnNameToSort: string = (sort && sort.key) as string || null,
-            columnSortByKey: string = this.state.sort && ((this.state.sort as SortData).key) as string || null;
+        let nextSortDir: SortDirection = SortDirection.ASC;
+        const columnNameToSort: string = (sort && sort.key) as string || null;
+        const columnSortByKey: string = this.state.sort && ((this.state.sort as SortData).key) as string || null;
 
-        if (columnNameToSort && (columnNameToSort == this.props.keyColumn || columnNameToSort == columnSortByKey)) {
+        if (columnNameToSort && (columnNameToSort === this.props.keyColumn || columnNameToSort === columnSortByKey)) {
             logger.trace("sens de tri courant :", sort.dir);
-            nextSortDir = (sort.dir == SortDirection.ASC) ? SortDirection.DESC : SortDirection.ASC;
-            logger.trace("prochain sens de tri :", nextSortDir)
+            nextSortDir = (sort.dir === SortDirection.ASC) ? SortDirection.DESC : SortDirection.ASC;
+            logger.trace("prochain sens de tri :", nextSortDir);
         }
 
+
         /* Données de tri à appliquer au prochain clic sur cette colonne */
-        let nextTableSort: SortData = {
+        const nextTableSort: SortData = {
             key: sortKey,
-            dir: nextSortDir/*,
-             type: sortType*/
+            dir: nextSortDir,
         };
 
-        let functionOnSortData: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
+        const functionOnSortData: React.MouseEventHandler<HTMLElement> = (e: React.MouseEvent<HTMLElement>) => {
             this.state.onSort(nextTableSort, this.tableCellRef, this.props.compareMethod);
         };
 
-        let handleOnKeyDown: React.KeyboardEventHandler<HTMLElement> = (e: React.KeyboardEvent<HTMLElement>) => {
+        const handleOnKeyDown: React.KeyboardEventHandler<HTMLElement> = (e: React.KeyboardEvent<HTMLElement>) => {
             /* Le composant a le comportement d'un bouton : il doit prendre en compte les touches Entrée OU Espace
              * (cf. https://www.w3.org/TR/wai-aria-practices/#button > "Keyboard Interaction")  */
-            if (e.keyCode == KeyCodes.SPACEBAR || e.keyCode == KeyCodes.ENTER) {
+            if (e.keyCode === KeyCodes.SPACEBAR || e.keyCode === KeyCodes.ENTER) {
                 this.state.onSort(nextTableSort, this.tableCellRef);
+                e.preventDefault();
             }
         };
 
@@ -187,25 +188,38 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
         }
 
         let urlImgArrow: string = "/img/tableau/ic_arrow_upward_black.svg";
-        let imgClassName: ClassDictionary = {"arrow-sort": true};
-        if (this.state.sortData && this.state.sortData.dir == SortDirection.DESC) {
+        const imgClassName: ClassDictionary = { "arrow-sort": true };
+        if (this.state.sortData && this.state.sortData.dir === SortDirection.DESC) {
             urlImgArrow = "/img/tableau/ic_arrow_downward_black.svg";
         }
-        let title: string = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none").title;
+
+        const titles = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none");
+
+
+        const divProps: any = {
+            "aria-sort": titles.ariasort,
+            className: "datatable-header-sort-liner",
+            role: "button",
+            lang: this.state.lang,
+            onClick: functionOnSortData,
+            onKeyDown: handleOnKeyDown,
+            tabIndex: this.getTabIndexFullKind(),
+            title: titles.title,
+
+
+        };
 
         return (
-            <div className="datatable-header-sort-liner" role="button" lang={this.state.lang}
-                 onClick={functionOnSortData} onKeyDown={handleOnKeyDown} tabIndex={-1}>
-                {!this.state.edition ?
-                    <div>
-                        <a href="#" className="arrow-sort-container" tabIndex={-1}>
-                            {(this.state.abbr) ?
-                                <abbr lang={this.state.lang} title={this.state.abbr}>
-                                    {this.state.title}
-                                </abbr> : this.state.title}
-                        </a>
-                        <img src={HeaderCell.genUrlTheme(urlImgArrow)} className={classNames(imgClassName)} alt={title}
-                             tabIndex={-1}/>
+            <div {...divProps}>
+                {!this.state.edition
+                    ?
+                    <div className="arrow-sort-container" tabIndex={-1}>
+                        {(this.state.abbr) ?
+                            <abbr lang={this.state.lang} title={this.state.abbr}>
+                                {this.state.title}
+                            </abbr> : this.state.title}
+                        <img src={HeaderCell.genUrlTheme(urlImgArrow)} className={classNames(imgClassName)} alt={titles.title}
+                            tabIndex={-1} />
                     </div>
                     :
                     <div>

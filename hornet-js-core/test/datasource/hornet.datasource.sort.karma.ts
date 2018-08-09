@@ -16,84 +16,82 @@ class DatasourceSortTest extends BaseTest {
     readonly data: any[] = [
         {
             key: 4,
-            value: "d"
+            value: "d",
         }, {
             key: 5,
-            value: "e"
+            value: "e",
         }, {
             key: 2,
-            value: "b"
+            value: "b",
         }, {
             key: 1,
-            value: "a"
+            value: "a",
         }, {
             key: 3,
-            value: "c"
-        }
+            value: "c",
+        },
     ];
 
     readonly dataForCustomSort: any[] = [
         {
             key: 402,
-            value: "d"
+            value: "d",
         }, {
             key: 54,
-            value: "e"
+            value: "e",
         }, {
             key: 2018,
-            value: "b"
+            value: "b",
         }, {
             key: 100,
-            value: "a"
+            value: "a",
         }, {
             key: 37,
-            value: "c"
-        }
+            value: "c",
+        },
     ];
 
     readonly dataForCustomSortUpperCase: any[] = [
         {
             key: 402,
-            value: "Dimanche"
+            value: "Dimanche",
         }, {
             key: 54,
-            value: "dejeuner"
+            value: "dejeuner",
         }, {
             key: 55,
-            value: "distance"
+            value: "distance",
         }, {
             key: 2018,
-            value: "artichaud"
+            value: "artichaud",
         }, {
             key: 100,
-            value: "Association"
+            value: "Association",
         }, {
             key: 101,
-            value: "atchoum"
-        }
+            value: "atchoum",
+        },
     ];
 
-    readonly dataVille : any[] = [
+    readonly dataVille: any[] = [
         {
-            lib: "BUDAPEST"
+            lib: "BUDAPEST",
         }, {
-            lib: "ABIDJAN"
+            lib: "ABIDJAN",
         }, {
-            lib: "PARIS"
+            lib: "PARIS",
         }, {
-            lib: "BRASILIA"
-        }
+            lib: "BRASILIA",
+        },
     ];
-
-
 
     @Decorators.it("Test initialisation d'un datasource")
     testCase1() {
         this.dataSource = new DataSource(this.data);
-        let results = this.dataSource.results;
+        const results = this.dataSource.results;
         HornetTestAssert.assertEquals(results.length, 5, "Datasource ne retourne pas suffisamment de résultat par rapport à data");
         this.end();
-    };
+    }
 
     @Decorators.it("Test tri ascendant d'un datasource")
     testCase2() {
@@ -129,21 +127,24 @@ class DatasourceSortTest extends BaseTest {
     testCase4() {
         this.dataSource = new DataSource(this.dataForCustomSort);
         this.dataSource.on("sort", (sortedResult) => {
-            HornetTestAssert.assertEquals(this.dataSource.results, sortedResult, "");
-            HornetTestAssert.assertEquals("c", this.dataSource.results[ 0 ].value, "");
-            HornetTestAssert.assertEquals("e", this.dataSource.results[ 1 ].value, "");
-            HornetTestAssert.assertEquals("a", this.dataSource.results[ 2 ].value, "");
-            HornetTestAssert.assertEquals("d", this.dataSource.results[ 3 ].value, "");
-            HornetTestAssert.assertEquals("b", this.dataSource.results[ 4 ].value, "");
-            this.end();
+            try {
+                HornetTestAssert.assertEquals(this.dataSource.results, sortedResult, "");
+                HornetTestAssert.assertEquals("c", this.dataSource.results[ 0 ].value, "");
+                HornetTestAssert.assertEquals("e", this.dataSource.results[ 1 ].value, "");
+                HornetTestAssert.assertEquals("a", this.dataSource.results[ 2 ].value, "");
+                HornetTestAssert.assertEquals("d", this.dataSource.results[ 3 ].value, "");
+                HornetTestAssert.assertEquals("b", this.dataSource.results[ 4 ].value, "");
+                this.end();
+            } catch (e) {
+                this.end(e);
+            }
         });
-        // this.dataSource.sort({compare: this.sortMethode});
-        this.dataSource.sort({ compare: this.sortMethode });
+        this.dataSource.sort({ sortDatas: [ { key: "value", dir: SortDirection.ASC } ], compare: this.sortMethode });
     }
 
     @Decorators.it("Test tri ascendant d'un datasource à partir d'une méthode de comparaison sur Init")
     testCase5() {
-        let sort: DefaultSort = new DefaultSort([ new SortData("key"), new SortData("value", SortDirection.ASC) ], this.sortMethode);
+        const sort: DefaultSort = new DefaultSort([ new SortData("key"), new SortData("value", SortDirection.ASC) ], this.sortMethode);
         this.dataSource = new DataSource(this.dataForCustomSort, {}, [ sort ]);
         this.dataSource.on("fetch", (result) => {
             HornetTestAssert.assertEquals("c", result[ 0 ].value, "");
@@ -158,7 +159,7 @@ class DatasourceSortTest extends BaseTest {
 
     @Decorators.it("Test tri ascendant d'un datasource sur Init")
     testCase6() {
-        let sort: DefaultSort = new DefaultSort([ new SortData("value", SortDirection.ASC) ]);
+        const sort: DefaultSort = new DefaultSort([ new SortData("value", SortDirection.ASC) ]);
         this.dataSource = new DataSource(this.data, {}, [ sort ]);
         this.dataSource.on("fetch", (result) => {
             HornetTestAssert.assertEquals(this.dataSource.results, result, "");
@@ -174,7 +175,7 @@ class DatasourceSortTest extends BaseTest {
 
     @Decorators.it("Test tri ascendant d'un datasource sur Init avec methodes de comparaison UPERCASE")
     testCase7() {
-        let sort: DefaultSort = new DefaultSort([ new SortData("value", SortDirection.ASC) ], CompareMethod.COMPARE_WITH_UPPERCASE);
+        const sort: DefaultSort = new DefaultSort([ new SortData("value", SortDirection.ASC) ], CompareMethod.COMPARE_WITH_UPPERCASE);
         this.dataSource = new DataSource(this.dataForCustomSortUpperCase, {}, [ sort ]);
         this.dataSource.on("fetch", (result) => {
             HornetTestAssert.assertEquals(this.dataSource.results, result, "");
@@ -224,30 +225,72 @@ class DatasourceSortTest extends BaseTest {
 
     @Decorators.it("Test tri ASC par défaut, puis action de tri DESC")
     testCase10() {
-        let sort: DefaultSort = new DefaultSort([new SortData("lib", SortDirection.ASC)]);
-        this.dataSource = new DataSource(this.dataVille, {}, [sort]);
+        let sort: DefaultSort = new DefaultSort([ new SortData("lib", SortDirection.ASC) ]);
+        this.dataSource = new DataSource(this.dataVille, {}, [ sort ]);
         this.dataSource.on("fetch", (result) => {
             HornetTestAssert.assertEquals(this.dataSource.results, result, "");
-            HornetTestAssert.assertEquals("ABIDJAN", this.dataSource.results[0].lib, "");
-            HornetTestAssert.assertEquals("BRASILIA", this.dataSource.results[1].lib, "");
-            HornetTestAssert.assertEquals("BUDAPEST", this.dataSource.results[2].lib, "");
-            HornetTestAssert.assertEquals("PARIS", this.dataSource.results[3].lib, "");
+            HornetTestAssert.assertEquals("ABIDJAN", this.dataSource.results[ 0 ].lib, "");
+            HornetTestAssert.assertEquals("BRASILIA", this.dataSource.results[ 1 ].lib, "");
+            HornetTestAssert.assertEquals("BUDAPEST", this.dataSource.results[ 2 ].lib, "");
+            HornetTestAssert.assertEquals("PARIS", this.dataSource.results[ 3 ].lib, "");
             this.dataSource.on("sort", (result) => {
                 HornetTestAssert.assertEquals(this.dataSource.results, result, "");
-                HornetTestAssert.assertEquals("ABIDJAN", this.dataSource.results[3].lib, "");
-                HornetTestAssert.assertEquals("BRASILIA", this.dataSource.results[2].lib, "");
-                HornetTestAssert.assertEquals("BUDAPEST", this.dataSource.results[1].lib, "");
-                HornetTestAssert.assertEquals("PARIS", this.dataSource.results[0].lib, "");
+                HornetTestAssert.assertEquals("ABIDJAN", this.dataSource.results[ 3 ].lib, "");
+                HornetTestAssert.assertEquals("BRASILIA", this.dataSource.results[ 2 ].lib, "");
+                HornetTestAssert.assertEquals("BUDAPEST", this.dataSource.results[ 1 ].lib, "");
+                HornetTestAssert.assertEquals("PARIS", this.dataSource.results[ 0 ].lib, "");
                 this.end();
             });
-            this.dataSource.sort({sortDatas: [new SortData("lib", SortDirection.DESC)]});
+            this.dataSource.sort({ sortDatas: [ new SortData("lib", SortDirection.DESC) ] });
         });
         this.dataSource.fetch(true);
+    }
+
+    @Decorators.it("Test COMPARE_DEFAULT au premier chargement")
+    testCase11() {
+
+        const sort: DefaultSort = new DefaultSort([], CompareMethod.COMPARE_DEFAULT);
+        this.dataSource = new DataSource(this.dataVille, {}, [ sort ]);
+
+        try {
+            HornetTestAssert.assertEquals(this.dataSource.results, this.dataVille, "Aucun trie ne devrait être effectué");
+            this.end();
+        } catch (e) {
+            this.end(e);
+        }
+    }
+
+
+    @Decorators.it("Test .COMPARE_WITH_LOWERCASE au premier chargement")
+    testCase12() {
+
+        const sort: DefaultSort = new DefaultSort([], CompareMethod.COMPARE_WITH_LOWERCASE);
+        this.dataSource = new DataSource(this.dataVille);
+        try {
+            HornetTestAssert.assertEquals(this.dataSource.results, this.dataVille, "Aucun trie ne devrait être effectué");
+
+            this.end();
+        } catch (e) {
+            this.end(e);
+        }
+    }
+
+    @Decorators.it("Test .COMPARE_WITH_UPPERCASE au premier chargement")
+    testCase13() {
+
+        const sort: DefaultSort = new DefaultSort([], CompareMethod.COMPARE_WITH_UPPERCASE);
+        this.dataSource = new DataSource(this.dataVille);
+        try {
+            HornetTestAssert.assertEquals(this.dataSource.results, this.dataVille, "Aucun trie ne devrait être effectué");
+            this.end();
+        } catch (e) {
+            this.end(e);
+        }
     }
 
     private sortMethode(sortData, a: any, b: any): number {
         return a.key - b.key;
     }
 }
-//lancement des Tests
+// lancement des Tests
 runTest(new DatasourceSortTest());

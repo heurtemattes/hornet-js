@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,18 +90,19 @@ import {
     SubRoutes,
     LazyRoutes,
     LazyRoutesAsyncClassResolver,
-    RouteAuthorization
+    RouteAuthorization,
 } from "src/routes/abstract-routes";
 import * as _ from "lodash";
 import { LazyClassLoader } from "hornet-js-utils/src/lazy-class-loader";
 import { AsyncExecutor } from "src/executor/async-executor";
+import { AsyncElement } from "src/executor/async-element";
 import {
     PAGE_READY_EVENT,
     ContextInitializerElement,
     UrlChangeElement,
     UserAccessSecurityElement,
     ViewRenderingElement,
-    UnmanagedViewErrorElement
+    UnmanagedViewErrorElement,
 } from "src/routes/router-client-async-elements";
 import { listenOnceHornetEvent } from "src/event/hornet-event";
 
@@ -121,38 +122,53 @@ export class RouterClient {
     protected pageRoutes: DirectorClientRoutesDesc = {};
     protected appRoutes: AbstractRoutes;
 
+    protected userAccessSecurityElement: Class<AsyncElement>;
+
     protected directorPage: DirectorRouter;
 
     protected directorClientConfiguration: DirectorRouterConfiguration;
     protected lazyRoutesClassResolver: LazyRoutesAsyncClassResolver;
+    protected initPrefix = "";
+    
 
-    constructor(appComponent, errorComponent, appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesAsyncClassResolver, directorClientConfiguration?: DirectorRouterConfiguration) {
+    constructor(appComponent, errorComponent, appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesAsyncClassResolver, directorClientConfiguration?: DirectorRouterConfiguration& {initDynamicContext?: boolean}, userAccessSecurityElement?) {
         this.appComponent = appComponent;
         this.errorComponent = errorComponent;
         this.appRoutes = appRoutes;
         this.lazyRoutesClassResolver = lazyRoutesClassResolver;
         this.directorClientConfiguration = directorClientConfiguration;
 
+        if(directorClientConfiguration && directorClientConfiguration.initDynamicContext === true) {
+            this.initPrefix = RouterClient.getDynamicPrefixContext();
+            //window.Config.contextPath = `${this.initPrefix}${Utils.getContextPath()}`;
+            //(Utils as any)._contextPath = `${this.initPrefix}${Utils.getContextPath()}`;
+            let save = Utils.config.getConfigObj();
+            save["contextPath"] = `${this.initPrefix}${Utils.getContextPath()}`;
+            Utils.setConfigObj(save);
+        } 
         this.computeRoutes();
 
         logger.trace("routes chargées (PAGE) :", this.pageRoutes);
         this.directorPage = new Router(this.pageRoutes).configure({ recurse: false, async: true });
+
+        this.userAccessSecurityElement = (userAccessSecurityElement) ? userAccessSecurityElement : UserAccessSecurityElement;
+
     }
 
-    protected computeRoutes(routesObj = this.appRoutes, prefix: string = Utils.getContextPath(), directorRoutes = this.pageRoutes): void {
+    protected computeRoutes(routesObj = this.appRoutes, prefix: string = escapeRegExp(Utils.getContextPath()), directorRoutes = this.pageRoutes): void {
         this.parseRoutes(routesObj.getPageRoutes(), directorRoutes, prefix);
         this.parseSubRoutes(routesObj.getSubRoutes(), directorRoutes, prefix);
 
-        var lazyRoutes = routesObj.getLazyRoutes();
-        for (let lazy in lazyRoutes) {
+        const lazyRoutes = routesObj.getLazyRoutes();
+        for (const lazy in lazyRoutes) {
             this.parseLazyRoute(this.pageRoutes, prefix + lazy, lazyRoutes[ lazy ]);
         }
     }
 
     protected parseRoutes<T extends RouteInfos>(declaredRoutes: Routes<T>, internalObj: DirectorClientRoutesDesc, prefix: string) {
-        for (var path in declaredRoutes) {
-            for (var method in declaredRoutes[ path ]) {
-                var uri = prefix + path;
+        for (const path in declaredRoutes) {
+            for (const method in declaredRoutes[ path ]) {
+                const uri = prefix + path;
 
                 if (internalObj[ uri ]) {
                     throw new Error("Route duppliquée : ('" + uri + "' <" + method + ">)");
@@ -165,45 +181,45 @@ export class RouterClient {
 
     protected buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string) {
         return (...params: Array<any>) => {
-            var done = params.pop();
+            const done = params.pop();
             this.handleRoute(done, declaredRoutes[ path ][ method ].authorization, declaredRoutes[ path ][ method ].handler, params);
             done();
-        }
+        };
     }
 
     protected parseLazyRoute(internalObj: DirectorClientRoutesDesc, prefix: string, routesClassPath: string) {
-        var regPrefix = prefix + "/?((\w|.)*)";
+        const regPrefix = prefix + "/?((\w|.)*)";
         if (internalObj[ regPrefix ]) {
             throw new Error("Route duppliquée : ('" + regPrefix + "' <" + "get" + ">)");
         }
 
         internalObj[ regPrefix ] = (...params: Array<any>) => {
-            var done = params.pop();
+            const done = params.pop();
 
             try {
-                var url = window.location.href;
+                const url = window.location.href;
                 this.loadLazyRoutes(url, prefix, routesClassPath, (err) => {
                     logger.debug("Chargement routes lazy terminé pour :", prefix, "url demandée :", url);
 
                     if (err) throw err;
                     else done();
-                })
+                });
             } catch (err) {
                 logger.error("Erreur durant le chargement de la route lazy '" + prefix + "'", err);
                 throw err;
             }
-        }
+        };
     }
 
     protected loadLazyRoutes(originalRoute: string, prefix: string, routesClassPath: string, done) {
         this.lazyRoutesClassResolver(routesClassPath, (lazyClass: Class<AbstractRoutes>) => {
-            let newRoutes: DirectorClientRoutesDesc = {};
-            let routesClass = LazyClassLoader.load(lazyClass);
+            const newRoutes: DirectorClientRoutesDesc = {};
+            const routesClass = LazyClassLoader.load(lazyClass);
             this.computeRoutes(new routesClass(), prefix, newRoutes);
 
             // suppression de la route "wildcard" gérant le lazy loading
             // _.set((this.directorPage as any).routes, (this.directorPage as any).getRoute().join("."), undefined);
-            var lazyObjPath = prefix.split("/");
+            const lazyObjPath = prefix.split("/");
             lazyObjPath.shift();
             _.set((this.directorPage as any).routes, lazyObjPath.join("."), undefined);
 
@@ -214,7 +230,7 @@ export class RouterClient {
             done();
 
             // chargement de la route initialement demandée
-            var iId = window.setInterval(() => {
+            const iId = window.setInterval(() => {
                 try {
                     this.setRoute(originalRoute);
                     window.clearInterval(iId);
@@ -230,27 +246,27 @@ export class RouterClient {
                         logger.trace("Exception prévue dans Director, retry");
                     }
                 }
-            }, 200);
+            },                             200);
         });
     }
 
 
     protected parseSubRoutes(subRoutes: SubRoutes, internalObj: DirectorClientRoutesDesc, prefix: string) {
-        for (let sub in subRoutes) {
-            let routesClass = LazyClassLoader.load(subRoutes[sub]);
+        for (const sub in subRoutes) {
+            const routesClass = LazyClassLoader.load(subRoutes[ sub ]);
             this.computeRoutes(new routesClass(), prefix + sub, internalObj);
         }
     }
 
     protected handleRoute<T extends RouteInfos>(done, authorization: RouteAuthorization, handler: RouteHandler<T>, params: Array<string>) {
 
-        var executor = new AsyncExecutor();
+        const executor = new AsyncExecutor();
 
         executor.setErrorAsyncElement(new UnmanagedViewErrorElement(this.errorComponent));
 
         executor.addElement(new ContextInitializerElement(authorization, handler, params));
         executor.addElement(new UrlChangeElement());
-        executor.addElement(new UserAccessSecurityElement());
+        executor.addElement(new this.userAccessSecurityElement());
         executor.addElement(new ViewRenderingElement(this.appComponent));
 
         executor.on("end", (err) => {
@@ -272,16 +288,16 @@ export class RouterClient {
         /**
          * Intercept any links that don't have 'data-pass-thru' or '#' and route using pushState.
          */
-        baseElement.addEventListener('click', (e: MouseEvent) => {
-            if (e.button != 0) return; // On ne prend que les clicks gauche
-            var el = e.target as any;
+        baseElement.addEventListener("click", (e: MouseEvent) => {
+            if (e.button !== 0) return; // On ne prend que les clicks gauche
+            let el = e.target as any;
             while (el) {
-                if (el.nodeName === 'A') {
-                    var link = el.attributes && el.attributes.href && el.attributes.href.value || '';
-                    var download = el.attributes && el.attributes.download && el.attributes.download.value || '';
+                if (el.nodeName === "A") {
+                    const link = el.attributes && el.attributes.href && el.attributes.href.value || "";
+                    const download = el.attributes && el.attributes.download && el.attributes.download.value || "";
 
                     // Cas des liens vides ou les actions
-                    if (link.length === 0 || link === '#') {
+                    if (link.length === 0 || link === "#") {
                         e.preventDefault();
                         return;
                     }
@@ -291,12 +307,12 @@ export class RouterClient {
                         return;
                     }
 
-                    //TODO: Gérer les exports
+                    // TODO: Gérer les exports
 
                     // Gestion des ancres
-                    if (link.indexOf('#') === 0) return;//startsWith('#')
-                    var dataset = el && el.getAttribute('data-pass-thru');
-                    if (dataset !== 'true') {
+                    if (link.indexOf("#") === 0) return;// startsWith('#')
+                    const dataset = el && el.getAttribute("data-pass-thru");
+                    if (dataset !== "true") {
                         this.directorPage.setRoute(link);
                         e.preventDefault();
                     }
@@ -305,18 +321,18 @@ export class RouterClient {
                     el = el.parentElement || el.parentNode;
                 }
             }
-        }, false);
+        },                           false);
 
         this.directorPage.configure(_.merge({
             html5history: true,
             strict: false,
             convert_hash_in_init: false,
             recurse: false,
-            notfound: function () {
+            notfound() {
                 alert("Erreur. Cette route n'existe pas: '" + this.path + "'");
-            }
-        }, this.directorClientConfiguration, {
-                async: true // on force l'async à true
+            },
+        },                                  this.directorClientConfiguration, {
+                async: true, // on force l'async à true
             }));
 
         /**
@@ -353,23 +369,23 @@ export class RouterClient {
             return {};
 
         // On s'assure d'avoir un '?'
-        var urls = url.split('?');
+        const urls = url.split("?");
         if (urls.length === 1) {
             return {};
         }
 
         // On enlève tout ce qui est avant le premier '?'
-        url = urls.slice(1, urls.length).join('?');
+        url = urls.slice(1, urls.length).join("?");
 
-        var b = {};
-        if (url.charAt(0) === '?') {
+        const b = {};
+        if (url.charAt(0) === "?") {
             url = url.substr(1);
         }
 
-        var a = url.split('&');
-        for (var i = 0; i < a.length; ++i) {
-            var p = a[ i ].split('=');
-            if (p.length != 2)
+        const a = url.split("&");
+        for (let i = 0; i < a.length; ++i) {
+            const p = a[ i ].split("=");
+            if (p.length !== 2)
                 continue;
             b[ p[ 0 ] ] = decodeURIComponent(p[ 1 ].replace(/\+/g, " "));
         }
@@ -395,7 +411,9 @@ export class RouterClient {
         if (window.localStorage) {
             if (!window.setHornetJsGenerationServer) {
                 window.setHornetJsGenerationServer = function (enableValue: string) {
-                    var enableGenerationServer: string = (!enableValue || enableValue === "null" || enableValue === "undefined") ? RouterClient.defaultGenerationServerEnabled : enableValue;
+                    const enableGenerationServer: string = (!enableValue || enableValue === "null" || enableValue === "undefined")
+                        ? RouterClient.defaultGenerationServerEnabled
+                        : enableValue;
                     logger.trace("New value for setHornetJsGenerationServer :", enableValue, ". Reload page (F5) to activate");
                     window.localStorage.setItem(RouterClient.LOCAL_STORAGE_ENABLE_GENERATION_SERVER_KEY, enableGenerationServer);
                 };
@@ -414,10 +432,43 @@ export class RouterClient {
      */
     static getHornetJsGenerationServer(): any {
         if (window.localStorage) {
-            return window.localStorage.getItem(RouterClient.LOCAL_STORAGE_ENABLE_GENERATION_SERVER_KEY) || RouterClient.defaultGenerationServerEnabled;
+            return window.localStorage.getItem(RouterClient.LOCAL_STORAGE_ENABLE_GENERATION_SERVER_KEY)
+                || RouterClient.defaultGenerationServerEnabled;
         } else {
             logger.trace("ERREUR: Browser doesn't support LocalStorage");
             return RouterClient.defaultGenerationServerEnabled;
         }
     }
+
+    static getDynamicPrefixContext(): string {
+        let path:string = window.location.pathname;
+        path = path.substring(0, path.indexOf(Utils.getContextPath()));
+        if (path.substr(0, 1) !== '/') {
+            path = '/' + path;
+        }
+
+        if(path.substr(path.length - 1) === "/") {
+            path = path.substr(0, path.length - 1);
+        }
+        return path;
+    }
+
+    static setDynamicDirectorPath() {
+        (Router as any).prototype.getPath = function () {
+            let path = window.location.pathname;
+            path = path.substring(path.indexOf(Utils.getContextPath()));
+            if (path.substr(0, 1) !== '/') {
+                path = '/' + path;
+            }
+            return path;
+        };
+    }
 }
+
+/**
+ * echappe tous les caratères particuliers regex pour le router director
+ * @param text 
+ */
+function escapeRegExp(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  }

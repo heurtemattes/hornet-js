@@ -73,12 +73,12 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {HornetComponentProps, IHornetComponent} from "src/component/ihornet-component";
+import { HornetComponentProps, IHornetComponent } from "src/component/ihornet-component";
 /**
  * Composant de haut-niveau : correspond à une page.
  */
@@ -87,17 +87,17 @@ export interface IHornetPage<P extends HornetComponentProps, S> extends IHornetC
      * Permet d'effectuer les appels d'API et initialisations éventuellement nécessaires une fois le composant page
      * monté côté client.
      */
-    prepareClient():void;
+    prepareClient(): void;
 
     /**
      * renvoie le service de la page
      */
     getService(): any;
 
-        /**
-     * Permet d'effectuer les appels d'API et initialisations éventuellement nécessaires une fois le composant page
-     * monté côté client et après le componentDidUpdate.
-     */
+    /**
+ * Permet d'effectuer les appels d'API et initialisations éventuellement nécessaires une fois le composant page
+ * monté côté client et après le componentDidUpdate.
+ */
     updateClient(): void;
 
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,8 +105,8 @@ import { NotificationManager, Notifications } from "hornet-js-core/src/notificat
 
 
 /** Tableau de liste de secteurs */
-let dataSource: DataSource<any>;
-let tableElement: JSX.Element;
+let dataSourceTableEditable: DataSource<any>;
+let tableEditableElement: JSX.Element;
 let table;
 let data;
 let schemaEditionTable;
@@ -123,24 +123,24 @@ class tableTest extends HornetReactTest {
             data.push({ id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++ });
         }
 
-        dataSource = new DataSource(data);
+        dataSourceTableEditable = new DataSource(data);
 
-        tableElement = (
+        tableEditableElement = (
             <div>
-                <Notification id="notifTest"/>
-                <Table id="lite">
+                <Notification id="notifTest" />
+                <Table id="lite1">
                     <Header title={"Tableau editable"}>
                     </Header>
-                    <Content dataSource={dataSource} notifId={"notifTest"} >
+                    <Content dataSource={dataSourceTableEditable} notifId={"notifTest"} >
                         <Columns>
                             <Column keyColumn="label" title={"libelle"} sortable={true} editable={true} />
                             <Column keyColumn="desc" title={"desc"} sortable={true} />
                             <EditionActionColumn keyColumn="id"
-                                                 titleEdit={"modif rapide"}
-                                                 titleSave={"Enregistrer"}
-                                                 titleCancel={"Annuler"}
-                                                 messageAlert={"Voulez vous annuler votre modification"}
-                                                 titleAlert={"Annuler"}
+                                titleEdit={"modif rapide"}
+                                titleSave={"Enregistrer"}
+                                titleCancel={"Annuler"}
+                                messageAlert={"Voulez vous annuler votre modification"}
+                                titleAlert={"Annuler"}
                             />
                         </Columns>
                     </Content>
@@ -149,7 +149,7 @@ class tableTest extends HornetReactTest {
         );
     };
 
-
+    
     @Decorators.it('Test OK')
     testOk() {
         assert.equal(1, 1);
@@ -158,43 +158,38 @@ class tableTest extends HornetReactTest {
 
     @Decorators.it('afficher une cellule editable ')
     editerElement() {
-        table = this.renderIntoDocument(tableElement, "main99990");
-        dataSource.on("fetch", (value) => {
-            this.triggerMouseEvent(document.querySelector('#main99990 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
+        table = this.renderIntoDocument(tableEditableElement, "main99990");
+        dataSourceTableEditable.on("fetch", (value) => {
+            console.log(document.querySelector("#main99991"));
+            this.triggerMouseEvent(document.querySelector('#main99990 #lite1-0-colBody-0-2 .edition-button-action-before'), "click");
 
-            expect(document.querySelector("#main99990 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
-            expect(document.querySelectorAll("#main99990 #lite-0-colBody-0-2 .edition-button-action").length).to.be.equal(2);
+            expect(document.querySelector("#main99990 #lite1-0-colBody-0-0 .table-cell-input")).to.exist;
+            expect(document.querySelectorAll("#main99990 #lite1-0-colBody-0-2 .edition-button-action").length).to.be.equal(2);
 
             this.end();
         });
-        dataSource.reload();
+        dataSourceTableEditable.reload();
     };
 
-    @Decorators.it('Annuler modification cellule editable ')
-    AnnulerElement() {
-        table = this.renderIntoDocument(tableElement, "main99991");
-        dataSource.on("fetch", (value) => {
+    @Decorators.it("Annuler modification cellule editable")
+    annulerElement() {
+        table = this.renderIntoDocument(tableEditableElement, "main99991");
 
-            this.triggerMouseEvent(document.querySelector('#main99991 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
+        this.triggerMouseEvent(document.querySelector('#main99991 #lite1-0-colBody-0-2 .edition-button-action-before'), "click");
+        expect(document.querySelector("#main99991 #lite1-0-colBody-0-0 .table-cell-input")).to.exist;
+        expect(document.querySelector("#main99991 #lite1-0-colBody-0-2 button[title=Annuler]")).to.exist;
+        this.triggerMouseEvent(document.querySelector("#main99991 #lite1-0-colBody-0-2 button[title=Annuler]"), "click");
 
-            expect(document.querySelector("#main99991 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
-            expect(document.querySelector("#main99991 #lite-0-colBody-0-2 button[title=Annuler]")).to.exist;
-            this.triggerMouseEvent(document.querySelector("#main99991 #lite-0-colBody-0-2 button[title=Annuler]"), "click");
-
+        setTimeout(() => {
+            expect(document.querySelector(".widget-dialogue-header")).to.exist;
+            expect(document.querySelector("#confirmOK")).to.exist;
+            //Annimation fermeture de la boite de dialog
+            this.triggerMouseEvent(document.querySelector("#confirmOK"), "click");
             setTimeout(() => {
-                
-                expect(document.querySelector(".widget-dialogue-header")).to.exist;
-                expect(document.querySelector("button[id=confirmOK]")).to.exist;
-                //Annimation fermeture de la boite de dialog
-                this.triggerMouseEvent(document.querySelector("button[id=confirmOK]"), "click");
-                setTimeout(() => {
-                    this.end();
-                }, 1000);
-            }, 1000);
-            //expect(document.querySelector(".widget-dialogue-header")).to.not.exist;
-
-        });
-        dataSource.reload();
+                expect(document.querySelector(".widget-dialogue-header")).to.not.exist;
+                this.end();
+            }, 250);
+        }, 250);
     };
 
 }

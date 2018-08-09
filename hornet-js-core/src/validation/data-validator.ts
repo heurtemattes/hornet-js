@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -166,8 +166,8 @@ export class DataValidator {
         /* Prise en compte des valideurs customisés éventuels */
         if (this.customValidators) {
             for (let index in this.customValidators) {
-                if (this.customValidators[index] && (typeof this.customValidators[index] != "function")) {
-                    let customResult: IValidationResult = this.customValidators[index].validate(data);
+                if (this.customValidators[ index ] && (typeof this.customValidators[ index ] != "function")) {
+                    let customResult: IValidationResult = this.customValidators[ index ].validate(data);
 
                     if (!customResult.valid && customResult.errors) {
                         result.errors = result.errors.concat(customResult.errors);
@@ -179,7 +179,7 @@ export class DataValidator {
 
         if (result.errors && Array.isArray(result.errors)) {
             for (let index in result.errors) {
-                result.errors[index].dataPath = result.errors[index].dataPath.replace("'][", ".").replace("['", "").replace("]", "");
+                result.errors[ index ].dataPath = result.errors[ index ].dataPath.replace("'][", ".").replace("['", "").replace("]", "");
             }
         }
 
@@ -222,7 +222,7 @@ export class DataValidator {
             resultSchema.required = resultSchema.required || [];
             // TODO à appliquer récursivement, chaque champ pouvant lui même être un objet
             for (var fn in resultSchema.properties) {
-                var field = resultSchema.properties[fn];
+                var field = resultSchema.properties[ fn ];
                 if (field.required === true && field.type == "string") {
                     field.minLength = 1;
                     if (resultSchema.required.indexOf(fn) == -1) {

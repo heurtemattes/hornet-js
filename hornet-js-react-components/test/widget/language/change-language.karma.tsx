@@ -70,14 +70,87 @@
  */
 
 /**
- * hornet-js-database - Ensemble des composants de gestion de base hornet-js
+ * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
- * @author 
- * @version v5.1.1
+ * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-export interface IModelDAO {
-    configDatabase: string;
+const chai = require("chai");
+const expect = chai.expect;
+import * as React from "react";
+
+import { BaseTest } from "hornet-js-test/src/base-test";
+import { runTest } from "hornet-js-test/src/test-run";
+import { Decorators } from "hornet-js-test/src/decorators";
+import * as assert from "assert";
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+
+
+import SyntheticEvent = React.SyntheticEvent;
+import { User } from "src/widget/user/user";
+import { isArray } from "util";
+import { ChangeLanguage } from "src/widget/language/change-language";
+import { Dropdown, Position } from "src/widget/dropdown/dropdown";
+
+
+const handleChangeLanguage = (i18nLocale: string) => {
+    console.log(i18nLocale);
+};
+
+
+let changeLanguageElement: JSX.Element;
+let changeLanguage;
+@Decorators.describe("Test Karma ChangeLanguage")
+class userTest extends BaseTest {
+    @Decorators.beforeEach
+    beforeEach() {
+        Utils.setCls("hornet.internationalization", { messages });
+        Utils.appSharedProps.set("listLanguage",
+                                 [
+                { langShort: "fr", locale: "Française", langLabel: "française" },
+                { langShort: "en", locale: "english", langLabel: "english" } ]);
+        changeLanguageElement = (
+            <ChangeLanguage handleChangeLanguage={handleChangeLanguage} position={Position.BOTTOMRIGHT} />
+        );
+    }
+
+    @Decorators.it("Test OK")
+    testOk() {
+        assert.equal(1, 1);
+        this.end();
+    }
+
+    @Decorators.it("affichage composant ChangeLanguage")
+    displayUserComponent() {
+        const id = this.generateMainId();
+        changeLanguage = this.renderIntoDocument(changeLanguageElement, id);
+        expect(document.querySelector(`#${id} .dropdown-list`).children.length).to.be.equal(2);
+        expect(document.querySelector(`.position-bottom-right.dropdown-content.dropdown-content-hidden`)).to.exist;
+        this.end();
+    }
+
+    @Decorators.it("Clic sur le bouton")
+    testClicButtonUser() {
+        const id = this.generateMainId();
+        changeLanguage = this.renderIntoDocument(changeLanguageElement, id);
+        const element = document.getElementById(id);
+        expect(element.querySelector(`#${id} .dropdown-button.button-action`)).to.exist;
+        expect(element.querySelector(`#${id} .dropdown-content-hidden`)).to.exist;
+        const aElement = element.querySelector(`#${id} .button-action`);
+        expect(aElement).to.exist;
+        (aElement as any).click();
+        setTimeout(() => {
+            expect(element.querySelector(`#${id} .dropdown-content`)).to.exist;
+            this.end();
+        },         500);
+    }    
 }
+
+// lancement des Tests
+runTest(new userTest());

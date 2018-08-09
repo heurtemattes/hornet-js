@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 import { TestUtils } from "hornet-js-test/src/test-utils";
@@ -117,21 +117,21 @@ class ModalMock extends Modal {
 }
 
 var AlertDialog = proxyquire("src/widget/dialog/alert", {
-    "./modal": {Modal: ModalMock}
+    "./modal": { Modal: ModalMock }
 });
 
 describe.skip("AlertSpec", () => {
 
     it("Test la construction de l alert", () => {
         var $ = render(() =>
-                <AlertDialog.Alert isVisible={true}/>);
+            <AlertDialog.Alert isVisible={true} />);
 
         expect($("div.widget-alert-body")).to.exist;
     });
 
     it("Alert caché", () => {
         var $ = render(() =>
-                <AlertDialog.Alert isVisible={false}/> );
+            <AlertDialog.Alert isVisible={false} />);
         expect($("div")).to.not.exist;
     });
 });

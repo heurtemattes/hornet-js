@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,8 +87,8 @@ import { HornetResult } from "hornet-js-core/src/result/hornet-result";
 import { OptionsFiles } from "hornet-js-core/src/result/hornet-result-interface";
 
 export interface OptionsBatch extends OptionsFiles {
-    isExist?: boolean,
-    history?: any
+    isExist?: boolean;
+    history?: any;
 }
 
 /**
@@ -103,20 +103,20 @@ export class ResultBatch extends HornetResult {
         if (options.isExist) {
             this.options.data = { status: "OK", code_retour: "-9999" };
         } else {
-            let res = { status: "KO", code_retour: "2" };
-            let data = this.options.data;
+            const res = { status: "KO", code_retour: "2" };
+            const data = this.options.data;
             if (data instanceof Array) {
                 let found = 0;
                 data.forEach((value) => {
-                    if (value.status == STATUS.FAILED) {
-                        found++
+                    if (value.status === STATUS.FAILED) {
+                        found++;
                     }
-                })
-                if (found == data.length) {
+                });
+                if (found === data.length) {
                     res.status = "KO";
                     res.code_retour = "1";
                 } else {
-                    if (found == 0) {
+                    if (found === 0) {
                         res.status = "OK";
                         res.code_retour = "0";
                     } else {
@@ -125,7 +125,7 @@ export class ResultBatch extends HornetResult {
                     }
                 }
             } else {
-                if (data[ "_status" ] == STATUS.FAILED) {
+                if (data[ "_status" ] === STATUS.FAILED) {
                     res.status = "KO";
                     res.code_retour = "1";
                 } else {

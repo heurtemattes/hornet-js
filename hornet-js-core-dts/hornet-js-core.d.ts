@@ -73,13 +73,14 @@ declare module "hornet-js-core/src/client-conf" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { Class } from "hornet-js-utils/src/typescript-utils";
 	import { AbstractRoutes, LazyRoutesAsyncClassResolver, DirectorClientConfiguration }  from "hornet-js-core/src/routes/abstract-routes";
 	import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
+	import { AsyncElement }  from "hornet-js-core/src/executor/async-element";
 	export interface ClientConfiguration {
 	    /**
 	     * Classe de création des routes. Voir la partie dédiée au routeur pour plus de détails
@@ -99,7 +100,9 @@ declare module "hornet-js-core/src/client-conf" {
 	     * Côté client elle permet de charger les pages de manière asynchrone (fonctionnement proposé par le module 'webpack')
 	     */
 	    routesLoaderfn: LazyRoutesAsyncClassResolver;
-	    directorClientConfiguration?: DirectorClientConfiguration;
+	    directorClientConfiguration?: DirectorClientConfiguration & {
+	        initDynamicContext?: boolean;
+	    };
 	    /**
 	     * Le composant HTML sur lequel monter le listener de clicks qui route les changements d'URL vers le routeur
 	     */
@@ -112,6 +115,10 @@ declare module "hornet-js-core/src/client-conf" {
 	     * Méthode exécutée au chargement de la page
 	     */
 	    onload?: Function;
+	    /**
+	     * Gestion des accès User au niveau du client
+	     */
+	    userAccessSecurityElement?: Class<AsyncElement>;
 	}
 	
 }
@@ -233,7 +240,7 @@ declare module "hornet-js-core/src/server-conf" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -318,23 +325,41 @@ declare module "hornet-js-core/src/server-conf" {
 	     * Déclaration des options pour exécuter un serveur en mode https
 	     */
 	    httpsOptions?: https.ServerOptions;
+	    /**
+	     * inclusion automatique des champs du CLS.
+	     * On exclue tout les champs et inclue seulement ceux précisés.
+	     */
+	    includeClsKey?: {
+	        [key: string]: string[];
+	    };
+	    /**
+	     * inclusion automatique des champs de la session.
+	     * On exclue tout les champs et inclue seulement ceux précisés.
+	     */
+	    includeSessionKey?: {
+	        [key: string]: string[];
+	    };
 	}
 	
 }
 
 declare module "hornet-js-core/src/server" {
+	import * as http from "http";
+	import * as https from "https";
+	import * as express from "express";
 	import { ServerConfiguration }  from "hornet-js-core/src/server-conf";
 	import { HornetMiddlewareList }  from "hornet-js-core/src/middleware/middlewares";
+	import { Monitor }  from "hornet-js-core/src/monitoring/monitor";
 	export class Server {
-	    private app;
-	    private server;
-	    private monitor;
-	    private keepAlive;
-	    private keepAliveTimeout;
-	    private port;
-	    private maxConnections;
-	    private timeout;
-	    private protocol;
+	    app: express.Express;
+	    protected server: any;
+	    protected monitor: Monitor;
+	    protected keepAlive: boolean;
+	    protected keepAliveTimeout: number;
+	    protected port: number;
+	    protected maxConnections: number;
+	    protected timeout: number;
+	    protected protocol: string;
 	    constructor(appConfig: ServerConfiguration, hornetMiddlewareList: HornetMiddlewareList);
 	    start(): void;
 	    /**
@@ -342,7 +367,7 @@ declare module "hornet-js-core/src/server" {
 	     * @param httpsOptions option pour le mode https
 	     * @returns {Server} le serveur instancié
 	     */
-	    private createServer(httpsOptions?);
+	    protected createServer(httpsOptions?: https.ServerOptions): http.Server | https.Server;
 	    /**
 	     * Fonction principale permettant d'initialiser le serveur NodeJS proprement dit. <br />
 	     * Elle effectue les opérations suivantes:
@@ -354,12 +379,8 @@ declare module "hornet-js-core/src/server" {
 	     * @param hornetMiddlewareList
 	     * @returns {"express".e.Express}
 	     */
-	    private init(appConfig, hornetMiddlewareList);
+	    protected init(appConfig: ServerConfiguration, hornetMiddlewareList: HornetMiddlewareList): express.Express;
 	}
-	
-}
-
-declare module "hornet-js-core/src/actions/redirect-client-action" {
 	
 }
 
@@ -369,8 +390,8 @@ declare module "hornet-js-core/src/cache/hornet-cache" {
 	 * Voir documentation Onion Skin: http://onionskin.io/
 	 * */
 	export class HornetCache {
-	    private static _instance;
-	    private pool;
+	    protected static _instance: HornetCache;
+	    protected pool: any;
 	    constructor();
 	    static getInstance(): HornetCache;
 	    /**
@@ -411,6 +432,84 @@ declare module "hornet-js-core/src/component/error-manager" {
 }
 
 declare module "hornet-js-core/src/component/hornet-component-errors" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.2.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
 	import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 	import { Class } from "hornet-js-utils/src/typescript-utils";
 	export interface HornetComponentErrorReport {
@@ -509,7 +608,7 @@ declare module "hornet-js-core/src/component/sort-data" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -612,7 +711,7 @@ declare module "hornet-js-core/src/data/file" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -632,6 +731,7 @@ declare module "hornet-js-core/src/data/file" {
 }
 
 declare module "hornet-js-core/src/event/hornet-event" {
+	import { RouteAuthorization }  from "hornet-js-core/src/routes/abstract-routes";
 	global  {
 	    interface Window {
 	        CustomEvent: CustomEvent;
@@ -670,7 +770,7 @@ declare module "hornet-js-core/src/event/hornet-event" {
 	    /**
 	     * @returns {HornetEvent<EventDetailInterface>} un clone de cet évènement
 	     */
-	    private clone();
+	    protected clone(): HornetEvent<EventDetailInterface>;
 	    /**
 	     * @param data détail de l'évènement à créer
 	     * @returns {HornetEvent} un clone de cet évènement alimenté avec le détail indiqué
@@ -687,8 +787,8 @@ declare module "hornet-js-core/src/event/hornet-event" {
 	export interface RequestEventDetail {
 	    inProgress: boolean;
 	}
-	export var ASYNCHRONOUS_REQUEST_EVENT: HornetEvent<RequestEventDetail>;
-	export var ASYNCHRONOUS_REQUEST_EVENT_COMPONENT: HornetEvent<RequestEventDetail>;
+	export let ASYNCHRONOUS_REQUEST_EVENT: HornetEvent<RequestEventDetail>;
+	export let ASYNCHRONOUS_REQUEST_EVENT_COMPONENT: HornetEvent<RequestEventDetail>;
 	export class ServiceEvent {
 	    static setRequestInProgress(inProgress: boolean): void;
 	    static setRequestComponentInProgress(inProgress: boolean): void;
@@ -698,14 +798,19 @@ declare module "hornet-js-core/src/event/hornet-event" {
 	    data: any;
 	    cb: () => void;
 	}
-	export var CHANGE_URL_WITH_DATA_EVENT: HornetEvent<ChangeUrlWithDataEventDetail>;
-	export {};
+	export let CHANGE_URL_WITH_DATA_EVENT: HornetEvent<ChangeUrlWithDataEventDetail>;
+	export interface UnauthorizeErrorEventDetail {
+	    user: any;
+	    routeAuthorization: RouteAuthorization;
+	    cb?: () => void;
+	}
+	export let UNAUTHORIZE_ERROR_EVENT: HornetEvent<UnauthorizeErrorEventDetail>;
 	
 }
 
 declare module "hornet-js-core/src/executor/async-element" {
 	export class AsyncElement {
-	    private fn;
+	    protected fn: (next: (err?: any, data?: any) => void) => void;
 	    constructor(fn?: (next: (err?: any, data?: any) => void) => void);
 	    getFn(): (next: (err?: any) => void, resolvedError: any) => void;
 	    execute(next: any, resolvedError: any): void;
@@ -788,7 +893,7 @@ declare module "hornet-js-core/src/executor/async-executor-context" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -876,33 +981,74 @@ declare module "hornet-js-core/src/executor/async-executor" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { EventEmitter } from "events";
 	import { AsyncElement }  from "hornet-js-core/src/executor/async-element";
+	import { Promise } from "hornet-js-utils/src/promise-api";
 	export class AsyncExecutor extends EventEmitter {
-	    private started;
-	    private ended;
-	    private asyncElements;
-	    private errorAsyncElement;
+	    protected started: boolean;
+	    protected ended: boolean;
+	    protected asyncElements: Array<AsyncElement>;
+	    protected errorAsyncElement: AsyncElement;
 	    constructor();
 	    setErrorAsyncElement(asyncElement: AsyncElement): this;
 	    addElement(element: AsyncElement): this;
 	    execute(): void;
-	    private toPromise(asyncElement, resolvedError?);
+	    protected toPromise(asyncElement: AsyncElement, resolvedError?: any): Promise<any>;
 	}
 	
 }
 
-declare module "hornet-js-core/src/i18n/i18n-loader" {
+declare module "hornet-js-core/src/i18n/abstract-i18n-loader" {
 	/**
 	 * Classe utilisée uniquement côté serveur.
 	 */
-	export class I18nLoader {
-	    pathLang: string;
-	    constructor(pathLang?: string);
+	export abstract class AbstractI18nLoader {
+	    /** Méthode qui retourne les messages de la langue selectionnée
+	     * @returns {string[]}
+	     */
+	    abstract getMessages(locales?: II18n): {
+	        locale: string;
+	        lang: string;
+	        messages: any;
+	    };
+	    /** Méthode qui liste les langues disponibles dans le dossier resources
+	     * @returns {string[]}
+	     */
+	    abstract getLocales(): Array<{
+	        langShort: string;
+	        locale: string;
+	        langLabel: string;
+	    }>;
+	}
+	export interface II18n {
+	    lang: string;
+	    locale: string;
+	}
+	
+}
+
+declare module "hornet-js-core/src/i18n/i18n-loader-sub-directory" {
+	import { II18n, AbstractI18nLoader }  from "hornet-js-core/src/i18n/abstract-i18n-loader";
+	/**
+	 * Classe utilisée uniquement côté serveur.
+	 */
+	export class I18nLoaderSubDirectory extends AbstractI18nLoader {
+	    pathsLang: Array<string>;
+	    messagesLang: {};
+	    allLocales: Array<{
+	        langShort: string;
+	        locale: string;
+	        langLabel: string;
+	    }>;
+	    constructor(pathsLang?: Array<string>);
+	    /** Méthode qui retourne la langue selectionné
+	     * @returns {string[]}
+	     */
+	    loadSubDirectoryMessages(locales?: Array<II18n>): any;
 	    /** Méthode qui retourne la langue selectionné
 	     * @returns {string[]}
 	     */
@@ -910,11 +1056,58 @@ declare module "hornet-js-core/src/i18n/i18n-loader" {
 	    /** Méthode qui liste les langues disponibles dans le dossier resources
 	     * @returns {string[]}
 	     */
-	    getLocales(): Array<string>;
+	    getLocales(): Array<{
+	        langShort: string;
+	        locale: string;
+	        langLabel: string;
+	    }>;
+	    /** Méthode qui liste les langues disponibles dans le dossier resources
+	     * @returns {string[]}
+	     */
+	    protected getLocalesRecusive(folder: string, locales: [string, {
+	        langShort: string;
+	        locale: string;
+	        langLabel: string;
+	    }]): void;
+	    getFilesRecursive(folder: string, searchFileName: string, messages: {}): void;
 	}
-	export interface II18n {
-	    lang: string;
-	    locale: string;
+	
+}
+
+declare module "hornet-js-core/src/i18n/i18n-loader" {
+	import { II18n, AbstractI18nLoader }  from "hornet-js-core/src/i18n/abstract-i18n-loader";
+	/**
+	 * Classe utilisée uniquement côté serveur.
+	 */
+	export class I18nLoader extends AbstractI18nLoader {
+	    pathLang: string;
+	    messagesLang: {};
+	    allLocales: Array<{
+	        langShort: string;
+	        locale: string;
+	        langLabel: string;
+	    }>;
+	    constructor(pathLang?: string);
+	    /** Méthode qui retourne la langue selectionné
+	 * @returns {string[]}
+	 */
+	    loadMessages(): any;
+	    /** Méthode qui retourne la langue selectionné
+	     * @returns {string[]}
+	     */
+	    getMessages(locales?: II18n): {
+	        locale: string;
+	        lang: string;
+	        messages: any;
+	    };
+	    /** Méthode qui liste les langues disponibles dans le dossier resources
+	     * @returns {string[]}
+	     */
+	    getLocales(): Array<{
+	        langShort: string;
+	        locale: string;
+	        langLabel: string;
+	    }>;
 	}
 	
 }
@@ -994,7 +1187,7 @@ declare module "hornet-js-core/src/inject/inject" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1084,7 +1277,7 @@ declare module "hornet-js-core/src/inject/injectable" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1098,13 +1291,14 @@ declare module "hornet-js-core/src/inject/injectable" {
 	 * */
 	export function injectable(key?: Class<any> | AbstractClass<any> | string, scope?: Scope, side?: Side): <T extends new (...args: any[]) => {}>(constructor: T) => T;
 	export enum Side {
-	    SERVER = 0,
-	    CLIENT = 1,
+	    SERVER = 1,
+	    CLIENT = 2,
 	}
 	export enum Scope {
-	    PROTOTYPE = 0,
-	    SINGLETON = 1,
-	    VALUE = 2,
+	    PROTOTYPE = 1,
+	    SINGLETON = 2,
+	    SINGLETON_EAGER = 3,
+	    VALUE = 4,
 	}
 	
 }
@@ -1184,7 +1378,7 @@ declare module "hornet-js-core/src/inject/injector" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1192,7 +1386,9 @@ declare module "hornet-js-core/src/inject/injector" {
 	import { Side, Scope }  from "hornet-js-core/src/inject/injectable";
 	export const INJECT_METADATA_KEY = "injectParameters";
 	export class Injector {
-	    private static registry;
+	    protected static registry: {
+	        [key: string]: any;
+	    };
 	    /**
 	     * Retourne la classe enregistrée pour une clé donnée
 	     * @param  key {any} clé de stockage
@@ -1253,8 +1449,8 @@ declare module "hornet-js-core/src/log/client-log" {
 	     * @param logConfig  configuration log
 	     */
 	    static getLoggerBuilder(logConfig: any): (category: any) => void;
-	    private static configureAjaxConsole(appender);
-	    private static configureBrowserConsole(appender);
+	    protected static configureAjaxConsole(appender: any): any;
+	    protected static configureBrowserConsole(appender: any): any;
 	    static getLoggerKeyValue(confKey: string, value: any, defaultValue: any): any;
 	    static configHornetLoggerHelp(): void;
 	    static configHornetJsLogState(): void;
@@ -1275,7 +1471,6 @@ declare module "hornet-js-core/src/log/client-log" {
 	    static getConsoleLayout(logLayout: string): any;
 	    static getDefaultConsoleLayout(): any;
 	}
-	export {};
 	
 }
 
@@ -1391,14 +1586,15 @@ declare module "hornet-js-core/src/mail/mailer" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { Promise } from "hornet-js-utils/src/promise-api";
 	import { Logger } from "hornet-js-utils/src/logger";
 	export interface NodeMailerMessage {
-	    /** The email address of the sender. All email addresses can be plain ‘sender@server.com’ or formatted ’“Sender Name” sender@server.com‘, see Address object for details */
+	    /** The email address of the sender. All email addresses can be plain ‘sender@server.com’
+	     * or formatted ’“Sender Name” sender@server.com‘, see Address object for details */
 	    from: string;
 	    /** Comma separated list or an array of recipients email addresses that will appear on the To: field */
 	    to: string | any[];
@@ -1436,8 +1632,8 @@ declare module "hornet-js-core/src/mail/mailer" {
 	        auth: any;
 	        logger: Logger;
 	    };
-	    private static _instance;
-	    private constructor();
+	    protected static _instance: Mailer;
+	    protected constructor();
 	    static readonly Instance: Mailer;
 	    protected transport: any;
 	    getSmtp(options?: any): any;
@@ -1447,6 +1643,7 @@ declare module "hornet-js-core/src/mail/mailer" {
 }
 
 declare module "hornet-js-core/src/middleware/middlewares" {
+	import { Logger } from "hornet-js-utils/src/logger";
 	import { Class } from "hornet-js-utils/src/typescript-utils";
 	import { ServerConfiguration }  from "hornet-js-core/src/server-conf";
 	/**
@@ -1473,47 +1670,55 @@ declare module "hornet-js-core/src/middleware/middlewares" {
 	    static APP_CONFIG: ServerConfiguration;
 	    protected prefix: string;
 	    protected middlewareFunction: ErrorRequestHandler | RequestHandler;
+	    protected config: ServerConfiguration;
 	    /**
 	     * Constructeur
 	     *
 	     * @param middlewareFunction
 	     * @param prefix
+	     * @param config server configuration
 	     */
-	    constructor(middlewareFunction?: ErrorRequestHandler | RequestHandler, prefix?: string);
+	    constructor(middlewareFunction?: ErrorRequestHandler | RequestHandler, prefix?: string, config?: ServerConfiguration);
 	    /**
 	     * Méthode appelée automatiquement lors de l'initialisation du serveur afin d'ajouter un middleware
 	     * @param app
 	     */
 	    insertMiddleware(app: express.Express): void;
 	}
+	export class AbstractHornetSubMiddleware extends AbstractHornetMiddleware {
+	    insertRouterMiddleware(router: express.Router): void;
+	}
 	export class HornetContextInitializerMiddleware extends AbstractHornetMiddleware {
 	    constructor();
+	}
+	export class HornetContextInitializerSubMiddleware extends AbstractHornetSubMiddleware {
+	    constructor(config: ServerConfiguration, prefix: any);
 	}
 	export class LoggerTIDMiddleware extends AbstractHornetMiddleware {
 	    constructor();
 	}
 	export class LoggerUserMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class WelcomePageRedirectMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class WithoutSlashPageRedirectMiddleware extends AbstractHornetMiddleware {
 	    constructor();
 	}
 	export class StaticNodeHttpHeaderMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	import * as express from "express";
 	export class StaticPathMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class StaticPathErrorMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class BodyParserJsonMiddleware extends AbstractHornetMiddleware {
@@ -1525,29 +1730,35 @@ declare module "hornet-js-core/src/middleware/middlewares" {
 	export class SessionMiddleware extends AbstractHornetMiddleware {
 	    constructor();
 	}
+	import multer = require("multer");
 	export class MulterMiddleware extends AbstractHornetMiddleware {
+	    /**
+	     * Parametrage static de middleware multer
+	     */
+	    static option: multer.Options;
+	    static defaultOption: multer.Options;
 	    constructor();
 	}
 	export class SecurityMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    insertMiddleware(app: any): void;
-	    private hppConfiguration(app);
-	    private ieNoOpenConfiguration(app);
-	    private noSniffConfiguration(app);
-	    private cspConfiguration(app);
-	    private referrerPolicyConfiguration(app);
-	    private frameguardConfiguration(app);
-	    private xssFilterConfiguration(app);
-	    private hpkpConfiguration(app);
-	    private hstsConfiguration(app);
+	    protected hppConfiguration(app: any): void;
+	    protected ieNoOpenConfiguration(app: any): void;
+	    protected noSniffConfiguration(app: any): void;
+	    protected cspConfiguration(app: any): void;
+	    protected referrerPolicyConfiguration(app: any): void;
+	    protected frameguardConfiguration(app: any): void;
+	    protected xssFilterConfiguration(app: any): void;
+	    protected hpkpConfiguration(app: any): void;
+	    protected hstsConfiguration(app: any): void;
 	}
 	import director = require("director");
 	export class CsrfMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    static HEADER_CSRF_NAME: string;
 	    static CSRF_SESSION_KEY: string;
 	    insertMiddleware(app: any): void;
-	    private csrfConfiguration(app);
+	    protected csrfConfiguration(app: any): void;
 	    /**
 	     * Retourne un nouveau token aléatoire
 	     * @return {string}
@@ -1565,67 +1776,153 @@ declare module "hornet-js-core/src/middleware/middlewares" {
 	     * @param incomingCsrf
 	     * @param sessionCsrf
 	     * @return {boolean}
-	     * @private
 	     */
 	    static isTokenValid(incomingCsrf: string, sessionCsrf: string): boolean;
 	}
 	export class InternationalizationMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
-	    constructor();
+	    protected static logger: Logger;
+	    constructor(config?: ServerConfiguration);
 	}
 	export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
-	export class RouterServerMiddleware extends AbstractHornetMiddleware {
-	    private router;
+	export class wakeUpNodeSessionMiddleware extends AbstractHornetMiddleware {
+	    protected static logger: Logger;
 	    constructor();
+	}
+	import { RouterServer }  from "hornet-js-core/src/routes/router-server";
+	export class RouterServerMiddleware extends AbstractHornetMiddleware {
+	    protected router: RouterServer;
+	    constructor(config?: ServerConfiguration);
 	    insertMiddleware(app: any): void;
 	}
+	export class RouterServerSubMiddleware extends AbstractHornetSubMiddleware {
+	    private router;
+	    constructor(config: ServerConfiguration);
+	    insertRouterMiddleware(router: express.Router): void;
+	}
 	export class UserAccessSecurityMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
 	}
 	export class MenuConfigMiddleware extends AbstractHornetMiddleware {
 	    constructor();
 	}
 	export class DataRenderingMiddleware extends AbstractHornetMiddleware {
+	    protected static logger: Logger;
+	    constructor();
+	}
+	export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
 	    private static logger;
 	    constructor();
 	}
-	import { RequestHandler } from "express";
-	import { ErrorRequestHandler } from "express";
+	import { RequestHandler, ErrorRequestHandler } from "express";
 	export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
-	    private static logger;
+	    protected static logger: Logger;
 	    constructor();
+	}
+	export class AliveMiddleware extends AbstractHornetMiddleware {
+	    static APP_CONFIG: ServerConfiguration;
+	    protected prefix: string;
+	    protected middlewareFunction: RequestHandler;
+	    protected config: ServerConfiguration;
+	    /**
+	     * Constructeur
+	     *
+	     * @param middlewareFunction
+	     * @param prefix
+	     * @param config server configuration
+	     */
+	    constructor(middlewareFunction?: RequestHandler, prefix?: string, config?: ServerConfiguration);
+	    /**
+	     * Méthode appelée automatiquement lors de l'initialisation du serveur afin d'ajouter un middleware
+	     * @param app
+	     */
+	    insertMiddleware(app: express.Express): void;
 	}
 	export const DEFAULT_HORNET_MIDDLEWARES: Array<Class<AbstractHornetMiddleware>>;
+	export const DEFAULT_HORNET_MODULE_MIDDLEWARES: Array<Class<AbstractHornetSubMiddleware>>;
 	export class HornetMiddlewareList {
 	    list: any[];
 	    constructor(middlewares?: Array<Class<AbstractHornetMiddleware>>);
 	    addBefore(newMiddleware: Class<AbstractHornetMiddleware>, middleware: Class<AbstractHornetMiddleware>): this;
+	    addRouterBefore(router: HornetRouter, middleware: Class<AbstractHornetMiddleware>): this;
 	    addAfter(newMiddleware: Class<AbstractHornetMiddleware>, middleware: Class<AbstractHornetMiddleware>): this;
 	    remove(middleware: Class<AbstractHornetMiddleware>): this;
+	}
+	export class HornetRouter {
+	    prefix: string;
+	    router: express.Router;
+	    constructor(prefix: string, router: express.Router);
 	}
 	
 }
 
 declare module "hornet-js-core/src/monitoring/monitor" {
 	export class Monitor {
-	    private server;
-	    private monitorServer;
-	    private connexion;
-	    private request;
-	    private eventLoopStats;
-	    private api;
+	    protected server: any;
+	    protected monitorServer: any;
+	    protected connexion: {
+	        max: number;
+	        available: number;
+	        opened: number;
+	        active: number;
+	        idle: number;
+	        error: number;
+	    };
+	    protected request: {
+	        received: number;
+	        sendingReply: number;
+	        completed: number;
+	        error: number;
+	    };
+	    protected eventLoopStats: {
+	        samples: any[];
+	        sampleTimeInterval: number;
+	        sample1MinCount: number;
+	        sample5MinCount: number;
+	        sample15MinCount: number;
+	        samplesToKeep: number;
+	        stats: {
+	            average1min: {
+	                p50: number;
+	                p90: number;
+	                p95: number;
+	                p99: number;
+	                p100: number;
+	            };
+	            average5min: {
+	                p50: number;
+	                p90: number;
+	                p95: number;
+	                p99: number;
+	                p100: number;
+	            };
+	            average15min: {
+	                p50: number;
+	                p90: number;
+	                p95: number;
+	                p99: number;
+	                p100: number;
+	            };
+	        };
+	    };
+	    protected api: {
+	        requestSended: number;
+	        requestCompleted: number;
+	        responseError: number;
+	        requestError: number;
+	        totalError: number;
+	    };
 	    constructor(server: any);
 	    monitorApiRequests(): void;
 	    /**
@@ -1740,7 +2037,7 @@ declare module "hornet-js-core/src/notification/notification-events" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1753,15 +2050,17 @@ declare module "hornet-js-core/src/notification/notification-events" {
 	    id?: string;
 	    exceptions?: Array<BaseError>;
 	    personnals?: any;
+	    idComponent?: string;
 	}
 	export interface CleanNotificationEventDetail {
 	    id?: string;
+	    idComponent?: string;
 	}
 	export interface CleanAllNotificationEventDetail {
 	}
-	export var ADD_NOTIFICATION_EVENT: HornetEvent<AddNotificationEventDetail>;
-	export var CLEAN_NOTIFICATION_EVENT: HornetEvent<CleanNotificationEventDetail>;
-	export var CLEAN_ALL_NOTIFICATION_EVENT: HornetEvent<CleanAllNotificationEventDetail>;
+	export const ADD_NOTIFICATION_EVENT: HornetEvent<AddNotificationEventDetail>;
+	export const CLEAN_NOTIFICATION_EVENT: HornetEvent<CleanNotificationEventDetail>;
+	export const CLEAN_ALL_NOTIFICATION_EVENT: HornetEvent<CleanAllNotificationEventDetail>;
 	
 }
 
@@ -1771,17 +2070,18 @@ declare module "hornet-js-core/src/notification/notification-manager" {
 	 * Gestionnaire d'évènements de notifications
 	 */
 	export class NotificationManager {
-	    static clean(id: string): void;
+	    static clean(id: string, idComponent?: string): void;
 	    static cleanAll(): void;
 	    /**
 	     * Déclenche un évènement d'ajout de notification contenant les détails indiqués
 	     * @param id identifiant de notification
+	     * @param idComponent identifiant du composant déclenchant la notification
 	     * @param errors détail des erreurs éventuelles
 	     * @param infos informations éventuelles détail des informations éventuelles
 	     * @param exceptions exceptions détail des exceptions éventuelles
 	     * @param warnings détail des warnings éventuelles
 	     */
-	    static notify(id: string, errors: any, infos?: any, exceptions?: BaseError[], warnings?: any, personnals?: any): void;
+	    static notify(id: string, idComponent: string, errors: any, infos?: any, exceptions?: BaseError[], warnings?: any, personnals?: any): void;
 	}
 	export class Notifications implements INotifications {
 	    color: string;
@@ -1891,8 +2191,8 @@ declare module "hornet-js-core/src/protocol/media-type" {
 	        SHORT: string;
 	        MIME: string;
 	    };
-	    private static _fromShortValue(parameter);
-	    private static _fromMime(mimeType);
+	    protected static _fromShortValue(parameter: string): MediaType;
+	    protected static _fromMime(mimeType: string): MediaType;
 	    /**
 	     * Rerouve la constante MediaType suivant la valeur abrégée
 	     * @param {string} shortValue
@@ -1905,6 +2205,92 @@ declare module "hornet-js-core/src/protocol/media-type" {
 	     * @return MediaTypes or MediaTypes.JSON si non pris en charge
 	     */
 	    static fromMime(accept: string): MediaType;
+	}
+	
+}
+
+declare module "hornet-js-core/src/result/disposition-type" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.2.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
+	export enum DispositionType {
+	    INLINE = "inline",
+	    ATTACHMENT = "attachment",
 	}
 	
 }
@@ -1984,10 +2370,11 @@ declare module "hornet-js-core/src/result/hornet-result-interface" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
+	import { DispositionType }  from "hornet-js-core/src/result/disposition-type";
 	/**
 	 * Cette interface définit le minimum d'options pour former un objet de type result.
 	 * A sucharger si nécessaire.
@@ -1997,9 +2384,11 @@ declare module "hornet-js-core/src/result/hornet-result-interface" {
 	    data?: any;
 	    filename?: string;
 	    encoding?: string;
+	    status?: number;
 	}
 	export interface OptionsFiles extends Options {
 	    size?: number;
+	    dispositionType?: DispositionType;
 	}
 	export interface OptionsPDF extends OptionsFiles {
 	    definition: {};
@@ -2109,11 +2498,11 @@ declare module "hornet-js-core/src/result/hornet-result" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
-	import { Response } from "express";
+	import { Response, Request } from "express";
 	import { MediaType }  from "hornet-js-core/src/protocol/media-type";
 	import { Options }  from "hornet-js-core/src/result/hornet-result-interface";
 	/**
@@ -2125,15 +2514,16 @@ declare module "hornet-js-core/src/result/hornet-result" {
 	     * référence le mediaType du result
 	     * @instance
 	     */
-	    private _mediaType;
+	    protected _mediaType: MediaType;
 	    /**
 	     * référence les options à utiliser dans les methodes {@link HornetResult#__compute}  & {@link HornetResult#__configure}
 	     * @instance
 	     */
-	    private _options;
+	    protected _options: Options;
 	    constructor(options: Options, mediaType: MediaType);
 	    options: any;
 	    mediaType: MediaType;
+	    readonly status: number;
 	    /**
 	     * méthode qui permet d'appliquer un traitement supplémentaire sur les données avant la télé-transmission des data dans la réponse
 	     * @returns {Promise} revoie une promise de traitement
@@ -2143,12 +2533,12 @@ declare module "hornet-js-core/src/result/hornet-result" {
 	     * méthode qui permet de parametrer les entêtes et le corps de la réponse HTTP en fonction du type de résult
 	     * @vreturns {boolean} true pour envoyer la reponse [response.end]
 	     */
-	    protected configure(res: Response): boolean;
+	    protected configure(res: Response, req?: Request): boolean;
 	    /**
 	     * méthode qui permet d'appeler la chaine des traitements + configuration des la response
 	     * @returns {Promise} revoie une promise de traitement
 	     */
-	    manageResponse(res: Response): Promise<boolean>;
+	    manageResponse(res: Response, req?: Request): Promise<boolean>;
 	}
 	
 }
@@ -2266,7 +2656,7 @@ declare module "hornet-js-core/src/result/result-file" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2372,7 +2762,7 @@ declare module "hornet-js-core/src/result/result-json" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2489,7 +2879,7 @@ declare module "hornet-js-core/src/result/result-open-document" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2614,7 +3004,7 @@ declare module "hornet-js-core/src/result/result-stream" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2637,8 +3027,7 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	import { UserInformations } from "hornet-js-utils/src/authentication-utils";
 	import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 	import { DataValidator }  from "hornet-js-core/src/validation/data-validator";
-	import { Request } from "express";
-	import { Response } from "express";
+	import { Request, Response } from "express";
 	import { IService }  from "hornet-js-core/src/services/service-api";
 	import { MediaType }  from "hornet-js-core/src/protocol/media-type";
 	/** DirectorClientConfiguration */
@@ -2677,6 +3066,9 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	export type DataRoutes = Routes<DataRouteInfos>;
 	export type LazyRoutes = {
 	    [key: string]: string;
+	};
+	export type SubRoutes = {
+	    [key: string]: AbstractRoutes;
 	};
 	export type LazyRoutesClassResolver = (name: string) => Class<AbstractRoutes>;
 	export type LazyRoutesAsyncClassResolver = (name: string, callback: (routesClass: Class<AbstractRoutes>) => void) => void;
@@ -2718,30 +3110,35 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	    getService(): B;
 	}
 	export abstract class RouteInfos {
-	    private type;
-	    private attributes;
-	    private service;
-	    constructor(type: string, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService>);
+	    protected type: string;
+	    protected attributes: RouteAttributes;
+	    protected service: Class<IService> | AbstractClass<IService> | IService;
+	    constructor(type: string, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService);
 	    getRouteType(): string;
 	    getAttributes(): RouteAttributes;
-	    getService(): Class<IService> | AbstractClass<IService>;
+	    getService(): IService;
 	}
 	export class PageRouteInfos extends RouteInfos {
-	    private viewComponent;
-	    constructor(viewComponent: Class<IHornetPage<any, any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService>);
+	    protected viewComponent: Class<IHornetPage<any, any>>;
+	    constructor(viewComponent: Class<IHornetPage<any, any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService);
+	    getService(): IService;
 	    getViewComponent(): Class<IHornetPage<any, any>>;
 	}
 	export class DataRouteInfos extends RouteInfos {
-	    private action;
-	    constructor(action: Class<RouteAction<any>>, attributes?: RouteAttributes, service?: Class<IService>);
+	    protected action: Class<RouteAction<any>>;
+	    constructor(action: Class<RouteAction<any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService);
 	    getAction(): Class<RouteAction<any>>;
 	}
 	/** Routes Declaration */
 	export abstract class AbstractRoutes {
-	    private pageRoutes;
-	    private dataRoutes;
-	    private lazyRoutes;
-	    private resolveAuthorizationAndMethod(authorizationOrMethod, method);
+	    protected pageRoutes: PageRoutes;
+	    protected dataRoutes: DataRoutes;
+	    protected lazyRoutes: LazyRoutes;
+	    protected subRoutes: SubRoutes;
+	    protected resolveAuthorizationAndMethod(authorizationOrMethod: RouteMethod | RouteAuthorization, method: RouteMethod): {
+	        authorization: any;
+	        method: any;
+	    };
 	    addPageRoute(path: string, handler: PageRouteHandler, authorization?: RouteAuthorization): void;
 	    addDataRoute(path: string, handler: DataRouteHandler): any;
 	    addDataRoute(path: string, handler: DataRouteHandler, authorization: RouteAuthorization): any;
@@ -2751,6 +3148,8 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	    getPageRoutes(): PageRoutes;
 	    getDataRoutes(): DataRoutes;
 	    getLazyRoutes(): LazyRoutes;
+	    addSubRoute(path: string, subRoutesFile: AbstractRoutes): void;
+	    getSubRoutes(): SubRoutes;
 	    /**
 	     * Permet de charger les routes depuis une liste de répertoires
 	     * @param paths
@@ -2761,150 +3160,30 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	
 }
 
-declare module "hornet-js-core/src/routes/actions-chain-data" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
-	 *
-	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	/**
-	 * Type d'objet qui est transféré d'une action à une autre (d'une promise à une autre)
-	 * Les chaines d'actions peuvent étendre cette classe pour ajouter des attributs spécifiques.
-	 *
-	 */
-	import * as superagent from "superagent";
-	export class ActionsChainData {
-	    /**
-	     * Le mimeType demandé par le client
-	     */
-	    requestMimeType: string;
-	    /**
-	     * Le MimeType du résultat à retourner au client
-	     */
-	    responseMimeType: string;
-	    /**
-	     * Le résultat à retourner au client.
-	     * Si ce champ est valorisé, il sera prioritaire sur les autres rendus (composant / json)
-	     */
-	    result: any;
-	    /**
-	     * La dernière erreur technique produite
-	     * Si ce champ est valorisé, il sera prioritaire sur les autres rendus (composant / json)
-	     */
-	    lastError: any;
-	    /**
-	     * Les erreurs présentes dans un formulaire
-	     * Si ce champ est valorisé, il sera prioritaire sur les autres rendus (composant / json)
-	     */
-	    formError: any;
-	    /**
-	     * Boolean indiquant que l'accès à la ressource courante n'est pas autorisé pour l'utilisateur courant
-	     * @type {boolean}
-	     */
-	    isAccessForbidden: boolean;
-	    parseResponse(res: superagent.Response): this;
-	    withBody(body: any): this;
-	    withResponseMimeType(responseMimeType: string): this;
-	}
-	
-}
-
 declare module "hornet-js-core/src/routes/router-client-async-elements" {
+	import { Logger } from "hornet-js-utils/src/logger";
 	import { Class } from "hornet-js-utils/src/typescript-utils";
 	import { AsyncElement }  from "hornet-js-core/src/executor/async-element";
 	import { HornetEvent }  from "hornet-js-core/src/event/hornet-event";
 	import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 	export class ContextInitializerElement extends AsyncElement {
-	    private authorization;
-	    private handler;
-	    private params;
+	    protected authorization: any;
+	    protected handler: any;
+	    protected params: any;
 	    constructor(authorization: any, handler: any, params: any);
 	    execute(next: any): void;
 	}
-	export var PAGE_READY_EVENT: HornetEvent<{}>;
+	export const PAGE_READY_EVENT: HornetEvent<{}>;
 	export interface UrlChangeEventDetail {
 	    newUrl: string;
 	    newPath: string;
 	}
-	export var URL_CHANGE_EVENT: HornetEvent<UrlChangeEventDetail>;
+	export const URL_CHANGE_EVENT: HornetEvent<UrlChangeEventDetail>;
 	export class UrlChangeElement extends AsyncElement {
 	    execute(next: any): void;
 	}
 	export class UserAccessSecurityElement extends AsyncElement {
-	    private static logger;
+	    protected static logger: Logger;
 	    execute(next: any): void;
 	}
 	export interface ComponentChangeEventDetail {
@@ -2913,14 +3192,14 @@ declare module "hornet-js-core/src/routes/router-client-async-elements" {
 	}
 	export var COMPONENT_CHANGE_EVENT: HornetEvent<ComponentChangeEventDetail>;
 	export class ViewRenderingElement extends AsyncElement {
-	    private static logger;
-	    private appComponent;
+	    protected static logger: Logger;
+	    protected appComponent: any;
 	    constructor(appComponent: any);
 	    execute(next: any): void;
 	}
 	export class UnmanagedViewErrorElement extends AsyncElement {
-	    private static logger;
-	    private errorComponent;
+	    protected static logger: Logger;
+	    protected errorComponent: any;
 	    constructor(errorComponent: any);
 	    execute(next: any, resolvedError: any): void;
 	}
@@ -2928,8 +3207,10 @@ declare module "hornet-js-core/src/routes/router-client-async-elements" {
 }
 
 declare module "hornet-js-core/src/routes/router-client" {
-	import { DirectorRouterConfiguration } from "director";
-	import { AbstractRoutes, RouteHandler, RouteInfos, LazyRoutesAsyncClassResolver, RouteAuthorization }  from "hornet-js-core/src/routes/abstract-routes";
+	import { Class } from "hornet-js-utils/src/typescript-utils";
+	import { DirectorRouter, DirectorRouterConfiguration } from "director";
+	import { AbstractRoutes, RouteHandler, RouteInfos, Routes, SubRoutes, LazyRoutesAsyncClassResolver, RouteAuthorization }  from "hornet-js-core/src/routes/abstract-routes";
+	import { AsyncElement }  from "hornet-js-core/src/executor/async-element";
 	global  {
 	    interface Window {
 	        setHornetJsGenerationServer: (enableValue: string) => void;
@@ -2939,19 +3220,24 @@ declare module "hornet-js-core/src/routes/router-client" {
 	    [key: string]: (...arg) => void;
 	};
 	export class RouterClient {
-	    private appComponent;
-	    private errorComponent;
-	    private pageRoutes;
-	    private appRoutes;
-	    private directorPage;
-	    private directorClientConfiguration;
-	    private lazyRoutesClassResolver;
-	    constructor(appComponent: any, errorComponent: any, appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesAsyncClassResolver, directorClientConfiguration?: DirectorRouterConfiguration);
-	    private computeRoutes(routesObj?, prefix?, directorRoutes?);
-	    private parseRoutes<T>(declaredRoutes, internalObj, prefix);
-	    private buildRouteHandler<T>(declaredRoutes, path, method);
-	    private parseLazyRoute(internalObj, prefix, routesClassPath);
-	    private loadLazyRoutes(originalRoute, prefix, routesClassPath, done);
+	    protected appComponent: any;
+	    protected errorComponent: any;
+	    protected pageRoutes: DirectorClientRoutesDesc;
+	    protected appRoutes: AbstractRoutes;
+	    protected userAccessSecurityElement: Class<AsyncElement>;
+	    protected directorPage: DirectorRouter;
+	    protected directorClientConfiguration: DirectorRouterConfiguration;
+	    protected lazyRoutesClassResolver: LazyRoutesAsyncClassResolver;
+	    protected initPrefix: string;
+	    constructor(appComponent: any, errorComponent: any, appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesAsyncClassResolver, directorClientConfiguration?: DirectorRouterConfiguration & {
+	        initDynamicContext?: boolean;
+	    }, userAccessSecurityElement?: any);
+	    protected computeRoutes(routesObj?: AbstractRoutes, prefix?: string, directorRoutes?: DirectorClientRoutesDesc): void;
+	    protected parseRoutes<T extends RouteInfos>(declaredRoutes: Routes<T>, internalObj: DirectorClientRoutesDesc, prefix: string): void;
+	    protected buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string): (...params: any[]) => void;
+	    protected parseLazyRoute(internalObj: DirectorClientRoutesDesc, prefix: string, routesClassPath: string): void;
+	    protected loadLazyRoutes(originalRoute: string, prefix: string, routesClassPath: string, done: any): void;
+	    protected parseSubRoutes(subRoutes: SubRoutes, internalObj: DirectorClientRoutesDesc, prefix: string): void;
 	    protected handleRoute<T extends RouteInfos>(done: any, authorization: RouteAuthorization, handler: RouteHandler<T>, params: Array<string>): void;
 	    /**
 	     * Méthode utilisée par la partie cliente pour initialiser le routeur
@@ -2994,20 +3280,28 @@ declare module "hornet-js-core/src/routes/router-client" {
 	     * @returns {any}
 	     */
 	    static getHornetJsGenerationServer(): any;
+	    static getDynamicPrefixContext(): string;
+	    static setDynamicDirectorPath(): void;
 	}
 	
 }
 
 declare module "hornet-js-core/src/routes/router-server" {
-	import { AbstractRoutes, RouteHandler, RouteInfos, LazyRoutesClassResolver, RouteAuthorization }  from "hornet-js-core/src/routes/abstract-routes";
+	import { DirectorRouter } from "director";
+	import { AbstractRoutes, RouteHandler, RouteInfos, Routes, LazyRoutes, SubRoutes, LazyRoutesClassResolver, RouteAuthorization }  from "hornet-js-core/src/routes/abstract-routes";
+	export type DirectorRoutesDesc = {
+	    [key: string]: {
+	        [key: string]: (...arg) => void;
+	    };
+	};
 	export class RouterServer {
-	    private dataRoutes;
-	    private pageRoutes;
-	    private appRoutes;
-	    private directorData;
-	    private directorPage;
-	    private lazyRoutesClassResolver;
-	    private dataContext;
+	    protected dataRoutes: DirectorRoutesDesc;
+	    protected pageRoutes: DirectorRoutesDesc;
+	    protected appRoutes: AbstractRoutes;
+	    protected directorData: DirectorRouter;
+	    protected directorPage: DirectorRouter;
+	    protected lazyRoutesClassResolver: LazyRoutesClassResolver;
+	    protected dataContext: String;
 	    constructor(appRoutes: AbstractRoutes, lazyRoutesClassResolver: LazyRoutesClassResolver, routesPaths: Array<string>, routesDataContext?: String);
 	    /**
 	     * Méthode utilisée par la partie serveur pour initialiser le routeur.
@@ -3015,12 +3309,13 @@ declare module "hornet-js-core/src/routes/router-server" {
 	     */
 	    dataMiddleware(): (req: Express.Request, res: Express.Response, next: any) => any;
 	    pageMiddleware(): (req: Express.Request, res: Express.Response, next: any) => any;
-	    private computeRoutes(routesObj?, prefix?);
-	    private computeAuthorizationsRoutes(pageRoutes, dataRoutes, prefix);
+	    protected computeRoutes(routesObj?: AbstractRoutes, prefix?: string): void;
+	    protected computeAuthorizationsRoutes(pageRoutes: any, dataRoutes: any, prefix: string): void;
 	    private parseRoutes<T>(declaredRoutes, internalObj, prefix);
-	    private buildRouteHandler<T>(declaredRoutes, path, method);
-	    private parseLazyRoutes(lazyRoutes, prefix);
+	    protected buildRouteHandler<T extends RouteInfos>(declaredRoutes: Routes<T>, path: string, method: string): (...params: any[]) => void;
+	    protected parseLazyRoutes(lazyRoutes: LazyRoutes, prefix: string): void;
 	    protected handleRoute<T extends RouteInfos>(authorization: RouteAuthorization, handler: RouteHandler<T>, method: any, params: Array<string>): void;
+	    protected parseSubRoutes(subRoutes: SubRoutes, prefix: string): void;
 	}
 	
 }
@@ -3150,7 +3445,7 @@ declare module "hornet-js-core/src/security/client-input-channel" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3245,20 +3540,11 @@ declare module "hornet-js-core/src/services/api-callback" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	export type ApiCallback<T> = (res: T) => void;
-	
-}
-
-declare module "hornet-js-core/src/services/expanding-layout-request" {
-	import { ServiceRequest }  from "hornet-js-core/src/services/service-request";
-	export class ExpandingLayoutRequest extends ServiceRequest {
-	    setExpandedLayout(layoutObject: any): Promise<any>;
-	    isExpandedLayout(): Promise<any>;
-	}
 	
 }
 
@@ -3337,13 +3623,14 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { Request } from "superagent";
 	import { MediaType }  from "hornet-js-core/src/protocol/media-type";
 	import { CacheKey }  from "hornet-js-core/src/services/hornet-superagent";
+	import { ClientSessionTimeout }  from "hornet-js-core/src/session/client-session-configuration";
 	/**
 	 * Surcharge pour la compilation des plugins
 	 */
@@ -3366,6 +3653,14 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	    cert?: string;
 	    key?: string;
 	    progress?: Function;
+	    timeout?: HornetRequestTimeOut;
+	    resultDisposition?: HornetRequestResultDisposition;
+	    clientTimeout?: ClientSessionTimeout;
+	    manageError?: ErrorManagementType;
+	}
+	export interface HornetRequestTimeOut {
+	    response?: number;
+	    deadline?: number;
 	}
 	export interface Attachment {
 	    field: string;
@@ -3376,6 +3671,15 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	    contentType?: string;
 	    Authorization?: string;
 	}
+	export interface HornetRequestResultDisposition {
+	    type: ResultDispositionType;
+	    data?: HornetRequestResultDispositionData | any;
+	}
+	export interface HornetRequestResultDispositionData {
+	    name?: string;
+	    specs?: any;
+	    replace?: boolean;
+	}
 	/**
 	 * Type de spinnerType
 	 * valeur possible (None, Default, Component[depreacated])
@@ -3385,6 +3689,24 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	    Default = 1,
 	    Component = 2,
 	}
+	/**
+	 * Type de spinnerType
+	 * valeur possible (None, Default, Component[depreacated])
+	 */
+	export enum ResultDispositionType {
+	    Custom = "custom",
+	    Default = "default",
+	}
+	/**
+	 * Type de spinnerType
+	 * valeur possible (None, Default, Component[depreacated])
+	 */
+	export enum ErrorManagementType {
+	    None = "",
+	    Business = "business",
+	    Technical = "technical",
+	    All = "all",
+	}
 	
 }
 
@@ -3392,27 +3714,42 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	import * as superagent from "superagent";
 	import { Response } from "superagent";
 	import { HornetRequest, SpinnerType }  from "hornet-js-core/src/services/hornet-superagent-request";
+	import { ClientSessionTimeout }  from "hornet-js-core/src/session/client-session-configuration";
 	import { Class } from "hornet-js-utils/src/typescript-utils";
 	import { HornetPlugin } from "hornet-js-core/src/services/superagent-hornet-plugins";
+	import { HornetEvent }  from "hornet-js-core/src/event/hornet-event";
 	import { Promise } from "hornet-js-utils/src/promise-api";
 	export enum CacheKey {
-	    URL = 0,
-	    URL_DATA = 1,
+	    URL = "URL",
+	    URL_DATA = "URL_DATA",
 	}
+	export interface SessionEvent {
+	    value: number;
+	}
+	export let SESSION_WILL_EXPIRE_NOTIFICATION_EVENT: HornetEvent<SessionEvent>;
+	export let SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT: HornetEvent<SessionEvent>;
+	export let SESSION_REFRESHED_NOTIFICATION_EVENT: HornetEvent<SessionEvent>;
 	/**
 	 * Cette classe sert à encapsuler les appels à SuperAgent pour ajouter des plugins au besoin
 	 * @class
 	 */
 	export class HornetSuperAgent {
-	    private enableCache;
-	    private timeToLiveInCache;
-	    private cacheKey;
-	    private noEventFired;
-	    private superAgentRequest;
+	    private clientSessionConfig;
+	    protected enableCache: boolean;
+	    protected timeToLiveInCache: number;
+	    protected cacheKey: CacheKey;
+	    protected noEventFired: boolean;
+	    protected superAgentRequest: any;
 	    plugins: HornetList<HornetPlugin>;
 	    response: Response;
+	    /** pour du cache de la configuration globale  */
+	    static globalClientSessionConfig: ClientSessionTimeout;
+	    /** pour sauvegarder l'handler du timeout */
+	    protected static sessionExpireTimeout: NodeJS.Timer;
 	    constructor(timeToliveInCache?: number, cacheKey?: CacheKey);
 	    protected getCacheConfig(): any;
+	    protected getClientSessionConfig(): ClientSessionTimeout;
+	    protected getTimeoutConfig(): any;
 	    /**
 	     * Initialise une instance de superagent en ajoutant les plugins et header
 	     * @returns {SuperAgentRequest}
@@ -3436,9 +3773,10 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	     * Methode executer sur  la reception d'une requete (gestion spinner et du cache)
 	     * @param {HornetRequest} request requete envoyée
 	     * @param {Response} response réponse recue
+	     * @param {boolean} throwed permet de jeter l'exception recu pour la manager
 	     * @returns Response
 	     * */
-	    protected postProcessRequest(request: HornetRequest, response: Response): Response;
+	    protected postProcessRequest(request: HornetRequest, response: Response, throwed?: boolean): Response;
 	    /**
 	     * send a request
 	     * @param {HornetRequest} request objet representant une requête (methode 'get' par defaut)
@@ -3450,38 +3788,38 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	     * Formate la réponse pour le client afin de traiter les erreurs automatiquement
 	     * @param {Response} response reponse de superagent
 	     */
-	    private manageClientResult(response);
+	    protected manageClientResult(response: Response, request: HornetRequest, throwed?: boolean): any;
 	    /**
 	     * Formate la réponse pour le serveur afin de traiter les erreurs automatiquement
 	     * @param {Response} response reponse de superagent
 	     */
-	    protected manageServerResult(response: Response): any;
+	    protected manageServerResult(response: Response, request: HornetRequest, throwed?: boolean): any;
 	    /**
 	     * Test si c'est un format Hornet
 	     * @param {Response.body} body reponse de superagent
 	     */
-	    private hasHornetBody(body);
+	    protected hasHornetBody(body: any): boolean;
 	    /**
 	     * Construction d'une erreur hornet et appel du manager d'erreurs
 	     */
-	    private manageError(err);
+	    protected manageError(err: any): void;
 	    /**
 	     * Lecture dans le cache
 	     * @param {string} url url de la requête
 	     */
-	    private getFromCache(request);
+	    protected getFromCache(request: HornetRequest): Promise<any>;
 	    /**
 	     * Mise en cache de la reponse
 	     * @param {Response} response reponse de superagant
 	     * @param {HornetRequest} request requête à mettre en cache
 	     * @param {number} timetoliveInCache durée de vie dans le cache
 	     */
-	    private setInCache(response, request, timetoliveInCache);
+	    protected setInCache(response: Response, request: HornetRequest, timetoliveInCache: number): Promise<any>;
 	    /**
 	     * Nettoyage en cache de la requete
 	     * @param {HornetRequest} request requête à mettre en cache
 	     */
-	    private removeInCache(request);
+	    protected removeInCache(request: HornetRequest): Promise<any>;
 	    /**
 	     * Génère la clé utilisée pour le cache
 	     * @param {HornetRequest} request requête pour la génération de la clé (url + param)
@@ -3508,6 +3846,19 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	     * @protected
 	     */
 	    protected cleanData(data: any): void;
+	    /**
+	     * initialise la méthode de timeout pour la notification de fin de session.
+	     * @param processing indicateur d'initialisation
+	     */
+	    protected static initSessionTimeout(clientSessionConfig: ClientSessionTimeout): void;
+	    /**
+	     * Methode appelée sur le timeout de session côté client
+	     * @param expireIn
+	     */
+	    protected static sessionWillExpireIn(expireIn: number): (clientSessionConfig: ClientSessionTimeout) => void;
+	    protected static updateSessionWillExpireIn(expireIn: number): (clientSessionConfig: ClientSessionTimeout) => void;
+	    protected static emitEvent(event: HornetEvent<SessionEvent>): (value?: number) => void;
+	    protected static clear(): void;
 	}
 	export class HornetPluginConfig<T> {
 	    readonly name: string;
@@ -3527,14 +3878,6 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	    addAfter(newElt: HornetPluginConfig<T>, Elt: HornetPluginConfig<T>): this;
 	    remove(Elt: HornetPluginConfig<T>): this;
 	    push(newElt: HornetPluginConfig<T>): this;
-	}
-	
-}
-
-declare module "hornet-js-core/src/services/i18n-service-api" {
-	import { ServiceRequest }  from "hornet-js-core/src/services/service-request";
-	export class I18nServiceApi extends ServiceRequest {
-	    changeLanguage(data: any): Promise<any>;
 	}
 	
 }
@@ -3614,7 +3957,7 @@ declare module "hornet-js-core/src/services/service-api-results" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3637,8 +3980,8 @@ declare module "hornet-js-core/src/services/service-api-results" {
 	    errors: Array<BaseError>;
 	}
 	export class NodeApiResultBuilder {
-	    static build(jsonData: any): NodeApiResult;
-	    static buildError(error: BaseError): NodeApiResult;
+	    static build(jsonData: any, url?: string): NodeApiResult;
+	    static buildError(error: BaseError, url?: string): NodeApiResult;
 	}
 	export class NodeApiError {
 	    /**
@@ -3680,7 +4023,8 @@ declare module "hornet-js-core/src/services/service-api-results" {
 	    args: Array<string>;
 	    httpStatus: number;
 	    backendApiErrorList: Array<BackendApiError>;
-	    constructor(date?: number, code?: string, name?: string, type?: string, details?: string, args?: Array<string>, reportId?: string, httpStatus?: number);
+	    originalAttrs: object;
+	    constructor(date?: number, code?: string, name?: string, type?: string, details?: string, args?: Array<string>, reportId?: string, httpStatus?: number, originalAttrs?: object);
 	    /**
 	     * Crée l'instance de BackendApiError à partir de l'objet JSON représentant la ou les erreurs
 	     * @param apiErrors erreurs[s] représentant
@@ -3768,7 +4112,7 @@ declare module "hornet-js-core/src/services/service-api" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3852,7 +4196,7 @@ declare module "hornet-js-core/src/services/service-page" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3934,13 +4278,13 @@ declare module "hornet-js-core/src/services/service-secure" {
 	     * methode à implementer retournant le token jwt
 	     * @return token JWT
 	     */
-	    abstract getToken(): String;
+	    protected getToken(): String;
 	    /**
 	     * methode à implementer pour sauvegarder le token jwt
 	     * @param {Response} response response contenant l'header d'authentification
 	     * @return token JWT
 	     */
-	    abstract saveToken(response: Response): void;
+	    protected saveToken(response: Response): void;
 	}
 	
 }
@@ -3985,7 +4329,7 @@ declare module "hornet-js-core/src/services/superagent-hornet-plugins" {
 	 * @constructor
 	 */
 	export class AddParamFromLocalStorage extends HornetPlugin {
-	    static getPlugin(param: string, localStorageName?: string): (request: HornetSuperAgentRequest) => void;
+	    static getPlugin(param: string, propNameName?: string, localStorageName?: string): (request: HornetSuperAgentRequest) => void;
 	}
 	/**
 	 * Plugin SuperAgent ajoutant les données telques le tid et le user à la requête du serveur
@@ -3999,112 +4343,19 @@ declare module "hornet-js-core/src/services/superagent-hornet-plugins" {
 	
 }
 
-declare module "hornet-js-core/src/upload/custom-store-engine" {
+declare module "hornet-js-core/src/session/client-session-configuration" {
 	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
+	 * Interface de configuration de la gestion des timeout session côté client
 	 */
-	/**
-	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
-	 *
-	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	/****
-	 * https://github.com/yongtang/clamav.js/blob/master/README.md
-	 * Fork
-	 */
-	import multer = require("multer");
-	/**
-	 * Classe qui permet d'appeler clamav
-	 */
-	export class CustomStoreEngine implements multer.StorageEngine {
-	    constructor();
-	    /**
-	     * Fonction qui envoie un flux au serveur Clamav et qui analyse la reponse
-	     * s'il n'y a pas d'erreur ou que le fichier n'est pas infecté, le traitement est passant.
-	     * @param {HttpRequest} req la requête
-	     * @param {File} file le fichier à transférer
-	     * @param {Function} cb la callback
-	     * @private
-	     */
-	    _handleFile: (req: any, file: any, cb: any) => void;
-	    /**
-	    *  Permet la suppression d'un
-	    * @param {HttpRequest} req la requête
-	    * @param {File} file le fichier à transférer
-	    * @param {Function} cb la callback
-	    * @private
-	    */
-	    _removeFile: (req: any, file: any, cb: any) => void;
+	export interface ClientSessionTimeout {
+	    /** inclusion / exclusion de la gestion du timeout client */
+	    isInSessionTimeout?: boolean;
+	    /** durée de vie de la session en millisecondes */
+	    sessionTimeout?: number;
+	    /** interval de déclenchement du timeout de session en millisecondes */
+	    notifSessionTimeout?: number;
+	    /** interval des répétitions après le déclenchement du timeout */
+	    notifSessionTimeoutRepeat?: number;
 	}
 	
 }
@@ -4158,9 +4409,9 @@ declare module "hornet-js-core/src/session/memory-store" {
 	import { Session }  from "hornet-js-core/src/session/session";
 	import { Store }  from "hornet-js-core/src/session/store";
 	export class MemoryStore extends Store {
-	    private sessions;
-	    private expiredCheckInterval;
-	    private lastExpiredCheck;
+	    protected sessions: any;
+	    protected expiredCheckInterval: number;
+	    protected lastExpiredCheck: number;
 	    /**
 	     * Constructor
 	     * @param expiredCheckInterval the interval in ms to check / delete expired sessions (default: 60000ms)
@@ -4204,20 +4455,21 @@ declare module "hornet-js-core/src/session/memory-store" {
 	    length(fn: any): void;
 	    set(session: Session, fn: Function): void;
 	    touch(session: Session, fn: Function): void;
-	    private checkExpired();
+	    protected checkExpired(): void;
 	}
 	
 }
 
 declare module "hornet-js-core/src/session/session-manager" {
 	import { Session }  from "hornet-js-core/src/session/session";
+	import { Store }  from "hornet-js-core/src/session/store";
 	module "express" {
 	    interface Request {
 	        getSession?: () => Session;
 	    }
 	}
 	export class SessionManager {
-	    private static STORE;
+	    protected static STORE: Store;
 	    static invalidate(session: Session, fn: Function): void;
 	    /**
 	     * Setup session middleware with the given `options`.
@@ -4242,11 +4494,11 @@ declare module "hornet-js-core/src/session/session-manager" {
 
 declare module "hornet-js-core/src/session/session" {
 	export class Session {
-	    private sid;
-	    private data;
-	    private creationTime;
-	    private lastAccessedTime;
-	    private maxInactiveInterval;
+	    protected sid: string;
+	    protected data: any;
+	    protected creationTime: Date;
+	    protected lastAccessedTime: Date;
+	    protected maxInactiveInterval: any;
 	    constructor(sid: string, maxInactiveInterval: any, data?: any);
 	    getId(): string;
 	    getData(): any;
@@ -4337,14 +4589,14 @@ declare module "hornet-js-core/src/session/store" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import * as events from "events";
 	import { Session }  from "hornet-js-core/src/session/session";
 	export class Store extends events.EventEmitter {
-	    private ready;
+	    protected ready: boolean;
 	    constructor();
 	    isReady(): boolean;
 	    get(sid: string, fn: Function): void;
@@ -4358,6 +4610,151 @@ declare module "hornet-js-core/src/session/store" {
 	     * @returns {boolean}
 	     */
 	    isTouchImplemented(): boolean;
+	}
+	
+}
+
+declare module "hornet-js-core/src/timers/timer" {
+	import { Logger } from "hornet-js-utils/src/logger";
+	export class Timer {
+	    static TIMER_REQUEST: string;
+	    static TIMER_ACTION: string;
+	    static TIMER_SERVICE: string;
+	    static TIMER_AJAX_REQUEST: string;
+	    static TIMER_SERVER_HTTP: string;
+	    static TIMERS_ORDER: string[];
+	    static NS_PER_SEC: number;
+	    static NS_TO_MS_PER_SEC: number;
+	    protected static logger: Logger;
+	    /**
+	     * Démarre un timer et en arrête un autre s'il est renseigné.
+	     * @param {string} timerName id du timer à démarrer
+	     * @param {string}  stopTimerName id du timer à arrêter
+	     */
+	    static startTimer(timerName: string, stopTimerName?: string): void;
+	    /**
+	     * Arrête un timer
+	     * @param {string} timerName id du timer à démarrer
+	     */
+	    static stopTimer(timerName: string): void;
+	    /**
+	     * Arrête tous les timers
+	     */
+	    static stopAllTimers(): void;
+	    /**
+	     * Fonction pour logger les timers se basant sur Timer.TIMERS_ORDER et le cls (hornet.timers)
+	     * @param {string} url - url à logger
+	     * @param {integer} statusCode - status http à logger
+	     */
+	    static logFinally(url?: any, statusCode?: any): void;
+	}
+	
+}
+
+declare module "hornet-js-core/src/upload/custom-store-engine" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.2.0
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
+	/****
+	 * https://github.com/yongtang/clamav.js/blob/master/README.md
+	 * Fork
+	 */
+	import multer = require("multer");
+	/**
+	 * Classe qui permet d'appeler clamav
+	 */
+	export class CustomStoreEngine implements multer.StorageEngine {
+	    constructor();
+	    /**
+	     * Fonction qui envoie un flux au serveur Clamav et qui analyse la reponse
+	     * s'il n'y a pas d'erreur ou que le fichier n'est pas infecté, le traitement est passant.
+	     * @param {HttpRequest} req la requête
+	     * @param {File} file le fichier à transférer
+	     * @param {Function} cb la callback
+	     */
+	    _handleFile: (req: any, file: any, cb: any) => void;
+	    /**
+	    *  Permet la suppression d'un
+	    * @param {HttpRequest} req la requête
+	    * @param {File} file le fichier à transférer
+	    * @param {Function} cb la callback
+	    */
+	    _removeFile: (req: any, file: any, cb: any) => void;
 	}
 	
 }
@@ -4518,7 +4915,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-linked" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4529,7 +4926,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-linked" {
 	export class DataSourceLinked<T> extends DataSource<T> {
 	    keysMap: DataSourceMap;
 	    options: any[];
-	    private _linked;
+	    protected _linked: DataSourceLinked<T>;
 	    constructor(config: DataSourceConfig | DataSourceConfigPage | Array<T>, keysMap?: DataSourceMap, options?: any[]);
 	    /***
 	     * Permet de lier les datasources de type DataSourceLinked entre eux.
@@ -4554,7 +4951,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-linked" {
 	     * @param items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
 	     * @void
 	     */
-	    private remove(triggerFetch, emiter, ...items);
+	    protected remove(triggerFetch: boolean, emiter: any, ...items: (T | T[])[]): void;
 	}
 	
 }
@@ -4634,7 +5031,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-master" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4645,7 +5042,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-master" {
 	export class DataSourceMaster<T> extends DataSource<T> {
 	    keysMap: DataSourceMap;
 	    options: any[];
-	    private _datasources;
+	    protected _datasources: DataSource<any>[];
 	    constructor(config: DataSourceConfig | DataSourceConfigPage | Array<T>, keysMap: DataSourceMap, options?: any[]);
 	    /***
 	     * Ajout d'un datasource slave
@@ -4749,17 +5146,17 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import events = require("events");
 	import { Promise } from "hornet-js-utils/src/promise-api";
-	import { SortData }  from "hornet-js-core/src/component/sort-data";
 	import { DataSourceOption, DefaultSort, InitAsync }  from "hornet-js-core/src/component/datasource/options/datasource-option";
 	import { DataSourceMap }  from "hornet-js-core/src/component/datasource/config/datasource-map";
 	import { DataSourceConfig }  from "hornet-js-core/src/component/datasource/config/service/datasource-config";
 	import { DataSourceConfigPage }  from "hornet-js-core/src/component/datasource/config/service/datasource-config-page";
+	import { DatasourceSortOption }  from "hornet-js-core/src/component/datasource/options/datasource-sort-option";
 	export enum DataSourceStatus {
 	    Dummy = 0,
 	    Initialized = 1,
@@ -4767,7 +5164,8 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	/***
 	 * @classdesc Classe de base des datasources
 	 * elle contient une methode pour récupérer des datas, varie selon le type de datasource;
-	 * elle implémente une methode qui transforme les données récupérées selon une classe de mapping  {@link DataSourceMap} afin de l'exploiter directement par l'IHM.
+	 * elle implémente une methode qui transforme les données récupérées selon une classe de mapping  {@link DataSourceMap}
+	 * afin de l'exploiter directement par l'IHM.
 	 * liste des events déclenchés par le datasource lorsque les opérations sont effectuées:
 	 * -init
 	 * -fetch
@@ -4785,10 +5183,10 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	    keysMap: DataSourceMap;
 	    options: DataSourceOption[];
 	    /***
-	     * tableau d'item selectionné du datasource
+	     * attribut de la selection du datasource
 	     * @instance
 	     */
-	    protected _selected: Array<any>;
+	    protected _selected: any;
 	    /***
 	     * scope utilisé pour réaliser un fetch de type méthode de service.
 	     * @instance
@@ -4803,7 +5201,7 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	     * tableau de résultats du datasource
 	     * @instance
 	     */
-	    protected _results: Array<any>;
+	    protected datasourceResults: Array<any>;
 	    /***
 	     * backup des résultats du datasource
 	     * @instance
@@ -4839,7 +5237,8 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	     */
 	    protected _status: any;
 	    /***
-	     * @param {DataSourceConfig|DataSourceConfigPage|Array<T>} config : accepte soit une liste de l'éléments Array<T>, soit un service DataSourceConfig | DataSourceConfigPage
+	     * @param {DataSourceConfig|DataSourceConfigPage|Array<T>}
+	     *        config : accepte soit une liste de l'éléments Array<T>, soit un service DataSourceConfig | DataSourceConfigPage
 	     * @param {DataSourceMap} keysMap  : utilisée pour la transformation des resultats du fetch.
 	     * @param {DataSourceOption[]} options : liste de paramètres supplémentaires à transmettre au fetch
 	     * Pour un config de type
@@ -4872,6 +5271,13 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	     * renvoie la valeur selectionnée courante.
 	     */
 	    selected: any;
+	    /***
+	     * Méthode qui retourne des items du result d'un datasource.
+	     * {@link https://lodash.com/docs/#every}
+	     * @param criteria
+	     * @return renvoie les éléments trouvés
+	     */
+	    findAll(criteria: any): any;
 	    /**
 	     * supprime l'item du dataSource
 	     * @param item
@@ -4963,7 +5369,7 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	    /***
 	     * enlève un élément ou des éléments au result du datasource
 	     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
-	     * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
+	     * @param {(T|T[])[]} items correspond aux données à supprimer, un appel à la méthode {@link DataSource#transformData} sera effectué
 	     * @return {Promise<Array<<any>>} une promise du result modifié
 	     */
 	    protected deleteData(triggerFetch?: Boolean, ...items: (T | T[])[]): Promise<Array<any>>;
@@ -4975,7 +5381,8 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	    /***
 	     * méthode qui convertie les données brutes en données exploitable par l'IHM.
 	     * @param {(T|T[])[]} data les données brutes.
-	     * @return {Promise<Array<<any>>} renvoie les données transformées à partir des données brutes et la classe de mapping  {@link DataSourceMap}
+	     * @return {Promise<Array<<any>>} renvoie les données transformées
+	     * à partir des données brutes et la classe de mapping  {@link DataSourceMap}
 	     */
 	    protected transformData(data: (T | T[])[]): Promise<Array<any>>;
 	    /***
@@ -4989,7 +5396,7 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	     * @param {SortData[]} sort  données de tri
 	     * @param {(a: any, b: any) => number} Fonction de comparaison.
 	     */
-	    protected sortData(sort: SortData[], compare?: any): void;
+	    protected sortData(options: DatasourceSortOption): void;
 	    /***
 	     * Fonction de tri
 	     * @param {SortData[]} sortData.
@@ -5001,10 +5408,11 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	     * dataSource.sort(sortData);
 	     * @void
 	     */
-	    sort(sortDatas: SortData[], compare?: (a: any, b: any) => number): void;
+	    sort(options: DatasourceSortOption): void;
 	    /***
 	     * Renvoie un sous-ensemble des resultats filtrés
-	     * @param config correspond soit aux critères de filtrage soit à une fonction (appelée à chaque itération) {@link https://lodash.com/docs/#filter}
+	     * @param config correspond soit aux critères de filtrage
+	     * soit à une fonction (appelée à chaque itération) {@link https://lodash.com/docs/#filter}
 	     * @param cancelFilterHistory false si on souhaite garder un historique des filtres true sinon. false par défaut
 	     * @example
 	     * dataSource.on("filter", (filteredResult)=>{
@@ -5055,8 +5463,8 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	import { DataSourceMap }  from "hornet-js-core/src/component/datasource/config/datasource-map";
 	import { DataSourceConfig }  from "hornet-js-core/src/component/datasource/config/service/datasource-config";
 	import { DataSourceConfigPage }  from "hornet-js-core/src/component/datasource/config/service/datasource-config-page";
-	import { SortData }  from "hornet-js-core/src/component/sort-data";
 	import { DataSourceOption }  from "hornet-js-core/src/component/datasource/options/datasource-option";
+	import { DatasourceSortOption }  from "hornet-js-core/src/component/datasource/options/datasource-sort-option";
 	export const ITEMS_PER_PAGE_ALL: number;
 	/**
 	 * @enum enumeration pour la navigation dans le paginateur
@@ -5094,9 +5502,9 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	 * @class
 	  */
 	export class Paginator<T> {
-	    private _pagination;
-	    private items;
-	    private _sort;
+	    protected _pagination: Pagination;
+	    protected items: Array<Array<T>>;
+	    protected _sort: any;
 	    /**
 	     * @constructs
 	     * @param {Pagination} pagination configuration de la pagination
@@ -5104,7 +5512,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	    constructor(pagination: Pagination);
 	    readonly pagination: Pagination;
 	    sort: any;
-	    private calculateNbPages(itemsTot?);
+	    protected calculateNbPages(itemsTot?: number): number;
 	    /**
 	     * Methode de gestion de la pagination
 	     * @param {(number|Direction)} page numero de la page ou la direction, première page à index 1.
@@ -5112,7 +5520,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	    paginate(page: number | Direction): Array<T>;
 	    /**
 	     * Extraction des données de la page de pagination
-	     * @param {Array<T>} itemsTot liste pour vant servir pour l'extraction
+	     * @param {Array<T>} itemsTot liste pouvant servir pour l'extraction
 	     * @param {boolean} forceUpdate force la mise a jour et va lire de itemsTot sinon prend dans la variable d'instance
 	     */
 	    extractPage(itemsTot: Array<T>, forceUpdate?: boolean): Array<T>;
@@ -5150,7 +5558,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	     * composant de pagination
 	     * @instance
 	     */
-	    private _paginator;
+	    protected _paginator: Paginator<T>;
 	    /***
 	     * @param {(DataSourceConfig|DataSourceConfigPage|Array<T>)} config accepte soit une liste de l'éléments Array<T>, soit un service DataSourceConfig | DataSourceConfigPage
 	     * @param {Pagination} pagination pagination à appliquer.
@@ -5158,7 +5566,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	     * @param {Object} options liste de paramètres supplémentaires à transmettre au fetch
 	     */
 	    constructor(config: DataSourceConfig | DataSourceConfigPage | Array<T>, pagination: Pagination, keysMap: DataSourceMap, options?: DataSourceOption[]);
-	    private initPaginateDataSource();
+	    protected initPaginateDataSource(): void;
 	    /***
 	     * Méthode qui déclenche un fetch appelé pour initialiser un datasource.
 	     * @param {any} args  paramètres à renseigner pour l'appel de la méthode de récupération des données.
@@ -5166,7 +5574,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	     */
 	    init(args?: any): void;
 	    pagination: Pagination;
-	    private updatePaginator(items, totalItems?);
+	    protected updatePaginator(items: Array<T>, totalItems?: number): void;
 	    /***
 	     * Réinitialise la pagination et envoie un event de pagination
 	     */
@@ -5201,9 +5609,9 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	    /***
 	     * @inheritdoc
 	     */
-	    sort(sort: SortData[], compare?: (a: any, b: any) => number): void;
+	    sort(options: DatasourceSortOption): void;
 	    /***
-	     * Renvoie un sous-ensemble des resultats filtrés
+	     * Déclenche l'event filter qui renvoie un sous-ensemble des resultats filtrés
 	     * @param config correspond soit aux critères de filtrage soit à une fonction (appelée à chaque itération) {@link https://lodash.com/docs/#filter}
 	     * @param cancelFilterHistory false si on souhaite garder un historique des filtres true sinon. false par défaut
 	     * @example
@@ -5217,7 +5625,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	    /***
 	     * Ajout un élément ou des éléments au result du datasource
 	     * cette action déclenche l'évènement add.
-	     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
+	     * @param {Boolean} triggerFetch param inutilisé, cette fonction déclenchera un évènement "pagination" .
 	     * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
 	     * @example
 	     * dataSource.on("add", (IncreasedResult)=>{
@@ -5226,7 +5634,7 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	     * dataSource.add();
 	     * @void
 	     */
-	    add(triggerFetch: Boolean, ...items: (T | T[])[]): void;
+	    add(triggerFetch?: Boolean, ...items: (T | T[])[]): void;
 	    /***
 	     * @inheritdoc
 	     */
@@ -5234,12 +5642,12 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	    /***
 	     * @inheritdoc
 	     */
-	    protected deleteData(triggerFetch?: boolean, ...items: (T | T[])[]): Promise<Array<any>>;
+	    protected deleteData(triggerFetch?: Boolean, ...items: (T | T[])[]): Promise<Array<any>>;
 	    /***
 	     * enlève un élément ou des éléments au result du datasource
 	     * cette action déclenche l'évènement delete
-	     * @param {Boolean} triggerFetch déclenche un évènement "fetch" après l'opération si true.
-	     * @param {(T|T[])[]} items correspond aux données à ajouter, un appel à la méthode {@link DataSource#transformData} sera effectué
+	     * @param {Boolean} triggerFetch param inutilisé, cette fonction déclenchera un évènement "pagination" .
+	     * @param {(T|T[])[]} items correspond aux données à supprimer, un appel à la méthode {@link DataSource#transformData} sera effectué
 	     * @void
 	     */
 	    delete(triggerFetch: Boolean, ...items: (T | T[])[]): void;
@@ -5298,6 +5706,31 @@ declare module "hornet-js-core/src/component/datasource/paginate-datasource" {
 	     * renvoie les valeurs sélectionnées du datasource.
 	     */
 	    readonly selected: any;
+	}
+	
+}
+
+declare module "hornet-js-core/src/services/default/change-language" {
+	import { ServiceRequest }  from "hornet-js-core/src/services/service-request";
+	export class ChangeLanguage extends ServiceRequest {
+	    changeLanguage(data: any): Promise<any>;
+	}
+	
+}
+
+declare module "hornet-js-core/src/services/default/expanding-layout" {
+	import { ServiceRequest }  from "hornet-js-core/src/services/service-request";
+	export class ExpandingLayout extends ServiceRequest {
+	    setExpandedLayout(layoutObject: any): Promise<any>;
+	    isExpandedLayout(): Promise<any>;
+	}
+	
+}
+
+declare module "hornet-js-core/src/services/default/wakeup-node" {
+	import { ServiceRequest }  from "hornet-js-core/src/services/service-request";
+	export class WakeUpNode extends ServiceRequest {
+	    wakeUp(): Promise<any>;
 	}
 	
 }
@@ -5377,7 +5810,7 @@ declare module "hornet-js-core/src/component/datasource/config/datasource-map" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5466,12 +5899,13 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
 	import { SortData }  from "hornet-js-core/src/component/sort-data";
 	import { SpinnerType }  from "hornet-js-core/src/services/hornet-superagent-request";
+	import { DatasourceSortOption }  from "hornet-js-core/src/component/datasource/options/datasource-sort-option";
 	export interface DataSourceOption {
 	    sendToFetch(): boolean;
 	}
@@ -5480,11 +5914,11 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	    COMPARE_WITH_LOWERCASE = 2,
 	    COMPARE_WITH_UPPERCASE = 3,
 	}
-	export type CompareFn = (a: any, b: any) => number;
+	export type CompareFn = (sortData, a: any, b: any) => number;
 	/**
 	 * Option de tri par defaut dans un datasourcede
 	 */
-	export class DefaultSort implements DataSourceOption {
+	export class DefaultSort implements DatasourceSortOption {
 	    sort: SortData[];
 	    initCompare: CompareMethod | CompareFn;
 	    sendFetch: boolean;
@@ -5500,7 +5934,10 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	     * @returns {boolean}
 	     */
 	    sendToFetch(): boolean;
-	    compare: (a: any, b: any) => number;
+	    getCompareFunction(number: number): Function;
+	    compare: (sort: any, a: any, b: any) => number;
+	    compareUpperCase: (sort: any, a: any, b: any) => number;
+	    compareLowerCase: (sort: any, a: any, b: any) => number;
 	}
 	export class SpinnerOption implements DataSourceOption {
 	    type: SpinnerType;
@@ -5532,6 +5969,20 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	     * @returns {boolean}
 	     */
 	    sendToFetch(): boolean;
+	}
+	
+}
+
+declare module "hornet-js-core/src/component/datasource/options/datasource-sort-option" {
+	import { SortData }  from "hornet-js-core/src/component/sort-data";
+	import { DefaultSort }  from "hornet-js-core/src/component/datasource/options/datasource-option";
+	export interface DatasourceSortOption {
+	    /** Informations de tri */
+	    sortDatas?: SortData[];
+	    /** Méthode de tri custom */
+	    compare?: ((sortDatas: SortData, a: any, b: any) => number) | DefaultSort;
+	    /** Méthode de tri custom */
+	    getCompareFunction?: (number: number) => Function;
 	}
 	
 }
@@ -5611,7 +6062,7 @@ declare module "hornet-js-core/src/component/datasource/config/service/datasourc
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5704,7 +6155,7 @@ declare module "hornet-js-core/src/component/datasource/config/service/datasourc
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.1.1
+	 * @version v5.2.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

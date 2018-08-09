@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,7 +88,7 @@ import * as classNames from "classnames";
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu.accessibilite");
 
 /**
- * Fil d'ariane
+ * Menu d'Accessibilité
  */
 export class MenuAccessibilite extends HornetComponent<HornetComponentProps, any> {
 
@@ -107,14 +107,14 @@ export class MenuAccessibilite extends HornetComponent<HornetComponentProps, any
      */
     render(): JSX.Element {
 
-        let UlClasses: ClassDictionary = {
+        const ulClasses: ClassDictionary = {
             "top-menu-accessibilite": true,
-            focused: this.state.focused
+            focused: this.state.focused,
         };
 
         return (
-            <ul className={classNames(UlClasses)} id="evitement" onFocus={this.handleFocus} onBlur={this.handleBlur}>
-                <li><a href="#page">Aller au contenu</a></li>
+            <ul className={classNames(ulClasses)} id="evitement" onFocus={this.handleFocus} onBlur={this.handleBlur}>
+                <li><a href="#page">{this.i18n("menuAccessibilite.label")}</a></li>
             </ul>
         );
     }
@@ -124,8 +124,8 @@ export class MenuAccessibilite extends HornetComponent<HornetComponentProps, any
      */
     handleFocus() {
         this.setState({
-            focused: true
-        })
+            focused: true,
+        });
     }
 
     /**
@@ -133,11 +133,7 @@ export class MenuAccessibilite extends HornetComponent<HornetComponentProps, any
      */
     handleBlur() {
         this.setState({
-            focused: false
-        })
+            focused: false,
+        });
     }
-
-
-
-
 }

@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -144,7 +144,7 @@ describe("DateUtils", () => {
     });
 
     it("should parse date matching the only format", () => {
-        let result = DateUtils.parseMultipleFmt("01/03/2017", ["DD/MM/YYYY"],calendarLocale);
+        let result = DateUtils.parseMultipleFmt("01/03/2017", [ "DD/MM/YYYY" ], calendarLocale);
         expect(moment.isMoment(result)).to.be.equal(true);
         expect(result.year()).to.be.equal(2017);
         expect(result.month()).to.be.equal(2);
@@ -152,7 +152,7 @@ describe("DateUtils", () => {
     });
 
     it("should parse date matching the second format", () => {
-        let result = DateUtils.parseMultipleFmt("01/03/2017", ["YYYY-MM-DD", "DD/MM/YYYY"], calendarLocale);
+        let result = DateUtils.parseMultipleFmt("01/03/2017", [ "YYYY-MM-DD", "DD/MM/YYYY" ], calendarLocale);
         expect(moment.isMoment(result)).to.be.equal(true);
         expect(result.year()).to.be.equal(2017);
         expect(result.month()).to.be.equal(2);
@@ -160,14 +160,14 @@ describe("DateUtils", () => {
     });
 
     it("should parse date matching the only short format", () => {
-        let result = DateUtils.parseMultipleFmt("01/03", ["DD/MM"],calendarLocale);
+        let result = DateUtils.parseMultipleFmt("01/03", [ "DD/MM" ], calendarLocale);
         expect(moment.isMoment(result)).to.be.equal(true);
         expect(result.month()).to.be.equal(2);
         expect(result.date()).to.be.equal(1);
     });
 
     it("should parse date with locale format when formats array is undefiend", () => {
-        let result = DateUtils.parseMultipleFmt("01/03/2017", undefined,calendarLocale);
+        let result = DateUtils.parseMultipleFmt("01/03/2017", undefined, calendarLocale);
         expect(moment.isMoment(result)).to.be.equal(true);
         expect(result.year()).to.be.equal(2017);
         expect(result.month()).to.be.equal(2);
@@ -175,7 +175,7 @@ describe("DateUtils", () => {
     });
 
     it("should parse date with locale format when formats array is empty", () => {
-        let result = DateUtils.parseMultipleFmt("01/03/2017", [],calendarLocale);
+        let result = DateUtils.parseMultipleFmt("01/03/2017", [], calendarLocale);
         expect(moment.isMoment(result)).to.be.equal(true);
         expect(result.year()).to.be.equal(2017);
         expect(result.month()).to.be.equal(2);
@@ -183,12 +183,12 @@ describe("DateUtils", () => {
     });
 
     it("should not parse date matching no format", () => {
-        let result = DateUtils.parseMultipleFmt("/03/2017", ["YYYY-MM-DD", "YYYY/MM/DD"],calendarLocale);
+        let result = DateUtils.parseMultipleFmt("/03/2017", [ "YYYY-MM-DD", "YYYY/MM/DD" ], calendarLocale);
         expect(result).to.be.undefined;
     });
 
     it("should not parse undefined date with multiple formats", () => {
-        let result = DateUtils.parseMultipleFmt(undefined, ["YYYY-MM-DD", "YYYY/MM/DD"],calendarLocale);
+        let result = DateUtils.parseMultipleFmt(undefined, [ "YYYY-MM-DD", "YYYY/MM/DD" ], calendarLocale);
         expect(result).to.be.undefined;
     });
 

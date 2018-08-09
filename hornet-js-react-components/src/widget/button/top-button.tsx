@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,7 +106,7 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
         offset: 0,
         header: "header-container",
         footer: "footer-container",
-        notificationSession: "notification-session"
+        notificationSession: "notification-session",
     });
 
     constructor(props, context?: any) {
@@ -120,62 +120,6 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
 
     componentWillUnmount() {
         window.removeEventListener("scroll", this.handleScroll);
-    }
-
-    /**
-     * Calcule si un élément est présent ou non a l'écran
-     * @param {Element} elm - l'élément a rechercher
-     * @return {boolean} true si l'élément est présent
-     */
-    protected checkvisible(elm) {
-        let rect = elm.getBoundingClientRect();
-        let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-
-        //sauvegarde la la taille visible du footer
-        let height = -(rect.top - viewHeight) + 16;
-        this.setState({ size: height });
-
-        return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
-    }
-
-    /**
-     * Métohde de gestion du scroll à l'écran
-     * @param event - evenement scroll
-     */
-    protected handleScroll(event) {
-        let header = document.getElementById(this.state.header);
-        let footer = document.getElementById(this.state.footer);
-        let notificationSession = document.getElementById(this.state.notificationSession);
-
-        /* récupération de la hauteur du header : le composant ne s'affichera qu'au dela de cette hauteur */
-        let height: number = 0;
-        if (header) {
-            height = header.getBoundingClientRect().height;
-        }
-
-        if (notificationSession) {
-            height += notificationSession.getBoundingClientRect().height;
-        }
-
-        /*si le notificationSession est visible, le composant s'affichera au dessus de celui-ci*/
-        let visible: boolean = false;
-        if (footer && notificationSession) {
-            visible = this.checkvisible(notificationSession);
-        } else if (footer) {
-            visible = this.checkvisible(footer);
-        }
-
-        this.setState({
-            offset: height,
-            visible: visible
-        });
-    }
-
-    /**
-     * Méthode de retour en haut de la page
-     */
-    protected scrolltop() {
-        window.scrollTo(0, 0);
     }
 
     /**
@@ -197,21 +141,21 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
             style = { bottom: this.state.size };
         }
 
-        let shouldShow = scroll > this.state.offset;
+        const shouldShow = scroll > this.state.offset;
 
-        let contentButton = this.state.children || this.renderDefaultTopButtonContent();
-        let tabIndex = 0; //Permet d'avoir le focus sur le champs lorsqu'on navigue au clavier
+        const contentButton = this.state.children || this.renderDefaultTopButtonContent();
+        const tabIndex = 0; // Permet d'avoir le focus sur le champs lorsqu'on navigue au clavier
 
-        let aProps: any = {
+        const aProps: any = {
             className: this.state.className || "top-button",
-            style: style,
+            style,
             onClick: this.scrolltop,
             id: this.state.id,
             name: this.state.name,
             title: this.state.title,
-            tabIndex: tabIndex,
+            tabIndex,
             onKeyDown: this.handleKeyDown,
-            role: "button"
+            role: "button",
         };
 
         if (shouldShow) {
@@ -226,12 +170,74 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
     }
 
     /**
- * Gestion du clic sur entrer ou espace
- * @param event
- */
+     * Calcule si un élément est présent ou non a l'écran
+     * @param {Element} elm - l'élément a rechercher
+     * @return {boolean} true si l'élément est présent
+     */
+    protected checkvisible(elm) {
+        const rect = elm.getBoundingClientRect();
+        const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+
+        // sauvegarde la la taille visible du footer
+        const height = -(rect.top - viewHeight) + 16;
+        this.setState({ size: height });
+
+        return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+    }
+
+    /**
+     * Métohde de gestion du scroll à l'écran
+     * @param event - evenement scroll
+     */
+    protected handleScroll(event) {
+        const header = document.getElementById(this.state.header);
+        const footer = document.getElementById(this.state.footer);
+        const notificationSession = document.getElementById(this.state.notificationSession);
+
+        /* récupération de la hauteur du header : le composant ne s'affichera qu'au dela de cette hauteur */
+        let height: number = 0;
+        if (header) {
+            height = header.getBoundingClientRect().height;
+        }
+
+        if (notificationSession) {
+            height += notificationSession.getBoundingClientRect().height;
+        }
+
+        /*si le notificationSession est visible, le composant s'affichera au dessus de celui-ci*/
+        let visible: boolean = false;
+        if (footer && notificationSession) {
+            visible = this.checkvisible(notificationSession);
+        } else if (footer) {
+            visible = this.checkvisible(footer);
+        }
+
+        this.setState({
+            offset: height,
+            visible,
+        });
+    }
+
+    /**
+     * Méthode de retour en haut de la page
+     */
+    protected scrolltop() {
+        window.scrollTo({
+            behavior: "smooth",
+            left: 0,
+            top: 0,
+        });
+    }
+
+    /**
+     * Gestion du clic sur entrer ou espace
+     * @param event
+     */
     protected handleKeyDown(event): void {
-        if (event.keyCode == KeyCodes.ENTER) {
-            this.scrolltop();
+        if (event.keyCode === KeyCodes.ENTER || event.keyCode === KeyCodes.SPACEBAR) {
+            setTimeout(() => {
+                this.scrolltop();
+            }, 250);
         }
     }
 
@@ -247,5 +253,5 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
             </div>
         );
     }
-
+    
 }

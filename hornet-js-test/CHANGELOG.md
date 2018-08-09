@@ -1,3 +1,20 @@
+# hornet-js-test 5.2.0
+
+- EVOL: update version react (XSS)
+- FIX  - [s240] - Accessibilité: px to em
+- EVOL -  Ajout de génération des index
+- FIX  - Table: correctif format date sur méthode componentWillReceiveProps
+- FIX  - TSLint
+- EVOL - TESTS: ajout méthode generateMainId
+- EVOL - Correction TU
+- EVOL - [S80] - hornet-js-test : Montée de version React 16.4.0
+- FIX  - [m0068017] - RadioField : getCurrentValue()  renvoie null
+- FIX  - Retrait des listeners uncaughtException avant d'en ajouter un nouveau
+- FIX  - Correction de la pile de module dans base-mocha-test
+- EVOL -  MAJ d.ts nodejs
+- FIX  - Prise en compte mocha
+- FIX  - [mantis 67437] - correction du bug et creation du test associé
+
 # hornet-js-test 5.1.0
 
 -	213191	-	Maj regex tsconfig

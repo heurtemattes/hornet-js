@@ -73,14 +73,14 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Register } from "src/common-register";
 
-var logger = Register.getLogger("hornet-js-utils.template");
+const logger = Register.getLogger("hornet-js-utils.template");
 
 
 export interface Key {
@@ -104,14 +104,14 @@ export class Template {
         this.template = template;
         this.stringKey = [];
 
-        let regex = /(\$\{[^\{\}\s;]+\})/g;
+        const regex = /(\$\{[^\{\}\s;]+\})/g;
         let corresp = regex.exec(this.template);
 
         while (corresp) {
             this.stringKey.push({
                 key: corresp[ 0 ],
                 index: corresp.index,
-                keys: corresp[ 0 ].substring(2, corresp[ 0 ].length - 1).split(/[\.\[\]]/)
+                keys: corresp[ 0 ].substring(2, corresp[ 0 ].length - 1).split(/[\.\[\]]/),
             });
             corresp = regex.exec(this.template);
         }
@@ -124,16 +124,22 @@ export class Template {
      * @param {string} remplaceUndef remplacement si undefined
      * @return la chaine avec les valeurs remplacées
      */
-    process(obj: any, remplaceUndef: string) {
+    process(obj: any, remplaceUndef: string): any {
         let returnValue = this.template;
-        for (let part in this.stringKey) {
-            let partKey: Key = this.stringKey[ part ];
+        for (const part in this.stringKey) {
+            const partKey: Key = this.stringKey[ part ];
             let value = obj;
-            for (let attr in partKey.keys) {
-                attr = partKey.keys[ attr ];
+            let attr;
+            
+            for (let index = 0; index < partKey.keys.length; index++) {
+                attr = partKey.keys[ index ];
                 if (attr) {
                     value = value[ attr ];
-                    if (!value) {
+                    if (typeof value === "boolean") {
+                        return value;
+                    } else if (typeof value === "object" && 1 === this.stringKey.length && index === (partKey.keys.length - 1)) {
+                        return value;
+                    } else if (!value) {
                         value = remplaceUndef;
                         break;
                     }
@@ -145,4 +151,3 @@ export class Template {
         return returnValue;
     }
 }
-

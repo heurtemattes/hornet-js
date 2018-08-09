@@ -1,5 +1,5 @@
 {
-  "contextPath": "applitutoriel-5.1.1",
+  "contextPath": "applitutoriel-5.2.0",
   "server": {
     "port": 8888,
     "keepAlive": true,
@@ -72,28 +72,28 @@
     "routes": "/mock/routes",
     "defaultServices": { // service mock par defaut : le contexte est toujours "applitutoriel/hornet-mock"
       "host": "http://localhost:${server.port}/" //default localhost:8888
-  },
-  "cookie": {
-    "httpOnly": true,
-    "secure": false,
-    "maxAge": 3600000,
-    "secrets": [
-      "091f95daa79f4f6897862b375eaccb1b13e83adb5323e6572f953dfdc1d9878313a0d7bd3d69165f1a9414d2cc18be40",
-      "7af130afdb95da51499eec413fe792240f8936ba3032fb37e353653ceb098a777b64aada6d7673aff01899b3b1f5184d"
-    ]
-  },
-  "fullSpa": {
-    "enabled": false,
-    "host": "",
-    "name": "/services"
-  },
-  "authentication": {
-    "loginUrl": "/login"
-  },
-  "request": {
-    "cache": {
-      "enabled": true,
-      "timetolive": 60
+    },
+    "cookie": {
+      "httpOnly": true,
+      "secure": false,
+      "maxAge": 3600000,
+      "secrets": [
+        "091f95daa79f4f6897862b375eaccb1b13e83adb5323e6572f953dfdc1d9878313a0d7bd3d69165f1a9414d2cc18be40",
+        "7af130afdb95da51499eec413fe792240f8936ba3032fb37e353653ceb098a777b64aada6d7673aff01899b3b1f5184d"
+      ]
+    },
+    "fullSpa": {
+      "enabled": false,
+      "host": "",
+      "name": "/services"
+    },
+    "authentication": {
+      "loginUrl": "/login"
+    },
+    "request": {
+      "cache": {
+        "enabled": true,
+        "timetolive": 60
+      }
     }
   }
-}

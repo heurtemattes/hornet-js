@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,18 +82,22 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 import * as assert from "assert";
 import { TextAreaField } from "src/widget/form/textarea-field";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-let ReactTestUtils = require("react-dom/test-utils");
 
+const ReactTestUtils = require("react-dom/test-utils");
 let element: JSX.Element;
 let element2: JSX.Element;
+let element3: JSX.Element;
 let textarea;
 
 @Decorators.describe("Test Karma textarea-field")
@@ -103,19 +107,18 @@ class TextareaFieldTestKarma extends BaseTest {
 
     @Decorators.beforeEach
     beforeEach() {
-
+        Utils.setCls("hornet.internationalization", { messages});
         element = (
             <TextAreaField
                 name={"textarea"}
-                charLabel={"{count} caractère"}
-                label={"test"}
+                label={"test"} 
                 maxChar={255}
                 readOnly={false}
                 ref={(elt) => {
-                    this.test = elt
+                    this.test = elt;
                 }
                 }
-            />)
+            />);
 
         element2 = (
             <TextAreaField
@@ -126,95 +129,237 @@ class TextareaFieldTestKarma extends BaseTest {
                 showAlert={false}
                 readOnly={false}
                 ref={(elt) => {
-                    this.test = elt
+                    this.test = elt;
                 }
                 }
-            />)
-    };
+            />);
 
-    @Decorators.it('Test OK')
+        element3 = (
+            <TextAreaField
+                name={"textarea"}
+                label={"test"}
+                maxChar={255}
+                readOnly={false}
+                alertMessage="alert message {count} superiere a {maxChar}"
+                alertTitle="alert title"
+                ref={(elt) => {
+                        this.test = elt;
+                    }
+                }
+                displayMaxCharInLabel={true}
+            />);
+    }
+
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('Test de l\' existence du textarea')
+    @Decorators.it("Test de l' existence du textarea")
     testExist() {
-        textarea = this.renderIntoDocument(element, "main856");
-        let area = document.querySelector('#main856 textarea[name="textarea"]');
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const area = document.querySelector(`#${id} textarea`);
         expect(area).to.exist;
         this.end();
-    };
+    }
 
-    @Decorators.it('Test du compte de caractère')
+    @Decorators.it("Test du compte de caractère")
     testCharNumber() {
-        textarea = this.renderIntoDocument(element, "main856");
-        let area = document.querySelector('#main856 textarea[name="textarea"]') as HTMLTextAreaElement;
-        let charLabel = document.querySelector('#main856 .textarea-character-value') as HTMLDivElement;
-        this.triggerKeydownEvent(area, "m", 77, true);
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const area = document.querySelector(`#${id} textarea`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+        this.triggerKeydownEvent(area, "", null, true);
+        
         setTimeout(() => {
-            expect(area.value).to.be.equal("m");
-            expect(charLabel.innerHTML).to.be.equal("1 caractère");
+            expect(area.value).to.be.equal("");
+            expect(charLabel.innerHTML).to.be.equal("0 caractère");
             this.triggerKeydownEvent(area, "m", 77, true);
             setTimeout(() => {
-                expect(area.value).to.be.equal("mm");
-                expect(charLabel.innerHTML).to.be.equal("2 caractère");
-                this.end();
-            }, 250);
-        }, 250);
-    };
+                expect(area.value).to.be.equal("m");
+                expect(charLabel.innerHTML).to.be.equal("1 caractère");
+                this.triggerKeydownEvent(area, "m", 77,  true);
+                setTimeout(() => {
+                    expect(area.value).to.be.equal("mm");
+                    expect(charLabel.innerHTML).to.be.equal("2 caractères");
+                    this.end();
+                });
+            },         250);
+        },         250);
+    }
 
-    @Decorators.it('Test de l`activation de l\'alerte')
-    testAffichageAlerte() {
-        textarea = this.renderIntoDocument(element, "main857");
-        let area = document.querySelector('#main857 textarea[name="textarea"]') as HTMLTextAreaElement;
-        let charLabel = document.querySelector('#main857 .textarea-character-value') as HTMLDivElement;
+    @Decorators.it("Test de l'activation de l'alerte")
+    testAlertActivation() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
         let i;
         for (i = 0; i < 256; i++) {
             this.triggerKeydownEvent(area, "m", 77, true);
         }
         setTimeout(() => {
-            expect(charLabel.innerHTML).to.be.equal("256 caractère");
-            let alert = document.querySelector('.widget-alert-body');
+            expect(charLabel.innerHTML).to.be.equal("256 caractères");
+            const alert = document.querySelector(".widget-alert-body");
             expect(alert).to.exist;
-            let alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
+            const alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
+            const alertTitle = document.querySelector(".widget-dialogue-title h1") as HTMLDivElement;
+            const alertBody = document.querySelector(".widget-alert-body") as HTMLDivElement;
+            expect(alertOk).to.exist;
+            expect(alertTitle).to.exist;
+            // Etant donné qu'il n y a pas de prop alertTitle on utilise le title défini dans i18n (clé:textarea.alertTitle)
+            expect(alertTitle.innerText).to.be.equals("Nombre de caractères trop élevé");
+            expect(alertBody).to.exist;
+            // Etant donné qu'il n y a pas de prop alertMessage on utilise le title défini dans i18n (clé:textarea.alertMessage)
+            expect(alertBody.innerText).to.be.equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (256/255).");
+
+            (alertOk as any).click();
+            this.end();
+        },         250);
+    }
+
+    @Decorators.it("Test de l'activation de l'alerte avec message et titre passés en props")
+    testAlertActivationWithMessageAndTitleInProps() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element3, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+        let i;
+        for (i = 0; i < 256; i++) {
+            this.triggerKeydownEvent(area, "m", 77, true);
+        }
+        setTimeout(() => {
+            expect(charLabel.innerHTML).to.be.equal("256 caractères");
+            const alert = document.querySelector(".widget-alert-body");
+            expect(alert).to.exist;
+            const alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
+            const alertTitle = document.querySelector(".widget-dialogue-title h1") as HTMLDivElement;
+            const alertBody = document.querySelector(".widget-alert-body") as HTMLDivElement;
+            expect(alertOk).to.exist;
+            expect(alertTitle).to.exist;
+            expect(alertTitle.innerText).to.be.equals("alert title");
+            expect(alertBody).to.exist;
+            expect(alertBody.innerText).to.be.equals("alert message 256 superiere a 255");
+
+            (alertOk as any).click();
+            this.end();
+        },         250);
+    }
+
+    @Decorators.it("Test de non activation de l'alerte")
+    testNoAlert() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element2, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+        let i;
+        for (i = 0; i < 256; i++) {
+            this.triggerKeydownEvent(area, "m", 77, true);
+        }
+        setTimeout(() => {
+            const alert = document.querySelector(".widget-alert-body");
+            expect(alert).to.be.null;
+            this.end();
+        },         250);
+    }
+
+    @Decorators.it("Test du className du charLabel")
+    testCharLabelClassName() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element2, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        let i;
+        for (i = 0; i < 256; i++) {
+            this.triggerKeydownEvent(area, "m", 77, true);
+        }
+        setTimeout(() => {
+            const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+            const className = charLabel.className;
+            expect(className).to.be.equals("textarea-character-value textarea-too-many-char");
+            this.end();
+        },         250);
+    }
+
+    @Decorators.it("Test de l'activation de l'alerte si dernier caractere est espace")
+    tesAlertActivationWithEspaceInLastPosition() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+        let i;
+        for (i = 0; i < 255; i++) {
+            this.triggerKeydownEvent(area, "m", 77, true);
+        }
+        this.triggerKeydownEvent(area, " ", 32, true);
+        setTimeout(() => {
+            expect(charLabel.innerHTML).to.be.equal("256 caractères");
+            const alert = document.querySelector(".widget-alert-body");
+            expect(alert).to.exist;
+            const alertOk = document.querySelector(".widget-dialogue-footer #alertOK");
             expect(alertOk).to.exist;
             (alertOk as any).click();
             this.end();
-        }, 250);
-    };
+        },         250);
+    }
 
-    @Decorators.it('Test de non activation de l\'alerte')
-    testNonAffichageAlerte() {
-        textarea = this.renderIntoDocument(element2, "main858");
-        let area = document.querySelector('#main858 textarea[name="textarea"]') as HTMLTextAreaElement;
-        let charLabel = document.querySelector('#main858 .textarea-character-value') as HTMLDivElement;
-        let i;
-        for (i = 0; i < 256; i++) {
-            this.triggerKeydownEvent(area, "m", 77, true);
-        }
+    @Decorators.it("Test de l'affichage du compteur via setCurrentValue")
+    testCharsCounterWithSetCurrentValue() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+        this.test.setCurrentValue("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
         setTimeout(() => {
-            let alert = document.querySelector('.widget-alert-body');
-            expect(alert).to.be.null;
+            expect(charLabel.innerHTML).to.be.equal("123 caractères");
+            expect(charLabel.className).to.be.equals("textarea-character-value");
             this.end();
-        }, 250);
-    };
+        },         250);
+    }
 
-    @Decorators.it('Test du className du charLabel')
-    testCharLabelClassName() {
-        textarea = this.renderIntoDocument(element2, "main859");
-        let area = document.querySelector('#main859 textarea[name="textarea"]') as HTMLTextAreaElement;
-        let i;
-        for (i = 0; i < 256; i++) {
-            this.triggerKeydownEvent(area, "m", 77, true);
-        }
+    @Decorators.it("Test de l'affichage du label sans maxChar")
+    testLabelWithoutMaxChar() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const label = document.querySelector(`#${id} .label`) as HTMLSpanElement;
         setTimeout(() => {
-            let charLabel = document.querySelector('#main859 .textarea-character-value') as HTMLDivElement;
-            let className = charLabel.className;
-            expect(className).to.be.equals("textarea-character-value textarea-too-many-char");
+            expect(label.innerHTML).to.be.equal("test");
             this.end();
-        }, 250);
-    };
+        },         250);
+    }
+
+    @Decorators.it("Test de l'affichage du label avec maxChar")
+    testLabelWithMaxChar() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element3, id);
+        const label = document.querySelector(`#${id} .label`) as HTMLSpanElement;
+        setTimeout(() => {
+            expect(label.innerHTML).to.be.equal("test (limite 255 caractères)");
+            this.end();
+        },         250);
+    }
+
+    @Decorators.it("Test des attributs RGAA")
+    testAriaAttributes() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element, id);
+        const area = document.querySelector(`#${id} textarea[name="textarea"]`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
+        setTimeout(() => {
+            expect(area.hasAttribute("aria-labelledby")).to.be.true;
+            expect(area.getAttribute("aria-labelledby")).to.be.equals("textarea-span-label chars-counter-textarea");
+            expect(area.hasAttribute("role-aria")).to.be.true;
+            expect(area.getAttribute("role-aria")).to.be.equals("textbox");
+            expect(area.hasAttribute("aria-multiline")).to.be.true;
+            expect(area.getAttribute("aria-multiline")).to.be.equals("true");
+
+            expect(charLabel.hasAttribute("role")).to.be.true;
+            expect(charLabel.getAttribute("role")).to.be.equals("log");
+
+            this.end();
+        },         250);
+    }
 
 
     /*****************************************************/
@@ -233,11 +378,13 @@ class TextareaFieldTestKarma extends BaseTest {
      * @param changeValue
      */
     protected triggerKeydownEvent(element: any, valueKey: string, keyCode: number, changeValue?: boolean): void {
-        ReactTestUtils.Simulate.keyDown(element, {key: valueKey, keyCode: keyCode, which: keyCode});
+        ReactTestUtils.Simulate.keyDown(element, { key: valueKey, keyCode, which: keyCode });
         this.handleChangeValueOnElement(changeValue, element, valueKey);
     }
 }
 
 
-//lancement des Tests
+// lancement des Tests
 runTest(new TextareaFieldTestKarma());
+
+

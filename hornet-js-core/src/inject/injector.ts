@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,7 +110,6 @@ export class Injector {
         if (!_.isString(key)) {
             id = key[ ID_NAME ];
         }
-
         return Injector.registry[ id as string ] && Injector.registry[ id as string ][ side ];
     }
 
@@ -178,12 +177,18 @@ export class Injector {
                     Injector.registry[ id as string ][ side ] = value;
                     break;
                 case Scope.SINGLETON:
+                    Object.defineProperty(Injector.registry[ id as string ], side + "", {
+                        get: () => { if(!Injector.registry[ id as string ][ side + "value"]) {Injector.registry[ id as string ][ side + "value"] = new value()};return Injector.registry[ id as string ][ side + "value"]; }, configurable: true
+                    });
+                    Injector.registry[ id as string ][ side + "value"] = undefined;
+                    break;
+                case Scope.SINGLETON_EAGER:
                     Injector.registry[ id as string ][ side ] = new value();
                     break;
                 case Scope.PROTOTYPE:
                     Object.defineProperty(Injector.registry[ id as string ], side + "", {
                         get: () => { return new value(); }, configurable: true
-                    })
+                    });
                     break;
             }
         } catch (e) {

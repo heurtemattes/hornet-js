@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -245,8 +245,8 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     }
 
     protected autobinding() {
-        let blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
-        for (let fn in this) {
+        const blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
+        for (const fn in this) {
             if (_.isFunction(this[ fn ]) && !(fn in blacklist)) {
                 this[ fn ] = this[ fn ][ "bind" ](this);
             }
@@ -259,11 +259,11 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      */
     protected errorManagement() {
         /* Fonctions à ne pas encapsuler */
-        let blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
+        const blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
         if (this.isErrorManaged()) {
-            for (let fn in this) {
+            for (const fn in this) {
                 if (_.isFunction(this[ fn ]) && !(fn in blacklist)) {
-                    //this.wrapMethod(fn);
+                    // this.wrapMethod(fn);
                 }
             }
 
@@ -319,22 +319,22 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      * @param method
      */
     protected wrapMethod(method) {
-        let unwrapped = this[ method ];
-        let self = this;
+        const unwrapped = this[ method ];
+        const self = this;
         self[ method ] = function () {
             try {
-                if (method == "render") self.rendering = true;
+                if (method === "render") self.rendering = true;
 
                 return unwrapped.apply(undefined, arguments);
             } catch (e) {
-                if (!e[ "hasBeenReported" ] && (!self.rendering || method == "render")) {
-                    let errorReport = {
+                if (!e[ "hasBeenReported" ] && (!self.rendering || method === "render")) {
+                    const errorReport = {
                         componentName: self.constructor[ "name" ],
-                        method: method,
+                        method,
                         methodArguments: arguments,
                         props: self.props,
                         state: self.state,
-                        error: e
+                        error: e,
                     };
                     e[ "hasBeenReported" ] = true;
                     self.getErrorHandler()(errorReport, self.getErrorComponent());
@@ -342,7 +342,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
 
                 // cas de la méthode "render" pour laquelle il faut au moins renvoyer null
                 // pour ne pas corrompre React
-                if (method == "render") {
+                if (method === "render") {
                     self.hasError = true;
                     return null;
                 } else if (!e[ "hasBeenThrown" ]) {
@@ -350,7 +350,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
                     throw e;
                 }
             } finally {
-                if (method == "render") self.rendering = false;
+                if (method === "render") self.rendering = false;
             }
         };
     }
@@ -435,7 +435,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      * @returns {Array}
      */
     protected getComponentsBy(ComponentType): any[] {
-        let children = [];
+        const children = [];
         React.Children.map(this.props.children, (child: React.ReactChild) => {
             if ((child as React.ReactElement<any>).type === ComponentType) {
                 children.push(child);
@@ -451,8 +451,8 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      * @returns {boolean}
      */
     protected hasChildrenOfComponentTypeOf(Component, ComponentType): boolean {
-        let elements: any[] = this.getChildrenOf(Component);
-        let nbMax = elements.length;
+        const elements: any[] = this.getChildrenOf(Component);
+        const nbMax = elements.length;
         for (let i = 0; i < nbMax; i++) {
             if (elements[ i ] && (elements[ i ] as React.ReactElement<any>).type === ComponentType) {
                 return true;
@@ -470,11 +470,11 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     wrap<P, S>(ComponentToWrap, otherProps: P, thisProps = this.props) {
 
 
-        let myProps = {};
+        const myProps = {};
         this.copyInitialPropsToState(thisProps, myProps);
         this.copyInitialPropsToState((otherProps as any), myProps);
 
-        let elt = React.createElement(ComponentToWrap, myProps, thisProps.children);
+        const elt = React.createElement(ComponentToWrap, myProps, thisProps.children);
         return elt;
     }
 
@@ -505,7 +505,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
             }
 
             public setState() {
-                this.componentToWrap.setState(arguments)
+                this.componentToWrap.setState(arguments);
             }
 
             public getThisBind(): HornetComponent<HornetComponentProps, HornetComponentState> {
@@ -529,7 +529,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
 
 
         // on retourne notre wrapper
-        return (WrapComponent as any)
+        return (WrapComponent as any);
     }
 
 
@@ -541,10 +541,10 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      */
     static mergeObjects(obj1, obj2) {
 
-        let merge = (finalObj, obj) => {
+        const merge = (finalObj, obj) => {
 
-            if (typeof obj == "object") {
-                let keys = Object.keys(obj);
+            if (typeof obj === "object") {
+                const keys = Object.keys(obj);
                 if (Array.isArray(keys) && keys.length > 0) {
                     keys.map((key) => {
                         finalObj[ key ] = obj[ key ];
@@ -555,7 +555,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
         };
 
 
-        let finalObj: any = merge({}, obj1);
+        const finalObj: any = merge({}, obj1);
         return merge(finalObj, obj2);
     }
 
@@ -574,9 +574,9 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     static genUrlThemeEmbedded(path?: string): string {
 
         let themeUrl = "";
-        let property: string = "themeName";
+        const property: string = "themeName";
         if (Utils.config.has(property)) {
-            let themeName = Utils.config.getOrDefault(property, "");
+            const themeName = Utils.config.getOrDefault(property, "");
             if (themeName) {
                 themeUrl = Utils.buildStaticPath("/" + themeName + (path === undefined ? "" : path));
             }
@@ -591,7 +591,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
      */
     static genUrlThemeExternal(path?: string): string {
         let themeUrl = "";
-        let property: string = "themeHost";
+        const property: string = "themeHost";
         if (Utils.config.has(property)) {
             themeUrl = Utils.config.get(property);
             if (themeUrl) {
@@ -671,7 +671,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
 
     /**
      * Retourne la valeur de la ressource si la property n'est pas initialisée
-     * @param property : valeur à vérifié si elle est initialisée
+     * @param property : valeur à vérifier si elle est initialisée
      * @param ressource : valeur par défaut à retourner si la première n'est pas initialisée
      * @returns {any}
      */

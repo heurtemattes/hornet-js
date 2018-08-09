@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,13 +81,13 @@
 import { TestUtils } from "hornet-js-test/src/test-utils";
 import { Utils } from "hornet-js-utils";
 import { HornetSuperAgent } from "src/services/hornet-superagent";
-import { HornetRequest} from "src/services/hornet-superagent-request";
+import { HornetRequest } from "src/services/hornet-superagent-request";
 var expect = TestUtils.chai.expect;
 var sinon = TestUtils.sinon;
 import * as _ from "lodash";
 
 
-process.on("unhandledRejection", function(reason, promise) {
+process.on("unhandledRejection", function (reason, promise) {
     console.error("hornet-agent-spec", reason);
     throw reason;
 });
@@ -118,15 +118,17 @@ process.on("unhandledRejection", function(reason, promise) {
     connectSpy = sinon.spy(instance, 'connect');
     callSuperAgentSpy = sinon.spy(instance, 'callSuperAgent');
 };*/
-describe.skip("hornet-agent-spec", () => {
+describe("hornet-agent-spec", () => {
 
     describe("cache", () => {
 
         it("should deactivate cache if global cache deactivated", () => {
             // Arrange
-            Utils.setConfigObj({request : {
-                cache: {enabled: false}
-            }});
+            Utils.setConfigObj({
+                request: {
+                    cache: { enabled: false }
+                }
+            });
 
             // Act
             var instance = new HornetSuperAgent();
@@ -138,9 +140,11 @@ describe.skip("hornet-agent-spec", () => {
 
         it("should activate cache with default ttl if global cache activate", () => {
             // Arrange
-            Utils.setConfigObj({request: {
-                cache: {enabled: true, timetolive: 45}
-            }});
+            Utils.setConfigObj({
+                request: {
+                    cache: { enabled: true, timetolive: 45 }
+                }
+            });
 
             // Act
             var instance = new HornetSuperAgent();
@@ -148,32 +152,6 @@ describe.skip("hornet-agent-spec", () => {
             // Assert
             expect((<any>instance).enableCache).to.be.true;
             expect((<any>instance).timeToLiveInCache).to.be.equals(45);
-        });
-
-    });
-
-    describe("config Request", () => {
-
-        /*beforeEach(() => {
-            globalReset()
-        });*/
-
-        it("should set a config to Request by 'send' call method", (done) => {
-
-            // Arrange
-            let config = {
-                method: 'get',
-                url: 'any'
-            } as HornetRequest;
-
-            let instance = new HornetSuperAgent();
-            let sendSpy = sinon.spy(instance, 'fetch');
-            
-            instance.fetch(config);
-            setTimeout(()=>{
-                expect((sendSpy.calledOnce), "sendSpy est appelée une seule fois").to.be.true;
-                done()
-            }, 50)
         });
 
     });

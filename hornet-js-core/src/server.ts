@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -266,7 +266,7 @@ export class Server {
                 logger.warn("Un middleware de valeur '" + middleware + "' a été trouvé dans le tableau des middlewares.");
             } else {
                 try {
-                    if(middleware instanceof HornetRouter) {
+                    if (middleware instanceof HornetRouter) {
                         app.use((middleware as HornetRouter).prefix, (middleware as HornetRouter).router);
                     } else {
                         var inst = new middleware();
@@ -303,8 +303,9 @@ function extendsExpressMethods(app: express.Express, routine: string) {
         // si un path est passé à express > on le prefix par le contextPath
         if (typeof arguments[ 0 ] === "string") {
             args[ 0 ] = joinUrl(Utils.getContextPath(), arguments[ 0 ]);
-
             // si pas de path > on créé le path avec le contextPath comme valeur
+        } else if (arguments[ 0 ].constructor == RegExp) {
+            args[ 0 ] = arguments[ 0 ].compile(Utils.getContextPath() + arguments[ 0 ].source);
         } else {
             args.unshift(Utils.getContextPath());
         }

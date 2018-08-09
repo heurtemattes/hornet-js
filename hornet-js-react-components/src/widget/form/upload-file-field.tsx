@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,7 @@ import {
     AbstractField,
     HornetBasicFormFieldProps,
     HornetClickableProps,
-    HornetMediaProps
+    HornetMediaProps,
 } from "src/widget/form/abstract-field";
 import { UploadedFile } from "hornet-js-core/src/data/file";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -111,6 +111,8 @@ export interface UploadFileFieldProps extends HornetClickableProps,
     classNameDelete?: string;
     /** clé i18n pour le label */
     i18nLabelKey?: string;
+    /** définit si le champs peut être réinitialiser */
+    resettable?: boolean;
 }
 
 /**
@@ -122,22 +124,25 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     public readonly props: Readonly<UploadFileFieldProps>;
 
     static defaultProps = _.assign(AbstractField.defaultProps, {
-        fileSelectedLabel: UploadFileField.getI18n("uploadFile.selectedFile", {"count": 0}),
-        i18nLabelKey: "uploadFile.selectedFile"
+        fileSelectedLabel: UploadFileField.getI18n("uploadFile.selectedFile", { count: 0 }),
+        i18nLabelKey: "uploadFile.selectedFile",
+        resettable: true,
     });
 
     constructor(props?: P, context?: any) {
         super(props, context);
-        this.state.readOnlyFile = this.state.defaultFile;
-        if (!this.state.buttonLabel) {
-            this.state.buttonLabel = this.state.name;
-        }
-        this.state.activeButtonLabel = this.state.buttonLabel;
+
+        this.state = {
+            ...this.state,
+            readOnlyFile: this.state.defaultFile,
+            buttonLabel: this.state.buttonLabel || this.state.name,
+            activeButtonLabel: this.state.buttonLabel,
+        };
     }
 
 
     setReadOnlyFile(readOnlyFile: boolean, callback?: () => any): this {
-        this.setState({readOnlyFile: readOnlyFile}, callback);
+        this.setState({ readOnlyFile }, callback);
         return this;
     }
 
@@ -146,12 +151,12 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * @param e évènement
      */
     protected handleChange(e: __React.SyntheticEvent<HTMLElement>): void {
-        let input: HTMLInputElement = e.target as HTMLInputElement;
+        const input: HTMLInputElement = e.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {
-            this.setState({activeButtonLabel: this.i18n(this.state.i18nLabelKey, {"count": input.files.length})});
+            this.setState({ activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: input.files.length }) });
 
         } else {
-            this.setState({activeButtonLabel: this.i18n(this.state.i18nLabelKey, {"count": 0})});
+            this.setState({ activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: 0 }) });
         }
 
         /* Déclenchement de la fonction onChange éventuellement passée en propriété */
@@ -164,14 +169,14 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * @returns {any} les propriétés du fichier en consultation converties en attributs html data
      */
     protected getDataFileProps(): any {
-        let dataProps: any = {};
+        const dataProps: any = {};
         if (this.state.defaultFile) {
-            dataProps["data-file-id"] = this.state.defaultFile.id;
-            dataProps["data-file-originalname"] = this.state.defaultFile.originalname;
-            dataProps["data-file-name"] = this.state.defaultFile.name;
-            dataProps["data-file-mime-type"] = this.state.defaultFile.mimeType;
-            dataProps["data-file-encoding"] = this.state.defaultFile.encoding;
-            dataProps["data-file-size"] = this.state.defaultFile.size;
+            dataProps[ "data-file-id" ] = this.state.defaultFile.id;
+            dataProps[ "data-file-originalname" ] = this.state.defaultFile.originalname;
+            dataProps[ "data-file-name" ] = this.state.defaultFile.name;
+            dataProps[ "data-file-mime-type" ] = this.state.defaultFile.mimeType;
+            dataProps[ "data-file-encoding" ] = this.state.defaultFile.encoding;
+            dataProps[ "data-file-size" ] = this.state.defaultFile.size;
         }
         return dataProps;
     }
@@ -180,13 +185,13 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * @override
      */
     setCurrentValue(formData: any): this {
-        //let value:any = _.get(formData, this.state.name);
+        // let value:any = _.get(formData, this.state.name);
         if (!formData) {
             this.handleDelete();
         }
         this.setState({
             readOnlyFile: formData,
-            defaultFile: formData
+            defaultFile: formData,
         });
 
         return this;
@@ -203,24 +208,22 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      */
     renderWidget(): JSX.Element {
 
-        logger.info("Rendu composant UploadFileField");
-
         let preview = "";
         if (this.props.renderPreviewFile) {
             preview = this.props.renderPreviewFile(this.state.readOnlyFile);
         }
 
         /* On n'inclut pas les propriétés spécifiques ou celles dont on surcharge la valeur */
-        let htmlProps = _.omit(this.getHtmlProps(), ["defaultFile", "type", "onChange"]);
-        _.assign(htmlProps, {"className": htmlProps["className"] ? htmlProps["className"] + " uploadfile" : " uploadfile"});
-        _.assign(htmlProps, {"data-multiple-caption": this.state.fileSelectedLabel});
+        const htmlProps = _.omit(this.getHtmlProps(), [ "defaultFile", "type", "onChange" ]);
+        _.assign(htmlProps, { className: htmlProps[ "className" ] ? htmlProps[ "className" ] + " uploadfile" : " uploadfile" });
+        _.assign(htmlProps, { "data-multiple-caption": this.state.fileSelectedLabel });
 
-        let cssDelete = (this.props.classNameDelete) ? "hornet-button hornet-button-right upload-delete-button " + this.props.classNameDelete : "hornet-button hornet-button-right upload-delete-button";
+        const cssDelete = (this.props.classNameDelete) ? "hornet-button hornet-button-right upload-delete-button " + this.props.classNameDelete : "hornet-button hornet-button-right upload-delete-button";
         /* On ne peut assigner programmatiquement la valeur d'un champ de type fichier (problème de sécurité potentiel)
          * on utilise donc ici les attributs data-* pour stocker les propriétés de l'éventuel fichier déjà sélectionné.
          * Celles-ci seront ensuite récupérées lors de l'envoi du formulaire, si un autre fichier n'a pas été sélectionné.*/
-        let dataProps = this.getDataFileProps();
-        let inputFile =
+        const dataProps = this.getDataFileProps();
+        const inputFile =
             <input
                 ref={(elt) => {
                     this.registerUploadFieldElement(elt);
@@ -231,18 +234,19 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
                 {...htmlProps}
             />;
 
-        let labelProps = {
-            htmlFor: htmlProps["id"],
-            readOnly: htmlProps["readOnly"],
-            className: "upload-content"
+        const labelProps = {
+            htmlFor: htmlProps[ "id" ],
+            readOnly: htmlProps[ "readOnly" ],
+            className: "upload-content",
+            title: htmlProps["title"], 
         };
 
-        let aProps: any = {
+        const aProps: any = {
             href: "#",
             onClick: this.downloadButtonActionHandler,
             onKeyDown: this.downloadButtonKeyDownHandler,
-            disabled: htmlProps["readOnly"],
-            "aria-haspopup": true
+            disabled: htmlProps[ "readOnly" ],
+            "aria-haspopup": true,
         };
 
 
@@ -255,12 +259,12 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
                         <span className="upload-text">{this.state.activeButtonLabel}</span>
                     </a>
                 </label>
-                {(this.htmlElement) && this.htmlElement.files.length ?
+                {(this.htmlElement) && this.htmlElement.files.length && this.state.resettable ?
                     <button type="button"
-                            className={cssDelete}
-                            onClick={this.handleDelete}
-                            aria-label={this.i18n("uploadFile.labelSupprimer")}
-                            disabled={this.state.readOnly}>X</button>
+                        className={cssDelete}
+                        onClick={this.handleDelete}
+                        aria-label={this.i18n("uploadFile.labelSupprimer")}
+                        disabled={this.state.readOnly}>X</button>
                     : ""}
                 {preview}
             </div>);
@@ -269,7 +273,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     /* suppression du fichier sélectionné  dans le champs input */
     handleDelete() {
         this.htmlElement.value = "";
-        this.setState({defaultFile: null, activeButtonLabel: this.i18n(this.state.i18nLabelKey, {"count": 0})});
+        this.setState({ defaultFile: null, activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: 0 }) });
 
     }
 
@@ -288,11 +292,10 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      */
     protected downloadButtonKeyDownHandler(e: React.KeyboardEvent<HTMLAnchorElement>) {
         if (!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
-            let keyCode: number = e.keyCode;
-            if (keyCode == KeyCodes.ENTER || keyCode == KeyCodes.SPACEBAR) {
+            const keyCode: number = e.keyCode;
+            if (keyCode === KeyCodes.SPACEBAR) {
                 this.downloadButtonActionHandler();
             }
         }
     }
-
 }

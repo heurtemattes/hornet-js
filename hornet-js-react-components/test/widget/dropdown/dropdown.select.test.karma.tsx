@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,6 @@ import * as React from "react";
 import * as ReactDom from "react-dom";
 import { Dropdown, Position } from "hornet-js-react-components/src/widget/dropdown/dropdown";
 import { runTest } from "hornet-js-test/src/test-run";
-import { BaseTest } from "hornet-js-test/src/base-test";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
@@ -101,19 +100,21 @@ function renderIntoDocument(element, id) {
 }
 
 import forEach = require("lodash/forEach");
+import { HornetTestAssert } from 'hornet-js-test/src/hornet-test-assert';
+import { HornetReactTest } from 'hornet-js-test/src/hornet-react-test';
+import { KeyCodes } from 'hornet-js-components/src/event/key-codes';
 const logger = Utils.getLogger("hornet-js-react-components.test.dropdown.dropdown");
-let element: JSX.Element;
-let $element;
+let element, element1: JSX.Element;
 
 
 @Decorators.describe('Test Karma Dropdown')
-class DropdownTest extends BaseTest {
+class DropdownTest extends HornetReactTest {
     @Decorators.beforeEach
     beforeEach() {
         let dropdownItems = [];
 
-        dropdownItems.push({id: "item1", label: "text Label 1", /*action: ,*/className: "items", disabled: true});
-        dropdownItems.push({id: "item2", label: "text Label 2", /*action: ,*/className: "items", disabled: false});
+        dropdownItems.push({ id: "item1", label: "text Label 1", /*action: ,*/className: "items-0", disabled: true });
+        dropdownItems.push({ id: "item2", label: "text Label 2", /*action: ,*/className: "items-1", disabled: false });
         element = (
             <Dropdown
                 className={"language"}
@@ -122,7 +123,19 @@ class DropdownTest extends BaseTest {
                 position={Position.TOPRIGHT}
                 icon="language-arrow-down"
                 valueCurrent={152}
+            />);
+        element1 = (
+            <Dropdown
+                className={"test"}
+                id={"test"}
+                items={dropdownItems}
+                position={Position.TOPRIGHT}
+                icon="test-arrow-down"
+                valueCurrent={152}
+                closeClick={false}
             />)
+
+
     }
 
     @Decorators.it('Test OK')
@@ -133,27 +146,180 @@ class DropdownTest extends BaseTest {
 
     @Decorators.it("Test Affichage Dropdown")
     testAffichage() {
-        $element = renderIntoDocument(element, "main1");
+        const id = this.generateMainId();
+        renderIntoDocument(element, id);
 
         /* Existance du boutton dropdown */
-        expect(document.querySelector('#main1 .language .dropdown-button .label'), "Problème élément Label non trouvé").to.exist;
-        expect(document.querySelector('#main1 .language .dropdown-button .icon'), "Problème élément Icon non trouvé").to.exist;
+        expect(document.querySelector(`#${id} .language .dropdown-button .label`), "Problème élément Label non trouvé").to.exist;
+        expect(document.querySelector(`#${id} .language .dropdown-button .icon`), "Problème élément Icon non trouvé").to.exist;
         /* Existance de la dropListe */
-        expect(document.querySelector('#main1 .language .dropdown-content.dropdown-content-hidden .dropdown-list '), "Problème élément dropdownlist non trouvé").to.exist;
+        expect(document.querySelector(`#${id} .language .dropdown-content.dropdown-content-hidden .dropdown-list `), "Problème élément dropdownlist non trouvé").to.exist;
         this.end();
 
-    };
+    }
 
     @Decorators.it("Test clic Dropdown")
     testClickButton(done) {
-        $element = renderIntoDocument(element, "main2");
+        const id = this.generateMainId()
+        renderIntoDocument(element, id);
 
-        (document.querySelector("#main2 .language .dropdown-button") as any).click();
-        expect(document.querySelector('#main2 .language .dropdown-content-hidden .dropdown-list'), "Problème lors du clic sur le bouton pour ouvrir la dropbox").to.be.null;
+        (document.querySelector(`#${id} .language .dropdown-button`) as any).click();
+        expect(document.querySelector(`#${id} .language .dropdown-content-hidden .dropdown-list`), "Problème lors du clic sur le bouton pour ouvrir la dropbox").to.be.null;
         this.end();
 
-    };
+    }
 
+    @Decorators.it("Test clic à l'extérieur du Dropdown")
+    testClickHorsDuDropdown(done) {
+        const id = this.generateMainId();
+        const elemntSuperflux = <div id="div-superflux"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</p></div>;
+        renderIntoDocument(element, id);
+        renderIntoDocument(elemntSuperflux, id);
+
+        // clic sur le bouton permettant d'ouvrir le dropdown
+        this.triggerMouseEvent(document.querySelector(`#${id} .language .dropdown-button`), "click");
+
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            // Clic à l'exterieur du dropdown, sur un autre noeud du DOM
+            this.triggerMouseEvent(document.querySelector(`#${id} #div-superflux`), "click");
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "false", "L'attribut aria-expanded n'est pas à false");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "4-Le dropdown n'est ouvert");
+                this.end();
+            }, 250);
+        }, 250);
+
+    }
+
+    @Decorators.it("Test clic à l'interieur du DropDown avec l'attribut closeClick à true : Fermeture du dropdown")
+    testClickDansLeDropdown(done) {
+        const id = this.generateMainId();
+        renderIntoDocument(element, id);
+
+        // clic sur le bouton permettant d'ouvrir le dropdown
+        this.triggerMouseEvent(document.querySelector(`#${id} .language .dropdown-button`), "click");
+
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            // Clic à sur un item du dropdown => fermeture du dropdown
+            this.triggerMouseEvent(document.querySelector(`#${id} .dropdown-list .items-0`), "click");
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "false", "L'attribut aria-expanded n'est pas à false");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "4-Le dropdown n'est ouvert");
+                this.end();
+            }, 250);
+        }, 250);
+
+
+    }
+
+    @Decorators.it("Test clic à l'interieur du DropDown avec l'attribut closeClick à false : Le dropdown reste ouvert")
+    testClickDansLeDropdown1(done) {
+        const id = this.generateMainId();
+        renderIntoDocument(element1, id);
+
+        // clic sur le bouton permettant d'ouvrir le dropdown
+        this.triggerMouseEvent(document.querySelector(`#${id} .test .dropdown-button`), "click");
+
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .test .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #testcontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #testcontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            // Clic à sur un item du dropdown => le dropdon reste ouverte
+            this.triggerMouseEvent(document.querySelector(`#${id} .dropdown-list .items-0`), "click");
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .test .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #testcontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+                HornetTestAssert.assertFalse(document.querySelector(`#${id} #testcontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+                this.end();
+            }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Test Ouverture/fermeture du dropdown avec la touche espace")
+    testOpenAndCloseWithESPACE() {
+        const id = this.generateMainId();
+        renderIntoDocument(element, id);
+        this.triggerKeydownEvent(document.querySelector(`#${id} .language .dropdown-button`), " " , KeyCodes.SPACEBAR, false);
+
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            this.triggerKeydownEvent(document.querySelector(`#${id} .language .dropdown-button`), " " , KeyCodes.SPACEBAR, false);
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "false", "L'attribut aria-expanded n'est pas à false");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "4-Le dropdown n'est ouvert");
+                this.end();
+            }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Test fermeture du dropdown avec la touche echap")
+    testCloseWithESCAPE() {
+        const id = this.generateMainId();
+        renderIntoDocument(element, id);
+        this.triggerKeydownEvent(document.querySelector(`#${id} .language .dropdown-button`), " " , KeyCodes.SPACEBAR, false);
+
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            this.triggerKeydownEvent(document.querySelector(`#${id} .language .dropdown-button`), " " , KeyCodes.ESCAPE, false);
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "false", "L'attribut aria-expanded n'est pas à false");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "4-Le dropdown n'est ouvert");
+                this.end();
+            }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Test fermeture du dropdown avec la touche echap sur un item")
+    testCloseWithESCAPEOnItem() {
+        const id = this.generateMainId();
+        renderIntoDocument(element, id);
+        this.triggerKeydownEvent(document.querySelector(`#${id} .language .dropdown-button`), " " , KeyCodes.SPACEBAR, false);
+
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            this.triggerKeydownEvent(document.querySelector(`#${id} .dropdown-list .items-0`), " " , KeyCodes.ESCAPE, false);
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "false", "L'attribut aria-expanded n'est pas à false");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "4-Le dropdown n'est ouvert");
+                this.end();
+            }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Test fermeture du dropdown à l'ouverture un autre dropdown")
+    testCloseDropdownWhenActivingOtherDropdown() {
+        const id = this.generateMainId();
+        renderIntoDocument(element, id);
+        renderIntoDocument(element1, id);
+        
+        this.triggerMouseEvent(document.querySelector(`#${id} .language .dropdown-button`), "click");
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "true", "L'attribut aria-expanded n'est pas à true");
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content"), "1-Le dropdown n'est ouvert");
+            HornetTestAssert.assertFalse(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "2-Le dropdown n'est ouvert");
+            this.triggerMouseEvent(document.querySelector(`#${id} .test .dropdown-button`), "click");
+            setTimeout(() => {
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} .language .dropdown-button`).getAttribute("aria-expanded") === "false", "L'attribut aria-expanded n'est pas à false");
+                HornetTestAssert.assertTrue(document.querySelector(`#${id} #Change-Langaugecontent`).classList.contains("dropdown-content-hidden"), "4-Le dropdown n'est ouvert");
+                // fermer le dropdown
+                this.triggerMouseEvent(document.querySelector(`#${id} .test .dropdown-button`), "click");
+                this.end();
+            }, 150);
+        }, 150);
+
+    }
 }
 
 //lancement des Tests

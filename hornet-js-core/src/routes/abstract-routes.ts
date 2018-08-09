@@ -73,10 +73,11 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+
 
 import { Utils } from "hornet-js-utils";
 import { Class, AbstractClass } from "hornet-js-utils/src/typescript-utils";
@@ -85,8 +86,7 @@ import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 import * as _ from "lodash";
 import Options = ajv.Options;
 import { DataValidator } from "src/validation/data-validator";
-import { Request } from "express";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { IService } from "src/services/service-api";
 import { Logger } from "hornet-js-utils/src/logger";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
@@ -107,11 +107,11 @@ export interface DirectorClientConfiguration {
 /** Routes type */
 export const RouteType = {
     PAGE: "PAGE_ROUTE",
-    DATA: "DATA_ROUTE"
+    DATA: "DATA_ROUTE",
 };
 
 /** Routes Authorizations */
-export type RouteAuthorization = Array<string>
+export type RouteAuthorization = Array<string>;
 export const PUBLIC_ROUTE: RouteAuthorization = [];
 export const PRIVATE_ROUTE: RouteAuthorization = [ "*" ];
 export const DEFAULT_AUTHORIZATION: RouteAuthorization = PRIVATE_ROUTE;
@@ -137,7 +137,6 @@ export type LazyRoutesAsyncClassResolver = (name: string, callback: (routesClass
 
 /** Routes Informations */
 export type RouteAttributes = { [ key: string ]: any };
-
 
 export abstract class RouteAction<A extends RouteAttributes> {
     /** Requête en cours */
@@ -180,13 +179,14 @@ export abstract class RouteAction<A extends RouteAttributes> {
      * @return {any} un objet contenant les données transmises à cette action
      */
     getMediaType(): MediaType {
-        return MediaTypes.fromMime(this.req.get('Accept'));
+        return MediaTypes.fromMime(this.req.get("Accept"));
     }
 }
 
 export abstract class RouteActionService<A extends RouteAttributes, B extends IService> extends RouteAction<A>{
 
     getService(): B {
+
         return this.service as B;
     }
 }
@@ -194,9 +194,9 @@ export abstract class RouteActionService<A extends RouteAttributes, B extends IS
 export abstract class RouteInfos {
     protected type: string;
     protected attributes: RouteAttributes = {};
-    protected service: Class<IService> | AbstractClass<IService>;
+    protected service: Class<IService> | AbstractClass<IService> | IService;
 
-    constructor(type: string, attributes: RouteAttributes = {}, service?: Class<IService> | AbstractClass<IService>) {
+    constructor(type: string, attributes: RouteAttributes = {}, service?: Class<IService> | AbstractClass<IService> | IService) {
         this.type = type;
         _.assign(this.attributes, attributes);
         if (service) {
@@ -212,7 +212,7 @@ export abstract class RouteInfos {
         return this.attributes;
     }
 
-    getService() {
+    getService(): IService {
         return this.service;
     }
 }
@@ -220,9 +220,13 @@ export abstract class RouteInfos {
 export class PageRouteInfos extends RouteInfos {
     protected viewComponent: Class<IHornetPage<any, any>>;
 
-    constructor(viewComponent: Class<IHornetPage<any, any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService>) {
+    constructor(viewComponent: Class<IHornetPage<any, any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService) {
         super(RouteType.PAGE, attributes, service);
         this.viewComponent = viewComponent;
+    }
+
+    getService(): IService {
+        return this.service;
     }
 
     getViewComponent(): Class<IHornetPage<any, any>> {
@@ -234,10 +238,9 @@ export class DataRouteInfos extends RouteInfos {
     protected action: Class<RouteAction<any>>;
 
 
-    constructor(action: Class<RouteAction<any>>, attributes?: RouteAttributes, service?: Class<IService>) {
+    constructor(action: Class<RouteAction<any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService) {
         super(RouteType.DATA, attributes, service);
         this.action = action;
-
     }
 
     getAction() {
@@ -253,7 +256,8 @@ export abstract class AbstractRoutes {
     protected subRoutes: SubRoutes = {};
 
     protected resolveAuthorizationAndMethod(authorizationOrMethod: RouteMethod | RouteAuthorization, method: RouteMethod) {
-        var auth, meth;
+        let auth;
+        let meth;
         if (_.isString(authorizationOrMethod)) {
             auth = DEFAULT_AUTHORIZATION;
             meth = authorizationOrMethod;
@@ -273,10 +277,10 @@ export abstract class AbstractRoutes {
     }
 
     addPageRoute(path: string, handler: PageRouteHandler, authorization?: RouteAuthorization) {
-        var args = this.resolveAuthorizationAndMethod(authorization, DEFAULT_METHOD);
+        const args = this.resolveAuthorizationAndMethod(authorization, DEFAULT_METHOD);
 
         if (!this.pageRoutes[ path ]) this.pageRoutes[ path ] = {};
-        this.pageRoutes[ path ][ args.method.toLowerCase() ] = { authorization: args.authorization, handler: handler };
+        this.pageRoutes[ path ][ args.method.toLowerCase() ] = { authorization: args.authorization, handler };
     }
 
     addDataRoute(path: string, handler: DataRouteHandler);
@@ -284,10 +288,10 @@ export abstract class AbstractRoutes {
     addDataRoute(path: string, handler: DataRouteHandler, method: RouteMethod);
     addDataRoute(path: string, handler: DataRouteHandler, authorization: RouteAuthorization, method: RouteMethod);
     addDataRoute(path: string, handler: DataRouteHandler, authorizationOrMethod?: RouteMethod | RouteAuthorization, method?: RouteMethod) {
-        var args = this.resolveAuthorizationAndMethod(authorizationOrMethod, method);
+        const args = this.resolveAuthorizationAndMethod(authorizationOrMethod, method);
 
         if (!this.dataRoutes[ path ]) this.dataRoutes[ path ] = {};
-        this.dataRoutes[ path ][ args.method.toLowerCase() ] = { authorization: args.authorization, handler: handler };
+        this.dataRoutes[ path ][ args.method.toLowerCase() ] = { authorization: args.authorization, handler };
     }
 
     addLazyRoutes(path: string, subRoutesFile: string) {
@@ -321,21 +325,23 @@ export abstract class AbstractRoutes {
     getDefaultRouteLoader(paths: Array<string>) {
         return (name: string) => {
             logger.trace("defaultRouteLoader(" + name + ")");
-            let index = _.findIndex(paths, function (path) {
+            const index = _.findIndex(paths, function (path) {
                 try {
                     return require.main.require(path + name);
                 } catch (e) {
                     // not throw error for module not found (parse all paths)
-                    if(e.code !== "MODULE_NOT_FOUND") {
-                        throw new TechnicalError('ERR_TECH_' + CodesError.ROUTE_ERROR, { errorMessage: e.message });
+                    if (e.code !== "MODULE_NOT_FOUND") {
+                        throw new TechnicalError("ERR_TECH_" + CodesError.ROUTE_ERROR, { errorMessage: e.message });
                     }
                 }
             });
-            if (index == -1) {
+            if (index === -1) {
                 logger.error("Unknow route " + name + " in paths " + paths);
-                throw new TechnicalError('ERR_TECH_' + CodesError.ROUTE_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
+                throw new TechnicalError("ERR_TECH_" + CodesError.ROUTE_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
             }
             return require.main.require(paths[ index ] + name);
-        }
+        };
+
     }
 }
+

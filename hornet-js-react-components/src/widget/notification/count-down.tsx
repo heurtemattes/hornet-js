@@ -37,7 +37,11 @@ export class Countdown extends HornetComponent<CountDownProps, any> {
 
     constructor(props, context?: any) {
         super(props, context);
-        this.state.secondsRemaining = 0;
+
+        this.state = {
+            ...this.state,
+            secondsRemaining: 0
+        };
     }
 
     componentDidMount() {

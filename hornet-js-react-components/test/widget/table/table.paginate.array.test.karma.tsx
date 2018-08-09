@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-'use strict';
-var chai = require('chai');
+"use strict";
+const chai = require("chai");
 const expect = chai.expect;
 import * as _ from "lodash";
 import * as React from "react";
@@ -111,7 +111,7 @@ let tableElement: JSX.Element;
 let table;
 let data;
 
-@Decorators.describe('Test Karma table paginate')
+@Decorators.describe("Test Karma table paginate")
 class tableTest extends BaseTest {
 
     @Decorators.beforeEach
@@ -119,14 +119,14 @@ class tableTest extends BaseTest {
         data = [];
         let step = 1;
         for (let i: number = 1; i < 50; i++) {
-            data.push({ id: i, label: "libelle" + i, desc: (step % 3 == 0) ? "desc" + 0 : "desc" + step++ });
+            data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
 
         dataSource = new PaginateDataSource<any>(data, {
             pageIndex: 0,
             itemsPerPage: 10,
-            totalItems: 0
-        }, {});
+            totalItems: 0,
+        },                                       {});
 
         tableElement = (
             <Table id="lite">
@@ -144,60 +144,59 @@ class tableTest extends BaseTest {
                 </Footer>
             </Table>
         );
-    };
+    }
 
-    @Decorators.it('Test OK')
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('afficher 10 éléments par page à l\'init')
+    @Decorators.it("afficher 10 éléments par page à l'init")
     selectionUnElement() {
         table = this.renderIntoDocument(tableElement, "main1");
-        expect(document.querySelectorAll('#main1 .datatable-data tr').length).to.equal(10);
+        expect(document.querySelectorAll("#main1 .datatable-data tr").length).to.equal(10);
         this.end();
-    };
+    }
 
-    @Decorators.it('afficher la dernière page')
+    @Decorators.it("afficher la dernière page")
     goToLastPage() {
         table = this.renderIntoDocument(tableElement, "main2");
         dataSource.on("pagination", (value) => {
             expect(value.list.length).to.equal(9);
             expect(value.list[ 0 ].id).to.equal(41);
-            expect(document.querySelector('#main2 .datatable-data #lite-0-colBody-0-1').innerHTML, value.list[ 0 ].label);
+            expect(document.querySelector("#main2 .datatable-data #lite-0-colBody-0-1").innerHTML, value.list[ 0 ].label);
             this.end();
         });
-        this.triggerMouseEvent(document.querySelector('#main2 .datatable-pagination-button-lastpage'), "click");
+        this.triggerMouseEvent(document.querySelector("#main2 .datatable-pagination-button-lastpage"), "click");
+    }
 
-    };
-
-
-    @Decorators.it('supprimer la selection')
+    @Decorators.it("supprimer la selection")
     deleteSelectedItem() {
-        table = this.renderIntoDocument(tableElement, "main3");
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
         dataSource.on("delete", () => {
             expect(dataSource.selected === undefined).to.true;
+            expect(document.querySelectorAll(`#${id} .datatable-data tr`).length).to.equal(10);
             this.end();
-        })
+        });
         dataSource.on("select", (value) => {
             if (value.length > 0) dataSource.deleteAll();
 
         });
-        this.triggerMouseEvent(document.querySelector('#main3 .datatable-data #lite-0-colBody-0-0 input'), "click");
+        this.triggerMouseEvent(document.querySelector(`#${id} .datatable-data #lite-0-colBody-0-0 input`), "click");
+    }
 
-    };
-
-    @Decorators.it('test d\'un appel de pagination programmatiquement')
+    @Decorators.it("test d'un appel de pagination programmatiquement")
     goToPageCall() {
         table = this.renderIntoDocument(tableElement, "main4");
         dataSource.on("pagination", (value) => {
-            expect(document.querySelector('#main4 .datatable-pagination-input')[ "value" ]).to.equal("2");
+            expect(document.querySelector("#main4 .datatable-pagination-input")[ "value" ]).to.equal("2");
             this.end();
-        })
+        });
         dataSource.goToPage(2);
-    };
+    }
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new tableTest());

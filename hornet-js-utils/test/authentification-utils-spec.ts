@@ -73,14 +73,14 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
 const chai = TestUtils.chai;
-const expect:any = chai.expect;
+const expect: any = chai.expect;
 
 import AuthenticationUtils = require("src/authentication-utils");
 const AuthUtils = AuthenticationUtils.AuthUtils;
@@ -98,16 +98,16 @@ describe("AuthenticationUtilsSpec", () => {
     it("should authorize from array", () => {
         //Arrange
         let user = {
-            name : "user",
-            roles: [{
+            name: "user",
+            roles: [ {
                 name: TestUtils.randomString()
             }, {
                 name: TestUtils.randomString()
-            }]
+            } ]
         };
 
         // Act
-        let authorized = AuthUtils.isAllowed(user, [TestUtils.randomString(), user.roles[0].name]);
+        let authorized = AuthUtils.isAllowed(user, [ TestUtils.randomString(), user.roles[ 0 ].name ]);
 
         // Assert
         expect(authorized).to.be.true;
@@ -116,16 +116,16 @@ describe("AuthenticationUtilsSpec", () => {
     it("should not authorize from array without role", () => {
         // Arrange
         let user = {
-            name : "user",
-            roles: [{
+            name: "user",
+            roles: [ {
                 name: "1" + TestUtils.randomString()
             }, {
                 name: "2" + TestUtils.randomString()
-            }]
+            } ]
         };
 
         // Act
-        let authorized = AuthUtils.isAllowed(user, ["3" + TestUtils.randomString(), "4" + TestUtils.randomString()]);
+        let authorized = AuthUtils.isAllowed(user, [ "3" + TestUtils.randomString(), "4" + TestUtils.randomString() ]);
 
         // Assert
         expect(authorized).to.be.false;

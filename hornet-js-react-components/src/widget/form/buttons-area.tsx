@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,7 +100,7 @@ export interface ButtonsAreaProps extends HornetComponentProps {
 export class ButtonsArea extends HornetComponent<ButtonsAreaProps, any> {
 
     static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
-        width: 100
+        width: 100,
     });
 
     constructor(props, context?: any) {
@@ -120,7 +120,7 @@ export class ButtonsArea extends HornetComponent<ButtonsAreaProps, any> {
                 value: this.i18n("form").valid,
                 className: "hornet-button",
                 label: this.i18n("form").valid,
-                title: this.i18n("form").validTitle
+                title: this.i18n("form").validTitle,
             },
             {
                 type: "reset",
@@ -130,8 +130,8 @@ export class ButtonsArea extends HornetComponent<ButtonsAreaProps, any> {
                 className: "hornet-button",
                 onClick: null,
                 label: this.i18n("form").cancel,
-                title: this.i18n("form").cancelTitle
-            }
+                title: this.i18n("form").cancelTitle,
+            },
         ];
     }
 
@@ -144,18 +144,18 @@ export class ButtonsArea extends HornetComponent<ButtonsAreaProps, any> {
             buttons = this.getDefaultButtons();
         }
 
-        let classList: ClassDictionary = {
+        const classList: ClassDictionary = {
             "button-area": true,
-            "grid": true,
+            grid: true,
             "has-gutter": ((this.state.children) && (this.state.children.length > 1)) ? true : false,
-            "flex-container": true
+            "flex-container": true,
         };
-        if (this.props.className) classList[this.props.className] = true;
+        if (this.props.className) classList[ this.props.className ] = true;
 
-        let width = this.props.width + "%";
+        const width = this.props.width + "%";
 
         return (
-            <div className={classNames(classList)} style={{width: width}}>
+            <div className={classNames(classList)} style={{ width }}>
                 {this.state.children}
             </div>
         );

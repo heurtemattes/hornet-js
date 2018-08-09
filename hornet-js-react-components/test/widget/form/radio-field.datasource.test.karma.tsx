@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,6 +98,8 @@ let $element;
 @Decorators.describe("Test Karma radio-field avec dataSource")
 class RadioFieldDataSourceTest extends BaseTest {
 
+    protected referencedElement;
+
     protected dataSet: any[] = [
         {
             isClient: true,
@@ -107,15 +109,31 @@ class RadioFieldDataSourceTest extends BaseTest {
             libelle: "Fournisseur"
         }
     ];
+    protected dataSet2: any[] = [
+        {
+            isClient: true,
+            libelle: "Client"
+        }, {
+            isClient: false,
+            libelle: "Fournisseur",
+        }, {
+            isClient: "autre",
+            libelle: "Autre"
+        }
+    ];    
+
+    private element: RadiosField;
 
     protected dataSource1: DataSource<any> = new DataSource<any>(this.dataSet);
-    protected dataSource2: DataSource<any> = new DataSource<any>(this.dataSet, {label: "libelle", value: "isClient"});
+    protected dataSource2: DataSource<any> = new DataSource<any>(this.dataSet, { label: "libelle", value: "isClient" });
     protected dataSource3: DataSource<any> = new DataSource<any>(this.dataSet);
     protected dataSource4: DataSource<any> = new DataSource<any>(this.dataSet);
     protected dataSource5: DataSource<any> = new DataSource<any>(this.dataSet);
     protected dataSource6: DataSource<any> = new DataSource<any>(this.dataSet);
     protected dataSource7: DataSource<any> = new DataSource<any>(this.dataSet);
-    protected dataSource8: DataSource<any> = new DataSource<any>(this.dataSet, {label: "libelle", value: "isClient"});
+    protected dataSource8: DataSource<any> = new DataSource<any>(this.dataSet, { label: "libelle", value: "isClient" });
+    protected dataSource9: DataSource<any> = new DataSource<any>(this.dataSet, { label: "libelle", value: "isClient" });
+    protected dataSource10: DataSource<any> = new DataSource<any>(this.dataSet2, { label: "libelle", value: "isClient" });
 
     @Decorators.it("Test OK")
     testOk() {
@@ -162,7 +180,7 @@ class RadioFieldDataSourceTest extends BaseTest {
                         inline={RadiosField.Inline.FIELD}
                         dataSource={this.dataSource2}
                         currentChecked={true}
-                        defaultValue={this.dataSet[0]}
+                        defaultValue={this.dataSet[ 0 ]}
                     />
                 </Form>
             </div>
@@ -191,7 +209,7 @@ class RadioFieldDataSourceTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[0]}
+                        defaultValue={this.dataSet[ 0 ]}
                     />
                 </Form>
             </div>
@@ -203,7 +221,7 @@ class RadioFieldDataSourceTest extends BaseTest {
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-3-Client doit être sélectionné");
         htmlElement = document.getElementById("exampleRadio-3-Fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-3-Fournisseur ne doit pas être sélectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-3-Fournisseur ne doit pas être sé7lectionné");
         this.end();
     };
 
@@ -220,7 +238,7 @@ class RadioFieldDataSourceTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[1]}
+                        defaultValue={this.dataSet[ 1 ]}
                     />
                 </Form>
             </div>
@@ -250,7 +268,7 @@ class RadioFieldDataSourceTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[1]}
+                        defaultValue={this.dataSet[ 1 ]}
                     />
                 </Form>
             </div>
@@ -274,7 +292,7 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 6 avec datasource avec valeur par défaut premier item")
     testRadioField6() {
-        this.dataSource6.select(this.dataSet[0]);
+        this.dataSource6.select(this.dataSet[ 0 ]);
         element = (
             <div id="main6">
                 <Form id="testForm-6">
@@ -303,7 +321,7 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 7 avec datasource avec valeur par défaut deuxième item")
     testRadioField7() {
-        this.dataSource7.select(this.dataSet[1]);
+        this.dataSource7.select(this.dataSet[ 1 ]);
         element = (
             <div id="main7">
                 <Form id="testForm-7">
@@ -339,7 +357,7 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 8 avec datasource avec valeur par défaut deuxième item")
     testRadioField8() {
-        this.dataSource8.select(this.dataSet[1]);
+        this.dataSource8.select(this.dataSet[ 1 ]);
         element = (
             <div id="main8">
                 <Form id="testForm-8">
@@ -370,8 +388,68 @@ class RadioFieldDataSourceTest extends BaseTest {
 
         this.end();
     };
+
+    @Decorators.it("Test radiofields 9 avec datasource ayant 2 éléments avec récupération de valeur depuis getCurrentValue")
+    testRadioField9() {
+        this.dataSource9.select(this.dataSet[ 1 ]);
+        element = (
+            <div id="main9">
+                <Form id="testForm-9">
+                    <RadiosField
+                        name="exampleRadio-9"
+                        label={"Type de partenaire"}
+                        inline={RadiosField.Inline.FIELD}
+                        dataSource={this.dataSource9}
+                        ref={(reactInstance) => {
+                            this.referencedElement = reactInstance;
+                        }}
+                    />
+                </Form>
+            </div>
+        );
+
+        $element = this.renderIntoDocument(element, "main9");
+        // this.referencedElement.setCurrentValue("true");
+        const htmlElement = document.getElementById("exampleRadio-9-Client");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-9-Client"), "click");
+        setTimeout(() => {
+        HornetTestAssert.assertEquals((htmlElement as any).value, this.referencedElement.getCurrentValue(), "la méthode getCurrentValue doit remonter la valeur TRUE");
+        this.end();
+        },         200); 
+
+    };
+
+    @Decorators.it("Test radiofields 10 avec datasource ayant 3 éléments avec récupération de valeur depuis getCurrentValue")
+    testRadioField10() {
+        this.dataSource10.select(this.dataSet2[ 2 ]);
+        element = (
+            <div id="main9">
+                <Form id="testForm-10">
+                    <RadiosField
+                        name="exampleRadio-10"
+                        label={"Type de partenaire"}
+                        inline={RadiosField.Inline.FIELD}
+                        dataSource={this.dataSource10}
+                        ref={(reactInstance) => {
+                            this.referencedElement = reactInstance;
+                        }}
+                    />
+                </Form>
+            </div>
+        );
+
+        $element = this.renderIntoDocument(element, "main10");
+        let htmlElement = document.getElementById("exampleRadio-10-Autre");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-10-Autre"), "click");
+        setTimeout(() => {
+        HornetTestAssert.assertEquals((htmlElement as any).value, this.referencedElement.getCurrentValue(), "la méthode getCurrentValue doit remonter la valeur AUTRE");
+        this.end();
+        },         200); 
+
+    };
+
 }
 
 
-//lancement des Tests
+// lancement des Tests
 runTest(new RadioFieldDataSourceTest());

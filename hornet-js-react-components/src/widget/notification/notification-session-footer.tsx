@@ -53,8 +53,11 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
 
     constructor(props?: any, context?: any) {
         super(props, context);
-        this.state.offset = 0;
 
+        this.state = {
+            ...this.state,
+            offset: 0
+        };
     }
 
     componentDidMount() {

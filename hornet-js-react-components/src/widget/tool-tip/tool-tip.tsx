@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,14 +107,14 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
     static defaultProps = {
         classImg: "tooltip-image",
         classSpan: "tooltip",
-        icoToolTip: "/img/tooltip/tooltip.svg"
+        icoToolTip: "/img/tooltip/tooltip.svg",
     };
 
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
-        let urlIcoTooltip = this.state.src || ToolTip.genUrlTheme(this.state.icoToolTip);
+        const urlIcoTooltip = this.state.src || ToolTip.genUrlTheme(this.state.icoToolTip);
         return (
 
             <span
@@ -126,9 +126,18 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
                 aria-haspopup={true}
                 role="tooltip"
             >
-                <img id={this.state.idImg} alt={this.state.alt} src={urlIcoTooltip}
-                    className={this.state.classImg} tabIndex={0} />
-                <span id={this.state.idSpan} className="tooltip-label" role="tooltip" aria-hidden="true" style={{ display: "none" }}>{this.state.alt}</span>
+                <img id={this.state.idImg}
+                    alt={this.state.alt}
+                    src={urlIcoTooltip}
+                    className={this.state.classImg}
+                    tabIndex={0} />
+                <span id={this.state.idSpan}
+                    className="tooltip-label"
+                    role="tooltip"
+                    aria-hidden="true"
+                    style={{ display: "none" }}>
+                    {this.state.alt}
+                </span>
             </span>
         );
     }
@@ -152,8 +161,8 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
      * @param event
      */
     protected handleKeyDown(event): void {
-        let keyCode: number = event.keyCode;
-        if (keyCode == KeyCodes.ESCAPE) {
+        const keyCode: number = event.keyCode;
+        if (keyCode === KeyCodes.ESCAPE) {
             this.hideTip(event);
         }
 

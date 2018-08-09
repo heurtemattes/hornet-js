@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -96,16 +96,20 @@ export interface InputTextColumnProps extends ColumnProps {
 export class InputTextColumn<P extends InputTextColumnProps, S extends ColumnState> extends Column<P, S> {
 
     static defaultProps = Column.mergeObjects(Column.defaultProps, {
-        defaultStyle: {"width": "10em"},
+        defaultStyle: { width: "10em" },
         isEditing: true,
         sortable: false,
-        hiddenable: false
+        hiddenable: false,
     });
+
 
     /**
      * @inheritDoc
      */
-    public getBodyCell(): Class<InputTextBodyCell<InputTextBodyCellProps, any>> {
+    static getBodyCell(props): Class<InputTextBodyCell<InputTextBodyCellProps, any>> {
         return InputTextBodyCell;
     }
+    
 }
+
+(InputTextColumn.prototype.getBodyCell as any).__deprecated__ = true;

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -143,7 +143,7 @@ export interface ColumnProps extends HornetComponentProps {
     /** nombre de colonne du tableau */
     nbColumns?: number;
     // Coordonnées de la cellule en cours de generation
-    cellCoordinate?: CellCoordinates;
+    coordinates?: CellCoordinates;
     /** objet representant l'état du tableau */
     contentState?: ContentState;
     /** la ligne est selectionnée */
@@ -156,7 +156,13 @@ export interface ColumnProps extends HornetComponentProps {
     alt?: string;
     headers?: string | string[];
     /** Méthode de comparaison custom pour le tri de la colonne */
-    compareMethod?:(sortData:SortData, a, b) => void;
+    compareMethod?: (sortData: SortData, a, b) => void;
+
+    className?: string;
+    /** Label de substitution dans le cas d'un tri custom ascendant */
+    orderByLabelUp?:string;
+    /** Label de substitution dans le cas d'un tri custom descendant */
+    orderByLabelDown?:string;
 }
 
 /**
@@ -182,8 +188,8 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
 
     static defaultProps = {
         sortable: false,
-        defaultStyle: { "width": "10em" },
-        hiddenable: true
+        defaultStyle: { width: "10em" },
+        hiddenable: true,
     };
 
     constructor(props: P, context: any) {
@@ -203,13 +209,40 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
     render(): JSX.Element {
         logger.trace("render Column");
 
-        let cellProps = this.getCellProps();
+        const cellProps = this.getCellProps();
         cellProps.key = "wc-" + cellProps.key;
         if (this.props.isHeader) {
             return this.wrap(this.getHeaderCell(), cellProps);
         }
         return this.wrap(this.getBodyCell(), cellProps);
     }
+    
+    /***
+     * @deprecated
+     * Méthode permettant de récupérer les propriétés d'une cellule
+     * @returns {any} Propriétés d'une cellule
+     */
+    getCellProps(): any {
+        const props: any = {
+            coordinates: this.props.coordinates,
+            isSelected: this.props.isSelected,
+            id: this.props.id,
+        };
+        if (this.props.style) {
+            props.style = this.props.style;
+        }
+        //
+        // if (this.props.headerFixed || this.props.defaultStyle) {
+        //     props.style = _.merge(props.style, this.props.defaultStyle);
+        // }
+
+        props.isEditing = this.state.isEditing;
+        props.nbColumns = this.props.nbColumns;
+        props.key = Column.getCellKey(props);
+        props.compareMethod = this.props.compareMethod || null;
+
+        return props;
+    }    
 
     /**
      * Getter pour le composant générant le entête de colonne
@@ -228,6 +261,22 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
     }
 
     /**
+     * Getter pour le composant générant le entête de colonne
+     * @return Class<HeaderCell<HeaderCellProps, any>>
+     */
+    public static getHeaderCell(props): Class<AbstractHeaderCell<AbstractHeaderCellProps, any>> {
+        return HeaderCell as any;
+    }
+
+    /**
+     * Getter pour le composant générant le contenu de colonne
+     * @return Class<BodyCell<BodyCellProps, any>>
+     */
+    public static getBodyCell(props): Class<AbstractBodyCell<AbstractBodyCellProps, any>> {
+        return (props.editable) ? Column.getEditableCell() : BodyCell;
+    }
+
+    /**
      * @inheritDoc
      */
     public static getEditableCell(): Class<InputTextInLineBodyCell<AbstractBodyCellProps, any>> {
@@ -238,30 +287,12 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
      * Méthode permettant de récupérer les propriétés d'une cellule
      * @returns {any} Propriétés d'une cellule
      */
-    getCellProps(): any {
-        let props: any = {
-            coordinates: this.props.cellCoordinate,
-            isSelected: this.props.isSelected,
-            id: this.props.id
-        };
-        if (this.props.style) {
-            props.style = this.props.style;
-        }
-        //
-        // if (this.props.headerFixed || this.props.defaultStyle) {
-        //     props.style = _.merge(props.style, this.props.defaultStyle);
-        // }
-
-        props.isEditing = this.state.isEditing;
-        props.nbColumns = this.props.nbColumns;
-        props.key = Column.getCellKey(props);
-        props.compareMethod = this.props.compareMethod || null;
-
-        return props;
+    static getCellProps(masterProps, isHeader): any {
+        return { };
     }
 
     static getCellKey(cellProps: any): any {
-        return "cell-" + cellProps.id + "-" + cellProps.coordinates.row + "-" + cellProps.coordinates.column + "-wrapped";
+        return "cell-" + cellProps.id + "-" + cellProps.coordinates.row + "-" + cellProps.coordinates.column ;
     }
 
 }

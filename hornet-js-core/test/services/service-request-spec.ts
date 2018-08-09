@@ -73,30 +73,33 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
-import { ServiceRequest } from "hornet-js-core/src/services/service-request";
+import { ServiceRequest } from "src/services/service-request";
 import { ConfigLib } from "hornet-js-utils/src/config-lib";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Utils } from "hornet-js-utils";
+import { NodeApiResultBuilder } from "src/services/service-api-results";
+import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 
-var expect = TestUtils.chai.expect;
-var assert = TestUtils.chai.assert;
+const expect = TestUtils.chai.expect;
+const assert = TestUtils.chai.assert;
 
-var _app;
-var _port = 3007;
-var _server;
-var _config: ConfigLib;
-var _actionContext;
-var defaultMessage = "Message de test";
-var _errorMessage = defaultMessage + " : [KO]";
+let _app;
+let _port = 3007;
+let _server;
+let _config: ConfigLib;
+let _actionContext;
+let defaultMessage = "Message de test";
+let _errorMessage = defaultMessage + " : [KO]";
+let dateCache = undefined;
 
-process.on("unhandledRejection", function(reason, promise) {
+process.on("unhandledRejection", function (reason, promise) {
     console.error("service-api-spec", reason);
     throw reason;
 });
@@ -107,42 +110,90 @@ process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
 class MyService extends ServiceRequest {
     remoteServicePath: string;
 
-    sending(data, cb: any) {
-        var url = this.buildUrl(this.remoteServicePath);
-        this.fetch({method : "post", url : url}).then((response) => {cb(response)});
+    sending(data): Promise<any> {
+        const buildUrl = this.buildUrl("/" + data.data);
+        return this.fetch({ method: "post", url: buildUrl, data: data }); // .then((response) => { cb(response); });
+    }
+    sendingCache(verb: "get" | "post"): Promise<any> {
+        const buildUrl = this.buildUrl("/cache-test");
+        return this.fetch({ method: verb, url: buildUrl}); // .then((response) => { cb(response); });
     }
 }
 
-describe.skip("service-api-spec", () => {
+describe("service-api-spec", () => {
 
-    before(function(done) {
+    before(function (done) {
         _app = express();
 
         _app.use(bodyParser.json()); // to support JSON-encoded bodies
 
-        _app.post("/service-api-spec-service/ok", function(req, res) {
+        _app.post("/service-api-spec-service/ok", function (req, res) {
             console.debug("/ok");
             res.json({
-                message: "Reçu : " + req.body.data
-            });
-        });
-        _app.post("/service-api-spec-service/ko", function(req, res) {
-            console.debug("/ko");
-            res.status(500).json({
-                message: "Retour d'une erreur : " + req.body.data
+                message: "Reçu : " + req.body.data,
+                date: new Date()
             });
         });
 
-        var testConfig = {
+        _app.get("/service-api-spec-service/cache-test", function (req, res) {
+            console.debug("/ok");
+            res.json({
+                date: new Date()
+            });
+        });
+
+        _app.post("/service-api-spec-service/cache-test", function (req, res) {
+            console.debug("reset cache for cache-test");
+            res.json({
+                date: new Date()
+            });
+        });
+
+        _app.post("/service-api-spec-service/ko", function (req, res) {
+            console.debug("/ko");
+            res.status(500).json({
+                message: "Retour d'une erreur : " + req.body.data,
+            });
+        });
+        
+        _app.post("/service-api-spec-service/kohornet", function (req, res) {
+            let err = new NotFoundError();
+            err.message = "test mocha";
+
+            let retour = NodeApiResultBuilder.buildError(err);
+            retour.url = req.url;
+            res.json(retour);
+            if (err.httpStatus && typeof err.httpStatus === "number") {
+                res.status(err.httpStatus);
+            } else if (err.args && err.args.httpStatus && typeof err.args.httpStatus === "number") { // gestion avec les NodeApiError
+                res.status(err.args.httpStatus);
+            } else {
+                res.status(500);
+            }
+            res.end();
+        });
+
+        const testConfig = {
             defaultServices: {
                 host: "http://localhost:" + _port + "/",
-                name: "service-api-spec-service"
-            }
+                name: "service-api-spec-service",
+            },request: {
+                cache: {
+                  client: {
+                    enabled: false,
+                    "timetolive": 60
+                  },
+                  server: {
+                    enabled: true,
+                    timetolive: 60
+                  }
+                }
+              }
         };
 
         Utils.setConfigObj(testConfig);
 
-        TestUtils.startExpressApp(_app, _port, function(server, port, err) {
+        TestUtils.startExpressApp(_app, _port, function (server, port, err) {
             _server = server;
             _port = port;
             _config = new ConfigLib();
@@ -155,22 +206,65 @@ describe.skip("service-api-spec", () => {
         _server && _server.close();
     });
 
-    it("should resolve", () => {
+    it("should resolve", (done) => {
 
-        var Service = new MyService();
+        const service = new MyService();
 
-        Service.sending({data: "ok"}, (result: any) => {
+
+        service.sending({ data: "ok" }).then((result: any) => {
             console.debug("result (should resolve):", result);
             expect(result).to.exist;
-            expect(result.result.message).to.be.equal("Reçu : ok");
+            expect(result.message).to.be.equal("Reçu : ok");
             console.debug("FIN");
+            dateCache = result.date;
+            done();
         });
     });
-    it("should reject", () => {
-        var Service = new MyService();
-        Service.sending({data: "ko"}, (result: any) => {
-            console.debug("result: ", result);
-            throw new Error("Expected error, result got instead");
+
+    it("should resolve whith cache", (done) => {
+
+        const service = new MyService();
+        service.sendingCache("get").then((result: any) => {
+            dateCache = result.date;
+            service.sendingCache("get").then((result: any) => {
+                expect(result).to.exist;
+                expect(result.date).to.be.equal(dateCache);
+                // post va vider le cache
+                service.sendingCache("post").then((result: any) => {
+                    expect(result).to.exist;
+                    expect(result.date).to.be.not.equal(dateCache);
+                    service.sendingCache("get").then((result: any) => {
+                        expect(result).to.exist;
+                        expect(result.date).to.be.not.equal(dateCache);
+                        done();
+                    });
+                });
+            });
+        });
+    });
+
+    it("should reject", (done) => {
+        const service = new MyService();
+        service.sending({ data: "ko" })
+        .then((result: any) => {
+            done(new Error("Expected error, result got instead"));
+        })
+        .catch((error) => {
+            console.info("error:", error);
+            expect(error.args.message).to.be.equal("Retour d\'une erreur : ko");
+            done();
+        });
+    });
+
+    it("should reject hornet result", (done) => {
+        const service = new MyService();
+        service.sending({ data: "kohornet" })
+        .then((result: any) => {
+            done(new Error("Expected error, result got instead"));
+        })
+        .catch((error) => {
+            expect(error.args.message).to.be.equal("test mocha");
+            done();
         });
     });
 });

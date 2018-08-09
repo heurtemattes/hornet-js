@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,7 +105,10 @@ export class Plan extends HornetComponent<PlanProps, any> {
         super(props, context);
 
         // Initialisation du composant par défaut
-        this.state.datas = NavigationUtils.getFilteredConfigNavigation(NavigationUtils.getConfigMenu(), this.user, true);
+        this.state = {
+            ...this.state,
+            datas: NavigationUtils.getFilteredConfigNavigation(NavigationUtils.getConfigMenu(), this.user, true)
+        }
     };
 
     /**

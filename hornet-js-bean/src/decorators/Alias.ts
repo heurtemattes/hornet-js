@@ -73,27 +73,25 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-"use strict";
 
 /**
  * Decorateur pour ajouter un ou des alias sur un champ
  */
 export default function alias(...alias) {
-    return function(target, key, description?) {
+    return function (target, key, description?) {
         let mapAlias;
         if (!target.__alias__) {
             mapAlias = {};
-        }else{
-            mapAlias = JSON.parse(target.__alias__)
+        } else {
+            mapAlias = JSON.parse(target.__alias__);
         }
-        if(key){
-            mapAlias[key] = alias;
+        if (key) {
+            mapAlias[ key ] = alias;
             target.__alias__ = JSON.stringify(mapAlias);
         }
     };
-};
+}

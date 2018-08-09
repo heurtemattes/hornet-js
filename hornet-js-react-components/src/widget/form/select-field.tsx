@@ -73,22 +73,17 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
 import {
-    HornetBasicFormFieldProps, HornetClickableProps,
-    HornetWrittableProps
-} from "src/widget/form/abstract-field";
+    HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps, AbstractFieldProps } from "src/widget/form/abstract-field";
 
 import { AbstractFieldDatasource } from "src/widget/form/abstract-field-datasource";
-import {
-    IHornetComponentDatasource,
-    HornetComponentChoicesProps
-} from "hornet-js-components/src/component/ihornet-component";
+import { IHornetComponentDatasource, HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import * as _ from "lodash";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
@@ -96,7 +91,7 @@ import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 /**
  * Propriétés d'un champ de formulaire de type groupe de boutons radios
  */
-export interface SelectFieldProps extends HornetWrittableProps,
+export interface SelectFieldProps extends AbstractFieldProps, HornetWrittableProps,
     HornetClickableProps,
     HornetBasicFormFieldProps,
     HornetComponentDatasourceProps,
@@ -106,6 +101,7 @@ export interface SelectFieldProps extends HornetWrittableProps,
     valueKey?: string;
     labelKey?: string;
     name: string;
+    nullable?:boolean;
 }
 
 /**
@@ -131,7 +127,8 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
     static defaultProps = _.assign(_.cloneDeep(AbstractFieldDatasource.defaultProps), {
         labelClass: "blocLabelUp",
         valueKey: "value",
-        labelKey: "label"
+        labelKey: "label",
+        nullable: false,
     });
 
     constructor(props: P, context?: any) {
@@ -146,23 +143,29 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
      * @returns {any}
      */
     renderWidget(): JSX.Element {
-        let hasError = this.hasErrors() ? " has-error" : "";
-        let htmlProps = this.getHtmlProps();
-        _.assign(htmlProps, { "className": htmlProps[ "className" ] ? htmlProps[ "className" ] + " selectfield" + hasError : " selectfield" + hasError , value: this.state.currentValue});
+        const hasError = this.hasErrors() ? " has-error" : "";
+        const htmlProps = this.getHtmlProps();
+        _.assign(htmlProps, {
+            className: htmlProps["className"] ? htmlProps["className"] + " selectfield" + hasError : " selectfield" + hasError,
+            value: this.state.currentValue,
+            onChange: (e) => {
+                this.handleChange(e);
+            },
+        });
 
-        let hasData = this.state.data && this.state.data.length > 0;
-        let hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
+        const hasData = this.state.data && this.state.data.length > 0;
+        const hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
 
-        if (this.state.currentValue == undefined) {
+        if ((this.state.currentValue === undefined || this.state.currentValue === null) && !this.state.nullable) {
             if (hasDataSource && this.state.items && Array.isArray(this.state.items)) {
-                (htmlProps as any).value = this.state.items[0][this.state.valueKey];
+                (htmlProps as any).value = this.state.items[ 0 ][ this.state.valueKey ];
             } else if (hasData) {
-                (htmlProps as any).value = this.state.data[0][this.state.valueKey];
+                (htmlProps as any).value = this.state.data[ 0 ][ this.state.valueKey ];
             }
         }
 
         return (
-            <select onChange={(e) => { this.handleChange(e) }} ref={(elt) => this.registerHtmlElement(elt)} {...htmlProps}>
+            <select ref={(elt) => this.registerHtmlElement(elt)} {...htmlProps}>
                 {hasDataSource ? this.renderOptionsDataSource() : null}
                 {hasData ? this.state.data.map(this.renderOption) : null}
             </select>
@@ -172,7 +175,7 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
 
     // Setters
     setData(data: SelectChoice[] | any[], cb?): this {
-        this.setState({ data: data }, cb);
+        this.setState({ data }, cb);
         return this;
     }
 
@@ -214,14 +217,14 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
      * @returns {any}
      */
     protected renderOption(choice: SelectChoice): JSX.Element {
-        let _value = ObjectUtils.getSubObject(choice, this.state.valueKey);
-        let _label = ObjectUtils.getSubObject(choice, this.state.labelKey);
-        let value: string = (_value != null && _value.toString) ? _value.toString() : "";
-        let label: string = (_label != null && _label.toString) ? _label.toString() : value;
+        const _value = ObjectUtils.getSubObject(choice, this.state.valueKey);
+        const _label = ObjectUtils.getSubObject(choice, this.state.labelKey);
+        const value: string = (_value != null && _value.toString) ? _value.toString() : "";
+        const label: string = (_label != null && _label.toString) ? _label.toString() : value;
 
-        let optionsProps = {
+        const optionsProps = {
             key: this.state.name + "-" + label + "-" + value,
-            value: value
+            value,
         };
 
         return <option {...optionsProps}>{label}</option>;
@@ -232,11 +235,11 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
      * @param value
      */
     protected selectItemByValue(value) {
-        let hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
+        const hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
         if (hasDataSource) {
             for (let index = 0; index < this.state.dataSource.results.length; index++) {
-                let element = this.state.dataSource.results[ index ];
-                if (element[ this.state.valueKey ] == value) {
+                const element = this.state.dataSource.results[ index ];
+                if (element[ this.state.valueKey ] === value) {
                     this.state.dataSource.select(element);
                     break;
                 }
@@ -258,5 +261,8 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
      */
     protected handleChange(e: React.ChangeEvent<HTMLElement>) {
         this.setCurrentValue((e.target as any).value);
+        if (this.state.onChange) {
+            this.state.onChange(e);
+        }
     }
 }

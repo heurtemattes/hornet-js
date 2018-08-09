@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,7 +97,7 @@ export interface ChangeLanguageProps extends HornetComponentProps {
     /** Boolean permettant de savoir si la liste deroulante est affiché */
     isOpen?: boolean;
     /** Méthode appelé après un changement de langue */
-    handleChangeLanguage?: (locale: string, ) => void;
+    handleChangeLanguage?: (locale: string) => void;
     /** détermine la position du arrow */
     position?: Position;
     switchTitle?: string;
@@ -111,16 +111,24 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
     /** Valeur de propriétés par défaut */
     static defaultProps = {
         isOpen: false,
-        position: Position.BOTTOMLEFT
+        position: Position.BOTTOMLEFT,
     };
 
     constructor(props, context?: any) {
         super(props, context);
-        this.state.listLanguage = Utils.appSharedProps.get("listLanguage") || [];
-        this.state.isValide = this.state.listLanguage.length > 0;
-        this.state.currentLanguage = Utils.getCls("hornet.internationalization") && Utils.getCls("hornet.internationalization").lang ? Utils.getCls("hornet.internationalization").lang : "";
-        this.state.isMounted = false;
-        this.state.switchTitle = this.i18n("changeLanguage.title");
+
+        const listLanguage = Utils.appSharedProps.get("listLanguage") || [];
+
+        this.state = {
+            ...this.state,
+            listLanguage,
+            isValide: listLanguage.length > 0,
+            currentLanguage: Utils.getCls("hornet.internationalization") && Utils.getCls("hornet.internationalization").lang
+                ? Utils.getCls("hornet.internationalization").lang
+                : "",
+            isMounted: false,
+            switchTitle: this.i18n("changeLanguage.title"),
+        };
     }
 
     componentDidMount() {
@@ -135,19 +143,20 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        let dropdownItems = [];
+        const dropdownItems = [];
 
         this.state.listLanguage.map((item) => {
             let disabled = false;
-            if (this.state.currentLanguage.toUpperCase() == item.langShort) {
+            if (this.state.currentLanguage.toUpperCase() === item.langShort) {
                 disabled = true;
             }
             dropdownItems.push({
                 label: item.langLabel,
                 action: this.selectLanguage.bind(this, item.locale, item.langShort),
                 className: "material-dropdown-menu__link",
-                disabled: disabled,
-                lang: item.locale
+                disabled,
+                lang: item.locale,
+                title: this.i18n("changeLanguage.titleItem", item),
             });
         });
         return (

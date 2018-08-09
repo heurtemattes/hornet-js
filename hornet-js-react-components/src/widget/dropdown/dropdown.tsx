@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,13 +84,16 @@ import { HornetComponent } from "src/widget/component/hornet-component";
 import { DropdownItem } from "src/widget/dropdown/dropdown-item";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { HornetEvent, fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 
+interface DropdownActivationEventDetail { id: string; }
+const DROPDOWN_ACTIVATION_EVENT = new HornetEvent<DropdownActivationEventDetail>("DROPDOWN_ACTIVATION_EVENT");
 
 export enum Position {
     BOTTOMLEFT = 0,
     BOTTOMRIGHT = 1,
     TOPLEFT = 2,
-    TOPRIGHT = 3
+    TOPRIGHT = 3,
 
 }
 
@@ -109,6 +112,7 @@ export interface DropdownProps extends HornetComponentProps {
     icon?: string;
     items?: any;
     valueCurrent?: number;
+    // label du lien généré par le dropdown
     ariaLabel?: string;
     /** parametre pour afficher le dropdown qui prendre en valeur un enum Position (ci-dessus) */
     position?: Position;
@@ -118,6 +122,8 @@ export interface DropdownProps extends HornetComponentProps {
     closeClick?: boolean;
     title?: string;
     type?: string;
+    // identifiant de l'élément lié répresentant le label du composant
+    ariaLabelledById?: string;
 }
 
 /**
@@ -129,7 +135,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         disabled: false,
         position: Position.BOTTOMRIGHT,
         drawArrow: true,
-        closeClick: true
+        closeClick: true,
     };
     /** bouton du dropdown */
     button: any;
@@ -137,15 +143,23 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
     items = [];
     dropDown: any;
     /** Tableau pour matcher Enum avec className */
-    lstPosition = [ "position-bottom-left", "position-bottom-right", "position-top-left", "position-top-right" ];
+    lstPosition = ["position-bottom-left", "position-bottom-right", "position-top-left", "position-top-right"];
     boxStyle: any;
     arrowStyle: any;
 
     constructor(props, context?: any) {
         super(props, context);
-        this.state.isActive = false;
+        this.state = {
+            ...this.state, isActive: false,
+        };
+
+        this.listen(DROPDOWN_ACTIVATION_EVENT, this.handleOtherDropdownActivation);
     }
 
+
+    /**
+     * @inheritDoc
+     */
     componentDidUpdate() {
         // when the component is updated
         // make sure you remove the listener on document
@@ -160,10 +174,23 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     componentDidMount() {
         this.calculPositionBox();
     }
 
+    /**
+     * @inheritDoc
+     */
+    componentWillUnmount() {
+        this.remove(DROPDOWN_ACTIVATION_EVENT, () => { });
+    }
+
+    /**
+     * @inheritDoc
+     */
     componentWillUpdate() {
         this.calculPositionBox();
     }
@@ -173,19 +200,17 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
      */
     render(): JSX.Element {
 
-        let dropdownClasses: ClassDictionary = {
-            "dropdown-container": true
+        const dropdownClasses: ClassDictionary = {
+            "dropdown-container": true,
         };
 
         if (this.state.className) {
-            dropdownClasses[ this.state.className ] = true;
+            dropdownClasses[this.state.className] = true;
         }
-
-
 
         return (
             <div id={this.state.id} title={this.state.title} className={classNames(dropdownClasses)}>
-                {(this.props.type == "button") ? this.renderButton() : this.renderLink()}
+                {(this.props.type === "button") ? this.renderButton() : this.renderLink()}
                 {this.renderDropDown()}
             </div>
         );
@@ -195,16 +220,16 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
     renderLink() {
 
         let img = null;
-        if (typeof this.props.icon == "string") {
+        if (typeof this.props.icon === "string") {
             img = <span className={"icon " + this.props.icon} />;
         } else {
             img = this.props.icon;
         }
 
-        let labelClass: string = this.props.labelClassName || "dropdown-label-span";
+        const labelClass: string = this.props.labelClassName || "dropdown-label-span";
 
-        let aProps: any = {
-            onClick: this.handleClick.bind(this),
+        const aProps: any = {
+            onClick: this.handleClick,
             onKeyDown: this.handleKeyDownDropDown,
             role: "button",
             href: "#",
@@ -215,8 +240,13 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             className: `dropdown-button button-action`,
             disabled: this.state.disabled,
             "aria-expanded": this.state.isActive ? "true" : "false",
-            "aria-haspopup": true
+            "aria-haspopup": true,
         };
+
+        if (this.props.ariaLabelledById) {
+            aProps["aria-labelledby"] = this.props.ariaLabelledById;
+        }
+
         return (
             <a {...aProps}>
                 {this.state.label ? null : <span className="dropdown-hidden-label">{this.props.ariaLabel}</span>}
@@ -224,20 +254,20 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                     className={"label" + " " + labelClass}>{this.props.label ? this.props.label : this.props.valueCurrent}</span>
                 {img}
             </a>
-        )
+        );
     }
 
     renderButton() {
 
         let img = null;
-        if (typeof this.props.icon == "string") {
+        if (typeof this.props.icon === "string") {
             img = <span className={"icon " + this.props.icon} ></span>;
         } else {
             img = this.props.icon;
         }
 
-        let buttonProps: any = {
-            onClick: this.handleClick.bind(this),
+        const buttonProps: any = {
+            onClick: this.handleClick,
             onKeyDown: this.handleKeyDownDropDown,
             role: "button",
             tabIndex: 0,
@@ -249,17 +279,17 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             "aria-expanded": this.state.isActive ? "true" : "false",
             "aria-haspopup": true,
             "aria-label": this.props.ariaLabel,
-            "type": "button"
+            type: "button",
         };
 
-        let labelClass: string = this.props.labelClassName || "dropdown-label-span";
+        const labelClass: string = this.props.labelClassName || "dropdown-label-span";
         return (
             <button {...buttonProps}>
                 {img}
                 {<span className="dropdown-hidden-label">{this.props.title}</span>}
                 <span className={"label" + " " + labelClass}>{this.props.label ? this.props.label : this.props.valueCurrent}</span>
             </button>
-        )
+        );
 
     }
 
@@ -273,7 +303,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         const buildItem = (item, index) => {
 
 
-            let dropdownItemsProps = {
+            const dropdownItemsProps = {
                 label: item.label,
                 url: item.url,
                 className: item.className,
@@ -283,11 +313,12 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 getRef: item => this.items.push(item),
                 disabled: item.disabled,
                 valueCurrent: item.valueCurrent,
-                lang: item.lang
+                lang: item.lang,
+                title: item.title,
             };
 
             if (item.action) {
-                dropdownItemsProps[ "action" ] = item.action
+                dropdownItemsProps["action"] = item.action;
             }
 
             return <DropdownItem {...dropdownItemsProps} />;
@@ -302,22 +333,22 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 items.push(React.cloneElement(item, {
                     key: `li-dropdown-${this.props.id}-${index}`,
                     onKeyDown: this.handleKeyDownDropDownItem,
-                    ref: item => this.items.push(item)
+                    ref: item => this.items.push(item),
                 }));
             });
         }
 
-        let dropDownClasses: ClassDictionary = {
+        const dropDownClasses: ClassDictionary = {
             "dropdown-content": true,
-            "dropdown-content-hidden": !this.state.isActive
+            "dropdown-content-hidden": !this.state.isActive,
         };
-        let classStyle = this.lstPosition[ this.props.position ];
-        let position = (this.props.drawArrow) ? classStyle : "";
+        const classStyle = this.lstPosition[this.props.position];
+        const position = (this.props.drawArrow) ? classStyle : "";
 
         return (
             <div id={this.state.id + "content"} className={classStyle + " " + classNames(dropDownClasses)}
                 style={this.boxStyle}>
-                <span style={this.arrowStyle} className={"arrow " + position}/>
+                <span style={this.arrowStyle} className={"arrow " + position} />
                 <ul
                     className={"dropdown-list " + position}
                     ref={dropDown => this.dropDown = dropDown}
@@ -330,9 +361,11 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
 
 
     calculPositionBox() {
-        let valRightArrow = 0, valLeftBox = 0, valLeftArrow = 0;
-        let widthIcon = this.button.getElementsByClassName("icon")[ 0 ].getBoundingClientRect().width;
-        let widthLabel = this.button.getElementsByClassName("label")[ 0 ].getBoundingClientRect().width;
+        let valRightArrow = 0;
+        let valLeftBox = 0;
+        let valLeftArrow = 0;
+        const widthIcon = this.button.getElementsByClassName("icon")[0].getBoundingClientRect().width;
+        const widthLabel = this.button.getElementsByClassName("label")[0].getBoundingClientRect().width;
         switch (this.props.position) {
 
             case Position.BOTTOMRIGHT:
@@ -340,7 +373,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 /* 5px decalement de la box -0.5em // -5px suppression de la moitié de la fleche*/
                 valRightArrow = (widthIcon / 2) + 5;
                 this.arrowStyle = {
-                    right: valRightArrow + "px"
+                    right: valRightArrow + "px",
                 };
                 break;
             case Position.TOPLEFT:
@@ -350,10 +383,10 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 }
                 valLeftArrow = (widthIcon / 2);
                 this.arrowStyle = {
-                    left: valLeftArrow + "px"
+                    left: valLeftArrow + "px",
                 };
                 this.boxStyle = {
-                    left: valLeftBox + "px"
+                    left: valLeftBox + "px",
                 };
                 break;
         }
@@ -361,21 +394,19 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
 
     /* Evenement sur le onClick */
     handleClick() {
-        /* on ferme que si on a le droit ( par defaut oui ) */
-        if (this.state.isActive && this.state.closeClick) {
+        if (this.state.isActive) {
             this.closePanel();
-        } else if (!this.state.isActive) { /* sinon on ouvre que si c'est fermé */
+        } else {
             this.openPanel();
         }
     }
 
     /**
-     * ouvre le dropdown et focus le premier enfant
+     * ouvre le dropdown, le focus reste sur le bouton appelant
      */
     openPanel() {
-        this.setState({ isActive: true }, () => {
-            this.dropDown.firstElementChild.firstElementChild.focus();
-        });
+        fireHornetEvent(DROPDOWN_ACTIVATION_EVENT.withData({ id: this.state.id }));
+        this.setState({ isActive: true });
     }
 
     /**
@@ -395,22 +426,21 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         switch (e.keyCode) {
             // la touche echappe ferm le panneau
             case KeyCodes.ESCAPE:
-                this.handleClick();
+                this.closePanel();
                 break;
 
             // la barre d'espace ouvre ou ferme le
             // panneau suivant son état
             case KeyCodes.SPACEBAR:
-                e.preventDefault();
-                if (!this.state.isActive) {
+                if (this.state.type !== "button") {
+                    e.preventDefault();
                     this.handleClick();
                 }
                 break;
-
             default:
                 break;
         }
-    };
+    }
 
     /**
      * Gère les événements clavier sur un item du dropdown
@@ -434,8 +464,8 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             case KeyCodes.SPACEBAR:
                 e.preventDefault();
                 if (this.state.isActive) {
-                    if (typeof action != "undefined") action();
-                    else if (url != "undefined") window.location.href = url;
+                    if (typeof action !== "undefined") action();
+                    else if (url !== "undefined") window.location.href = url;
                     this.handleClick();
                 }
                 break;
@@ -449,7 +479,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 break;
             case KeyCodes.TAB:
                 if (e.shiftKey) { /** SHIFT+TAB */
-                    if ((e.currentTarget as any).parentNode.previousElementSibling.nodeName != "LI") {
+                    if ((e.currentTarget as any).parentNode.previousElementSibling.nodeName !== "LI") {
                         this.closePanel();
                     }
                 }
@@ -469,7 +499,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             default:
                 break;
         }
-    };
+    }
 
     /**
      * Ferme la liste lorsque le clic est en dehors de la div
@@ -481,9 +511,20 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             if (!document.getElementById(this.state.id + "content").contains(e.target)) {
                 // the click was outside your component, so handle closing here
                 this.setState({ isActive: false });
-            } else {
-                this.handleClick();
+            } else if (this.state.isActive && this.state.closeClick) {
+                this.closePanel();
             }
         }
     }
+
+    /**
+     * Ferme le dropdown courrant à l'ouverture d'un autre dropdown
+     * @param event 
+     */
+    private handleOtherDropdownActivation(event) {
+        if (this.state.isActive && event && event.detail && event.detail.id !== this.state.id) {
+            this.setState({ isActive: false });
+        }
+    }
+
 }

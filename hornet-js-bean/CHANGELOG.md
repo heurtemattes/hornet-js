@@ -1,3 +1,9 @@
+# hornet-js-bean 5.2.0
+
+- EVOL(S102-517) - hornet-js-bean : upgrader en 2.9.0
+- FIX[m0068017] > radioField - Hornet 5.1.1 getCurrentValue() renvoie null
+- FIX [M0067512]: Impossible de mapper un champ custom dans un objet métier
+
 # hornet-js-bean 5.1.0-rc2
 
 -  0061977  -  hornet-js  -  Framework de validation du formulaire  -  fermé

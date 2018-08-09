@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -113,6 +113,10 @@ export interface ToggleColumnsButtonProps extends HornetComponentProps {
      * Affiche de l'option de sélection complet
      */
     selectAllItem?: boolean;
+
+    itemTitleDisplay?: string;
+
+    itemTitleHide?: string;
 }
 
 /**
@@ -121,12 +125,34 @@ export interface ToggleColumnsButtonProps extends HornetComponentProps {
 export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProps, any> {
 
     static defaultProps = {
-        selectAllItem: true
+        selectAllItem: true,
+        itemTitleToggle: "toggleColumnsButton.itemTitleToggle",
     };
 
-    constructor(props: HornetComponentProps, context?: any) {
+    public readonly props: Readonly<ToggleColumnsButtonProps>;
+
+
+    constructor(props: ToggleColumnsButtonProps, context?: any) {
         super(props, context);
-        this.state.title = this.i18n("toggleColumnsButton.title");
+
+        this.state = {
+            ...this.state,
+            title: this.i18n("toggleColumnsButton.title"),
+        };
+    }
+
+    /**
+     * @inheritDoc
+     */
+    componentDidMount() {
+        super.componentDidMount();
+        this.state.columns.columns.map((column) => {
+            const isVisible: boolean = !this.state.hiddenColumns[ column.keyColumn ];
+            fireHornetEvent(new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY").withData({
+                column: column.keyColumn,
+                isVisible,
+            }));
+        });
     }
 
     /**
@@ -154,15 +180,15 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      */
     protected renderDropDownItem(column): JSX.Element {
 
-        let checked: boolean = !(this.props.hiddenColumns && this.props.hiddenColumns[column.keyColumn]);
+        let checked: boolean = !(this.props.hiddenColumns && this.props.hiddenColumns[ column.keyColumn ]);
         if (column.keyColumn === SELECTALL_KEYCOLUMN) {
             checked = this.isAllChecked();
         }
 
-        let checkBoxProps: any = {
-            checked: checked,
+        const checkBoxProps: any = {
+            checked,
             onChange: column.action,
-            title: column.label,
+            title: this.i18n(this.state.itemTitleToggle, column),
             name: this.props.columns.id + "-checkbox-" + column.keyColumn,
             key: this.props.columns.id + "-checkbox-" + column.keyColumn + "-" + checked,
             id: this.props.columns.id + "-checkbox-" + column.keyColumn,
@@ -171,30 +197,19 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
         return (
             <div className="toggle-column-item-content">
                 <div className="toggle-column-item-checkbox fl">
-                    <CheckBox {...checkBoxProps}/>
+                    <CheckBox {...checkBoxProps} />
                 </div>
                 <div className="toggle-column-item-label fl"><label htmlFor={checkBoxProps.id}>{column.title}</label></div>
             </div>
         );
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.state.columns.columns.map((column) => {
-            let isVisible: boolean = !this.state.hiddenColumns[column.keyColumn];
-            fireHornetEvent(new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY").withData({
-                column: column.keyColumn,
-                isVisible: isVisible
-            }));
-        });
-    }
+    }    
 
     /**
      * méthode permettant de configurer les items de la liste
      * @returns {Array}
      */
     protected configureDropDownItems(): any[] {
-        let dropdownItems = [];
+        const dropdownItems = [];
 
         if (this.props.selectAllItem) {
             dropdownItems.push(this.configureSelectAllItem());
@@ -205,7 +220,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
                 label: this.renderDropDownItem(column),
                 action: column.action,
                 className: "material-dropdown-menu__link",
-                key: column.id || index + "-table-settings-" + index
+                key: column.id || index + "-table-settings-" + index,
             });
         });
 
@@ -216,8 +231,8 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      * Méthode de sélection/déselection associé au "Sélectionner tout"
      */
     protected handleToggleAllColumns(): void {
-        let checkbox: HTMLInputElement = (document.getElementById(this.props.columns.id + "-checkbox-" + SELECTALL_KEYCOLUMN) as any);
-        let checked: boolean = checkbox.checked;
+        const checkbox: HTMLInputElement = (document.getElementById(this.props.columns.id + "-checkbox-" + SELECTALL_KEYCOLUMN) as any);
+        const checked: boolean = checkbox.checked;
 
         Promise.resolve(
             this.props.columns.columns.map((column) => {
@@ -225,9 +240,9 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
                 this.toggleCheckBox(column.keyColumn, checked);
                 fireHornetEvent(new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY").withData({
                     column: column.keyColumn,
-                    isVisible: checked
+                    isVisible: checked,
                 }));
-            })
+            }),
         ).then(() => {
             this.toggleCheckBox(SELECTALL_KEYCOLUMN, checked);
         });
@@ -248,7 +263,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
     protected handleToggleColumn(keyColumn: string): void {
 
         // Récupération de l'état de la checkbox
-        let checkbox: HTMLInputElement = (document.getElementsByName(this.props.columns.id + "-checkbox-" + keyColumn)[0] as any);
+        const checkbox: HTMLInputElement = (document.getElementsByName(this.props.columns.id + "-checkbox-" + keyColumn)[ 0 ] as any);
 
         this.toggleColumn(keyColumn, checkbox.checked);
         this.toggleCheckBox(keyColumn, checkbox.checked);
@@ -275,8 +290,8 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
         let bool: boolean = true;
         this.props.columns.columns.map((column) => {
             if (bool) {
-                let checkbox: HTMLInputElement =
-                    (document.getElementsByName(this.props.columns.id + "-checkbox-" + column.keyColumn)[0] as any);
+                const checkbox: HTMLInputElement =
+                    (document.getElementsByName(this.props.columns.id + "-checkbox-" + column.keyColumn)[ 0 ] as any);
                 bool = checkbox.checked;
             }
         });
@@ -289,15 +304,15 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      * @returns {{}}
      */
     protected getColumnsState() {
-        let columnsState = {};
+        const columnsState = {};
         this.props.columns.columns.map((column, index) => {
-            let checkbox: HTMLInputElement =
-                (document.getElementsByName(this.props.columns.id + "-checkbox-" + column.keyColumn)[0] as any);
+            const checkbox: HTMLInputElement =
+                (document.getElementsByName(this.props.columns.id + "-checkbox-" + column.keyColumn)[ 0 ] as any);
             if (column.keyColumn !== SELECTALL_KEYCOLUMN) {
-                columnsState[column.keyColumn] = !checkbox.checked;
+                columnsState[ column.keyColumn ] = !checkbox.checked;
 
                 if (!checkbox.checked) {
-                    columnsState["hidden-" + index] = index;
+                    columnsState[ "hidden-" + index ] = index;
                 }
             }
         });
@@ -311,23 +326,16 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      */
     protected toggleColumn(keyColumn: string, checked?: boolean): void {
         // Gestion du masquage des cellules
-        let cells: HTMLCollection = document.getElementsByClassName(this.props.columns.id + "-" + keyColumn);
+        const cells: HTMLCollection = document.getElementsByClassName(this.props.columns.id + "-" + keyColumn);
 
         for (let i = 0; i < cells.length; i++) {
 
             // La colonne est à afficher
             if (checked) {
-                (cells[i] as any).style.display = "table-cell";
+                (cells[ i ] as any).style.display = "table-cell";
             } else {
-                (cells[i] as any).style.display = "none";
+                (cells[ i ] as any).style.display = "none";
             }
-        }
-
-        // Gestion du colspan du/des loader(s)
-        let loader: HTMLCollection = document.getElementsByClassName(this.props.columns.id + "-tr-with-colspan");
-        let nbColumns = this.getNbColumnsAlreadyDisplayed();
-        for (let i = 0; i < loader.length; i++) {
-            (loader[i] as any).childNodes[0].colSpan = nbColumns;
         }
     }
 
@@ -337,28 +345,11 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      * @param checked
      */
     toggleCheckBox(keyColumn: string, checked?: boolean): void {
-        let checkbox: HTMLInputElement =
-            (document.getElementsByName(this.props.columns.id + "-checkbox-" + keyColumn)[0] as any);
+        const checkbox: HTMLInputElement =
+            (document.getElementsByName(this.props.columns.id + "-checkbox-" + keyColumn)[ 0 ] as any);
         checkbox.checked = checked;
     }
 
-    /**
-     * Récupération du nombre de colonnes affichées
-     * @returns {number}
-     */
-    protected getNbColumnsAlreadyDisplayed(): number {
-        // Calcul du nombre de colonnes déjà affichées
-        let columns: NodeList = document.getElementById(this.props.columns.id + "-tr-header").childNodes;
-        let nbColumns: number = columns.length;
-
-        for (let i = 0; i < columns.length; i++) {
-            if ((columns[i] as any).style.display == "none") {
-                nbColumns--;
-            }
-        }
-
-        return nbColumns;
-    }
 
     /**
      * Permet de configurer l'item selectAll
@@ -366,17 +357,17 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      */
     protected configureSelectAllItem(): any {
 
-        let conf: any = {
+        const conf: any = {
             keyColumn: SELECTALL_KEYCOLUMN,
             label: this.i18n("dropdown.selectAll"),
             title: this.i18n("dropdown.selectAll"),
-            action: this.handleToggleAllColumns
+            action: this.handleToggleAllColumns,
         };
         return {
             label: this.renderDropDownItem(conf),
             action: conf.action,
             className: "material-dropdown-menu__link",
-            key: this.props.columns.id + "-table-settings-select-all"
+            key: this.props.columns.id + "-table-settings-select-all",
         };
     }
 
@@ -388,7 +379,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
         let bool: boolean = true;
         if (this.props.hiddenColumns) {
             this.props.columns.columns.map((column) => {
-                if (this.props.hiddenColumns[column.keyColumn]) {
+                if (this.props.hiddenColumns[ column.keyColumn ]) {
                     bool = false;
                 }
             });

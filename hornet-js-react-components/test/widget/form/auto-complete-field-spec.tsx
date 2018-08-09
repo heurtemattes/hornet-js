@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -117,20 +117,20 @@ describe.skip("AutoComplete", () => {
         it.skip("doit avoir deux champs input", () => {
 
             let listeCivilites: any[] = [
-                {id: 0, libelle: "aucune"},
-                {id: 1, libelle: "mme"},
-                {id: 2, libelle: "mr"}];
+                { id: 0, libelle: "aucune" },
+                { id: 1, libelle: "mme" },
+                { id: 2, libelle: "mr" } ];
 
-            let dataSourceCivilite = new DataSource<any>(listeCivilites, {value : "id", text : "libelle"});
+            let dataSourceCivilite = new DataSource<any>(listeCivilites, { value: "id", text: "libelle" });
 
             var $: CheerioStatic = render(() =>
                 <AutoCompleteField dataSource={dataSourceCivilite}
-                                   maxHeight={200}
-                                   name="civilite"
-                                   label="civilite"
-                                   required={true}
-                                   labelKey="libelle"
-                                   valueKey="id"
+                    maxHeight={200}
+                    name="civilite"
+                    label="civilite"
+                    required={true}
+                    labelKey="libelle"
+                    valueKey="id"
 
                 />);
 
@@ -140,23 +140,23 @@ describe.skip("AutoComplete", () => {
             /* Existance de lattribut id */
             let $input = $(`input[name="civilite.libelle"]`);
             assert.equal($input.attr('id'), `civilite.libelle`);
-         });
+        });
 
 
         it("choix d'un item dans le datasource", () => {
 
             let listeCivilites: any[] = [
-                {id: 1, libelle: "mme"},
-                {id: 2, libelle: "mr"}];
+                { id: 1, libelle: "mme" },
+                { id: 2, libelle: "mr" } ];
 
-            let dataSourceCivilite = new DataSource<any>(listeCivilites, {value : "id", text : "libelle"});
+            let dataSourceCivilite = new DataSource<any>(listeCivilites, { value: "id", text: "libelle" });
 
-            var autoCompleteField: AutoCompleteField<AutoCompleteFieldProps> = new AutoCompleteField({ name:"civilite", dataSource:dataSourceCivilite,  label:"civilite" , labelKey:"libelle", valueKey:"id"});
+            var autoCompleteField: AutoCompleteField<AutoCompleteFieldProps> = new AutoCompleteField({ name: "civilite", dataSource: dataSourceCivilite, label: "civilite", labelKey: "libelle", valueKey: "id" });
             //autoCompleteField.changeSelectedChoice(listeCivilites[0]);
 
         });
 
 
-     });
- });
+    });
+});
 

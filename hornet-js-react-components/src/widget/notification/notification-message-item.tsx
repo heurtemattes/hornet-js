@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,7 +95,7 @@ export interface MessageItemProps extends HornetComponentProps {
     text: string;
     anchor?: string;
     className?: string;
-    id?:string;
+    id?: string;
 }
 
 /**
@@ -128,7 +128,7 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
      * @protected
      */
     protected renderLink() {
-        let id = this.props.id? this.props.id : null;
+        const id = this.props.id ? this.props.id : null;
         return (
             <a href="#" onClick={this.setFocus} className={this.props.className} id={id}>
                 {this.i18n(this.state.text)}

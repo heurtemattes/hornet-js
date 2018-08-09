@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -113,7 +113,11 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
 
     constructor(props?: P, context?: any) {
         super(props, context);
-        this.state.title = this.i18n("table.menuActions.title");
+
+        this.state = {
+            ...this.state,
+            title: this.i18n("table.menuActions.title"),
+        };
     }
 
     /**
@@ -121,7 +125,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
      */
     render(): JSX.Element {
         logger.trace("render MenuActions");
-        let actions = this.getMenuActions();
+        const actions = this.getMenuActions();
         return (
             <div className="datatable-header-menu flex-container fr">
                 {(actions.priorityActions.length > 0) ? MenuActions.renderPriorityActions(actions.priorityActions) :
@@ -136,10 +140,10 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
      * @returns {Array}
      */
     getMenuActions() {
-        let priorityActions = [];
-        let dropdownItems = [];
-        let item = this.props.selectedItems ? this.props.selectedItems[ 0 ] : {};
-        let self = this;
+        const priorityActions = [];
+        const dropdownItems = [];
+        const item = this.props.selectedItems ? this.props.selectedItems[ 0 ] : {};
+        const self = this;
 
         if (this.props.showIconInfo) {
             priorityActions.push(<TableButtonInfoAccessibilite srcImg={Picto.white.info}
@@ -147,16 +151,17 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
         }
 
         if (this.props.toggleColumnsButton) {
-            let WrappedToggleColumnsButton = this.props.toggleColumnsButton;
-            priorityActions.push(<WrappedToggleColumnsButton />);
+            const WrappedToggleColumnsButton = this.props.toggleColumnsButton;
+            priorityActions.push(WrappedToggleColumnsButton);
         }
 
         if (this.props.actions && this.props.actions.length > 0) {
             this.props.actions.map((action, index) => {
                 if ((action.props.typeAction === TypeAction.ACTION_MASSE && self.props.selectedItems && self.props.selectedItems.length > 0)
-                    || (action.props.typeAction === TypeAction.ACTION_UNITAIRE && self.props.selectedItems && self.props.selectedItems.length == 1)
+                    || (action.props.typeAction === TypeAction.ACTION_UNITAIRE 
+                        && self.props.selectedItems && self.props.selectedItems.length === 1)
                     || !action.props.typeAction) {
-                    let propsButtons: ActionButtonProps = _.cloneDeep(action.props);
+                    const propsButtons: ActionButtonProps = {...action.props};
 
                     propsButtons.showAlert = this.props.showAlert;
                     propsButtons.selectedItems = this.props.selectedItems;
@@ -165,7 +170,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                     propsButtons[ "value" ] = item;
 
 
-                    let isVisible: boolean = propsButtons.items.length > 0 || propsButtons.displayedWithoutResult;
+                    const isVisible: boolean = propsButtons.items.length > 0 || propsButtons.displayedWithoutResult;
 
                     if (isVisible && (!propsButtons.visible || propsButtons.visible && propsButtons.visible())) {
 
@@ -177,12 +182,13 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                                 srcImg: propsButtons.srcImg,
                                 className: "material-dropdown-menu__link",
                                 key: propsButtons.id || index + "-menuAction-" + index,
-                                valueCurrent: item
+                                valueCurrent: item,
+                                title: propsButtons.title,
                             });
                         } else {
-                            let newProps = _.cloneDeep(propsButtons);
+                            const newProps = _.cloneDeep(propsButtons);
                             newProps.label = null;
-                            let actionButton = <ActionButton {...newProps} />;
+                            const actionButton = <ActionButton {...newProps} />;
                             priorityActions.push(actionButton);
                         }
                     }
@@ -190,8 +196,8 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
             });
         }
         return {
-            priorityActions: priorityActions,
-            dropdownItems: dropdownItems
+            priorityActions,
+            dropdownItems,
         };
     }
 

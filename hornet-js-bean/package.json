@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-bean",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "license": "CECILL-2.1",
   "description": "Ensemble des décorateurs pour les beans hornet-js",
   "bugs": {
@@ -12,20 +12,20 @@
   },
   "main": "./index.js",
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.1.1",
-    "hornet-js-utils-dts": "5.1.1",
-    "hornet-js-test-dts": "5.1.1"
+    "hornet-js-ts-typings": "5.2.0",
+    "hornet-js-utils-dts": "5.2.0",
+    "hornet-js-test-dts": "5.2.0"
   },
   "appDependencies": {
-    "hornet-js-utils": "5.1.1",
+    "hornet-js-utils": "5.2.0",
     "lodash": "4.17.5",
     "reflect-metadata": "0.1.12"
   },
   "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.1.1",
+    "hornet-js-test": "5.2.0",
     "moment-timezone": "0.5.14",
-    "log4js": "2.3.12",
+    "log4js": "2.9.0",
     "config": "1.29.4"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"

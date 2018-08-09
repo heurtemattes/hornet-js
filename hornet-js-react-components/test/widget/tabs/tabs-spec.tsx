@@ -73,16 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import {TestUtils} from "hornet-js-test/src/test-utils";
-import {ReactTestUtils} from "hornet-js-test/src/react-test-utils";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+import { ReactTestUtils } from "hornet-js-test/src/react-test-utils";
 import * as React from "react";
-import {Tabs} from "src/widget/tab/tabs";
-import {Tab} from "src/widget/tab/tab";
+import { Tabs } from "src/widget/tab/tabs";
+import { Tab } from "src/widget/tab/tab";
 
 const expect = TestUtils.chai.expect;
 const assert = TestUtils.chai.assert;
@@ -94,22 +94,22 @@ describe.skip("TabsSpec", () => {
     let afterShowTabCount = 0;
 
     const props = {
-        tabs: [{
+        tabs: [ {
             title: "Titre premier onglet",
             h5: "Montre Le premier onglet"
         }, {
             title: "Titre second onglet",
             h5: "Montre Le second onglet"
-        }]
+        } ]
     };
 
     let $ = render(() =>
         <Tabs id="tabs-spec" selectedTabIndex={1}>
-            <Tab title={props.tabs[0].title}>
-                <h5>{props.tabs[0].h5}</h5>
+            <Tab title={props.tabs[ 0 ].title}>
+                <h5>{props.tabs[ 0 ].h5}</h5>
             </Tab>
-            <Tab title={props.tabs[1].title}>
-                <h3>{props.tabs[1].h5}</h3>
+            <Tab title={props.tabs[ 1 ].title}>
+                <h3>{props.tabs[ 1 ].h5}</h3>
             </Tab>
         </Tabs>);
 
@@ -119,15 +119,15 @@ describe.skip("TabsSpec", () => {
         assert.isNotNull($.html());
     });
 
-    describe("rendered component", ()=> {
-        it("should have two child", ()=> {
+    describe("rendered component", () => {
+        it("should have two child", () => {
             let $ul = $('ul');
             assert.equal($ul.children().length, 2);
         });
-        describe("<Tabs/> child", ()=> {
-            it("should have correct title", ()=> {
-                assert.equal($(`a:contains('${props.tabs[0].title}')`).html(), props.tabs[0].title);
-                assert.equal($(`a:contains('${props.tabs[1].title}')`).html(), props.tabs[1].title);
+        describe("<Tabs/> child", () => {
+            it("should have correct title", () => {
+                assert.equal($(`a:contains('${props.tabs[ 0 ].title}')`).html(), props.tabs[ 0 ].title);
+                assert.equal($(`a:contains('${props.tabs[ 1 ].title}')`).html(), props.tabs[ 1 ].title);
             });
         });
     });

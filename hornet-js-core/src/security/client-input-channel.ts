@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,7 +98,7 @@ export class ClientInputChannel extends stream.Transform {
             this.push("nINSTREAM\n");
             this._inBody = true;
         }
-        let size = new Buffer(4);
+        const size = Buffer.alloc(4);
         size.writeInt32BE(chunk.length, 0);
         this.push(size);
         this.push(chunk);
@@ -107,9 +107,9 @@ export class ClientInputChannel extends stream.Transform {
     }
 
     _flush(callback) {
-        let size = new Buffer(4);
+        const size = Buffer.alloc(4);
         size.writeInt32BE(0, 0);
         this.push(size);
         callback();
-    };
+    }
 }

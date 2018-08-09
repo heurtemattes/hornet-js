@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -113,7 +113,7 @@ class NavigationUtilsMock extends NavigationUtils {
 }
 
 var PlanNS = proxyquire("src/widget/navigation/plan", {
-    "hornet-js-components/src/utils/navigation-utils": {NavigationUtils: NavigationUtilsMock},
+    "hornet-js-components/src/utils/navigation-utils": { NavigationUtils: NavigationUtilsMock },
 });
 
 /* Composant utilisé pour debug Webstorm avec chemin en absolu */
@@ -128,15 +128,15 @@ Utils.config.setConfigObj({
 
 
 var cls = Utils.getContinuationStorage();
-var contextMock = {"hornet.user": {name: "admin", roles: [{"id": 1, "name": "admin"}, {"id": 2, "name": "user"}]}};
+var contextMock = { "hornet.user": { name: "admin", roles: [ { "id": 1, "name": "admin" }, { "id": 2, "name": "user" } ] } };
 describe("PlanSpec", () => {
 
     it("doit afficher le plan de l'application avec restriction sur les rôles => user non connecté", () => {
         // Act
         var $ = render(() =>
-                <div id="planDuSiteTest">
-                    <PlanNS.Plan/>
-                </div>);
+            <div id="planDuSiteTest">
+                <PlanNS.Plan />
+            </div>);
 
         // Assert
         expect($("a[href=\"/applitutoriel/cas1\"]")).to.exist;
@@ -148,9 +148,9 @@ describe("PlanSpec", () => {
     it("doit afficher le plan de l'application avec restriction sur les rôles => user connecté en tant qu'ADMIN", cls.bind(() => {
         // Act
         var $ = render(() =>
-                <div id="planDuSiteTest">
-                    <PlanNS.Plan/>
-                </div>);
+            <div id="planDuSiteTest">
+                <PlanNS.Plan />
+            </div>);
 
         // Assert
         expect($("a[href=\"/applitutoriel/cas1\"]")).to.exist;

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,12 +91,12 @@ export abstract class AbstractI18nLoader {
     /** Méthode qui retourne les messages de la langue selectionnée
      * @returns {string[]}
      */
-    abstract getMessages(locales?: II18n): {locale: string, lang: string, messages: any};
+    abstract getMessages(locales?: II18n): { locale: string, lang: string, messages: any };
 
     /** Méthode qui liste les langues disponibles dans le dossier resources
      * @returns {string[]}
      */
-    abstract getLocales(): Array<{langShort: string, locale: string, langLabel: string}>;
+    abstract getLocales(): Array<{ langShort: string, locale: string, langLabel: string }>;
 }
 
 export interface II18n {

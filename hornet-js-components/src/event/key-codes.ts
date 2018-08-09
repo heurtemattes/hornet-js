@@ -73,7 +73,7 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -167,14 +167,14 @@ export enum KeyCodes {
     F24 = 135,
     NUM_LOCK = 144,
     SCROLL_LOCK = 145,
-    POINT = 190, 
-    SLASH = 191 
+    POINT = 190,
+    SLASH = 191,
 }
 
 
-export const KEYNAMES =  {
-    ArrowUp : "ArrowUp",
-    ArrowDown : "ArrowDown",
+export const KEYNAMES = {
+    ArrowUp: "ArrowUp",
+    ArrowDown: "ArrowDown",
     Home: "Home",
-    Enter: "Enter"
+    Enter: "Enter",
 };

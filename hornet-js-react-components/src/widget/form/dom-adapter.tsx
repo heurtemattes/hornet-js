@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,13 +105,13 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
     }
 
     protected getElementType(elt) {
-        let tag = this.htmlElement.tagName.toLowerCase();
+        const tag = this.htmlElement.tagName.toLowerCase();
         let type = null;
-        if (tag == "input") {
+        if (tag === "input") {
             type = this.htmlElement[ "type" ];
-        } else if (tag == "textarea") {
+        } else if (tag === "textarea") {
             type = "textarea";
-        } else if (tag == "select") {
+        } else if (tag === "select") {
             type = "select";
         }
         return type;
@@ -134,7 +134,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             this.type = null;
             this.htmlElement = null;
         } else {
-            if (this.htmlElement) {
+            if (this.htmlElement || this.multipleElement) {
                 this.addHtmlElement(elt);
             } else {
                 this.htmlElement = elt;
@@ -147,19 +147,28 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
     addHtmlElement(elt) {
         if (this.htmlElement) {
-            let type = this.getElementType(elt);
-            if (this.type == type && type == "radio") {
-                this.multipleElement = [];
-                this.multipleElement.push(this.htmlElement);
+            const type = this.getElementType(elt);
+            if (this.type === type && type === "radio") {
+                if (!this.multipleElement) {
+                    this.multipleElement = [];
+                }
+
                 elt[ "__component" ] = this;
-                this.multipleElement.push(elt);
+
+                if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
+                    this.multipleElement.push(this.htmlElement);
+                }
                 this.htmlElement = null;
             } else {
                 logger.error("DomAdapter.addHtmlElement > different or unallowed types : " + this.type + " and " + type);
             }
         } else {
             elt[ "__component" ] = this;
-            this.multipleElement.push(elt);
+
+            if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
+                this.multipleElement.push(elt);
+            }
+
         }
     }
 
@@ -197,7 +206,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
      * @returns {DomAdapter} cette instance
      */
     setCurrentChecked(value: boolean): this {
-        if (this.htmlElement && this.type == "checkbox") {
+        if (this.htmlElement && this.type === "checkbox") {
             this.htmlElement.checked = value;
         }
         return this;
@@ -209,22 +218,24 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
      * @returns {DomAdapter} cette instance
      */
     setCurrentValue(value: any): this {
-        let strValue: string = (value != null && value.toString) ? value.toString() : "";
+        const strValue: string = (value != null && value.toString) ? value.toString() : "";
         let type: string = this.type;
         if (type) {
             type = type.toLowerCase();
         }
         if (this.htmlElement) {
-            if (type == "text" || type == "textarea" || type == "hidden" || type == "checkbox"
-                || (type == "select" && this.htmlElement.multiple === false)) {
-                this.htmlElement.value = (this.htmlElement.dataset && this.htmlElement.dataset.multiple === "true") ? (value ? JSON.stringify(value) : "") : strValue;
+            if (type === "text" || type === "textarea" || type === "hidden" || type === "checkbox"
+                || (type === "select" && this.htmlElement.multiple === false)) {
+                this.htmlElement.value = (this.htmlElement.dataset && this.htmlElement.dataset.multiple === "true")
+                    ? (value ? JSON.stringify(value) : "")
+                    : strValue;
 
-            } else if (type == "select"/*select multiple*/) {
+            } else if (type === "select"/*select multiple*/) {
                 if (value instanceof Array) {
                     this.htmlElement.value = null;
                     value.forEach((val) => {
                         for (let i = 0; i < this.htmlElement.options.length; i++) {
-                            if (this.htmlElement.options[ i ].value == val) {
+                            if (this.htmlElement.options[ i ].value === val) {
                                 this.htmlElement.options[ i ].selected = true;
                                 return;
                             }
@@ -238,7 +249,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
         } else if (this.multipleElement) {
             for (let i = 0; i < this.multipleElement.length; i++) {
-                if (this.multipleElement[ i ].value == strValue) {
+                if (this.multipleElement[ i ].value === strValue) {
                     this.multipleElement[ i ].checked = true;
                 } else {
                     this.multipleElement[ i ].checked = false;
@@ -250,17 +261,18 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
     /**
      * Renvoie la valeur courante du champ de formulaire
+     * @param removeEmptyStrings {boolean} non utilisé ici, à conserver pour remonter valeur champs non valorisé d'un form 
      * @returns {null}
      */
-    getCurrentValue(): any {
+    getCurrentValue(removeEmptyStrings: boolean = true): any {
         let val: any = null;
         if (this.htmlElement) {
             let type: string = this.type;
             if (type) {
                 type = type.toLowerCase();
             }
-            if (type == "text" || type == "textarea" || type == "hidden"
-                || (type == "select" && this.htmlElement.multiple === false)) {
+            if (type === "text" || type === "textarea" || type === "hidden"
+                || (type === "select" && this.htmlElement.multiple === false)) {
 
                 try {
                     if (Array.isArray(JSON.parse(this.htmlElement.value))) {
@@ -271,16 +283,16 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                 } catch (e) {
                     val = this.htmlElement.value;
                 }
-            } else if (type == "select"/*select multiple*/) {
+            } else if (type === "select"/*select multiple*/) {
                 val = [];
                 /* Note : l'attribut selectedOptions n'est pas supporté par Internet Explorer */
                 for (let i = 0; i < (this.htmlElement as HTMLSelectElement).options.length; i++) {
-                    let option: HTMLOptionElement = (this.htmlElement as HTMLSelectElement).options[ i ] as HTMLOptionElement;
+                    const option: HTMLOptionElement = (this.htmlElement as HTMLSelectElement).options[ i ] as HTMLOptionElement;
                     if (option.selected) {
                         val.push(option.value);
                     }
                 }
-            } else if (type == "checkbox") {
+            } else if (type === "checkbox") {
                 // if(!_.isEmpty(this.htmlElement.value) && this.htmlElement.value != "on") {
                 //     /* Cas où une valeur est explicitement spécifiée */
                 //     if (this.htmlElement.checked) {
@@ -292,8 +304,8 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                 /* Pas de valeur spécifique : la valeur est un booléen égal à checked */
                 val = this.htmlElement.checked;
                 // }
-            } else if (type == "file") {
-                let fileList: FileList = this.htmlElement.files;
+            } else if (type === "file") {
+                const fileList: FileList = this.htmlElement.files;
                 if (fileList && fileList.length >= 1) {
                     /* Pour simplifier la validation et la transmission via super-agent,
                      un seul fichier par champ de type "file" est pris en compte */
@@ -304,6 +316,8 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                     // TODO à réactiver : voir pourquoi le composant UploadFileField ne peut être utilisé
                     val = FormUtils.extractFileData(this.htmlElement as HTMLInputElement);
                 }
+            } else if (type === "number") {
+                val = this.htmlElement.valueAsNumber;
             }
 
         } else if (this.multipleElement) {

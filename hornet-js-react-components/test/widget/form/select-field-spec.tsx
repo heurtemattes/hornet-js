@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.1
+ * @version v5.2.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import {Logger} from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-utils/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
         "console": {
-        "type": "console",
-        "layout": {
-            "type": "pattern",
-            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-        }
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
+            }
         }
     },
     "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
+        "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
 
@@ -128,7 +128,7 @@ describe.skip('SelectField', () => {
 
     it("doit s'afficher avec seulement les propriétés obligatoires valorisées", () => {
         var $: CheerioStatic = render(() =>
-            <SelectField name="testSelect"/>);
+            <SelectField name="testSelect" />);
 
         // Un seul select ayant le nom indiqué doit avoir été rendu
         var $select: Cheerio = $("select");
@@ -137,10 +137,10 @@ describe.skip('SelectField', () => {
     });
 
     it("doit afficher les choix passés en propriété", () => {
-        let dataSource = new DataSource([{value: "1", label: "choix1"}, {value: "2", label:"choix2"}]);
+        let dataSource = new DataSource([ { value: "1", label: "choix1" }, { value: "2", label: "choix2" } ]);
         var $: CheerioStatic = render(() =>
             <SelectField name="testSelect"
-                         dataSource={dataSource}/>);
+                dataSource={dataSource} />);
 
         // Un select avec deux options doit être rendu
         var $select: Cheerio = $("select");
@@ -152,10 +152,10 @@ describe.skip('SelectField', () => {
     });
 
     it("doit afficher les choix passés en propriété avec des propriétés customisées", () => {
-        let dataSource = new DataSource([{valeur: "1", libelle: "choix1"}, {valeur: "2", libelle:"choix2"}]);
+        let dataSource = new DataSource([ { valeur: "1", libelle: "choix1" }, { valeur: "2", libelle: "choix2" } ]);
         var $: CheerioStatic = render(() =>
             <SelectField name="testSelect" valueKey="valeur" labelKey="libelle"
-                         dataSource={dataSource}/>);
+                dataSource={dataSource} />);
 
         // Un select avec deux options doit être rendu
         var $select: Cheerio = $("select");
@@ -167,10 +167,10 @@ describe.skip('SelectField', () => {
     });
 
     it("doit afficher permettre d'afficher un choix sans valeur", () => {
-        let dataSource = new DataSource([{label: "choix1"}, {value: "2", label:"choix2"}]);
+        let dataSource = new DataSource([ { label: "choix1" }, { value: "2", label: "choix2" } ]);
         var $: CheerioStatic = render(() =>
             <SelectField name="testSelect"
-                         dataSource={dataSource}/>);
+                dataSource={dataSource} />);
 
         // Un select avec deux options doit être rendu
         var $select: Cheerio = $("select");
@@ -182,10 +182,10 @@ describe.skip('SelectField', () => {
     });
 
     it("doit utiliser la valeur lorsque le libellé d'un choix n'est pas fourni", () => {
-        let dataSource = new DataSource([{value: "1"}, {value: "2", label:"choix2"}]);
+        let dataSource = new DataSource([ { value: "1" }, { value: "2", label: "choix2" } ]);
         var $: CheerioStatic = render(() =>
             <SelectField name="testSelect"
-                         dataSource={dataSource}/>);
+                dataSource={dataSource} />);
 
         // Un select avec deux options doit être rendu
         var $select: Cheerio = $("select");
