@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,38 +92,25 @@ export default function map(className?) {
                     const fnParam = [];
                     if (target.__mapParams__ && target.__mapParams__[ key ]) {
                         for (const index in target.__mapParams__[ key ]) {
-                            fnParam.push(BeanUtils.mapArray(target.__mapParams__[ key ][ index ], args[ index ]).then((result) => {
-                                args[ index ] = result;
-                            }));
+                            args[ index ] = BeanUtils.mapArray(target.__mapParams__[ key ][ index ], args[ index ]);
                         }
                     }
+
                     const _instance = this;
                     const _className = className;
-                    return new Promise((resolve, reject) => {
-                        Promise.all(fnParam).then(() => {
-                            try {
-                                let result;
-                                if (_className) {
-                                    result = fn.apply(_instance, args).then(values => {
-                                        if (values instanceof Array) {
-                                            values.map((item) => {
-                                                checkDateInstance(item, _className);
-                                            });
-                                        } else {
-                                            checkDateInstance(values, _className);
-                                        }
-                                        return BeanUtils.mapArray(_className, values);
-                                    });
-                                } else {
-                                    result = fn.apply(_instance, args);
-                                }
-                                resolve(result);
-                            } catch (e) {
-                                reject(e);
+                    return fn.apply(_instance, args).then(result => {
+                        if (_className) {
+                            if (result instanceof Array) {
+                                result.map((item) => {
+                                    checkDateInstance(item, _className);
+                                });
+                            } else {
+                                checkDateInstance(result, _className);
                             }
-                        });
+                            result =  BeanUtils.mapArray(_className, result);
+                        }
+                        return result;
                     });
-
                 };
             } else {
                 if (!target.__mapParams__) {
@@ -158,13 +145,15 @@ export default function map(className?) {
 }
 
 const checkDateInstance = function (item, _className: any) {
-    for (const attribute in item.dataValues) {
-        const type = Reflect.getMetadata("design:type", _className.prototype, attribute);
-        if (type && (type.name === "Date") && item.dataValues[ attribute ] && !(item.dataValues[ attribute ] instanceof type)) {
-            const date = new Date(item.dataValues[ attribute ]);
-            item.dataValues[ attribute ] = date;
-        } else if (type && (type.name === "String") && item.dataValues[ attribute ] && (item.dataValues[ attribute ] instanceof Date)) {
-            item.dataValues[ attribute ] = (item.dataValues[ attribute ] as Date).toDateString();
+    if (item) {
+        for (const attribute in item.dataValues) {
+            const type = Reflect.getMetadata("design:type", _className.prototype, attribute);
+            if (type && (type.name === "Date") && item.dataValues[attribute] && !(item.dataValues[attribute] instanceof type)) {
+                const date = new Date(item.dataValues[attribute]);
+                item.dataValues[attribute] = date;
+            } else if (type && (type.name === "String") && item.dataValues[attribute] && (item.dataValues[attribute] instanceof Date)) {
+                item.dataValues[attribute] = (item.dataValues[attribute] as Date).toDateString();
+            }
         }
     }
 };

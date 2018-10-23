@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 import * as assert from "assert";
@@ -97,10 +97,9 @@ let $element;
 @Decorators.describe("Test Karma radio-field")
 class RadioFieldTest extends BaseTest {
 
-
     @Decorators.beforeEach
     beforeEach() {
-        let data = [];
+        const data = [];
         for (let i: number = 1; i < 50; i++) {
             data.push({ id: i, label: "libelle" + i });
         }
@@ -113,39 +112,39 @@ class RadioFieldTest extends BaseTest {
                 dataSource={dataSource}
                 currentChecked={true}
                 inline={RadiosField.Inline.FIELD}
-            />)
-    };
+            />);
+    }
 
-    @Decorators.it('Test OK')
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('selectionner un element dans le radiofield')
+    @Decorators.it("selectionner un element dans le radiofield")
     testSelect() {
-        let datasource = dataSource;
+        const datasource = dataSource;
         let index = 0;
 
         $element = this.renderIntoDocument(element, "main1");
         datasource.on("fetch", () => {
             datasource.results.forEach(() => {
                 index++;
-                (document.querySelector('#exampleRadio-' + index) as any).click()
-            })
+                (document.querySelector("#exampleRadio-" + index) as any).click();
+            });
         });
 
         datasource.on("select", () => {
-            expect(datasource.selected.value, "Problème de selection de élément" + index).to.equal(index);
-            if (index == datasource.results.length) this.end();
+            if (datasource.selected) {
+                expect(datasource.selected.value, "Problème de selection de élément" + index).to.equal(index);
+                if (index === datasource.results.length) this.end();
+            }
         });
 
         datasource.reload();
-    };
-
+    }
 
 }
 
-
-//lancement des Tests
+// lancement des Tests
 runTest(new RadioFieldTest());

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -140,7 +140,7 @@ export class Table extends HornetComponent<TableProps, any> {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.state.isVisible !== nextState.isVisible;
+        return this.state.isVisible !== nextState.isVisible || this.props.children !== nextProps.children;
     }
 
     componentWillUnmount(): void {
@@ -266,21 +266,6 @@ export class Table extends HornetComponent<TableProps, any> {
                 columns: this.getColumnsInformation(myContents),
                 hiddenColumns: this.getHiddenColumns(myComponent)};
             return React.createElement(Header, props);
-            /*let Wrapped = Table.wrap(
-                Header, this,
-                myComponent.props,
-                {
-                    parentId: this.props.id,
-                    key: key,
-                    tableState: this.tableState,
-                    contentState: this.contentState,
-                    dataSourcesList: this.getContentsDataSources(myContents),
-                    tabIndex: -1,
-                    columns: this.getColumnsInformation(myContents),
-                    hiddenColumns: this.getHiddenColumns(myComponent)
-                }
-            );
-            return <Wrapped key={"wc-" + key} />;*/
         } else {
             return <div tabIndex={-1} />;
         }
@@ -326,21 +311,6 @@ export class Table extends HornetComponent<TableProps, any> {
                         tabIndex: -1,
                         hiddenColumns: this.getHiddenColumns(myHeader),
                         title: (!myContent.props.title && myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : myContent.props.title};
-                    /*const Wrapped = Table.wrap(
-                        Content, myContent,
-                        myContent.props,
-                        {
-                            id,
-                            key,
-                            contentState: this.contentState,
-                            width,
-                            notifId,
-                            tabIndex: -1,
-                            hiddenColumns: this.getHiddenColumns(myHeader),
-                            title: (myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : null,
-                        },
-                    );
-                    Contents.push(<Wrapped key={"wc-" + key} />);*/
                     Contents.push(React.createElement(Content,props ));
                 }
             });

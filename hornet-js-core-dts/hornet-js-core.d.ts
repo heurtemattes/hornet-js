@@ -73,7 +73,7 @@ declare module "hornet-js-core/src/client-conf" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -240,7 +240,7 @@ declare module "hornet-js-core/src/server-conf" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -506,7 +506,7 @@ declare module "hornet-js-core/src/component/hornet-component-errors" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -608,7 +608,7 @@ declare module "hornet-js-core/src/component/sort-data" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -711,7 +711,7 @@ declare module "hornet-js-core/src/data/file" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -893,7 +893,7 @@ declare module "hornet-js-core/src/executor/async-executor-context" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -981,7 +981,7 @@ declare module "hornet-js-core/src/executor/async-executor" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1187,7 +1187,7 @@ declare module "hornet-js-core/src/inject/inject" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1277,7 +1277,7 @@ declare module "hornet-js-core/src/inject/injectable" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1378,7 +1378,7 @@ declare module "hornet-js-core/src/inject/injector" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1586,7 +1586,7 @@ declare module "hornet-js-core/src/mail/mailer" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2037,7 +2037,7 @@ declare module "hornet-js-core/src/notification/notification-events" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2284,7 +2284,7 @@ declare module "hornet-js-core/src/result/disposition-type" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2370,7 +2370,7 @@ declare module "hornet-js-core/src/result/hornet-result-interface" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2498,7 +2498,7 @@ declare module "hornet-js-core/src/result/hornet-result" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2656,7 +2656,7 @@ declare module "hornet-js-core/src/result/result-file" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2762,7 +2762,7 @@ declare module "hornet-js-core/src/result/result-json" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2879,7 +2879,7 @@ declare module "hornet-js-core/src/result/result-open-document" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3004,7 +3004,7 @@ declare module "hornet-js-core/src/result/result-stream" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3076,6 +3076,7 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	export type RouteAttributes = {
 	    [key: string]: any;
 	};
+	export type cIService<B extends IService> = () => B;
 	export abstract class RouteAction<A extends RouteAttributes> {
 	    /** Requête en cours */
 	    req: Request;
@@ -3112,21 +3113,20 @@ declare module "hornet-js-core/src/routes/abstract-routes" {
 	export abstract class RouteInfos {
 	    protected type: string;
 	    protected attributes: RouteAttributes;
-	    protected service: Class<IService> | AbstractClass<IService> | IService;
-	    constructor(type: string, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService);
+	    protected service: Class<IService> | AbstractClass<IService> | cIService<IService>;
+	    constructor(type: string, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | cIService<IService>);
 	    getRouteType(): string;
 	    getAttributes(): RouteAttributes;
-	    getService(): IService;
+	    getService(): Class<IService> | AbstractClass<IService> | cIService<IService>;
 	}
 	export class PageRouteInfos extends RouteInfos {
 	    protected viewComponent: Class<IHornetPage<any, any>>;
-	    constructor(viewComponent: Class<IHornetPage<any, any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService);
-	    getService(): IService;
+	    constructor(viewComponent: Class<IHornetPage<any, any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService>);
 	    getViewComponent(): Class<IHornetPage<any, any>>;
 	}
 	export class DataRouteInfos extends RouteInfos {
 	    protected action: Class<RouteAction<any>>;
-	    constructor(action: Class<RouteAction<any>>, attributes?: RouteAttributes, service?: Class<IService> | AbstractClass<IService> | IService);
+	    constructor(action: Class<RouteAction<any>>, attributes?: RouteAttributes, service?: Class<IService>);
 	    getAction(): Class<RouteAction<any>>;
 	}
 	/** Routes Declaration */
@@ -3445,7 +3445,7 @@ declare module "hornet-js-core/src/security/client-input-channel" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3540,7 +3540,7 @@ declare module "hornet-js-core/src/services/api-callback" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3623,7 +3623,7 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3957,7 +3957,7 @@ declare module "hornet-js-core/src/services/service-api-results" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4112,7 +4112,7 @@ declare module "hornet-js-core/src/services/service-api" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4196,7 +4196,7 @@ declare module "hornet-js-core/src/services/service-page" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4589,7 +4589,7 @@ declare module "hornet-js-core/src/session/store" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4726,7 +4726,7 @@ declare module "hornet-js-core/src/upload/custom-store-engine" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4915,7 +4915,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-linked" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5031,7 +5031,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-master" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5146,7 +5146,7 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5810,7 +5810,7 @@ declare module "hornet-js-core/src/component/datasource/config/datasource-map" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5899,7 +5899,7 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6062,7 +6062,7 @@ declare module "hornet-js-core/src/component/datasource/config/service/datasourc
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6155,7 +6155,7 @@ declare module "hornet-js-core/src/component/datasource/config/service/datasourc
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

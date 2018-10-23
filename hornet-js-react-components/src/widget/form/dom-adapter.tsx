@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -151,14 +151,17 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             if (this.type === type && type === "radio") {
                 if (!this.multipleElement) {
                     this.multipleElement = [];
+                    if(this.htmlElement) {
+                        this.multipleElement.push(this.htmlElement);
+                        this.htmlElement = null;
+                    }
                 }
 
                 elt[ "__component" ] = this;
 
                 if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
-                    this.multipleElement.push(this.htmlElement);
+                    this.multipleElement.push(elt);
                 }
-                this.htmlElement = null;
             } else {
                 logger.error("DomAdapter.addHtmlElement > different or unallowed types : " + this.type + " and " + type);
             }
@@ -224,7 +227,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             type = type.toLowerCase();
         }
         if (this.htmlElement) {
-            if (type === "text" || type === "textarea" || type === "hidden" || type === "checkbox"
+            if (type === "text" || type === "number" || type === "textarea" || type === "hidden" || type === "checkbox"
                 || (type === "select" && this.htmlElement.multiple === false)) {
                 this.htmlElement.value = (this.htmlElement.dataset && this.htmlElement.dataset.multiple === "true")
                     ? (value ? JSON.stringify(value) : "")
@@ -261,7 +264,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
     /**
      * Renvoie la valeur courante du champ de formulaire
-     * @param removeEmptyStrings {boolean} non utilisé ici, à conserver pour remonter valeur champs non valorisé d'un form 
+     * @param removeEmptyStrings {boolean} non utilisé ici, à conserver pour remonter valeur champs non valorisé d'un form
      * @returns {null}
      */
     getCurrentValue(removeEmptyStrings: boolean = true): any {
@@ -332,7 +335,6 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
         return val;
     }
 
-
     /**
      * Bascule le champ en readOnly
      * @param value valeur à utiliser
@@ -360,5 +362,12 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             this.htmlElement.disabled = value;
         }
         return this;
+    }
+
+    /**
+     * retourne le type
+     */
+    getType() {
+        return this.type;
     }
 }

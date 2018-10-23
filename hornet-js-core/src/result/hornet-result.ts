@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -125,7 +125,7 @@ export class HornetResult {
     }
 
     get status() {
-        return this._options.status || (this._options.data? 200 : 206); 
+        return this._options.status || (this._options.data ? 200 : 206);
     }
 
     /**
@@ -133,7 +133,7 @@ export class HornetResult {
      * @returns {Promise} revoie une promise de traitement
      */
     protected compute(): Promise<any> {
-        return Promise.resolve(true)
+        return Promise.resolve(true);
     }
 
     /**
@@ -151,7 +151,7 @@ export class HornetResult {
      */
     public manageResponse(res: Response, req?: Request): Promise<boolean> {
         return this.compute().then(() => {
-            if (!res[ "_headerSent" ]) {
+            if (!res["_headerSent"]) {
                 return this.configure(res, req);
             }
             return false;

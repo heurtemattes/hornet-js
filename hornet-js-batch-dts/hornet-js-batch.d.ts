@@ -196,7 +196,7 @@ declare module "hornet-js-batch/src/core/batch-options" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -417,7 +417,7 @@ declare module "hornet-js-batch/src/core/batch-status" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -621,7 +621,7 @@ declare module "hornet-js-batch/src/middleware/middlewares" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -728,7 +728,7 @@ declare module "hornet-js-batch/src/routes/abstract-batch-routes" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -820,7 +820,7 @@ declare module "hornet-js-batch/src/core/filter/batch-filter" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -925,7 +925,7 @@ declare module "hornet-js-batch/src/core/mapper/batch-mapper" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1014,7 +1014,7 @@ declare module "hornet-js-batch/src/core/parameters/parameters" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1103,7 +1103,7 @@ declare module "hornet-js-batch/src/core/reader/batch-reader" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1247,7 +1247,7 @@ declare module "hornet-js-batch/src/core/service/batch-service" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1367,7 +1367,7 @@ declare module "hornet-js-batch/src/core/transform/batch-transform" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1472,7 +1472,7 @@ declare module "hornet-js-batch/src/core/writer/batch-writer" {
 	 * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

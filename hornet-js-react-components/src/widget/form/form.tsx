@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -155,7 +155,6 @@ export interface FormProps extends AbstractFormProps {
     // Ignorer ou non les informations non valorisées du formulaire
     omitNull?: boolean;
 }
-
 
 /**
  * Composant permettant de rendre un formulaire Hornet de manière standardisée
@@ -302,7 +301,6 @@ export class Form extends AbstractForm<FormProps, any> {
         }
     }
 
-
     /**
      * Met à jour la propriété markRequired sur chacun des champs héritant de AbstractField contenus dans le formulaire
      * @param isMarkRequired valeur à assigner à la propriété 'markRequired'
@@ -359,7 +357,7 @@ export class Form extends AbstractForm<FormProps, any> {
                                 for (let i = 0; i < fields[ nameField ].state.allChoices.length; i++) {
                                     const choice = fields[ nameField ].state.allChoices[ i ];
                                     for (let j = 0; j < val.length; j++) {
-                                        if (val[ j ].toString() === choice[ "value" ]) {
+                                        if (val[ j ].toString() === choice[ "value" ].toString()) {
                                             choices.push(choice[ "value" ]);
                                             break;
                                         }
@@ -422,8 +420,8 @@ export class Form extends AbstractForm<FormProps, any> {
                         /* La notification référence le nom global du champ d'auto-complétion
                          ou bien le champ caché contenant la valeur :
                          on modifie cette référence pour pointer vers le champ de saisie libre */
-                        if (notif.field == autoField.state.name ||
-                            notif.field == (autoField.getValueFieldName())) {
+                        if (notif.field === autoField.state.name ||
+                            notif.field === (autoField.getValueFieldName())) {
                             notif.field = autoField.getFreeTypingFieldName();
 
                             /* Fin de la boucle de parcours des auto-complete */
@@ -431,7 +429,7 @@ export class Form extends AbstractForm<FormProps, any> {
                         }
                     }
                     return true;
-                }, this);
+                },                        this);
                 return notif;
             }, this);
         notifs.setNotifications(processedNotifs);
@@ -501,7 +499,7 @@ export class Form extends AbstractForm<FormProps, any> {
     /**
      * Déclenche la validation du formulaire, notifie les erreurs éventuelles et exécute la fonction
      * onSubmit présente dans les propriétés s'il n'y a pas d'erreurs
-     * 
+     *
      */
     public validateAndSubmit() {
         if (this.formElement) {
@@ -523,8 +521,6 @@ export class Form extends AbstractForm<FormProps, any> {
             }
         }
     }
-
-
 
     /**
      * Retourne le résultat de la validation et ses éventuelles erreurs
@@ -554,7 +550,6 @@ export class Form extends AbstractForm<FormProps, any> {
         return validation.valid;
     }
 
-
     /**
      * Supprime les nofifications d'erreurs et les erreurs associées à chaque champ de ce formulaire
      */
@@ -582,7 +577,7 @@ export class Form extends AbstractForm<FormProps, any> {
     /**
      * Méthode permettant d'alimenter le bloc Notifications d'erreurs puis de déléguer l'évent au composant parent
      * @param e
-     * 
+     *
      */
     protected _submitHornetForm(e: React.SyntheticEvent<HTMLElement>): void {
         /* e.preventDefault ne doit pas être 'débouncée', sinon la soumission par défaut du formulaire serait effectuée */
@@ -603,7 +598,7 @@ export class Form extends AbstractForm<FormProps, any> {
                 (field as AbstractField<any, any>).setImgFilePath(this.state.imgFilePath);
             }
             return true;
-        }, this);
+        },                        this);
     }
 
     /** @override */

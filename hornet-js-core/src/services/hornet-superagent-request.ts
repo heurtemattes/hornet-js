@@ -73,13 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 
-import { Request, Response } from "superagent";
+import { Request, Response, SuperAgentRequest } from "superagent";
 import { IncomingMessage, ServerResponse } from "http";
 import { MediaType } from "src/protocol/media-type";
 import { CacheKey } from "src/services/hornet-superagent";
@@ -96,7 +96,7 @@ export interface HornetSuperAgentRequest extends Request<HornetSuperAgentRequest
 export interface HornetRequest {
     url: string;
     method?: "get" | "post" | "patch" | "put" | "delete" | "head" | "options";
-    headers?: HornetRequestHeader;
+    headers?: HornetRequestHeader | any;
     data?: any;
     spinnerType?: SpinnerType;
     typeMime?: MediaType;
@@ -162,11 +162,11 @@ export enum ResultDispositionType {
 };
 
 /**
- * Type de spinnerType
- * valeur possible (None, Default, Component[depreacated])
+ * Type de management des erreurs pour la requête
+ * valeur possible (None, Business, Technical, All)
  */
 export enum ErrorManagementType {
-    None = "",
+    None = "None",
     Business = "business",
     Technical = "technical",
     All = "all",

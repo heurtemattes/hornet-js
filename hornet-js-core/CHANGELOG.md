@@ -1,3 +1,54 @@
+# hornet-js-core 5.2.2
+
+- 1df4ee94 FIX - [M69460] hornet-js-core - probleme utilisation query superagent pour les plugins
+- f642c9f1 FIX - [s769] hornet-js-core - ComponentMiddleware : correction du filtre de sécurité
+- 95496c49 FIX - [s293] - hornet-js-core - HornetResult : Ajout du charset dans le content-type
+
+# hornet-js-core 5.2.1
+
+- 1b49c73c - FIX[SUPPORT] : CheckColumn prise en compte des objets transformés lors déselection dans datasource
+
+# hornet-js-core 5.2.0
+
+- FIX  - Accessibilité - entêtes de colonne retour crocus
+- FIX  - Timer : correctif libellé log
+- FIX  - correction message Sequelize
+- FIX  - [T576] - log4js - montée de version 2.11.0
+- FIX  - [s225] - Notification: I18N suppression message en "dur"
+- FIX  - [Crocus] - hornet-js-core : Précisions dans la doc pour filter
+- FIX  - moment suite à upgrade - timeZone obligatoire
+- FIX  - RouterServer: optimisation tests roles
+- FIX  - [m68184] - i18nLoader: I18nLoaderSubDirectory fix perte des messages de hornet
+- FIX  - Router : Roles.EVERYONE == '*'
+- FIX  - Server : Correction traitement erreur http
+- FIX  - [s483] : DataSource Array : fix perte de la pagination apres delete
+- FIX  - Datasource : Correction de l'evenement add emit par le paginate datasource poru qu'il renvoit les données de la page courrante et non toute les données
+- FIX  - Datasource : [M67434] - DataSource : Correction trie tableau
+- FIX  - Datasource : [M67438] DataSource : ajout event add sur le paginateDatasource
+- FIX  - Test : - Activation des tests Mocha
+
+- EVOL - Injector : singleton eagger
+- EVOL - hornet-super-agent : suppression cache sur delete
+- EVOL - ajout fonction comme param service pour ne pas obliger l'utilisation de l'injecteur
+- EVOL - style composant session idp
+- EVOL - menage cls client et parametrage exclusion
+- EVOL - chargement dynamique du contextPath
+- EVOL - dev composant session idp
+- EVOL - hornet-js : Ajout des loggers deprecated
+- EVOL - recalcule du contextpath pour les routes dynamiques
+- EVOL - Middleware : Dynamic multer middleware 
+- EVOL - Ajout de génération des index
+- EVOL - [s231] -  DatePicker: ajout de title des boutons de navigation
+- EVOL - [s228] - Ajout title sur les menuitems
+- EVOL - Notification nouvelle gestion du management des erreurs
+- EVOL - (S102-517) - hornet-js-core : upgrader en 2.9.0
+- EVOL - (S177-492) - hornet-js-core : normalisation injector
+- EVOL - [m68231] - routerClient : surcharge UserAccessSecurityElement
+- EVOL - Ajout log stacktrace
+- EVOL - Datasource : Pagination & Mise en place pagination sur DAO générique
+- EVOL - [s159]: Gestion des erreurs techniques - préfixe fonctionnalité impactée
+
+
 # hornet-js-core 5.1.1
 
 -	65965	-	Problème de mise à jour de pagination lors du tri sur une colonne

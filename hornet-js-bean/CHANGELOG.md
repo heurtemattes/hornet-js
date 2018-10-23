@@ -1,3 +1,7 @@
+# hornet-js-bean 5.2.2
+
+- fffaf8b0 FIX - [] - hornet-js-bean - Correction mapper pour un résultat null
+
 # hornet-js-bean 5.2.0
 
 - EVOL(S102-517) - hornet-js-bean : upgrader en 2.9.0

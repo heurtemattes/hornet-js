@@ -1,3 +1,58 @@
+# hornet-js-react-components 5.2.2
+
+- 8c890ae4 FIX - [s302] - hornet-js-react-components - TABLE : ajout event après MaJ Content
+- d0f93af1 FIX - [s307] - hornet-js-react-components - TABLE : ajout methode handleCancel sur EditionActionColumn
+- 4a36d533 FIX - [m0069480] - hornet-js-react-components - Autocomplete: Saisie possible en readonly
+- 4ae867cb FIX - [???] hornet-js-react-components - TABLE : affichage du title bouton reset edition en ligne
+- abcda60f FIX - [m69856] - hornet-js-react-components - ActionColumn : Fix du message d'alert suite à la pagination
+- 235d4041 FIX - hornet-js-react-components - suppression du label dans les message "effacer le champs" , posait problème lorsqu'il n'y avait pas de label
+- fb0e5bc6 FIX - [m69805] - hornet-js-react-components - Tabs : Correction disparition des chevrons sur les onglets
+- 50ce2d91 FIX - [m69800] - hornet-js-react-components - Tooltip: Affichage d'une modale, focus automatique sur 1er champ
+- 4fe56589 FIX - hornet-js-react-components - ajout onChange sur le bouton reset de l'input
+- 65b94b28 FIX - [m69685] - hornet-js-react-components - CalendarField: Définir une valeur par défaut sur un composant CalendarField - prise en compte currentValue de type string TU
+- b56e748c FIX - hornet-js-react-components - erreur console dans les accordions avec un seul accordion
+- 8f79233d FIX - hornet-js-react-components - correction autocomplete not writable touche entrée
+- 6d7d966d FIX - hornet-js-react-components - checkboxfield onChange touche entrée navigation clavier
+- 0c36b760 FIX - hornet-js-react-components - radiofields problème setCurrentValue type string
+- d2155547 FIX - [M0069858] - hornet-js-react-components - affichage action-button avec tableau paginé
+- ff17e5c5 FIX - [s299] - hornet-js-react-components : suppression de props inutilisées dans alert
+- f2e50cd6 FIX - [] - hornet-js-react-components - Tabs : utilisation du key au lieu de l'id comme identifiant unique
+- 13b86d3b FIX - [S300] - hornet-js-react-components - Content : ajouter props customValidators
+- e780539c FIX - [m69685] - hornet-js-react-components - CalendarField: Définir une valeur par défaut sur un composant CalendarField - prise en compte currentValue de type string
+- dcc42f23 FIX - [s734] hornet-js-react-components : Support crocus selectfield value number ne déclenche pas l'event select
+- 4ca83747 FIX - [s277]: hornet-js-react-components - Form : La validation de champ required ko sur un type number ou radioField - correction test unitaire
+- 4fe32b40 FIX - [s277-703] - hornet-js-react-components : La validation de champ required ko sur un type number ou radioField
+- 39f9b33c FIX - [m69685] - hornet-js-react-components - CalendarField: Définir une valeur par défaut sur un composant CalendarField
+- 8e94dc66 FIX - [s278-700] - hornet-js-react-components - ActionButton : la props disabled n'est pas prise en compte
+
+# hornet-js-react-components 5.2.1
+
+- 77a20855 - FIX  - [s687] - CalendarField : Problème de prise en compte de la props alt
+- a15fd44f - FIX  - Pager : problème affichage "afficher tout" pager
+- 8a244032 - FIX  - checkboxfield - correction classname
+- 578a3c93 - FIX  - checkbox - Ajout et correction tests unitaires checkbox
+- 742e5107 - FIX  - [s74] - CheckBoxField: problème readonly et disabled inopérant
+- 878ea4da - FIX  - [M69402] - TextareaField :  problè- FIX  - Datasource : [M67434] - DataSource : Correction trie tableau
+- FIX  - Datasource : [M67438] DataSource : ajout event add sur le paginateDatasource
+- FIX  - Test : - Activation des tests Mochame de changement de la state disabled sur le textarea
+- 11f04053 - FIX  - [M0069553] - TextareaField : correction setReadOnly dans une textarea
+- fe9fc8b3 - FIX  - [s275] - Table : Ajout TU du fix sur le rendu des ActionColumn
+- 62686cd1 - FIX  - AbstractCell : correction des fautes dans les commentaires
+- c6ed3538 - FIX  - [MIGRATION_CROCUS] - Form :  prise en compte des textarea par le onFormChange de form
+- 1b49c73c - FIX  - [SUPPORT] - CheckColumn :  prise en compte des objets transformés lors déselection dans datasource
+- 7b85deba - FIX  - [support electis] - CheckColumn: synchro datasource checkcolumn
+- 63deee3f - FIX  - Table :  Correction des données manquantes lors de l'édition inline
+- 3c41c590 - FIX  - ActionColumn : Correction erreur de rendu lors de la pagination
+- 5a8eed77 - FIX  - modification template
+- 7c8bff8a - FIX  - modification typage props format
+- 0b566a4d - FIX  - [s-256] - Dropdown : Correction ouverture de dropdown avec SPACEBAR
+- 05933c88 - FIX  - [s632] - Dropdown : Fermeture de dropdown ouvert lorsqu'un est activé
+- 3e9ed2e2 - EVOL - [S254-673] - hornet-js-react-component : Gestion dynamique des colonnes d'un tableau
+- 64a9ff4e - EVOL - Table : utilisation d'id timestamp dans les TU de pagination
+- 26c295c6 - EVOL - appel i18n pour le title
+- c0e1c0fa - EVOL - Table : ajout de la pagination pour le caption
+- f1347062 - EVOL - Tab : ajout selection de l'onglet actif sur le refresh
+
 # hornet-js-react-components 5.2.0
 
 - EVOL - AbstractField : Contextualisation bouton reset
@@ -49,7 +104,7 @@
 - FIX  - Form : split methode validateAndSubmit
 - FIX  - Form : correction temporaire pour l'affichage du texte et des champs requis
 
-- EVOL - hornet-js-react-components : EVOL: update version react (XSS)
+- EVOL - hornet-js-react-components : update version react (XSS)
 - FIX  - hornet-js-react-components :  Erreur clés de message i18n
 - FIX  - hornet-js-react-components : top button fonctionne aléatoirement
 - EVOL - hornet-js-react-components : menage cls client et parametrage exclusion

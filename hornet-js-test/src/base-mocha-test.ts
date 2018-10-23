@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,165 +90,9 @@ import * as path from "path";
 export class BaseMochaTest extends AbstractTest {
     constructor() {
         super();
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Bootstrap de lancement de l'application
-        // permet la résolution de modules dans des répertoires autres que "node_modules"
-        const appDirectory = process.cwd();
-        const moduleDirectoriesContainer = [];
-        const moduleDirectories = [];
-        // On conserve la méthode originale pour rétablir le fonctionnement normal en cas d'un requireGlobal
-        Module._oldNodeModulePaths = Module._nodeModulePaths;
-
-        const NODE_MODULES_TEST = path.join("node_modules", "test");
-        const NODE_MODULES_APP = path.join("node_modules", "app");
-
-        // on surcharge la méthode de résolution interne nodejs pour gérer d'autres répertoires
-        Module._newNodeModulePaths = function (from) {
-            const paths = [];
-            const matched = matchModuleDirectory(from);
-
-            moduleDirectoriesContainer.forEach((path) => {
-                paths.push(path);
-            });
-            paths.push(path.join(appDirectory, NODE_MODULES_APP));
-            paths.push(path.join(matched || appDirectory));
-
-            return paths;
-        };
-        Module._nodeModulePaths = Module._newNodeModulePaths;
-
-        function matchModuleDirectory(from) {
-            let match = null;
-            let len = 0;
-            for (let i = 0; i < moduleDirectories.length; i++) {
-                const mod = moduleDirectories[ i ];
-                if (from.indexOf(mod + path.sep) === 0 && mod.length > len) {
-                    match = mod;
-                    len = mod.length;
-                }
-            }
-            return match;
-        }
-
-        function addModuleDirectory(path2add) {
-            path2add = path.normalize(path2add);
-            if (moduleDirectories.indexOf(path2add) === -1) {
-                moduleDirectories.push(path2add);
-            }
-        }
-
-        function addModuleDirectoryContainer(path2add) {
-            path2add = path.normalize(path2add);
-            if (moduleDirectoriesContainer.indexOf(path2add) === -1) {
-                moduleDirectoriesContainer.push(path2add);
-            }
-        }
-
-        function isNodeModule(directory) {
-            // si un fichier 'package.json' existe, c'est un module nodejs
-            let isModule = false;
-            try {
-                fs.statSync(path.normalize(path.join(directory, "package.json")));
-                isModule = true;
-            } catch (e) {
-                isModule = false;
-            }
-            return isModule;
-        }
-
-        // Lecture et ajout dans le resolver des répertoires externes déclarés par le package courant
-        try {
-            const builder = require(path.join(process.cwd(), "builder.js"));
-            const os = require("os");
-            const parentBuilderFile = path.join(process.cwd(), "../", "builder.js");
-            if (!builder.externalModules || !builder.externalModules.directories) {
-                builder.externalModules = { directories: [], enabled: true };
-            }
-            if (fs.existsSync(parentBuilderFile)) {
-                const parentBuilderJs = require(parentBuilderFile);
-                if (parentBuilderJs.type === "parent") {
-                    addModuleDirectoryContainer(path.normalize(path.join(process.cwd(), "..")));
-                    builder.externalModules.directories.push(path.join(process.cwd(), ".."));
-                }
-            }
-
-            if (builder.externalModules 
-                && builder.externalModules.enabled 
-                && builder.externalModules.directories 
-                && builder.externalModules.directories.length > 0) {
-
-                builder.externalModules.directories.forEach(function (directory) {
-                    try {
-                        directory = directory.replace("~", os.homedir());
-                        const stat = fs.statSync(directory);
-                        if (stat.isDirectory()) {
-
-                            if (isNodeModule(directory)) {
-                                addModuleDirectory(directory);
-                                addModuleDirectoryContainer(path.normalize(path.join(directory, "..")));
-                                console.log("MODULE RESOLVER > le répertoire '" + directory + "' est déclaré comme module nodejs");
-                                console.log("MODULE RESOLVER > le répertoire '" 
-                                + (path.normalize(path.join(directory, ".."))) 
-                                + "' est déclaré comme container de module nodejs");
-                            }
-                            // on vérifie si des répertoires du 1er niveau sont des modules nodejs pour les ajouter eux aussi
-                            const files = fs.readdirSync(directory);
-                            let moduleFound = false;
-                            files.forEach(function (file) {
-                                const modPath = path.normalize(path.join(directory, file));
-                                if (fs.statSync(modPath).isDirectory()) {
-                                    if (file.indexOf(".") === 0) return;
-
-                                    if (isNodeModule(modPath)) {
-                                        addModuleDirectory(modPath);
-                                        const projetModules = path.join(modPath, "node_modules", "app");
-                                        console.log("MODULE RESOLVER > le répertoire '" 
-                                        + projetModules + "' est déclaré comme container de module nodejs");
-                                        addModuleDirectoryContainer(projetModules);
-                                        moduleFound = true;
-                                        console.log("MODULE RESOLVER > le répertoire '" 
-                                        + modPath + "' est déclaré comme module nodejs");
-                                    } else {
-                                        console.log("MODULE RESOLVER > le répertoire '" 
-                                        + modPath + "' est ignoré car ce n'est pas un module nodejs");
-                                    }
-                                }
-                            });
-                            if (moduleFound) {
-                                console.log("MODULE RESOLVER > le répertoire '" 
-                                + directory + "' est déclaré comme container de module nodejs");
-                                addModuleDirectoryContainer(directory);
-                            }
-                        }
-                    } catch (e) {
-                        console.log("MODULE RESOLVER > erreur lors de la déclaration du répertoire externe '" + directory + "' :", e);
-                        process.exit(1);
-                    }
-                });
-            }
-
-
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Gestion du cas particulier du main (car nodejs le considère différent des autres modules ...)  //
-            require.main.paths = [];
-            moduleDirectoriesContainer.forEach((path) => {
-                require.main.paths.push(path);
-            });
-            require.main.paths.push(path.join(process.cwd()));
-            require.main.paths.push(path.join(process.cwd(), NODE_MODULES_TEST));
-            require.main.paths.push(path.join(process.cwd(), NODE_MODULES_APP));
-
-        } catch (e) {
-            // pas de fichier 'builder.js' >> mode production
-            // on ignore en silence
-            console.log(e);
-        }
     }
 
     end(err?: Error) {
-        Module._nodeModulePaths = Module._oldNodeModulePaths;
         super.end(err);
     }
 }

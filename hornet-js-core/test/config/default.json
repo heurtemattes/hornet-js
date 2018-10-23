@@ -1,5 +1,5 @@
 {
-  "contextPath": "applitutoriel-5.2.0",
+  "contextPath": "applitutoriel-5.2.2",
   "server": {
     "port": 8888,
     "keepAlive": true,
@@ -93,7 +93,7 @@
     "request": {
       "cache": {
         "enabled": true,
-        "timetolive": 60
+        "timetolive": 1
       }
     }
   }

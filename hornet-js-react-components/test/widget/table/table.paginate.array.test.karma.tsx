@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -104,10 +104,15 @@ import { CheckColumn } from "src/widget/table/column/check-column";
 import { Footer } from "hornet-js-react-components/src/widget/table/footer";
 import { Picto } from "hornet-js-react-components/src/img/picto";
 import { Pager, PaginationProps } from "hornet-js-react-components/src/widget/pager/pager";
+import { ActionColumn } from "src/widget/table/column/action-column";
+import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
+import { LineAfter } from "src/widget/table/line/line-after";
 
 /** Tableau de liste de secteurs */
 let dataSource: PaginateDataSource<any>;
 let tableElement: JSX.Element;
+let tableElementWithActionColumns: JSX.Element;
+let tableElementWithActionColumnsSupprimer: JSX.Element;
 let table;
 let data;
 
@@ -126,7 +131,7 @@ class tableTest extends BaseTest {
             pageIndex: 0,
             itemsPerPage: 10,
             totalItems: 0,
-        },                                       {});
+        }, {});
 
         tableElement = (
             <Table id="lite">
@@ -144,6 +149,54 @@ class tableTest extends BaseTest {
                 </Footer>
             </Table>
         );
+
+        tableElementWithActionColumns = (
+            <Table id="table-with-action-column">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={dataSource}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                        <ActionColumn keyColumn="editer"
+                            srcImg={Picto.blue.editer}
+                            alt={"Editer {label}"}
+                            action={() => { }} />
+                        <MoreInfoColumn keyColumn="idMore" visible={(value) => true}
+                            alt={"Plus d'info sur {label} {desc}"}
+                            headers={["label", "desc"]}>
+                        </MoreInfoColumn>
+                    </Columns>
+                </Content>
+                <Footer>
+                    <Pager dataSource={dataSource} id="maTable-paginate-with-action-column" />
+                </Footer>
+            </Table>
+        );
+
+        tableElementWithActionColumnsSupprimer = (
+            <Table id="table-with-action-column-supprimer">
+                <Header title={"test"}>
+                </Header>
+                <Content dataSource={dataSource}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                        <ActionColumn keyColumn="supprimer"
+                            srcImg={Picto.white.supprimer}
+                            titleAlert={"Suppression de ${label} alert title"}
+                            messageAlert={"Voulez-vous vraiment supprimer ${label}"}
+                            alt={"Supprimer {label}"}
+                            action={() => { }} />
+                    </Columns>
+                </Content>
+                <Footer>
+                    <Pager dataSource={dataSource} id="maTable-paginate-with-action-column-supprimer" />
+                </Footer>
+            </Table>
+        );
     }
 
     @Decorators.it("Test OK")
@@ -154,21 +207,23 @@ class tableTest extends BaseTest {
 
     @Decorators.it("afficher 10 éléments par page à l'init")
     selectionUnElement() {
-        table = this.renderIntoDocument(tableElement, "main1");
-        expect(document.querySelectorAll("#main1 .datatable-data tr").length).to.equal(10);
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
+        expect(document.querySelectorAll(`#${id} .datatable-data tr`).length).to.equal(10);
         this.end();
     }
 
     @Decorators.it("afficher la dernière page")
     goToLastPage() {
-        table = this.renderIntoDocument(tableElement, "main2");
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
         dataSource.on("pagination", (value) => {
             expect(value.list.length).to.equal(9);
-            expect(value.list[ 0 ].id).to.equal(41);
-            expect(document.querySelector("#main2 .datatable-data #lite-0-colBody-0-1").innerHTML, value.list[ 0 ].label);
+            expect(value.list[0].id).to.equal(41);
+            expect(document.querySelector(`#${id} .datatable-data #lite-0-colBody-0-1`).innerHTML, value.list[0].label);
             this.end();
         });
-        this.triggerMouseEvent(document.querySelector("#main2 .datatable-pagination-button-lastpage"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${id} .datatable-pagination-button-lastpage`), "click");
     }
 
     @Decorators.it("supprimer la selection")
@@ -189,12 +244,82 @@ class tableTest extends BaseTest {
 
     @Decorators.it("test d'un appel de pagination programmatiquement")
     goToPageCall() {
-        table = this.renderIntoDocument(tableElement, "main4");
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
         dataSource.on("pagination", (value) => {
-            expect(document.querySelector("#main4 .datatable-pagination-input")[ "value" ]).to.equal("2");
+            expect(document.querySelector(`#${id} .datatable-pagination-input`)["value"]).to.equal("2");
             this.end();
         });
         dataSource.goToPage(2);
+    }
+
+    @Decorators.it("test du rendu de l'action column après pagination sur la page 2")
+    testRenderActionColumnAfterPaginationToPage2() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElementWithActionColumns, id);
+        dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-3 a`)["title"]).to.equal("Editer libelle11");
+            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-4 a`)["title"]).
+                to.equal("Plus d'info sur libelle11 desc0");
+            this.end();
+        });
+        dataSource.goToPage(2);
+    }
+
+
+    @Decorators.it("test du rendu de l'action column après pagination sur la page 3")
+    testRenderActionColumnAfterPaginationToPage3() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElementWithActionColumns, id);
+        dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-3 a`)["title"]).to.equal("Editer libelle21")
+            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-4 a`)["title"])
+                .to.equal("Plus d'info sur libelle21 desc0");
+            this.end();
+        });
+        dataSource.goToPage(3);
+    }
+
+    @Decorators.it("test du rendu de la modale suite au clic sur le bouton de l'action column supprimer après pagination sur la page 2")
+    testRenderActionColumnAlertAfterPaginationToPage2() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElementWithActionColumnsSupprimer, id);
+        dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`)["title"])
+                .to.equal("Supprimer libelle11");
+            this.triggerMouseEvent(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            setTimeout(() => {
+                expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
+                expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
+                expect(document.querySelector(`#dialogue-title h1`).innerHTML).to.equal("Suppression de libelle11 alert title");
+                expect(document.querySelector(`#widget-alert-body`)).to.exist;
+                expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle11");
+                this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
+                this.end();
+            }, 200);
+        });
+        dataSource.goToPage(2);
+    }
+
+    @Decorators.it("test du rendu de la modale suite au clic sur le bouton de l'action column supprimer après pagination sur la page 3")
+    testRenderActionColumnAlertAfterPaginationToPage3() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElementWithActionColumnsSupprimer, id);
+        dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`)["title"])
+                .to.equal("Supprimer libelle21");
+            this.triggerMouseEvent(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            setTimeout(() => {
+                expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
+                expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
+                expect(document.querySelector(`#dialogue-title h1`).innerHTML).to.equal("Suppression de libelle21 alert title");
+                expect(document.querySelector(`#widget-alert-body`)).to.exist;
+                expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle21");
+                this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
+                this.end();
+            }, 200);
+        });
+        dataSource.goToPage(3);
     }
 }
 

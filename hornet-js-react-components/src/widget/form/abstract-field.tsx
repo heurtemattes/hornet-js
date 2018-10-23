@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -896,7 +896,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         const ariaDescribedby = { "aria-describedby": fieldName + "Tooltip" };
 
         return (
-            <div className={this.state.labelClass + " label-container label-row-inline"}>
+            <div className={classNames(this.calculateLabelClassName())}>
                 <label htmlFor={fieldId} id={fieldName + "Label"}
                     className="label-content" {...this.state.toolTip ? ariaDescribedby : null}>
                     {(this.state.abbr) ?
@@ -912,6 +912,22 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
                 </label>
             </div>
         );
+    }
+
+    /**
+     * Méthode permettant de calculer les classNames du label
+     */
+    protected calculateLabelClassName():ClassDictionary {
+
+        const classes: ClassDictionary = {
+            "label-container": true,
+            "label-row-inline": true,
+        };
+        if (this.state.labelClass) {
+            classes[this.state.labelClass] = true;
+        }
+
+        return classes;
     }
 
     protected getRequiredLabel(): string {

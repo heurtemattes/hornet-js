@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,7 +112,7 @@ export interface PageSizeItem {
     value: number;
     /** Clé du libellé internationalisé */
     textKey: string;
-    /** Title du lien */ 
+    /** Title du lien */
     title?: string;
 }
 
@@ -132,7 +132,7 @@ export interface PagerProps extends HornetComponentProps {
     id: string;
     /** indicateur disabled */
     disabled?: boolean;
-    
+
     nextPageTitle?: string;
     lastPageTitle?: string;
     previousPageTitle?: string;
@@ -156,7 +156,7 @@ export interface MessagesProps {
 }
 
 /**
- * Valeur de la propriété de pagination itemsPerPage correspondant à "Afficher tout" les éléments. 
+ * Valeur de la propriété de pagination itemsPerPage correspondant à "Afficher tout" les éléments.
  * Egale à la constante Java Integer.MAX_VALUE (2^32 - 1)
  */
 export const ITEMS_PER_PAGE_ALL: number = 2147483647;
@@ -184,7 +184,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
         { value: 20, textKey: this.i18n("table.20") },
         { value: 50, textKey: this.i18n("table.50") },
         { value: 100, textKey: this.i18n("table.100") },
-        { value: ITEMS_PER_PAGE_ALL, textKey: "table.displayAll" , title: "table.pager.titleItemAll"},
+        { value: ITEMS_PER_PAGE_ALL, textKey: this.i18n("table.displayAll") , title: this.i18n("table.pager.titleItemAll")},
     ];
 
     constructor(props: PagerProps, context?: any) {
@@ -383,7 +383,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
         }
 
         const i18nValues = {firstPage, totalPages, nextPage, prevPage, summary: this.state.summary};
-        
+
         return [
             this.renderButton(this.i18n(this.state.firstPageTitle, i18nValues), firstPage, startOnClickActif, "firstPage"),
             this.renderButton(this.i18n(this.state.previousPageTitle, i18nValues), prevPage, startOnClickActif, "prevPage"),
@@ -481,7 +481,6 @@ export class Pager extends HornetComponent<PagerProps, any> {
                     this.tableInputPager.value = this.state.pagination.pageIndex;
                 }
 
-
                 const pagination = _.cloneDeep(this.state.pagination);
                 pagination.pageIndex = this.tableInputPager.value;
                 this.setState({ pagination });
@@ -542,4 +541,3 @@ export class Pager extends HornetComponent<PagerProps, any> {
         return this;
     }
 }
-

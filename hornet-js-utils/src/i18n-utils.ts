@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,7 +106,12 @@ IntlMessageFormat.prototype._format = function (pattern, values) {
 
         // Enforce that all required values are provided by the caller.
         if (!(values && src$utils$$.hop.call(values, id))) {
-            values[ id ] = "{" + id + "}";
+            values[ id ] = undefined;
+            if(part.options && (part.options["undefined"] || part.options["=undefined"])) {
+                values[ id ] = undefined;
+            } else {
+                values[ id ] = "{" + id + "}";
+            }
         }
 
         value = values[ id ];
@@ -115,7 +120,12 @@ IntlMessageFormat.prototype._format = function (pattern, values) {
         // nested pattern structure. The choosing of the option to use is
         // abstracted-by and delegated-to the part helper object.
         if (part.options) {
-            result += this._format(part.getOption(value), values);
+            const opt = part.getOption(value);
+            if(opt) {
+                result += this._format(opt, values);
+            } else {
+                result += value;
+            }
         } else {
             result += part.format(value);
         }

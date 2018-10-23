@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,12 +83,13 @@ import { DateBodyCell } from "src/widget/table/column/cell/date/date-body-cell";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { BodyCellProps } from "src/widget/table/column/cell/body-cell";
 import * as _ from "lodash";
+import * as moment from "moment";
 
 export interface DateColumnProps extends ColumnProps {
     /** format d'affichage de la valeur */
     format?: string;
     /** Format de la valeur en entrée si besoin de parser */
-    inputFormat?: string;
+    inputFormat?: moment.MomentFormatSpecification;
 }
 
 /**

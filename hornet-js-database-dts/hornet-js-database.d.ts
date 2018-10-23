@@ -95,7 +95,7 @@ declare module "hornet-js-database/src/decorators/dec-seq-entity" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -218,7 +218,7 @@ declare module "hornet-js-database/src/sequelize/database" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -318,7 +318,7 @@ declare module "hornet-js-database/src/sequelize/dbconnect-sequelize" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -355,6 +355,7 @@ declare module "hornet-js-database/src/sequelize/hornet-generic-dao-table-struct
 	export class HornetGenericDAOTableStructure<T extends HornetSequelizeModel, ENTITY extends HornetSequelizeEntityAttributes> extends HornetGenericDAO<T, ENTITY> {
 	    constructor(entity: Class<ENTITY>, modelDAO?: T);
 	    selectInfoFromTable(): Promise<any>;
+	    selectPrimaryKeyInfo(): Promise<any>;
 	}
 	
 }
@@ -517,7 +518,7 @@ declare module "hornet-js-database/src/sequelize/hornet-sequelize-attributes" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

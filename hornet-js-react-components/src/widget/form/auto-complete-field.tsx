@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -168,7 +168,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             writable: true,
             filterText: FilterTextType.indexOf,
             resettable: true,
-            resetTitle: "autoComplete.resetTitle",
+            resetTitle: "form.autoCompleteField.resetTitle",
         },
                                         AbstractField.defaultProps);
 
@@ -306,6 +306,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     renderWidget(): JSX.Element {
         logger.trace("auto-complete  render");
+
+        if (this.state.readOnly && this.state.writable) {
+            logger.warn("L'autocomplete ne peut pas être readonly et writable.. on considère donc qu'il est readonly");
+        }
+
         const shouldShow: boolean = this.shouldShowChoices();
 
         const hasError = this.hasErrors() ? " has-error" : "";
@@ -343,7 +348,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
                 {/* Champ de saisie libre */}
                 <input {...htmlProps}
                        ref={this.registerTextInput}
-                       readOnly={!this.props.writable} data-writable={this.props.writable}
+                       readOnly={this.state.readOnly || !this.state.writable} data-writable={this.state.writable}
                 />
                 {this.state.disabled || !this.state.resettable ? null : this.renderResetButton()}
                 <AutoCompleteSelector
@@ -569,7 +574,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         } else if (key === KeyCodes.ENTER) {
             // valide un choix si on est sur un autocomplete simple et writable
             // ne fait rien sinon (valide le formulaire)
-            if (this.state.shouldShowChoices && this.state.writable) {
+            if (this.state.shouldShowChoices) {
                 e.preventDefault();
                 this.validateSelectedValue(shouldShow);
             }
@@ -741,10 +746,10 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
                 this.clearFilterData();
                 if (!this.state.isShiftTab) this.props.dataSource.select(undefined);
             } else {
-                let val;                
+                let val;
                 if (this.state.allChoices.length > 0) {
                     val = (typeof this.state.allChoices[0]
-                        .value === "number") ? parseInt(this.hiddenInput.value, 10) : this.hiddenInput.value;                   
+                        .value === "number") ? parseInt(this.hiddenInput.value, 10) : this.hiddenInput.value;
                 }
                 this.props.dataSource.select(_.find(this.state.allChoices, { value: val }));
             }

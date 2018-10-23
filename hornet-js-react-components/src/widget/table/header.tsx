@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -147,7 +147,6 @@ export class Header extends HornetComponent<HeaderProps, any> {
             selectedItems: [],
         };
 
-
         // gestion de l'event de changement de la liste des items du tableau
         this.handleChangeDataTable = this.handleChangeDataTable.bind(this);
         this.props.tableState.on(TableState.INDEX_CHANGE_EVENT, this.handleChangeDataTable);
@@ -208,10 +207,8 @@ export class Header extends HornetComponent<HeaderProps, any> {
             <div {...headerContainerProps} ref={(instance) => { this.headerRef = instance; }}>
                 <div className="datatable-title">
                     <span className="datatable-title-span">
-                        {this.i18n(this.state.title,
-                                   { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })
-                        + " " + this.i18n(this.state.libelleNombreTotalItem,
-                                { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })}
+                        {this.state.title + " " + this.i18n(this.state.libelleNombreTotalItem,
+                                                            { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })}
                     </span>
                 </div>
                 {(!this.state.hideMenuActions) ? this.renderMenuActions() : null}
@@ -279,7 +276,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
             items: this.state.items,
             showAlert: this.showAlert,
             showIconInfo: this.props.showIconInfo,
-            selectedItems: this.getSelectedItemsForAllContent(),
+            selectedItems: this.getAllSelectedItems(),
             id: this.state.id + "-menu-action",
             columns: this.props.columns,
             toggleColumnsButton: WrappedToggleColumns,
@@ -343,12 +340,24 @@ export class Header extends HornetComponent<HeaderProps, any> {
     protected getSelectedItemsForAllContent(): any[] {
         logger.trace("getSelectedItemsForAllContent");
         let resultList: any[] = [];
+        // intersection des items affichés avec les items selectionés dans le dataSource
+        resultList = this.getAllSelectedItems();
+        resultList = ArrayUtils.intersectionWith(resultList, this.state.items, this.state.contentState.keyColumnMassSelection);
+        return resultList;
+    }
+
+    /**
+     * fonction qui retourne la liste des items selectionés
+     * @returns {any[]}
+     */
+    protected getAllSelectedItems(): any[] {
+        logger.trace("getSelectedItems");
+        let resultList: any[] = [];
         // recupere la liste de tous les items selectionés dans les dataSources des contents
         this.props.dataSourcesList.map((dataSource, index) => {
             resultList = ArrayUtils.unionWith(this.props.dataSourcesList[ index ].selected, resultList, this.state.contentState.keyColumnMassSelection);
         });
         // intersection des items affichés avec les items selectionés dans le dataSource
-        resultList = ArrayUtils.intersectionWith(resultList, this.state.items, this.state.contentState.keyColumnMassSelection);
         return resultList;
     }
 
@@ -390,7 +399,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
                 if (dataSource instanceof PaginateDataSource) {
                     const pagDt: PaginateDataSource<any> = dataSource as PaginateDataSource<any>;
                     result = {...pagDt.pagination};
-                    if(!result.nbPages || result.nbPages === 0) {
+                    if (!result.nbPages || result.nbPages === 0) {
                             result.nbPages = Math.max(1, Math.ceil(result.totalItems / result.itemsPerPage)) || 0;
                     }
                     return false;

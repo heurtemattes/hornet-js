@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,8 +102,14 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
     constructor(config?: ServerConfiguration) {
         super((req, res, next) => {
             try {
-                const includeCls:{[key: string]: string[]} = _.merge(config && config.includeClsKey || {}, {"hornet.user": ["SessionNotOnOrAfter", "Profil", "Nom","Prenom", "name","Mail", "Login", "roles"]});
-                const includeSession:{[key: string]: string[]} = _.merge(config && config.includeSessionKey || {}, {passport: [], strategy: []});
+                const configuration = config || AbstractHornetMiddleware.APP_CONFIG;
+                const userKeysToInclude = configuration && configuration.includeClsKey && configuration.includeClsKey["hornet.user"] || [];
+                const filterUserKeys = ["SessionNotOnOrAfter", "Profil", "Nom", "Prenom", "name", "Mail", "Login", "roles"];
+                const userKeys = [...userKeysToInclude, ...filterUserKeys];
+
+                const includeCls:{[key: string]: string[]} = _.merge(configuration && configuration.includeClsKey || {}, {"hornet.user": userKeys});
+
+                const includeSession:{[key: string]: string[]} = _.merge(configuration && configuration.includeSessionKey || {}, {passport: [], strategy: []});
                 const routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
 
                 // route de type 'PAGE' uniquement

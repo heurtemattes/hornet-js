@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -183,14 +183,14 @@ export class AddParamFromLocalStorage extends HornetPlugin {
         return (request: HornetSuperAgentRequest) => {
             logger.trace("Ajout Param request from local storage.");
             if (Utils.isServer) {
-                var callbacksStorage = Utils.getContinuationStorage(localStorageName);
+                const callbacksStorage = Utils.getContinuationStorage(localStorageName);
                 // var callbacksStorage = require("hornet-js-utils/src/callbacks-local-storage").getStorage(localStorageName);
-                var paramValue = callbacksStorage.get(propNameName || param);
-                var query = request.query;
-                query[ param ] = paramValue;
+                const paramValue = callbacksStorage.get(propNameName || param);
+                const queryParameters = {};
+                queryParameters[ param ] = paramValue;
 
                 logger.trace("Ajout des paramètres superAgent,", param, ":", paramValue);
-                request.query(query);
+                request.query(queryParameters);
             }
         }
     };
@@ -207,10 +207,10 @@ export class AddParam extends HornetPlugin {
         return (request: HornetSuperAgentRequest) => {
             logger.trace("Ajout Param request.");
             if (Utils.isServer) {
-                var query = request.query;
-                query[ param ] = paramValue;
+                const queryParameters = {};
+                queryParameters[ param ] = paramValue;
                 logger.trace("Ajout des paramètres superAgent,", param, ":", paramValue);
-                request.query(query);
+                request.query(queryParameters);
             }
         };
     }

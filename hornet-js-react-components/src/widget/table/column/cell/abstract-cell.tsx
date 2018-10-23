@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,9 +97,9 @@ export interface AbstractCellProps extends HornetComponentProps {
     // permet de savoir si une cellule du tableau est en cours d'edition
     isEditing?: boolean;
     style?: any;
-    // valeur d'une cellule su tableau
+    // valeur d'une cellule du tableau
     value?: any;
-    // les coordonées lign eet colonnes d'une cellule
+    // les coordonées ligne et colonne d'une cellule
     coordinates?: CellCoordinates;
     // si une cellule est focus
     isFocused?: boolean;
@@ -394,14 +394,13 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
     }
 
     /**
-     * Permet de selectionner la valeur dans la cellules 
+     * Permet de sélectionner la valeur dans la cellule
      */
     handleDoubleClick(tableCellRef) {
 
         console.log("je passe ici et je peux selectionner le text");
 
     }
-
 
     /**
      * @inheritDoc

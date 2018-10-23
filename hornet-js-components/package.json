@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-components",
-  "version": "5.2.0",
+  "version": "5.2.2",
   "license": "CECILL-2.1",
   "description": "Interfaces des composants web de hornet-js",
   "bugs": {
@@ -15,11 +15,11 @@
     "hornet"
   ],
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.2.0",
-    "hornet-js-utils-dts": "5.2.0"
+    "hornet-js-ts-typings": "5.2.2",
+    "hornet-js-utils-dts": "5.2.2"
   },
   "appDependencies": {
-    "hornet-js-utils": "5.2.0"
+    "hornet-js-utils": "5.2.2"
   },
   "buildDependencies": {},
   "testDependencies": {},

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -123,7 +123,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     protected inputFileElement: HTMLElement;
     public readonly props: Readonly<UploadFileFieldProps>;
 
-    static defaultProps = _.assign(AbstractField.defaultProps, {
+    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
         fileSelectedLabel: UploadFileField.getI18n("uploadFile.selectedFile", { count: 0 }),
         i18nLabelKey: "uploadFile.selectedFile",
         resettable: true,
@@ -238,7 +238,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
             htmlFor: htmlProps[ "id" ],
             readOnly: htmlProps[ "readOnly" ],
             className: "upload-content",
-            title: htmlProps["title"], 
+            title: htmlProps["title"],
         };
 
         const aProps: any = {
@@ -248,7 +248,6 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
             disabled: htmlProps[ "readOnly" ],
             "aria-haspopup": true,
         };
-
 
         return (
             <div className="upload-container">

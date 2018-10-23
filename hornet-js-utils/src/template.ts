@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -130,7 +130,7 @@ export class Template {
             const partKey: Key = this.stringKey[ part ];
             let value = obj;
             let attr;
-            
+
             for (let index = 0; index < partKey.keys.length; index++) {
                 attr = partKey.keys[ index ];
                 if (attr) {

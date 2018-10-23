@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -248,10 +248,9 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         const idInput = `${this.state.id}-${label}`;
         const key = `${idInput}-${choice.value}`;
 
-
         const classNamesSpan: ClassDictionary = {
             outer: true,
-            "has-error":this.hasErrors(), 
+            "has-error":this.hasErrors(),
         };
 
         // positioning an input inside a label
@@ -296,7 +295,6 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
             return false;
         }
     }
-
 
     /**
      * @override
@@ -347,5 +345,33 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
                         id={this.state.id} /> : null}
             </ul>
         );
+    }
+
+    /**
+     * @override
+     */
+    setCurrentValue(value): this {
+        super.setCurrentValue(value);
+        /* L'adaptateur DOM met à jour l'élément dans le DOM : on met ici à jour l'état interne du composant */
+        this.setState({ currentValue: value });
+        if (this.state.items && this.state.items.length > 0) {
+            const itemToSelected = _.find(this.state.items, (element) => {
+                const elementValue = element[ this.state.valueKey ] !== null && element[ this.state.valueKey ] !== undefined ?
+                element[ this.state.valueKey ].toString() : element[ this.state.valueKey ];
+
+                const incomingValue = value !== null && value !== undefined ? value.toString() : value;
+
+                return elementValue === incomingValue;
+            },
+        );
+            if (this.props.dataSource) {
+                this.props.dataSource.select(itemToSelected);
+            } else {
+                this.setState({ selected: itemToSelected });
+            }
+
+            return this.state.items.map(this.renderRadioItem);
+        }
+        return this;
     }
 }

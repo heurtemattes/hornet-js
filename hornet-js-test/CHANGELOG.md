@@ -1,6 +1,10 @@
+# hornet-js-test 5.2.2
+
+- a2f9d89e FIX - hornet-js-test - test mocha: suppression chargement node_modules/test car gestion déjà présent dans le builder
+
 # hornet-js-test 5.2.0
 
-- EVOL: update version react (XSS)
+- EVOL : update version react (XSS)
 - FIX  - [s240] - Accessibilité: px to em
 - EVOL -  Ajout de génération des index
 - FIX  - Table: correctif format date sur méthode componentWillReceiveProps

@@ -1,6 +1,6 @@
 {
   "name": "hornet-js",
-  "version": "5.2.0",
+  "version": "5.2.2",
   "license": "CECILL-2.1",
   "description": "Projet parent permettant de builder les modules de hornet-js",
   "bugs": {

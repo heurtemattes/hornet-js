@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,17 +87,18 @@ const expect = chai.expect;
 import * as React from "react";
 import * as assert from "assert";
 import { TextAreaField } from "src/widget/form/textarea-field";
+import { Form } from "src/widget/form/form";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 
-
 const ReactTestUtils = require("react-dom/test-utils");
 let element: JSX.Element;
 let element2: JSX.Element;
 let element3: JSX.Element;
+let element4: JSX.Element;
 let textarea;
 
 @Decorators.describe("Test Karma textarea-field")
@@ -111,7 +112,7 @@ class TextareaFieldTestKarma extends BaseTest {
         element = (
             <TextAreaField
                 name={"textarea"}
-                label={"test"} 
+                label={"test"}
                 maxChar={255}
                 readOnly={false}
                 ref={(elt) => {
@@ -148,6 +149,19 @@ class TextareaFieldTestKarma extends BaseTest {
                 }
                 displayMaxCharInLabel={true}
             />);
+
+        element4 = (
+                <Form id="test" readOnly={true}>
+                <TextAreaField
+                name={"textarea"}
+                label={"test"}
+                maxChar={255}
+                ref={(elt) => {
+                    this.test = elt;
+                }
+                }
+            /></Form>
+            );
     }
 
     @Decorators.it("Test OK")
@@ -172,7 +186,7 @@ class TextareaFieldTestKarma extends BaseTest {
         const area = document.querySelector(`#${id} textarea`) as HTMLTextAreaElement;
         const charLabel = document.querySelector(`#${id} .textarea-character-value`) as HTMLDivElement;
         this.triggerKeydownEvent(area, "", null, true);
-        
+
         setTimeout(() => {
             expect(area.value).to.be.equal("");
             expect(charLabel.innerHTML).to.be.equal("0 caractère");
@@ -361,7 +375,6 @@ class TextareaFieldTestKarma extends BaseTest {
         },         250);
     }
 
-
     /*****************************************************/
     protected handleChangeValueOnElement(changeValue: boolean, element: any, valueKey: string) {
         if (changeValue) {
@@ -381,10 +394,19 @@ class TextareaFieldTestKarma extends BaseTest {
         ReactTestUtils.Simulate.keyDown(element, { key: valueKey, keyCode, which: keyCode });
         this.handleChangeValueOnElement(changeValue, element, valueKey);
     }
-}
 
+    @Decorators.it("Test du passage de readonly dans un formulaire readonly")
+    testReadOnly() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element4, id);
+        const area = document.querySelector(`#${id} textarea`);
+        setTimeout(() => {
+            expect(area.hasAttribute ("readonly")).to.be.true;
+            this.end();
+        },         500);
+
+    }
+}
 
 // lancement des Tests
 runTest(new TextareaFieldTestKarma());
-
-

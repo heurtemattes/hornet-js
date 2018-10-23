@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -321,6 +321,19 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
         }
     }
 
+    componentDidUpdate(prevProps: any, prevState: any, prevContext: any) {
+        super.componentDidUpdate(prevProps, prevState, prevContext);
+        const domElement = ReactDOM.findDOMNode(this);
+
+        if (domElement) {
+            const tabViewContentList = domElement.firstElementChild.firstElementChild.children[ 1 ];
+            const tabViewList = tabViewContentList.firstElementChild;
+            if(this.state.tabsScroll !== tabViewContentList.clientWidth <= tabViewList.clientWidth) {
+                this.setState({ tabsScroll: tabViewContentList.clientWidth <= tabViewList.clientWidth });
+            }
+        } 
+    }
+
     /**
      * @inheritDoc
      */
@@ -545,7 +558,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
             tableauDesTabs = this.getTabs(this.state.children);
             _.forEach(tableauDesTabs, (item) => {
                 const element = this.createTabsHeader(item);
-                if (!_.find(this.elementsHeaderReact, (tab) => tab.props.id === element.props.id)) {
+                if (!_.find(this.elementsHeaderReact, (tab) => tab.key === element.key)) {
                     this.elementsHeaderReact.push(element);
                 }
             });
@@ -554,7 +567,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
         if (this.elementsTab.length === 0) {
             _.forEach(tableauDesTabs, (item) => {
                 const element = this.createWrap(item);
-                if (!_.find(this.elementsTabReact, (tab) => tab.props.id === element.props.id)) {
+                if (!_.find(this.elementsTabReact, (tab) => tab.key === element.key)) {
                     this.elementsTabReact.push(element);
                 }
             });

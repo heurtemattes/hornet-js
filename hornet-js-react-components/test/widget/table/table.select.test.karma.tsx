@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,10 +99,13 @@ import { Content } from "hornet-js-react-components/src/widget/table/content";
 import { Column } from "hornet-js-react-components/src/widget/table/column";
 import { Columns } from "hornet-js-react-components/src/widget/table/columns";
 import { CheckColumn } from "src/widget/table/column/check-column";
+import { ActionColumn } from "src/widget/table/column/action-column";
+import { Picto } from "src/img/picto";
+import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
 
 /** Tableau de liste de secteurs */
 let dataSourceTriTable: DataSource<any>;
-let tableElement: JSX.Element;
+let tableElement, tableElementWithActionColumns: JSX.Element;
 let table;
 let data;
 
@@ -127,6 +130,28 @@ class tableTest extends BaseTest {
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
                         <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+            </Table>
+        );
+
+        tableElementWithActionColumns = (
+            <Table id="table-with-action-column">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={dataSourceTriTable}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                        <ActionColumn keyColumn="editer"
+                                srcImg={Picto.blue.editer}
+                                alt={"Editer {label}"}
+                                action={()=>{}}/>
+                        <MoreInfoColumn keyColumn="idMore" visible={(value) => true}
+                                alt={"Plus d'info sur {label} {desc}"}
+                                headers={["label", "desc"]}>
+                            </MoreInfoColumn>    
                     </Columns>
                 </Content>
             </Table>
@@ -212,6 +237,35 @@ class tableTest extends BaseTest {
                 expect((document.querySelector(`#${id} #lite-0-colBody-1-1`) as any).innerText).to.be.equal("libelle1");
                 expect((document.querySelector(`#${id} #lite-0-colBody-2-1`) as any).innerText).to.be.equal("libelle9");
                 expect((document.querySelector(`#${id} #lite-0-colBody-8-1`) as any).innerText).to.be.equal("libelle3");
+                this.end();
+            }, 500);
+        });
+        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.DESC), new SortData("label", SortDirection.DESC)] });
+    }
+
+    @Decorators.it("test du rendu de l'action column après tri colonnes part1")
+    testRenderActionColumnAfterSortAscOnLabelAndDesc() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElementWithActionColumns, id);
+        dataSourceTriTable.on("sort", () => {
+            setTimeout(() => {
+                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-6-3 a`) as any).title).to.be.equal("Editer libelle9");
+                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-6-4 a`) as any).title).to.be.equal("Plus d'info sur libelle9 desc0");
+                this.end();
+            }, 500);
+        });
+        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.ASC), new SortData("label", SortDirection.ASC)] });
+    }
+
+
+    @Decorators.it("test du rendu de l'action column après tri colonnes part2")
+    testRenderActionColumnAfterSortDescOnLabelAndDesc() {
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElementWithActionColumns, id);
+        dataSourceTriTable.on("sort", () => {
+            setTimeout(() => {
+                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-2-3 a`) as any).title).to.be.equal("Editer libelle9");
+                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-2-4 a`) as any).title).to.be.equal("Plus d'info sur libelle9 desc0");
                 this.end();
             }, 500);
         });

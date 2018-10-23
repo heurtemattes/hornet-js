@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,6 +107,8 @@ export interface EditionActionBodyCellProps extends AbstractBodyCellProps {
     showAlert?: Function;
     /** chaine de remplacement des valeurs undefined dans le templating */
     replaceUndef?: string;
+    /** Fonction exécutée au moment de l'annulation de l'edition d'une ligne */
+    handleCancel?: Function;
 }
 
 export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
@@ -188,6 +190,10 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         this.props.contentState.setItemInEdition(
             this.state.isEditing ? null : this.props.value,
             this.state.isEditing ? null : this.props.coordinates.row);
+
+        if (this.state.isEditing && this.props.handleCancel) {
+            this.props.handleCancel(this.props.value, this.props.coordinates.row);
+        }
     }
 
     /**

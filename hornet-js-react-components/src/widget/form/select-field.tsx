@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -239,7 +239,7 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
         if (hasDataSource) {
             for (let index = 0; index < this.state.dataSource.results.length; index++) {
                 const element = this.state.dataSource.results[ index ];
-                if (element[ this.state.valueKey ] === value) {
+                if (element[ this.state.valueKey ] == value) {
                     this.state.dataSource.select(element);
                     break;
                 }

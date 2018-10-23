@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,7 +112,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
      * @inheritDoc
      */
     componentWillReceiveProps(nextProps: MoreInfoBodyCellProps, context) {
-        super.componentWillReceiveProps(nextProps as any,context);
+        super.componentWillReceiveProps(nextProps as any, context);
         // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
          this.state = {...this.state, ...nextProps,
             url: (nextProps.url) ? this.genUrlWithParams(nextProps.url, nextProps.value) : null,
@@ -126,6 +126,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
     renderCell(): JSX.Element {
 
         logger.trace("render MoreInfoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        this.title = this.getCellTitleWithProps(this.props);
 
         const classes: ClassDictionary = {
             "button-action": true,

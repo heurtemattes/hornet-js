@@ -22,7 +22,7 @@ export class Timer {
      * @param {string}  stopTimerName id du timer à arrêter
      */
     static startTimer(timerName: string, stopTimerName?: string) {
-        let timers = Utils.getCls("hornet.timers");
+        let timers = Timer.getTimers("hornet.timers");
         
         if (!timers) {
             timers = {};
@@ -36,7 +36,7 @@ export class Timer {
             Timer.logger.warn(`startTimer : Problème de Timers (${timerName}) non stoppé.`);
         } else {
             timers[timerName].push(new Date().getTime());
-            Utils.setCls("hornet.timers", timers);
+            Timer.setTimers("hornet.timers", timers);
         }
         
 
@@ -50,13 +50,13 @@ export class Timer {
      * @param {string} timerName id du timer à démarrer
      */
     static stopTimer(timerName: string) {
-        const timers = Utils.getCls("hornet.timers");
+        const timers = Timer.getTimers("hornet.timers");
         
         if (!timers || !timers[timerName] || timers[timerName].length % 2 === 0) {
             Timer.logger.warn(`startTimer : Problème de Timers (${timerName}) non démarré.`);
         } else {
             timers[timerName].push(new Date().getTime());
-            Utils.setCls("hornet.timers", timers);
+            Timer.setTimers("hornet.timers", timers);
         }
         
     }
@@ -66,7 +66,7 @@ export class Timer {
      */
     static stopAllTimers() {
 
-        const timers = Utils.getCls("hornet.timers");
+        const timers = Timer.getTimers("hornet.timers");
 
         if (timers) {
             Object.keys(timers).forEach((timerName) => {
@@ -74,7 +74,7 @@ export class Timer {
                     timers[timerName].push(new Date().getTime());
                 }                
             });
-            Utils.setCls("hornet.timers", timers);
+            Timer.setTimers("hornet.timers", timers);
         }
         
     }
@@ -85,7 +85,7 @@ export class Timer {
      * @param {integer} statusCode - status http à logger
      */
     static logFinally(url?, statusCode?) {
-        const timers = Utils.getCls("hornet.timers");
+        const timers = Timer.getTimers("hornet.timers");
         const valueTimers = {};
 
         if (timers) {
@@ -110,4 +110,25 @@ export class Timer {
         }
 
     }
+
+    static getTimers(clsKey: string):any {
+        let timers;
+        try {
+            timers = Utils.getCls(clsKey);
+        } catch (e) {
+            Timer.logger.warn("No timers available, Cls error.");
+            Timer.logger.debug("error : ", e);
+        }
+        return timers;
+    }
+
+    static setTimers(clsKey: string, timers:any):any {
+        try {
+            timers = Utils.setCls(clsKey, timers);
+        } catch (e) {
+            Timer.logger.warn("No timers available, Cls error.");
+            Timer.logger.debug("error : ", e);
+        }
+        return timers;
+    }    
 }

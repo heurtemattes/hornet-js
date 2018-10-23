@@ -73,7 +73,7 @@ declare module "hornet-js-components/src/component/iclient-initializer" {
 	 * hornet-js-components - Interfaces des composants web de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -259,7 +259,7 @@ declare module "hornet-js-components/src/component/ihornet-page" {
 	 * hornet-js-components - Interfaces des composants web de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -361,7 +361,7 @@ declare module "hornet-js-components/src/component/imenu-item" {
 	 * hornet-js-components - Interfaces des composants web de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -466,7 +466,7 @@ declare module "hornet-js-components/src/event/key-codes" {
 	 * hornet-js-components - Interfaces des composants web de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -646,7 +646,7 @@ declare module "hornet-js-components/src/utils/menu-constantes" {
 	 * hornet-js-components - Interfaces des composants web de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.0
+	 * @version v5.2.2
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

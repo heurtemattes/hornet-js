@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,6 @@ import * as moment from "moment";
 import { DateUtils } from "hornet-js-utils/src/date-utils";
 import { InputField, InputFieldProps } from "src/widget/form/input-field";
 import { KEYNAMES } from "hornet-js-components/src/event/key-codes";
-
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.calendar-fied");
 
@@ -133,7 +132,6 @@ export interface CalendarFieldState {
     onValueChange?: (value: string) => void;
 }
 
-
 if (!Utils.isServer) {
     logger.trace("Execution sur le CLIENT(NAVIGATEUR)");
     RcCalendar = require("rc-calendar");
@@ -161,7 +159,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
     readonly props: Readonly<CalendarFieldProps>;
 
-    static defaultProps = _.assign(AbstractField.defaultProps, {
+    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
         disabled: false,
         isDatePicker: true,
         valideOnForm: true,
@@ -199,6 +197,13 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         };
     }
 
+    componentDidMount() {
+        super.componentDidMount();
+            if (this.props.currentValue) {
+                this.setCurrentValue(this.props.currentValue);
+            }
+    }
+
     /**
      * Récupère le format d'affichage des dates
      */
@@ -226,9 +231,8 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                     disabled={this.state.readOnly || this.state.disabled} aria-haspopup={true} value="calendar"
                 >
                     <img src={CalendarField.genUrlTheme("/img/calendar/icon_calendar.svg")}
-                        alt={this.state.title || this.state.calendarLocale.agendaTitle} />
+                        alt={this.state.alt || this.state.title || this.state.calendarLocale.agendaTitle} />
                 </button>;
-
 
             /*RcCalendar prend un Moment en paramètre*/
             const date = _.clone(this.state.currentValue);
@@ -285,7 +289,17 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         if ((htmlProps as any).label === htmlProps.title) {
             htmlProps.title = undefined;
         }
+
+        if (this.props.currentValue != null) {
+            if (this.props.currentValue instanceof Date) {
+                _.assign(htmlProps, { defaultValue: this.formatCalendarDate((this.props.currentValue as any).getTime(), this.state.calendarLocale) });
+            } else {
+                _.assign(htmlProps, { defaultValue: this.props.currentValue });
+            }
+        }
+
         (htmlProps as any).label = undefined;
+        (htmlProps as any).alt = undefined;
 
         const hasError = this.hasErrors() ? " has-error" : "";
 
@@ -544,7 +558,6 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         return this;
     }
 
-
     /**
      * Permet d'afficher la modal contenant le calendier
      * @returns {Calendar}
@@ -568,7 +581,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
     getCurrentValue(removeEmptyStrings: boolean = true): Date {
         let val;
         if (this.state.valideOnForm) {
-            val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS) 
+            val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS)
             || this.state.currentValue;
         } else {
             val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS);

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -507,7 +507,7 @@ export class HornetSuperAgent {
                     else {
                         const objectUrl = window.URL.createObjectURL(
                             // xhr.response is a blob
-                            res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }), { oneTimeOnly: true });  
+                            res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }));  
                         if (!request.resultDisposition) {
                             if (!attachFile || attachFile[ 1 ] === DispositionType.ATTACHMENT) {
                                 const elemt = { a: null };

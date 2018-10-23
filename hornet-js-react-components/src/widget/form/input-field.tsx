@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -232,7 +232,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
         if (key === KeyCodes.ENTER || key === KeyCodes.SPACEBAR) {
             e.preventDefault();
             e.stopPropagation();
-            this.resetValue();
+            this.resetValue(e);
             this.htmlElement.focus();
         }
     }
@@ -240,14 +240,18 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
     /**
      * Permet de rendre à null la valeur du champ et de masquer la colonne
      */
-    resetValue(): void {
+    resetValue(e): void {
         this.htmlElement.value = null;
         if (this.htmlElement && this.htmlElement.onchange) this.htmlElement.onchange();
         fireHornetEvent(VALUE_CHANGED_EVENT.withData(this.htmlElement));
         if (this.charsCounter) {
             this.charsCounter.handleTextChange(null);
         }
-        this.setState({ valued: false });
+        this.setState({ valued: false }, () => {
+            if (this.props.onChange) {
+                this.props.onChange(e);
+            }
+        });
     }
 
     /**
@@ -276,10 +280,10 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
     /**
      * Surcharge de la méthode de la classe mère pour ajouter la limite autorisée si le nombre de caractères maximum est défini
      * et si la props displayMaxCharInLabel est true
-     * @param fieldId 
-     * @param fieldName 
-     * @param label 
-     * @param required 
+     * @param fieldId
+     * @param fieldName
+     * @param label
+     * @param required
      */
     renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
         let customLabel = label || "";

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,9 +93,7 @@ export interface AlertProps extends HornetComponentProps {
     title?: string;
     message: string;
     valid?: string;
-    cancel?: string;
     validTitle?: string;
-    cancelTitle?: string;
     underlayClickExits?: boolean;
     escapeKeyExits?: boolean;
     notificationId?: string;
@@ -128,11 +126,6 @@ export class Alert extends HornetComponent<AlertProps, any> {
 
     setOnClickOk(onClickOk: React.MouseEventHandler<HTMLInputElement>, cb?) {
         this.setState({ onClickOk }, cb);
-        return this;
-    }
-
-    setOnClickCancel(onClickCancel: Function, cb?) {
-        this.setState({ onClickCancel }, cb);
         return this;
     }
 
@@ -177,7 +170,6 @@ export class Alert extends HornetComponent<AlertProps, any> {
             </Modal>);
     }
 
-
     /**
      * Renvoie le/les buttons
      * @returns {any}
@@ -206,7 +198,6 @@ export class Alert extends HornetComponent<AlertProps, any> {
             onClick: this.state.onClickOk,
         };
     }
-
 
     /**
      * Extrait le libelle valid passé dans les propriétés du composant ou indique un libellé par défaut

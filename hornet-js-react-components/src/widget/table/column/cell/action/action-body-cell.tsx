@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -114,25 +114,29 @@ export interface ActionBodyCellProps extends AbstractBodyCellProps {
 
 export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
     protected title: string;
+    private inferedAlertMessage: string;
+    private inferedAlertTitle: string;
+
 
     constructor(props: P, context: any) {
         super(props, context);
 
-        const message = props.messageAlert && new Template(props.messageAlert).process(props.value, props.replaceUndef || "?");
-        const title = props.messageAlert && new Template(props.titleAlert).process(props.value, props.replaceUndef || "?");
 
         this.state = {
             ...this.state,
             url: this.props.url && this.genUrlWithParams(props.url, props.value),
             visible: (this.props.visible && (typeof this.props.visible === "function")) ? this.props.visible(this.props.value) : true,
-            hasPopUp: this.props.messageAlert,
-            messageAlert: message,
-            titleAlert: title,
-
+            hasPopUp: this.props.messageAlert
         };
 
-        this.title = this.getCellTitleWithProps(props);
+    }
 
+    /**
+     * @inheritDoc
+     */
+    shouldComponentUpdate(nextProps: any, nextState: any) {
+        return super.shouldComponentUpdate(nextProps, nextState) ||
+        ((this.props.value as any).id !== (nextProps.value as any).id);
     }
 
     /**
@@ -141,6 +145,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
     renderCell(): JSX.Element {
 
         logger.trace("render ActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        this.title = this.getCellTitleWithProps(this.props);
 
         const classes: ClassDictionary = {
             "button-action": true,
@@ -173,6 +178,13 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
             "aria-haspopup": this.state.hasPopUp,
             role: "button"
         };
+
+        if (this.props.messageAlert) {
+            this.inferedAlertMessage = this.props.messageAlert
+                && new Template(this.props.messageAlert).process(this.props.value, this.props.replaceUndef || "?");
+            this.inferedAlertTitle = this.props.messageAlert
+                && new Template(this.props.titleAlert).process(this.props.value, this.props.replaceUndef || "?");
+        }
 
         return (
             this.state.visible ?
@@ -211,8 +223,8 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         if (this.props.messageAlert) {
             e.stopPropagation();
             setTimeout(() => {
-                this.props.showAlert(this.state.messageAlert, this.state.titleAlert, this.onAction);
-            }, 150);
+                this.props.showAlert(this.inferedAlertMessage, this.inferedAlertTitle, this.onAction);
+            },         150);
         } else {
             this.onAction();
         }

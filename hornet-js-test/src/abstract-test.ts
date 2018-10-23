@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -146,7 +146,7 @@ export class AbstractTest {
                     process.on("uncaughtException", originalErrorListeners[ i ]);
                 }
                 // For the sake of simplicity we are done after catching the unhandled exception
-                done();
+                done(e);
             });
         }
     }

@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-'use strict';
-var chai = require("chai");
+"use strict";
+const chai = require("chai");
 const expect = chai.expect;
 import * as React from "react";
 
@@ -90,13 +90,14 @@ import * as assert from "assert";
 import { Form } from "hornet-js-react-components/src/widget/form/form";
 import * as schema from "hornet-js-react-components/test/widget/form/form-validate.submit.json";
 import { InputField } from "src/widget/form/input-field";
+import { CalendarField } from "src/widget/form/calendar-field";
 import { Row } from "src/widget/form/row";
 import { ButtonsArea } from "src/widget/form/buttons-area";
 import { Button } from "src/widget/button/button";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 
 let element: JSX.Element;
-const dataSet = { nom: "Secteur9", desc: "Secteur 9" };
+const dataSet = { nom: "Secteur9", desc: "Secteur 9", date: new Date("2015-03-25") };
 
 @Decorators.describe("Test Karma Form validation et soumission")
 class FormValidateSubmit extends BaseTest {
@@ -116,7 +117,8 @@ class FormValidateSubmit extends BaseTest {
                             this.monForm.updateFields(dataSet);
                         }
                     }}
-                    schema={schema}>
+                    schema={schema}
+                >
                     <Row>
                         <InputField name="nom" label="nom"
                             required={true} size={40} maxLength={50} />
@@ -124,6 +126,12 @@ class FormValidateSubmit extends BaseTest {
                     <Row>
                         <InputField name="desc" label="description"
                             required={true} size={40} maxLength={200} />
+                        <CalendarField
+                            valideOnForm={false}
+                            label={"Test date alt props"}
+                            alt={"test alt props"}
+                            name="date"
+                        />
                     </Row>
                     <ButtonsArea>
                         <Button type="submit" id="enregistrer" name="action:save"
@@ -146,7 +154,8 @@ class FormValidateSubmit extends BaseTest {
 
     @Decorators.it("Test validation du formulaire avec schema par défaut")
     testDefaultValidationForm() {
-        const document = this.renderIntoDocument(element, `${this.className}-main1`);
+        const id = this.generateMainId();
+        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
         const valide: boolean = this.monForm.validate(false);
         HornetTestAssert.assertTrue(valide, "Le formulaire n'est pas correctement validé");
         this.end();
@@ -154,7 +163,8 @@ class FormValidateSubmit extends BaseTest {
 
     @Decorators.it("Test validation du formulaire avec schema custom")
     testCustomValidationForm() {
-        const document = this.renderIntoDocument(element, `${this.className}-main2`);
+        const id = this.generateMainId();
+        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
         const valide: boolean = this.monForm.validate(false, schema);
         HornetTestAssert.assertTrue(valide, "Le formulaire n'est pas correctement validé");
         this.end();
@@ -162,7 +172,8 @@ class FormValidateSubmit extends BaseTest {
 
     @Decorators.it("Test invalidation du formulaire avec schema par défaut")
     testDefaultInvalidationForm() {
-        const document = this.renderIntoDocument(element, `${this.className}-main3`);
+        const id = this.generateMainId();
+        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
         const invalideData = { desc: "Secteur 9" };
         this.monForm.updateFields(invalideData);
         const valide: boolean = this.monForm.validate(false);
@@ -172,24 +183,26 @@ class FormValidateSubmit extends BaseTest {
 
     @Decorators.it("Test invalidation du formulaire avec schema custom")
     testCustomInvalidationForm() {
-        const document = this.renderIntoDocument(element, `${this.className}-main4`);
+        const id = this.generateMainId();
+        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
         const invalideData = { nom: "Secteur 9" };
         this.monForm.updateFields(invalideData);
         const valide: boolean = this.monForm.validate(false, schema);
         HornetTestAssert.assertFalse(valide, "Le formulaire n'aurait pas dû être validé");
-        const messageList = this.getNotificationMessageListForm("FormValideSubmit-main4", "error-message-list");
+        const messageList = this.getNotificationMessageListForm(`FormValideSubmit-main${id}`, "error-message-list");
         HornetTestAssert.assertNull(messageList, "Il est anormal de récupérer des notifications quand elles sont désactivées");
         this.end();
     }
 
     @Decorators.it("Test invalidation du formulaire avec schema par défaut et notification des erreurs")
     testCustomInvalidationFormWithNotify() {
-        const document = this.renderIntoDocument(element, `${this.className}-main5`);
+        const id = this.generateMainId();
+        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
         const invalideData = { nom: "Secteur 9" };
         this.monForm.updateFields(invalideData);
         const valide: boolean = this.monForm.validate(true);
         HornetTestAssert.assertFalse(valide, "Le formulaire n'aurait pas dû être validé");
-        const messageList = this.getNotificationMessageListForm("FormValideSubmit-main5", "error-message-list");
+        const messageList = this.getNotificationMessageListForm(`FormValideSubmit-main${id}`, "error-message-list");
         HornetTestAssert.assertNotNull(messageList, "Aucune notification récupérée par la validation");
         this.end();
     }

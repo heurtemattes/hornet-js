@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -103,8 +103,8 @@ describe("Test of BeanUtils.serialize* : ", () => {
         user.list = [];
         user.list.push(new Adress("my adress1"));
         user.list.push(new Adress("my adress2"));
-        user.list[ 0 ].id = 12;
-        user.list[ 1 ].id = 13;
+        user.list[0].id = 12;
+        user.list[1].id = 13;
         user.adress = new Adress("Object = my adress1");
         user.id = 10;
 
@@ -113,120 +113,123 @@ describe("Test of BeanUtils.serialize* : ", () => {
         user2.list = [];
         user2.list.push(new Adress("my adress1"));
         user2.list.push(new Adress("my adress2"));
-        user2.list[ 0 ].id = 14;
-        user2.list[ 1 ].id = 15;
+        user2.list[0].id = 14;
+        user2.list[1].id = 15;
         user2.adress = new Adress("Object = my adress1");
         user2.id = 12;
     });
 
     it("should create a array of Flat object [no instance] ", (done) => {
-        const array = [ user, user2 ];
-        BeanUtils.serializeObject(User, array).then((result) => {
-            expect(result).not.empty;
-            expect(result.length).to.be.eq(array.length);
-            _.map(result, function (item) {
-                expect(item.constructor).to.be.eq(undefined);
-            });
-            for (let i = 0; i < result.length; i++) {
-                expect(result[ i ].id).to.be.undefined;
-                expect(array[ i ].id).to.be.exist;
-                expect(result[ i ].name).to.be.eq(array[ i ].name);
-                expect(result[ i ].password).to.be.eq(array[ i ].password);
-                expect(result[ i ].adress.label).to.be.eq(array[ i ].adress.label);
-
-                expect(result[ i ].list.length).to.be.eq(array[ i ].list.length);
-                for (let j = 0; j < result[ i ].list.length; j++) {
-                    expect(result[ i ].list[ j ].id).to.be.undefined;
-                    expect(array[ i ].list[ j ].id).to.be.exist;
-                    expect(result[ i ].list[ j ].label).to.be.eq(array[ i ].list[ j ].label);
-                }
-            }
-            done();
-        }).catch((error) => {
-            done(error);
+        const array = [user, user2];
+        const result = BeanUtils.serializeObject(User, array);
+        expect(result).not.empty;
+        expect(result.length).to.be.eq(array.length);
+        _.map(result, function (item) {
+            expect(item.constructor).to.be.eq(undefined);
         });
+        for (let i = 0; i < result.length; i++) {
+            expect(result[i].id).to.be.undefined;
+            expect(array[i].id).to.be.exist;
+            expect(result[i].name).to.be.eq(array[i].name);
+            expect(result[i].password).to.be.eq(array[i].password);
+            expect(result[i].adress.label).to.be.eq(array[i].adress.label);
+
+            expect(result[i].list.length).to.be.eq(array[i].list.length);
+            for (let j = 0; j < result[i].list.length; j++) {
+                expect(result[i].list[j].id).to.be.undefined;
+                expect(array[i].list[j].id).to.be.exist;
+                expect(result[i].list[j].label).to.be.eq(array[i].list[j].label);
+            }
+        }
+        done();
     });
 
 
     it("should test object is null ", (done) => {
-        BeanUtils.serializeObject(User, null).then((result) => {
-            expect(result).to.be.undefined;
-            done();
-        }).catch((error) => {
-            done(error);
-        });
+        const result = BeanUtils.serializeObject(User, null)
+        expect(result).to.be.undefined;
+        done();
     });
 
     it("should test object is undefined ", (done) => {
-        BeanUtils.serializeObject(User, undefined).then((result) => {
-            expect(result).to.be.undefined;
-            done();
-        }).catch((error) => {
-            done(error);
-        });
+        const result = BeanUtils.serializeObject(User, undefined)
+        expect(result).to.be.undefined;
+        done();
     });
 
     it.skip("should test object is primitive ", (done) => {
-        BeanUtils.serializeObject(User, 2).then((result) => {
+        try {
+            const result = BeanUtils.serializeObject(User, 2)
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+
+        } catch (error) {
             expect(error).to.be.instanceOf(TechnicalError);
             expect(error.args.message).to.be.equals("Cannot find @Bean for object : 2 .So, we cannot transform it to an object User");
             done(error);
-        });
+        }
     });
 
     it("should test class is null ", (done) => {
-        BeanUtils.serializeArray(null, [ user, user2 ]).then((result) => {
+        try {
+
+            const result = BeanUtils.serializeArray(null, [user, user2])
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class is boolean ", (done) => {
-        BeanUtils.serializeArray(false, [ user, user2 ]).then((result) => {
+        try {
+            const result = BeanUtils.serializeArray(false, [user, user2]);
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+
+        } catch (error) {
             done(error);
-        });
+        }
     });
 
     it("should test object like function ", (done) => {
-        BeanUtils.serializeObject(User, function () {
-        }).then((result) => {
+        try {
+            const result = BeanUtils.serializeObject(User, function () {
+            });
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+
+        }
     });
 
     it("should test empty array with mapArray", (done) => {
-        BeanUtils.serializeArray(User, []).then((result) => {
+        try {
+            const result = BeanUtils.serializeArray(User, []);
             expect(result).to.be.an("array");
             expect(result).to.be.empty;
             done();
-        }).catch((error) => {
+        }
+        catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test empty array with serializeObject ", (done) => {
-        BeanUtils.serializeObject(User, []).then((result) => {
+        try {
+            const result = BeanUtils.serializeObject(User, []);
             expect(result).to.be.an("array");
             expect(result).to.be.empty;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test Flat object [no instance]", (done) => {
-        BeanUtils.serializeObject(User, user).then((result) => {
+        try {
+            const result = BeanUtils.serializeObject(User, user);
             expect(result.constructor).to.be.eq(undefined);
             expect(result.id).to.be.undefined;
             expect(result.name).to.be.eql(user.name);
@@ -234,19 +237,20 @@ describe("Test of BeanUtils.serialize* : ", () => {
             expect(result.adress.id).to.be.undefined;
             expect(result.list.length).to.be.eq(user.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ].constructor).to.be.eq(undefined);
-                expect(result.list[ j ].id).to.be.undefined;
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(user.list[ j ].label);
+                expect(result.list[j].constructor).to.be.eq(undefined);
+                expect(result.list[j].id).to.be.undefined;
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(user.list[j].label);
             }
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class UserDTO ", (done) => {
-        BeanUtils.serializeObject(UserDTO, user).then((result) => {
+        try {
+            const result = BeanUtils.serializeObject(UserDTO, user)
             expect(result.constructor).to.be.eq(undefined);
             expect(result.id).to.be.undefined;
             expect(result.name).to.be.eql(user.name);
@@ -254,15 +258,16 @@ describe("Test of BeanUtils.serialize* : ", () => {
             expect(result.adress.id).to.be.undefined;
             expect(result.list.length).to.be.eq(user.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ].constructor).to.be.eq(undefined);
-                expect(result.list[ j ].id).to.be.undefined;
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(user.list[ j ].label);
+                expect(result.list[j].constructor).to.be.eq(undefined);
+                expect(result.list[j].id).to.be.undefined;
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(user.list[j].label);
             }
             done();
-        }).catch((error) => {
+        }
+        catch (error) {
             done(error);
-        });
+        };
     });
 });
 
@@ -278,8 +283,8 @@ describe("Test of BeanUtils.map* : ", () => {
         user.list = [];
         user.list.push(new Adress("my adress1"));
         user.list.push(new Adress("my adress2"));
-        user.list[ 0 ].id = 12;
-        user.list[ 1 ].id = 13;
+        user.list[0].id = 12;
+        user.list[1].id = 13;
         user.adress = new Adress("Object = my adress1");
         user.id = 10;
 
@@ -288,129 +293,142 @@ describe("Test of BeanUtils.map* : ", () => {
         user2.list = [];
         user2.list.push(new Adress("my adress1"));
         user2.list.push(new Adress("my adress2"));
-        user2.list[ 0 ].id = 14;
-        user2.list[ 1 ].id = 15;
+        user2.list[0].id = 14;
+        user2.list[1].id = 15;
         user2.adress = new Adress("Object = my adress1");
         user2.id = 12;
     });
 
 
     it("should create a array of User", (done) => {
-        const array = [ user, user2 ];
-        BeanUtils.mapObject(User, array).then((result) => {
+        const array = [user, user2];
+        try {
+            const result = BeanUtils.mapObject(User, array);
             expect(result).not.empty;
             expect(result.length).to.be.eq(array.length);
             _.map(result, function (item) {
                 expect(item).to.be.an.instanceOf(User);
             });
             for (let i = 0; i < result.length; i++) {
-                expect(result[ i ].id).to.be.eq(0);
-                expect(array[ i ].id).to.be.exist;
-                expect(result[ i ].name).to.be.eq(array[ i ].name);
-                expect(result[ i ].password).to.be.eq(array[ i ].password);
-                expect(result[ i ].adress.label).to.be.eq(array[ i ].adress.label);
-                expect(result[ i ].adress.id).to.be.eq(0);
-                expect(result[ i ].list.length).to.be.eq(array[ i ].list.length);
-                for (let j = 0; j < result[ i ].list.length; j++) {
-                    expect(result[ i ].list[ j ].id).to.be.eq(0);
-                    expect(array[ i ].list[ j ].id).to.be.exist;
-                    expect(result[ i ].list[ j ].label).to.be.eq(array[ i ].list[ j ].label);
+                expect(result[i].id).to.be.eq(0);
+                expect(array[i].id).to.be.exist;
+                expect(result[i].name).to.be.eq(array[i].name);
+                expect(result[i].password).to.be.eq(array[i].password);
+                expect(result[i].adress.label).to.be.eq(array[i].adress.label);
+                expect(result[i].adress.id).to.be.eq(0);
+                expect(result[i].list.length).to.be.eq(array[i].list.length);
+                for (let j = 0; j < result[i].list.length; j++) {
+                    expect(result[i].list[j].id).to.be.eq(0);
+                    expect(array[i].list[j].id).to.be.exist;
+                    expect(result[i].list[j].label).to.be.eq(array[i].list[j].label);
                 }
             }
             done();
-        }).catch((error) => {
+
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
 
     it("should test object is null ", (done) => {
-        BeanUtils.mapObject(User, null).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, null);
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test object is undefined ", (done) => {
-        BeanUtils.mapObject(User, undefined).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, undefined);
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it.skip("should test object is primitive ", (done) => {
-        BeanUtils.mapObject(User, 2).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, 2)
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             expect(error).to.be.instanceOf(TechnicalError);
             expect(error.args.message).to.be.equals("Cannot find @Bean for object : 2 .So, we cannot transform it to an object User");
             done(error);
-        });
+        };
     });
 
     it("should test class is null ", (done) => {
-        BeanUtils.mapArray(null, [ user, user2 ]).then((result) => {
+        try {
+            const result = BeanUtils.mapArray(null, [user, user2]);
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class is boolean ", (done) => {
-        BeanUtils.mapArray(false, [ user, user2 ]).then((result) => {
+        try {
+            const result = BeanUtils.mapArray(false, [user, user2]);
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test mapArray is boolean ", (done) => {
-        BeanUtils.mapArray(false, [ user, user2 ]).then((result) => {
+        try {
+            const result = BeanUtils.mapArray(false, [user, user2]);
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test object like function ", (done) => {
-        BeanUtils.mapObject(User, function () { }).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, function () { });
             expect(result).to.be.undefined;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test empty array with mapArray", (done) => {
-        BeanUtils.mapArray(User, []).then((result) => {
+        try {
+            const result = BeanUtils.mapArray(User, []);
             expect(result).to.be.an("array");
             expect(result).to.be.empty;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test empty array with mapObject ", (done) => {
-        BeanUtils.mapObject(User, []).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, []);
             expect(result).to.be.an("array");
             expect(result).to.be.empty;
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class User", (done) => {
-        BeanUtils.mapObject(User, user).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, user);
             expect(result).to.be.instanceof(User);
             expect(result.id).to.be.eq(0);
             expect(result.name).to.be.eql(user.name);
@@ -418,19 +436,20 @@ describe("Test of BeanUtils.map* : ", () => {
             expect(result.adress.id).to.be.eq(0);
             expect(result.list.length).to.be.eq(user.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ]).to.be.instanceOf(Adress);
-                expect(result.list[ j ].id).to.be.eq(0);
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(user.list[ j ].label);
+                expect(result.list[j]).to.be.instanceOf(Adress);
+                expect(result.list[j].id).to.be.eq(0);
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(user.list[j].label);
             }
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class UserDTO ", (done) => {
-        BeanUtils.mapObject(UserDTO, user).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(UserDTO, user)
             expect(result).to.be.instanceof(UserDTO);
             expect(result.id).to.be.eq(0);
             expect(result.name).to.be.eql(user.name);
@@ -438,19 +457,20 @@ describe("Test of BeanUtils.map* : ", () => {
             expect(result.adress.id).to.be.eq(0);
             expect(result.list.length).to.be.eq(user.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ]).to.be.instanceOf(AdressDTO);
-                expect(result.list[ j ].id).to.be.eq(0);
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(user.list[ j ].label);
+                expect(result.list[j]).to.be.instanceOf(AdressDTO);
+                expect(result.list[j].id).to.be.eq(0);
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(user.list[j].label);
             }
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class OtherUser (empty constructor) ", (done) => {
-        BeanUtils.mapObject(OtherUser, user).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(OtherUser, user);
             expect(result).to.be.instanceof(OtherUser);
             expect(result.id).to.be.eq(0);
             expect(result.name).to.be.eql(user.name);
@@ -458,15 +478,16 @@ describe("Test of BeanUtils.map* : ", () => {
             expect(result.adress.id).to.be.eq(0);
             expect(result.list.length).to.be.eq(user.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ]).to.be.instanceOf(Adress);
-                expect(result.list[ j ].id).to.be.eq(0);
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(user.list[ j ].label);
+                expect(result.list[j]).to.be.instanceOf(Adress);
+                expect(result.list[j].id).to.be.eq(0);
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(user.list[j].label);
             }
             done();
-        }).catch((error) => {
+        }
+        catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class ForeignUser (with no @Bean) ", (done) => {
@@ -491,7 +512,8 @@ describe("Test of BeanUtils.map* : ", () => {
         foreignUser.adress = ad3;
         foreignUser.comments = "foreign comment foreignUser";
 
-        BeanUtils.mapObject(UserDTO, foreignUser).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(UserDTO, foreignUser);
             expect(result).to.be.instanceof(UserDTO);
             expect(result.id).to.be.eq(0);
             expect(result.name).to.be.eql(foreignUser.name);
@@ -499,20 +521,21 @@ describe("Test of BeanUtils.map* : ", () => {
             expect(result.adress.id).to.be.eq(0);
             expect(result.list.length).to.be.eq(foreignUser.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ]).to.be.instanceOf(AdressDTO);
-                expect(result.list[ j ].id).to.be.eq(0);
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(foreignUser.list[ j ].label);
+                expect(result.list[j]).to.be.instanceOf(AdressDTO);
+                expect(result.list[j].id).to.be.eq(0);
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(foreignUser.list[j].label);
             }
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should test class User with an attribute Number", (done) => {
         user.number = new Number(2);
-        BeanUtils.mapObject(User, user).then((result) => {
+        try {
+            const result = BeanUtils.mapObject(User, user);
             expect(result).to.be.instanceof(User);
             expect(result.id).to.be.eq(0);
             expect(result.name).to.be.eql(user.name);
@@ -522,15 +545,15 @@ describe("Test of BeanUtils.map* : ", () => {
             expect(result.number.valueOf()).to.be.eq(user.number.valueOf());
             expect(result.list.length).to.be.eq(user.list.length);
             for (let j = 0; j < result.list.length; j++) {
-                expect(result.list[ j ]).to.be.instanceOf(Adress);
-                expect(result.list[ j ].id).to.be.eq(0);
-                expect(user.list[ j ].id).to.be.exist;
-                expect(result.list[ j ].label).to.be.eq(user.list[ j ].label);
+                expect(result.list[j]).to.be.instanceOf(Adress);
+                expect(result.list[j].id).to.be.eq(0);
+                expect(user.list[j].id).to.be.exist;
+                expect(result.list[j].label).to.be.eq(user.list[j].label);
             }
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 });
 /////////////////////////////////////////////////////////////////
@@ -538,30 +561,32 @@ describe("Test of BeanUtils.map* : ", () => {
 /////////////////////////////////////////////////////////////////
 describe("Test of BeanUtils.clone* : ", () => {
     it("should do a dummy deep equal test", (done) => {
-        const array = [ user, user2 ];
+        const array = [user, user2];
         const array2 = _.cloneDeep(array);
         expect(array).to.deep.eql(array2);
         done();
     });
 
     it("should do a cloneArray deep equal test", (done) => {
-        const array = [ user, user2 ];
-        BeanUtils.cloneArray(array, { deep: true }).then((result) => {
+        const array = [user, user2];
+        try {
+            const result = BeanUtils.cloneArray(array, { deep: true });
             expect(result).to.deep.eql(array);
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 
     it("should do a cloneArray deep equal test", (done) => {
-        const array = [ user, user2 ];
-        BeanUtils.cloneArray(array).then((result) => {
+        const array = [user, user2];
+        try {
+            const result = BeanUtils.cloneArray(array);
             expect(result).to.eql(array);
             done();
-        }).catch((error) => {
+        } catch (error) {
             done(error);
-        });
+        };
     });
 });
 

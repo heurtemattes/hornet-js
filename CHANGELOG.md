@@ -1,3 +1,47 @@
+# hornet-js 5.2.2
+
+- 8c890ae4 FIX - [s302] - hornet-js-react-components - TABLE : ajout event après MaJ Content
+- d0f93af1 FIX - [s307] - hornet-js-react-components - TABLE : ajout methode handleCancel sur EditionActionColumn
+- 4a36d533 FIX - [m0069480] - hornet-js-react-components - Autocomplete: Saisie possible en readonly
+- 4ae867cb FIX - [???] hornet-js-react-components - TABLE : affichage du title bouton reset edition en ligne
+- 5bbe3363 FIX - [S306] hornet-js-utils - traitement particulier des undefined si déclarés
+- 1df4ee94 FIX - [M69460] hornet-js-core - probleme utilisation query superagent pour les plugins
+- abcda60f FIX - [m69856] - hornet-js-react-components - ActionColumn : Fix du message d'alert suite à la pagination
+- f642c9f1 FIX - [s769] hornet-js-core - ComponentMiddleware : correction du filtre de sécurité
+- 235d4041 FIX - hornet-js-react-components - suppression du label dans les message "effacer le champs" , posait problème lorsqu'il n'y avait pas de label
+- fb0e5bc6 FIX - [m69805] - hornet-js-react-components - Tabs : Correction disparition des chevrons sur les onglets
+- 95496c49 FIX - [s293] - hornet-js-core - HornetResult : Ajout du charset dans le content-type
+- 0cfcbe47 FIX - [m69679] - hornet-js-database: correction du bug sur les transactions
+- 50ce2d91 FIX - [m69800] - hornet-js-react-components - Tooltip: Affichage d'une modale, focus automatique sur 1er champ
+- 4fe56589 FIX - hornet-js-react-components - ajout onChange sur le bouton reset de l'input
+- 14700715 FIX - [S130] : déplacement dans referentiel
+- 65b94b28 FIX - [m69685] - hornet-js-react-components - CalendarField: Définir une valeur par défaut sur un composant CalendarField - prise en compte currentValue de type string TU
+- b56e748c FIX - hornet-js-react-components - erreur console dans les accordions avec un seul accordion
+- 8f79233d FIX - hornet-js-react-components - correction autocomplete not writable touche entrée
+- 6d7d966d FIX - hornet-js-react-components - checkboxfield onChange touche entrée navigation clavier
+- fffaf8b0 FIX - [] - hornet-js-bean - Correction mapper pour un résultat null
+- c205ab3c FIX - 298 Ajout de warning si pas de cls de disponible
+- 0c36b760 FIX - hornet-js-react-components - radiofields problème setCurrentValue type string
+- d2155547 FIX - [M0069858] - hornet-js-react-components - affichage action-button avec tableau paginé
+- ff17e5c5 FIX - [s299] - hornet-js-react-components : suppression de props inutilisées dans alert
+- f2e50cd6 FIX - [] - hornet-js-react-components - Tabs : utilisation du key au lieu de l'id comme identifiant unique
+- 31a12528 FIX - [m69679] - hornet-js-database: correction du bug sur les transactions
+- 13b86d3b FIX - [S300] - hornet-js-react-components - Content : ajouter props customValidators
+- e780539c FIX - [m69685] - hornet-js-react-components - CalendarField: Définir une valeur par défaut sur un composant CalendarField - prise en compte currentValue de type string
+- 492acd73 ajout de la gestion des versions
+- dcc42f23 FIX - [s734] hornet-js-react-components : Support crocus selectfield value number ne déclenche pas l'event select
+- 8fc317b0 FIX - [] : maj hornet-js-database.d.ts
+- 4ca83747 FIX - [s277]: hornet-js-react-components - Form : La validation de champ required ko sur un type number ou radioField - correction test unitaire
+- 4fb0362b FIX - [M0069663]: AutocompleteMultiField updateFields KO - TSLint correction
+- cb7d18a6 FIX - correction enregistrement multipleElement et check
+- 4fe32b40 FIX - [s277-703] - hornet-js-react-components : La validation de champ required ko sur un type number ou radioField
+- 39f9b33c FIX - [m69685] - hornet-js-react-components - CalendarField: Définir une valeur par défaut sur un composant CalendarField
+- 2e9f3951 FIX - [S254-694] - hornet-js-database : récupérer la clé primaire d'une table
+- 582f62f7 FIX - passage à typescript 3
+- 8e94dc66 FIX - [s278-700] - hornet-js-react-components - ActionButton : la props disabled n'est pas prise en compte
+- 375f5f74 FIX - hornet-js-utils : Correction test en erreur considéré comme passant
+- a2f9d89e FIX - hornet-js-test - test mocha: suppression chargement node_modules/test car gestion déjà présent dans le builder
+
 # hornet-js 5.1.0-rc3
 
 -	61981	-	Doc routes

@@ -31,7 +31,7 @@
       "error": "erreur"
     },
     "autoCompleteField": {
-      "resetTitle": "Effacer le champ {label}",
+      "resetTitle": "Effacer le champ {label, select, undefined {} others {{label}}}",
       "title": "Aide à la saisie d'un champ d'auto-completion",
       "toolTip": "Commencez la saisie et des propositions vous seront faites. Vous pouvez naviguer dans ces propositions à partir des flèches du clavier",
       "selectedItem": "{count, plural, =0 {aucun item sélectionné } =1 {1 item sélectionné} other {# items sélectionnés}}",
@@ -61,13 +61,13 @@
     }
   },
   "inputField": {
-    "resetTitle": "Effacer le champ {label}",
+    "resetTitle": "Effacer le champ {label, select, undefined {} others {{label}}}",
     "alertMessage": "Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum ({count}/{maxChar}).",
     "alertTitle":"Nombre de caractères trop élevé",
     "charLabel":"{count, plural, =0 {0 caractère} =1 {1 caractère} other {# caractères}}"
   },
   "autoComplete": {
-    "resetTitle": "Effacer le champ {label}"
+    "resetTitle": "Effacer le champ {label, select, undefined {} others {{label}}}"
   },
   "uploadFile": {
     "selectedFile": "{count, plural, =0 {aucun fichier sélectionné } =1 {1 fichier sélectionné} other {# items fichiers sélectionnés}}",
@@ -214,7 +214,7 @@
     "booleanNon": "non"
   },
   "textarea": {
-    "resetTitle": "Effacer le champ {label}",
+    "resetTitle": "Effacer le champ {label, select, undefined {} others {{label}}}",
     "alertMessage": "Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum ({count}/{maxChar}).",
     "alertTitle": "Nombre de caractères trop élevé",
     "charLabel": "{count, plural, =0 {0 caractère} =1 {1 caractère} other {# caractères}}"
@@ -251,7 +251,7 @@
     "previousYear": "Année précédente",
     "nextMonth": "Mois suivant",
     "previousMonth": "Mois précédent",
-    "resetTitle": "Effacer le champ {label}"
+    "resetTitle": "Effacer le champ {label, select, undefined {} others {{label}}}"
   },
   "changeLanguage": {
     "title": "Changer la langue",

@@ -1,3 +1,7 @@
+# hornet-js-database 5.2.2
+
+- 31a12528 FIX - [m69679] - hornet-js-database: correction du bug sur les transactions
+
 # hornet-js-database 5.2.0
 
 - EVOL - hornet-js-database : Ajout des loggers deprecated

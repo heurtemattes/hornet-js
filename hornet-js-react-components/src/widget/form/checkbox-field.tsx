@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,7 +90,6 @@ import {
 import * as _ from "lodash";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-
 
 export interface CheckBoxFieldProps extends AbstractFieldProps, HornetClickableProps,
     HornetBasicFormFieldProps {
@@ -110,13 +109,12 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
     public readonly props: Readonly<CheckBoxFieldProps>;
     public state: any;
 
-    static defaultProps = _.assign(AbstractField.defaultProps, {
+    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
         switch: false,
     });
 
     constructor(props?: CheckBoxFieldProps, context?: any) {
         super(props, context);
-
 
         if (props.readOnly) {
             // permet de désactiver le click lorsqu'uniquement readOnly par défaut
@@ -129,6 +127,19 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
                 off: this.i18n("form.checkbox.booleanNon"),
             };
         }
+    }
+
+        /**
+     * Méthode permettant de calculer les classNames du label
+     */
+    protected calculateLabelClassName():ClassDictionary {
+
+        const classes: ClassDictionary = {
+            ...super.calculateLabelClassName(),
+            "label-margin-right": true,
+        };
+        return classes;
+
     }
 
     /**
@@ -200,8 +211,9 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         const classNamesSpan: ClassDictionary = {
             check: true,
-            readonly: this.state.readOnly || this.state.disabled,
-            "has-error":this.hasErrors(), 
+            readonly: this.state.readOnly ,
+            disabled: this.state.disabled,
+            "has-error":this.hasErrors(),
         };
 
         return (
@@ -221,8 +233,11 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      * @param e
      */
     protected handleKeyDown(e) {
-        if (e.keyCode === KeyCodes.ENTER) {
+        if (e.keyCode === KeyCodes.ENTER && this.isNotInactive()) {
             this.setCurrentChecked(!this.getCurrentValue());
+            if (this.props.onChange) {
+                this.props.onChange(e);
+            }
             e.preventDefault();
             e.stopPropagation();
         }
@@ -233,6 +248,15 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      * @param e
      */
     protected handleClick(e) {
-        this.setCurrentChecked(!this.getCurrentValue());
+        if (this.isNotInactive()) {
+            this.setCurrentChecked(!this.getCurrentValue());
+        }
+    }
+
+    /**
+     * Indique si le checkbox est inactif (readOnly et/ou disabled) ou pas
+     */
+    private isNotInactive() {
+        return !this.state.disabled && !this.state.readonly;
     }
 }

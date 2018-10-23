@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -103,6 +103,8 @@ export interface EditionActionColumnProps extends ColumnProps {
     titleCancel?: string;
     /** chaine de remplacement des valeurs undefined dans le templating */
     replaceUndef?: string;
+    /** Fonction exécutée au moment de l'annulation de l'edition d'une ligne */
+    handleCancel?: Function;
 }
 
 /**

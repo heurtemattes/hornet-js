@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -115,7 +115,7 @@ class SelectFieldDataTest extends BaseTest {
             nom: "Yann-Yves"
         }, {
             id: "3",
-            nom: "Tediaga"
+            nom: "Tediaga",
         }, {
             id: "4",
             nom: "Florent"
@@ -147,7 +147,7 @@ class SelectFieldDataTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main1");
-        let htmlElement = document.getElementById("selectTypePartenaire1");
+        const htmlElement = document.getElementById("selectTypePartenaire1");
         HornetTestAssert.assertEquals(this.dataSet[0].id, (htmlElement as any).value, "SelectField doit être valorisé par le premier élément");
         this.end();
     };
@@ -193,7 +193,7 @@ class SelectFieldDataTest extends BaseTest {
 
         $element = this.renderIntoDocument(element, "main3");
 
-        let htmlElement = document.getElementById("selectTypePartenaire3");
+        const htmlElement = document.getElementById("selectTypePartenaire3");
         HornetTestAssert.assertEquals(this.dataSet[4].id, (htmlElement as any).value, "SelectField doit être valorisé avec l'élement ayant l'id 5");
 
         this.end();
@@ -201,5 +201,5 @@ class SelectFieldDataTest extends BaseTest {
 }
 
 
-//lancement des Tests
+// lancement des Tests
 runTest(new SelectFieldDataTest());

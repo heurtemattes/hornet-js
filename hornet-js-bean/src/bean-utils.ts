@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -131,8 +131,6 @@ export class BeanUtils {
 
     protected static _beforeCall(options) {
         // création d'une promesse
-        return new Promise((resolve, reject) => {
-
             const method: Methods = options.method;
             const clazz = options.clazz;
             const object: Object = options.object;
@@ -143,8 +141,7 @@ export class BeanUtils {
                 let result;
                 // Cas particuliers qui doivent retourner undefined
                 if (!clazz && method !== Methods.clone || !object || typeof object === "function") {
-                    resolve();
-                    return;
+                    return ;
                 }
 
 
@@ -158,7 +155,7 @@ export class BeanUtils {
                     // Mapping pour un object
                     result = BeanUtils._call({ method, clazz, object, config });
                 }
-                resolve(result);
+                return result;
             } catch (e) {
                 let error = e;
                 if (!(e instanceof TechnicalError)) {
@@ -166,10 +163,10 @@ export class BeanUtils {
                     error = new TechnicalError("ERR_TECH_BINDING", { message: msg }, e);
                 }
                 logger.error(e);
-                reject(error);
+                throw error;
             }
-        });
-    }
+        }
+    
 
     /**
      * Méthode statique qui permet de mapper un objet <source> vers un objet de type <targetClass>
@@ -178,7 +175,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static mapObject(targetClass, source, options?): Promise<any> {
+    static mapObject(targetClass, source, options?): any {
         return BeanUtils.map(targetClass, source, options);
 
     }
@@ -190,7 +187,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static mapArray(targetClass, source, options?): Promise<any> {
+    static mapArray(targetClass, source, options?): any {
         return BeanUtils.mapObject(targetClass, source, options);
     }
 
@@ -201,7 +198,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static map(targetClass, source, options?): Promise<any> {
+    static map(targetClass, source, options?): any {
         return BeanUtils._beforeCall({ method: Methods.map, clazz: targetClass, object: source, config: options });
     }
 
@@ -212,7 +209,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static serializeObject(targetClass, source, options?): Promise<any> {
+    static serializeObject(targetClass, source, options?): any {
         return BeanUtils.serialize(targetClass, source, options);
     }
 
@@ -223,7 +220,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static serializeArray(targetClass, source, options?): Promise<any> {
+    static serializeArray(targetClass, source, options?): any {
         return BeanUtils.serializeObject(targetClass, source, options);
     }
 
@@ -234,7 +231,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static serialize(targetClass, source, options?): Promise<any> {
+    static serialize(targetClass, source, options?): any {
         return BeanUtils._beforeCall({ method: Methods.serialize, clazz: targetClass, object: source, config: options });
     }
 
@@ -244,7 +241,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static cloneObject(source, options?): Promise<any> {
+    static cloneObject(source, options?): any {
         return BeanUtils.clone(source, options);
 
     }
@@ -255,7 +252,7 @@ export class BeanUtils {
      * @param options : options
      * vers un tableau de type <targetClass>@returns Promise
      */
-    static cloneArray(array, options?): Promise<any> {
+    static cloneArray(array, options?): any {
         return BeanUtils.cloneObject(array, options);
     }
 
@@ -265,7 +262,7 @@ export class BeanUtils {
      * @param options : options
      * @returns Promise
      */
-    static clone(source, options?): Promise<any> {
+    static clone(source, options?): any {
         return BeanUtils._beforeCall({ method: Methods.clone, object: source, config: options });
     }
     

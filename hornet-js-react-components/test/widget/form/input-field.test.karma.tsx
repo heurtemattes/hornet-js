@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,25 +83,25 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as React from "react";
 import * as assert from "assert";
-import { expect } from 'chai'
+import { expect } from "chai";
 
 import { InputField } from "src/widget/form/input-field";
 import { Form } from "src/widget/form/form";
 import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
-import { Utils } from 'hornet-js-utils';
+import { Utils } from "hornet-js-utils";
 
-
-let elementBase, elementWithValue, elementWithValueEtCompteur: JSX.Element;
+let elementBase, elementWithValue, elementWithValueEtCompteur, elementWithOnChange: JSX.Element;
 let $element;
 let count: number = 0;
+let onChangeCpt: number = 0;
 
-@Decorators.describe('Test Karma InputField')
+@Decorators.describe("Test Karma InputField")
 class InputFieldTest extends HornetReactTest {
     protected inputField;
 
     @Decorators.beforeEach
     beforeEach() {
-        Utils.setCls("hornet.internationalization", { messages: messages });
+        Utils.setCls("hornet.internationalization", { messages });
         count++;
         elementBase = (
             <InputField name="prenom"
@@ -140,28 +140,40 @@ class InputFieldTest extends HornetReactTest {
             displayMaxCharInLabel={true}
             displayCharNumber={true}
             showAlert={true}
-        />)
-    };
+        />);
 
-    @Decorators.it('Test OK')
+        elementWithOnChange = (
+            <InputField name="testOnChange"
+                id="testOnChange"
+                label={"testOnChange"}
+                required={true}
+                requiredLabel="testOnChange"
+                maxLength={50}
+                resettable={true}
+                onChange={() => {onChangeCpt = 1; }}
+            />
+        );
+    }
+
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
     @Decorators.it("Vérifier l'existence du champ Input")
     testInput() {
         $element = this.renderIntoDocument(elementBase, "main1");
-        expect(document.querySelector('#main1 #prenom'), "Problème élément Input non trouvé").to.exist;
+        expect(document.querySelector("#main1 #prenom"), "Problème élément Input non trouvé").to.exist;
         this.end();
-    };
+    }
 
     @Decorators.it("Vérifier la non existence du bouton reset lorsqu'un champ est vide")
     testNoResetButton() {
         $element = this.renderIntoDocument(elementBase, "main2");
-        expect(document.querySelector('#main2 #prenomResetButton.input-reset.input-reset-hidden'), "bouton reset trouvé").to.not.exist;
+        expect(document.querySelector("#main2 #prenomResetButton.input-reset.input-reset-hidden"), "bouton reset trouvé").to.not.exist;
         this.end();
-    };
+    }
 
     @Decorators.it("Vérifier l'existence du bouton reset lorsqu'un champ est valorisé")
     testResetButton() {
@@ -175,13 +187,13 @@ class InputFieldTest extends HornetReactTest {
         const elementWithReverseLabel = (<InputField name="testReverseLabel"
             label={"testReverseLabel"}
             reverseLabel={true}
-        />)
+        />);
         const id = this.generateMainId();
         this.renderIntoDocument(elementWithReverseLabel, id);
-        setTimeout(() =>{
+        setTimeout(() => {
             expect(document.querySelector(`#${id} .abstractfield-container-reverse-label`)).to.exist;
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test du compte de caractère")
@@ -194,7 +206,7 @@ class InputFieldTest extends HornetReactTest {
             expect(charLabel).to.exist;
             expect(charLabel.innerHTML).to.equals("1 caractère");
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test du compte de caractère avec setCurrentValue")
@@ -207,7 +219,7 @@ class InputFieldTest extends HornetReactTest {
             expect(charLabel.innerHTML).to.equals("5 caractères");
             expect(charLabel.className).to.be.equals("chars-counter");
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test de l'affichage de l'alerte avec setCurrentValue")
@@ -231,7 +243,7 @@ class InputFieldTest extends HornetReactTest {
 
             (alertOk as any).click();
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test de l'affichage de l'alerte avec setCurrentValue")
@@ -258,7 +270,7 @@ class InputFieldTest extends HornetReactTest {
 
             (alertOk as any).click();
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test de non activation du compteur")
@@ -275,7 +287,7 @@ class InputFieldTest extends HornetReactTest {
             expect(inputPrenom.getAttribute("aria-labelledby")).to.be.equals("prenom-span-label");
             expect(charLabel).to.be.null;
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test de l'activation de l'alerte si dernier caractere est espace")
@@ -296,7 +308,7 @@ class InputFieldTest extends HornetReactTest {
             expect(alertOk).to.exist;
             (alertOk as any).click();
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test de l'affichage du label sans maxChar")
@@ -306,7 +318,7 @@ class InputFieldTest extends HornetReactTest {
         setTimeout(() => {
             expect(label.innerHTML).to.be.equal("prénom");
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test de l'affichage du label avec maxChar")
@@ -316,7 +328,7 @@ class InputFieldTest extends HornetReactTest {
         setTimeout(() => {
             expect(label.innerHTML).to.be.equal("Nom (limite 25 caractères)");
             this.end();
-        }, 250);
+        },         250);
     }
 
     @Decorators.it("Test des attributs RGAA")
@@ -332,7 +344,22 @@ class InputFieldTest extends HornetReactTest {
             expect(charLabel.getAttribute("role")).to.be.equals("log");
 
             this.end();
-        }, 250);
+        },         250);
+    }
+
+    @Decorators.it("Test onChange après click bouton reset")
+    testOnChangeOnReset() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithOnChange, id);
+        setTimeout(() => {
+            const input = document.querySelector(`#${id} #testOnChange`) as HTMLTextAreaElement;
+            this.triggerKeydownEvent(input, "m", 77, true);
+            this.triggerMouseEvent(document.querySelector(`#${id} .input-reset`), "click");
+            setTimeout(() => {
+                expect(onChangeCpt).to.be.equal(1);
+                this.end();
+            },         250);
+        },         250);
     }
 
 }

@@ -1,3 +1,16 @@
+# Montée de version vers Hornet.js 5.2.2
+
+## prototypage de la localisation des logs
+
+La nomenclature des log node.js répondant aux normes syslogae impose de modifier les variables du fichier `log4s-instance.json`. En effet, le filename devient:
+
+```
+
+"filename":"#{NODE_LOG_DIR}-#{INSTANCE}/#{APPLICATION_CONTEXT_ROOT}/#{APPLICATION_CONTEXT_ROOT}.log",
+
+```
+
+
 # Montée de version vers Hornet.js 5.2.0
 
 ## Injection de service dans l'injector context

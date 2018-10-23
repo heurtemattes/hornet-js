@@ -17,6 +17,12 @@
       "description": "Description du secteur",
       "type": "string",
       "maxLength": 200
+    },
+    "date": {
+      "description": "Date de départ : doit être supérieure ou égale à une constante (01/01/1900 au format ISO 8601)",
+      "type": "string",
+      "format": "date-time",
+      "formatMinimum": "1900-01-01T00:00:00-00:00"
     }
   }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,6 @@ import * as classNames from "classnames";
 import { Accordion, TAB_ID_NAME } from "src/widget/accordion/accordion";
 import { GroupComponent, GroupComponentProps } from "src/widget/group/abstract-group-component";
 import * as _ from "lodash";
-
 
 const logger = Utils.getLogger("hornet-js-react-components.widget.accordion.accordions");
 
@@ -150,7 +149,6 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
 
         return visibleAccordion;
     }
-
 
     /**
      * controle de l'action sur le clique
@@ -222,9 +220,15 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
             }
         } else {
             const tabIndex = _.cloneDeep(this.state.tabIndex);
-            this.state.children.map((child, i) => {
-                tabIndex[ i ] = (i === index) ? 0 : -1;
-            });
+            if (this.state.children) {
+                if (this.state.children.length > 1 ) {
+                    this.state.children.map((child, i) => {
+                        tabIndex[ i ] = (i === index) ? 0 : -1;
+                    });
+                }else {
+                    tabIndex[ 0 ] = (0 === index) ? 0 : -1;
+                }
+            }
             this.setState({ tabIndex });
         }
     }

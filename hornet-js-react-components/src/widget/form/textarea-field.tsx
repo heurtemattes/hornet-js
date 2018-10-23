@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -137,8 +137,9 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
     shouldComponentUpdate(nextProps, nextState) {
         return this.state.valued !== nextState.valued
             || this.state.currentValue !== nextState.currentValue
-            || this.state.errors !== nextState.errors;
-
+            || this.state.errors !== nextState.errors
+            || this.state.readOnly !== nextState.readOnly
+            || this.state.disabled !== nextState.disabled;
     }
 
     /**
@@ -173,7 +174,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
 
         return (
             <div className={"textarea-container"}>
-                <textarea onChange={this.valueChange} ref={
+                <textarea onChange={this.valueChange} readOnly = {this.state.readOnly} ref={
                     (elt) => {
                         this.registerHtmlElement(elt);
                         this.element = elt;
@@ -188,10 +189,10 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
     /**
      * Surcharge de la méthode de la classe mère pour ajouter la limite autorisée si le nombre de caractères maximum est défini
      * et si la props displayMaxCharInLabel est true
-     * @param fieldId 
-     * @param fieldName 
-     * @param label 
-     * @param required 
+     * @param fieldId
+     * @param fieldName
+     * @param label
+     * @param required
      */
     renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
         let customLabel = label || "";
@@ -244,7 +245,6 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
         );
     }
 
-
     /**
      * rendu html du bouton reset
      * @returns {any}
@@ -290,7 +290,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
             this.resetValue();
             this.htmlElement.focus();
         }
-    }    
+    }
 
     protected getResetButtonId(): string {
         return this.props.id || this.props.name + "ResetButton";
@@ -356,12 +356,6 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
 
         // mise à jour du texte d'affichage du nombre de caractère
         const value = event.target.value;
-
-        // Empêcher la propagation de l'évènement pour ne pas que la modale se ferme systématiquement
-        // lorsque le event.target.value est 32 (touche espace).
-        // affichage de l'alerte
-        event.stopPropagation();
-
 
         if (value) {
             this.setState({ valued: true, currentValue: value });

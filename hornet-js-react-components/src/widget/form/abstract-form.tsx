@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,7 +95,6 @@ export interface AbstractFormProps extends HornetComponentProps {
     /** Indique que les champs enfatns sont désactivés */
     disabled?: boolean;
 }
-
 
 /**
  * Composant permettant de rendre un formulaire Hornet de manière standardisée
@@ -228,7 +227,7 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
         const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
         for (const name in fields) {
             const value: any = fields[ name ].getCurrentValue(removeEmptyStrings);
-            if (value !== "" || !removeEmptyStrings) {
+            if ((value !== "" && value !== null && !(fields[name].getType() === "number" && isNaN(value))) || !removeEmptyStrings) {
                 _.set(data, name, value);
             } else {
                 /* Le champ est vide : si son nom correspond à une arborescence d'objets, on s'assure tout de même

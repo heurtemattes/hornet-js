@@ -73,16 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-'use strict';
+"use strict";
 import { runTest } from "hornet-js-test/src/test-run";
 import "hornet-js-test/src/test-run";
 
-var chai = require('chai');
+const chai = require("chai");
 const expect = chai.expect;
 import * as _ from "lodash";
 import * as React from "react";
@@ -98,70 +98,69 @@ import { CalendarField } from "src/widget/form/calendar-field";
 let formElement: JSX.Element;
 let form;
 
-
-@Decorators.describe('Test Karma calendar-field')
+@Decorators.describe("Test Karma calendar-field")
 class CalendarFieldTest extends HornetReactTest {
 
     @Decorators.beforeEach
     beforeEach() {
 
         Utils.setCls("hornet.internationalization",
-            {
+                     {
                 messages: {
-                    "calendar": {
-                        "agendaTitle": "Agenda",
-                        "choiceDate": "Choisir une date",
-                        "today": "Aujourd'hui",
-                        "now": "Maintenant",
-                        "ok": "Ok",
-                        "clear": "Effacer",
-                        "month": "Mois",
-                        "year": "Année",
-                        "hourPanelTitle": "Choisir une heure",
-                        "minutePanelTitle": "Choisir une minute",
-                        "secondPanelTitle": "Choisir une seconde",
-                        "monthSelect": "Choisir un mois",
-                        "yearSelect": "Choisir une année",
-                        "decadeSelect": "Choisir une décade",
-                        "yearFormat": "YYYY",
-                        "dateFormat": "DD\u002FMM\u002FYYYY",
-                        "monthYearFormat": "MMMM YYYY",
-                        "monthFormat": "MMMM",
-                        "monthBeforeYear": true,
-                        "timezoneOffset": 60,
-                        "firstDayOfWeek": 1,
-                        "minimalDaysInFirstWeek": 1,
-                        "placeHolder": "JJ\u002FMM\u002FAAAA"
+                    calendar: {
+                        agendaTitle: "Agenda",
+                        choiceDate: "Choisir une date",
+                        today: "Aujourd'hui",
+                        now: "Maintenant",
+                        ok: "Ok",
+                        clear: "Effacer",
+                        month: "Mois",
+                        year: "Année",
+                        hourPanelTitle: "Choisir une heure",
+                        minutePanelTitle: "Choisir une minute",
+                        secondPanelTitle: "Choisir une seconde",
+                        monthSelect: "Choisir un mois",
+                        yearSelect: "Choisir une année",
+                        decadeSelect: "Choisir une décade",
+                        yearFormat: "YYYY",
+                        dateFormat: "DD\u002FMM\u002FYYYY",
+                        monthYearFormat: "MMMM YYYY",
+                        monthFormat: "MMMM",
+                        monthBeforeYear: true,
+                        timezoneOffset: 60,
+                        firstDayOfWeek: 1,
+                        minimalDaysInFirstWeek: 1,
+                        placeHolder: "JJ\u002FMM\u002FAAAA",
                     },
-                }
+                },
             });
 
         formElement = (
             <CalendarField name={"test"}
                 label={"Test date"} />
         );
-    };
+    }
 
-    @Decorators.it('Test OK')
+    @Decorators.it("Test OK")
     testOk() {
         assert.equal(1, 1);
         this.end();
-    };
+    }
 
-    @Decorators.it('Affichage du champs calendar')
+    @Decorators.it("Affichage du champs calendar")
     ShowElement() {
-        form = this.renderIntoDocument(formElement, "main1");
-        expect(document.querySelector("#main1 .calendar-input")).to.exist;
-        expect(document.querySelector("#main1 .agenda")).to.exist;
+        const id = this.generateMainId();
+        form = this.renderIntoDocument(formElement, id);
+        expect(document.querySelector(`#${id} .calendar-input`)).to.exist;
+        expect(document.querySelector(`#${id} .agenda`)).to.exist;
 
         this.end();
-    };
+    }
 
-
-    @Decorators.it('Test saisie de caractère non autorisé')
+    @Decorators.it("Test saisie de caractère non autorisé")
     controlInputElement() {
 
-        let SpecialCar = [
+        const specialCar = [
             { key: "²" }, { key: "<" }, { key: "&" }, { key: "é" }, { key: "~" }, { key: "#" },
             { key: "\"" }, { key: "{" }, { key: "\'" }, { key: "[" }, { key: "(" }, { key: "|" },
             { key: "`" }, { key: "è" }, { key: "_" }, { key: "\\" }, { key: "^" }, { key: "ç" },
@@ -169,39 +168,39 @@ class CalendarFieldTest extends HornetReactTest {
             { key: "=" }, { key: "}" }, { key: "£" }, { key: "$" }, { key: "¤" }, { key: "*" },
             { key: "µ" }, { key: "%" }, { key: "ù" }, { key: "!" }, { key: "§" }, { key: ":" },
             { key: "." }, { key: ";" }, { key: "?" }, { key: "," }, { key: "<" }, { key: ">" },
-            { key: "æ" }, { key: "«" }, { key: "ð" }, { key: "¹" }, { key: "”" }, { key: "ß" }
+            { key: "æ" }, { key: "«" }, { key: "ð" }, { key: "¹" }, { key: "”" }, { key: "ß" },
         ];
-
-        form = this.renderIntoDocument(formElement, "main2");
-        let dateInput = (document.querySelector("#main2 .calendar-input"));
+        const id = this.generateMainId();
+        form = this.renderIntoDocument(formElement, id);
+        const dateInput = (document.querySelector(`#${id} .calendar-input`));
 
         setTimeout(() => {
 
-            SpecialCar.forEach((char, index) => {
+            specialCar.forEach((char, index) => {
                 this.triggerKeyPressEvent(dateInput, char.key, char.key.charCodeAt(0), false);
                 expect(this.isPreventDefault, "Impossible de saisir le caractère : " + char.key).be.true;
             });
 
             this.end();
-        }, 2500);
-    };
-
+        },         2500);
+    }
 
     @Decorators.it("Test saisie date valide")
     controlInvalidDateElement() {
+        const id = this.generateMainId();
         form = this.renderIntoDocument(<CalendarField valideOnForm={false} label={"Test date"}
-            name="dateTest" />, "main3");
+            name="dateTest" />,        id);
 
-        let dateInput = (document.querySelector("#main3 .calendar-input"));
+        const dateInput = (document.querySelector(`#${id} .calendar-input`));
 
         setTimeout(() => {
             this.triggerKeyPressEvent(dateInput, "24/10/2012", 0, true);
-            //this.triggerFocusOnElement(dateInput);
-            this.triggerFocusOnElement(document.querySelector("#main3 .agenda"));
+            // this.triggerFocusOnElement(dateInput);
+            this.triggerFocusOnElement(document.querySelector(`#${id} .agenda`));
 
-            expect(document.querySelector("#main3 .fielderror-content")).to.not.exist;
+            expect(document.querySelector(`#${id} .fielderror-content`)).to.not.exist;
             this.end();
-        }, 2500);
+        },         2500);
     }
 
     @Decorators.it("Test selection d'une date dans la boite de dialogue")
@@ -210,29 +209,91 @@ class CalendarFieldTest extends HornetReactTest {
         let onSelectCount = 0;
         let onChangeCount = 0;
         let onValueChangeCount = 0;
-
-        form = this.renderIntoDocument(<CalendarField valideOnForm={false} label={"Test date"}
-            name="dateTest" onSelect={(value) => { onSelectCount++; }} onChange={(value) => { onChangeCount++; }} onValueChange={(value) => { onValueChangeCount++; }} />, "main5");
+        const id = this.generateMainId();
+        form = this.renderIntoDocument(
+            <CalendarField
+                valideOnForm={false}
+                label={"Test date"}
+                name="dateTest"
+                onSelect={(value) => { onSelectCount++; }}
+                onChange={(value) => { onChangeCount++; }}
+                onValueChange={(value) => { onValueChangeCount++; }} />
+            , id);
 
         setTimeout(() => {
 
-            this.triggerMouseEvent(document.querySelector("#main5 .agenda"), "click");
+            this.triggerMouseEvent(document.querySelector(`#${id} .agenda`), "click");
 
             expect(document.querySelector(".widget-dialogue-header")).to.exist;
 
             this.triggerMouseEvent(document.querySelector(".rc-calendar-selected-day"), "click");
 
-            expect((document.querySelector("#main5 #dateTest") as any).value).to.be.equal(moment().locale('fr').format("DD/MM/YYYY"));
+            expect((document.querySelector(`#${id} #dateTest`) as any).value).to.be.equal(moment().locale("fr").format("DD/MM/YYYY"));
 
-            this.triggerMouseEvent(document.querySelector("#main5 #dateTestResetButton a"), "click");
+            this.triggerMouseEvent(document.querySelector(`#${id} #dateTestResetButton a`), "click");
 
             expect(onSelectCount, "selectCount").to.be.equal(2);
             expect(onChangeCount, "changeCount").to.be.equal(1);
             expect(onValueChangeCount, "valueChangeCount").to.be.equal(2);
 
+            this.end();
+        },         3000);
+    }
+
+    @Decorators.it("Test prise en compte de la props alt si présente")
+    testPorpsAlt() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(
+            <CalendarField
+                valideOnForm={false}
+                label={"Test date alt props"}
+                alt={"test alt props"}
+                name="dateTestAltProps"
+                onSelect={(value) => { }}
+                onChange={(value) => { }}
+                onValueChange={(value) => { }}
+            />
+            , id);
+
+        setTimeout(() => {
+            expect(document.querySelector(`#${id} img`)).to.exist;
+            expect((document.querySelector(`#${id} img`) as any).alt).to.equal("test alt props");
+            expect(document.querySelector(`#${id} input`)).to.exist;
+            expect((document.querySelector(`#${id} input`) as HTMLInputElement).hasAttribute("alt")).to.be.false;
 
             this.end();
-        }, 3000);
+        },         120);
+
+    }
+
+    @Decorators.it("Valorisation du composant avec une currentValue")
+    SetCurrentValue() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(
+            <CalendarField
+                valideOnForm={false}
+                label={"Test date alt props"}
+                alt={"test alt props"}
+                name="dateTestAltProps"
+                currentValue={new Date("2015-03-25") as any}
+            />
+            , id);
+
+        setTimeout(() => {
+            expect(document.querySelector(`#${id} .calendar-input`)).to.exist;
+            expect(document.querySelector(`#${id} .agenda`)).to.exist;
+            /** Le Champ Input Est bien valorisé */
+            expect((document.querySelector(`#${id} .calendar-input`) as any).value).to.equal("25/03/2015");
+
+            /** La date sélectionnée dans la modal est la bonne */
+            this.triggerMouseEvent(document.querySelector(`#${id} .agenda`), "click");
+            expect((document.querySelector(`.dialog-content-alert .rc-calendar-date[aria-selected="true"]`) as any)
+                .innerHTML).to.equal("25");
+
+            this.triggerMouseEvent(document.querySelector(`.hornet-button.hornet-dialogue-croix`), "click");
+            this.end();
+        }
+            ,      300);
     }
 
     /*
@@ -257,7 +318,31 @@ class CalendarFieldTest extends HornetReactTest {
 
 */
 
+    @Decorators.it("Valorisation du composant avec une currentValue de type string")
+    valorisationDateEnString() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(
+            <CalendarField
+                label={"Test date string"}
+                alt={"Test date string"}
+                name="dateStringTest"
+                currentValue={"26/03/1986"}
+            />
+            , id);
+
+         /** Le Champ Input Est bien valorisé */
+         expect((document.querySelector(`#${id} .calendar-input`) as any).value).to.equal("26/03/1986");
+
+         /** La date sélectionnée dans la modal est la bonne */
+         this.triggerMouseEvent(document.querySelector(`#${id} .agenda`), "click");
+         expect((document.querySelector(`.dialog-content-alert .rc-calendar-date[aria-selected="true"]`) as any)
+             .innerHTML).to.equal("26");
+
+         this.triggerMouseEvent(document.querySelector(`.hornet-button.hornet-dialogue-croix`), "click");
+         this.end();
+    }
+
 }
 
-//lancement des Tests
+// lancement des Tests
 runTest(new CalendarFieldTest());

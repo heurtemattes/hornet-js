@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.1.0
+ * @version v5.2.2
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -112,7 +112,7 @@ class SelectFieldDataSourceTest extends BaseTest {
             label: "Wilfried"
         }, {
             value: "2",
-            label: "Yann-Yves"
+            label: "Yann-Yves",
         }, {
             value: "3",
             label: "Tediaga"
@@ -141,7 +141,6 @@ class SelectFieldDataSourceTest extends BaseTest {
     protected dataSource4: DataSource<any> = new DataSource<any>(this.dataSet);
     protected dataSource5: DataSource<any> = new DataSource<any>(this.dataSet);
     protected dataSource6: DataSource<any> = new DataSource<any>(this.dataSet);
-    protected tableDataSource: DataSource<any> = new DataSource<any>(this.tableDataSet);
 
     @Decorators.it('Test OK')
     testOk() {
@@ -163,7 +162,7 @@ class SelectFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main1");
-        let htmlElement = document.getElementById("selectTypePartenaire1");
+        const htmlElement = document.getElementById("selectTypePartenaire1");
         HornetTestAssert.assertEquals(this.dataSet[ 0 ].value, (htmlElement as any).value, "SelectField doit être valorisé par le premier élément");
         HornetTestAssert.assertEquals(undefined, this.dataSource1.selected, "Le dataSource ne doit pas être valorisé");
         this.end();
@@ -214,7 +213,7 @@ class SelectFieldDataSourceTest extends BaseTest {
 
         $element = this.renderIntoDocument(element, "main3");
 
-        let htmlElement = document.getElementById("selectTypePartenaire3");
+        const htmlElement = document.getElementById("selectTypePartenaire3");
         HornetTestAssert.assertEquals(this.dataSet[ 4 ].value, (htmlElement as any).value, "SelectField doit être valorisé avec l'élement ayant l'id 5");
         HornetTestAssert.assertEquals(this.dataSet[ 4 ], this.dataSource3.selected, "Le dataSource doit être valorisé avec l'élement ayant l'id 5");
 
@@ -238,7 +237,7 @@ class SelectFieldDataSourceTest extends BaseTest {
         this.dataSource4.on("select", (result) => {
             if (!passed) {
                 passed = true;
-                let htmlElement = document.getElementById("selectTypePartenaire4");
+                const htmlElement = document.getElementById("selectTypePartenaire4");
                 HornetTestAssert.assertEquals(this.dataSet[ 0 ].value, (htmlElement as any).value, "SelectField doit être valorisé avec l'élement ayant l'id 1 par défaut, c'est au projet de se mettre à jour");
                 HornetTestAssert.assertEquals(this.dataSet[ 3 ], this.dataSource4.selected, "Le dataSource doit être valorisé avec l'élement ayant l'id 4");
 
@@ -263,61 +262,57 @@ class SelectFieldDataSourceTest extends BaseTest {
         );
 
         this.dataSource5.on("fetch", (result) => {
-            let htmlElement = document.getElementById("selectTypePartenaire5");
+            const htmlElement = document.getElementById("selectTypePartenaire5");
             HornetTestAssert.assertEquals(this.dataSet[ 0 ].value, (htmlElement as any).value, "SelectField doit être valorisé par le premier élément");
             HornetTestAssert.assertEquals(undefined, this.dataSource1.selected, "Le dataSource ne doit pas être valorisé");
             this.end();
         });
         $element = this.renderIntoDocument(element, "main5");
-        let htmlElement = document.getElementById("selectTypePartenaire5");
+        const htmlElement = document.getElementById("selectTypePartenaire5");
         HornetTestAssert.assertEquals(this.dataSet[ 0 ].value, (htmlElement as any).value, "SelectField doit être valorisé par le premier élément");
         HornetTestAssert.assertEquals(undefined, this.dataSource1.selected, "Le dataSource ne doit pas être valorisé");
         this.dataSource5.add(true, { id: "8", nom: "Vincent" });
     };
 
-    // @Decorators.it("Test selectfield avec datasource dans un tableau")
-    // testSelectField6() {
-    //     element = (
-    //         <div id="main6">
-    //             <Form id={"testForm-6"}>
-    //                 <Table id="lite">
-    //                     <Header title={"Team"}>
-    //                     </Header>
-    //                     <Content dataSource={this.tableDataSource}>
-    //                         <Columns>
-    //                             <Column keyColumn={"cas"} title={"Cas"}>
-    //                             </Column>
-    //                             <ButtonSelectColumn btnId={"selectFieldId"}
-    //                                                 btnText={"Type de partenaire"}
-    //                                                 keyColumn={"nom"}
-    //                                                 datasource={this.dataSource6}
-    //                                                 keyColumnId={"developer"}/>
-    //                         </Columns>
-    //                     </Content>
-    //                 </Table>
-    //             </Form>
-    //         </div>
-    //     );
-    //
-    //     $element = this.renderIntoDocument(element, "main6");
-    //
-    //     this.dataSource6.on("select", (result) => {
-    //         debugger;
-    //         this.end();
-    //     });
-    //
-    //     let htmlElement = document.getElementById("lite-0.0.nom");
-    //     HornetTestAssert.assertEquals(this.dataSet[1].value, (htmlElement as any).value, "SelectField doit être valorisé par l'élement 2");
-    //
-    //     htmlElement = document.getElementById("lite-0.1.nom");
-    //     HornetTestAssert.assertEquals(this.dataSet[2].value, (htmlElement as any).value, "SelectField doit être valorisé par l'élement 3");
-    //
-    //     htmlElement = document.getElementById("lite-0.2.nom");
-    //     HornetTestAssert.assertEquals(this.dataSet[3].value, (htmlElement as any).value, "SelectField doit être valorisé par l'élement 4");
-    // };
+    @Decorators.it("Test selectfields avec datasource mappé")
+    testSelectFieldMapped() {
+        let passed: boolean = false;
+
+        let options = [
+            {id: 1, libelle: "option 1"},
+            {id: 2, libelle: "option 2"},
+            {id: 3, libelle: "option 3"},
+            {id: 4, libelle: "option 4"},
+        ];
+
+        let dataSourceOption = new DataSource<any>(options, {value: "id", label: "libelle"});
+
+        element = (
+            <SelectField
+                name= {"optionlist"}
+                label= {"liste d'option"}
+                dataSource= {dataSourceOption}
+                ref={(element) => { this.referencedElement = element }}
+            />
+        );
+        dataSourceOption.on("select", (result) => {
+            if (!passed) {
+                HornetTestAssert.assertEquals(options[3].id, dataSourceOption.selected.value, "Le dataSource doit être valorisé avec l'élement ayant l'id 4");
+                HornetTestAssert.assertEquals(options[3].libelle, dataSourceOption.selected.label, `Le dataSource doit être valorisé avec l'élement ayant le libelle "option 4"`);
+                passed = true;
+                this.end();
+            }
+        });
+
+        $element = this.renderIntoDocument(element, "mainTestSelectFieldMapped");
+        this.referencedElement.setCurrentValue("4");
+
+        let htmlElement = document.getElementById("optionlist");
+        HornetTestAssert.assertEquals(options[3].id, (htmlElement as any).value, "SelectField doit être valorisé avec l'élement ayant l'id 4");
+    }
 
 }
 
 
-//lancement des Tests
+// lancement des Tests
 runTest(new SelectFieldDataSourceTest());
