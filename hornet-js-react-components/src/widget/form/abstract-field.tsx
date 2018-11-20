@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -137,7 +137,6 @@ export interface HornetClickableProps
     extends ReactBasicMouseDOMAttributes,
     ReactSelectDOMAttributes {
 }
-
 
 export interface HornetMediaProps
     extends HTMLStandardMediaAttributes,
@@ -559,7 +558,6 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         this.makeState(this.state as any);
     }
 
-
     componentDidMount() {
         this.mounted = true;
         if (this.htmlElement) {
@@ -596,7 +594,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
     componentWillReceiveProps(nextProps: any, nextContext: any): void {
         for (const key in nextProps) {
             /* On doit s'assurer que chaque propriété a effectivement changé, car componentWillReceiveProps peut aussi
-             * être appelée alors qu'aucune propriété n'a changé 
+             * être appelée alors qu'aucune propriété n'a changé
              * (cf.http://facebook.github.io/react/blog/2016/01/08/A-implies-B-does-not-imply-B-implies-A.html)
              * Dans ce cas cela poserait problème, car l'état pourrait avaoir été modifié
              * via un setter alors que la propriété utilisée initialement pour le constructeur n'a pas changé.*/
@@ -619,11 +617,12 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         }
     }
 
-
     /**
       * @inheritDoc
       */
     render(): JSX.Element {
+
+        logger.debug("AbstractField render : ", this.state.id ? this.state.id : this.state.name);
 
         let type: string = this.state.type;
         if (type) {
@@ -754,7 +753,6 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         }
         return this;
     }
-
 
     setErrorComponent(errorComponent: ComponentClass<FieldErrorProps>, callback?: () => any): this {
         this.setState({ errorComponent }, callback);
@@ -988,7 +986,6 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         delete htmlProps["label"];
         return htmlProps;
     }
-
 
     /**
      * Génère le rendu de l'élément permettant la saisie. A implémenter dans les sous-classes.

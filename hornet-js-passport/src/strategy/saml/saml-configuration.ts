@@ -72,10 +72,10 @@
 /**
  * hornet-js-passport - Gestion d'authentification
  *
- * @author 
- * @version v5.2.2
+ * @author
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
- * @license 
+ * @license
  */
 
 /**
@@ -120,7 +120,6 @@ export class SamlConfiguration {
     connexionComponent: any;
     isMetadataAccessible: boolean;
 
-
     /**
      *
      * @param appLoginPath path relatif de l'application déclenchant le process de connexion
@@ -140,15 +139,13 @@ export class SamlConfiguration {
         this.privateCert = this.decryptionPvk = privateCert;
         this.availableIdp = availableIdp;
         this.verifyFunction = verifyFunction;
-        this.isMetadataAccessible = isMetadataAccessible || false;
-
+        this.isMetadataAccessible = isMetadataAccessible || true;
 
         this.identifierFormat = this.identifierFormat || null;
         this.validateInResponseTo = this.validateInResponseTo || false;
         this.disableRequestedAuthnContext = this.disableRequestedAuthnContext || true;
         this.signatureAlgorithm = this.signatureAlgorithm || "sha1";
         this.acceptedClockSkewMs = this.acceptedClockSkewMs || -1;
-
 
         if (Array.isArray(this.availableIdp) && this.availableIdp.length === 1) {
             this.idp = this.availableIdp[ 0 ];

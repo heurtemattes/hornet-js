@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -148,12 +148,12 @@ class tabsTest extends BaseTest {
                 <Tab title="tab1" id="test784">
                     <div>TabContent1</div>
                 </Tab>
-                <Tab title="tab2" id="test788">
-                    <div>TabContent2</div>
-                </Tab>
-                <Tab id="test785" title="tab3" mount={false} onClick={fnt} onSelect={(select: boolean) => {
+                <Tab title="tab2" id="test788" onSelect={(tab: Tab, select: boolean) => {
                     select === true ? onSelectCount += 10 : onSelectCount += 1;
                 }}>
+                    <div>TabContent2</div>
+                </Tab>
+                <Tab id="test785" title="tab3" mount={false} onClick={fnt} >
                     <TabHeader>tab3 Async</TabHeader>
                     <TabContent dataSource={dataSource}>
                         <Table id="lite">
@@ -205,18 +205,18 @@ class tabsTest extends BaseTest {
         setTimeout(() => {
             tabs = this.renderIntoDocument(tabsElement, id);
             setTimeout(() => {
-                this.triggerMouseEvent(document.querySelector(`#${id} #tabs-2`), "focus");
                 expect(beforeHideTabCount).to.equal(1);
                 expect(afterShowTabCount).to.equal(2);
+                this.triggerMouseEvent(document.querySelector(`#${id} #tabs-2`), "focus");
+                setTimeout(() => {
+                    expect(beforeHideTabCount).to.equal(2);
+                    expect(afterShowTabCount).to.equal(3);
+                    expect(onSelectCount).to.equal(11);
+                    this.end();
+                }, 250);
             }, 250);
 
             this.triggerMouseEvent(document.querySelector(`#${id} #tabs-1`), "focus");
-            setTimeout(() => {
-                expect(beforeHideTabCount).to.equal(2);
-                expect(afterShowTabCount).to.equal(3);
-                expect(onSelectCount).to.equal(11);
-            }, 250);
-            this.end();
         }, 250);
     }
 

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,6 +81,10 @@
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.row");
 
 /**
  * Propriétés d'une ligne de formulaire
@@ -148,15 +152,16 @@ export class Row extends HornetComponent<RowProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Row render");
         /* Affecte automatiquement la classe pure css aux noeuds enfants qui n'en ont pas */
         const fraction: number = this.props.fraction || this.getPureChildFraction();
         let className = "";
-        if(!this.props.fraction) {
+        if (!this.props.fraction) {
             className = "has-gutter ";
         } else {
             className = "fraction ";
         }
-        className += this.state.className
+        className += this.state.className;
         if (fraction !== 1) {
             className += "-" + fraction;
         }

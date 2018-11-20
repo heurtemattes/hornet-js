@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -111,4 +111,14 @@ export class ObjectUtils {
         }
         return res;
     }
+
+    /**
+     * Teste si une object n'est pas vide
+     * @param {Object} obj objet à tester
+     * renvoie true si l'objet n'est pas undefined, ni null et comporte au moins une clé énumérée
+     */
+    static isNotEmpty(obect: any) {
+        return typeof(obect) !== "undefined" && obect !== null && Object.keys(obect).length > 0
+    }
+
 }

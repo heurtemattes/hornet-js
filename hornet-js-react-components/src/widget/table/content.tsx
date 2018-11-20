@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -282,6 +282,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Table Content render : ", this.props.id ? this.props.id : this.props.name);
         logger.trace("rendu du tableau ", this.state.onSubmit ? "avec un formulaire" : "sans formulaire");
 
         // On réinitialise les tableau des ref liées aux Tr
@@ -620,7 +621,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 const Wrapped = HornetComponent.wrap(column.type, column, props, columnsProps);
                 Ths.push(<Wrapped key={"wc-" + props.key} />);
             } else {
-                Ths.push(React.createElement(column.type.getHeaderCell({ ...props, ...columnsProps }), { ...props, ...columnsProps }));
+
+                const masterProps = { ...props, ...columnsProps };
+                const cellProps = column.type.getCellProps(masterProps);
+                Ths.push(React.createElement(column.type.getHeaderCell({ ...masterProps, ...cellProps }), { ...masterProps, ...cellProps }));
             }
         });
 
@@ -647,7 +651,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     renderTBody(columns): JSX.Element {
         logger.trace("renderTBody ");
         const rows = [];
-        if (!(this.state.items && this.state.items.length > 0 && this.state.isContentVisible)) {
+         if (!(this.state.items && this.state.items.length > 0 && this.state.isContentVisible)) {
             // Cas d'un tableau sans résultats
             rows.push(this.renderDatatableMessage(this.state.emptyResult || this.i18n("table.emptyResult")));
         } else {
@@ -825,7 +829,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 tds.push(wrappedElement);
             } else {
                 const masterProps = { ...props, ...columnsProps };
-                tds.push(React.createElement(column.type.getBodyCell({ ...masterProps, ...column.type.getCellProps(masterProps) }), masterProps));
+                const cellProps = column.type.getCellProps(masterProps);
+                tds.push(React.createElement(column.type.getBodyCell({ ...masterProps, ...cellProps }), { ...masterProps, ...cellProps }));
             }
 
         });

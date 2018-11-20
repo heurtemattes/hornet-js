@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -265,7 +265,6 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
         this.paysDataSourceOnSelectListener();
         let _id = this.getTestId();
         this.eventEmitter.on(_id + "villeDataSourceOnFilter", (results: any[]) => {
-            console.log('villeDataSourceOnFilter', results, results.length)
             if (results.length != 0) {
                 expect(_.isEqual(results.length, 3), ("testSelectUnknownInSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
                 setTimeout(() => {

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,8 +81,11 @@
 import * as React from "react";
 import { SpinnerComponent, SpinnerProps } from "src/widget/spinner/spinner-component";
 import { UNIT_SIZE } from "src/widget/table/content";
-
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import * as classNames from "classnames";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.spinner-table");
 
 export interface SpinnerTableProps extends SpinnerProps {
     nbColumns?: number;
@@ -107,6 +110,7 @@ export class SpinnerLoader<P extends SpinnerTableProps, S extends SpinnerTablePr
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("SpinnerLoader render");
         return (
             this.state.isVisible ? this.renderLoader() : null
         );

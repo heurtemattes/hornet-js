@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-utils",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "license": "CECILL-2.1",
   "description": "Partie commune et utilitaire à tous les composants hornet-js",
   "bugs": {
@@ -12,8 +12,8 @@
   },
   "main": "./src/index.js",
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.2.2",
-    "hornet-js-test-dts": "5.2.2"
+    "hornet-js-ts-typings": "5.2.3",
+    "hornet-js-test-dts": "5.2.3"
   },
   "appDependencies": {
     "bluebird": "3.5.1",
@@ -30,7 +30,7 @@
   },
   "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.2.2"
+    "hornet-js-test": "5.2.3"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

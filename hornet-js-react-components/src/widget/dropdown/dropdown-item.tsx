@@ -73,15 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
-
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import EventHandler = __React.EventHandler;
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.dropdown-item");
 
 /**
  * Composant contenant les élements du dropdown
@@ -106,6 +109,8 @@ export class DropdownItem extends HornetComponent<any, any> {
      * @inheritDoc
      */
     render() {
+        logger.debug("DropdownItem render");
+
         let image;
         let checked = "";
         let rendu;

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -139,7 +139,6 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
             activeButtonLabel: this.state.buttonLabel,
         };
     }
-
 
     setReadOnlyFile(readOnlyFile: boolean, callback?: () => any): this {
         this.setState({ readOnlyFile }, callback);
@@ -207,6 +206,8 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * @returns {any}
      */
     renderWidget(): JSX.Element {
+
+        logger.debug("UploadFileField renderWidget : ", this.props.id ? this.props.id : this.state.name);
 
         let preview = "";
         if (this.props.renderPreviewFile) {

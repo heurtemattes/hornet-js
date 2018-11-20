@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -108,36 +108,43 @@ import { ActionColumn } from "src/widget/table/column/action-column";
 import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
 import { LineAfter } from "src/widget/table/line/line-after";
 
-/** Tableau de liste de secteurs */
-let dataSource: PaginateDataSource<any>;
-let tableElement: JSX.Element;
-let tableElementWithActionColumns: JSX.Element;
-let tableElementWithActionColumnsSupprimer: JSX.Element;
-let table;
-let data;
 
 @Decorators.describe("Test Karma table paginate")
 class tableTest extends BaseTest {
+    /** Tableau de liste de secteurs */
+    private dataSource: PaginateDataSource<any>;
+    private tableElement: JSX.Element;
+    private tableElementWithActionColumns: JSX.Element;
+    private tableElementWithActionColumnsSupprimer: JSX.Element;
+    private table;
+    private data;
+    private id;
 
-    @Decorators.beforeEach
-    beforeEach() {
-        data = [];
+    @Decorators.before
+    before() {
+        this.data = [];
         let step = 1;
         for (let i: number = 1; i < 50; i++) {
-            data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
+            this.data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
-
-        dataSource = new PaginateDataSource<any>(data, {
+    }
+    
+    @Decorators.beforeEach
+    beforeEach() {
+        if(this.dataSource) {
+            this.dataSource.removeAllListeners();
+        }
+        this.dataSource = new PaginateDataSource<any>(this.data, {
             pageIndex: 0,
             itemsPerPage: 10,
             totalItems: 0,
         }, {});
 
-        tableElement = (
+        this.tableElement = (
             <Table id="lite">
                 <Header title={"Secteurs"}>
                 </Header>
-                <Content dataSource={dataSource}>
+                <Content dataSource={this.dataSource}>
                     <Columns>
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
@@ -145,16 +152,16 @@ class tableTest extends BaseTest {
                     </Columns>
                 </Content>
                 <Footer>
-                    <Pager dataSource={dataSource} id="maTable-paginate" />
+                    <Pager dataSource={this.dataSource} id="maTable-paginate" />
                 </Footer>
             </Table>
         );
 
-        tableElementWithActionColumns = (
+        this.tableElementWithActionColumns = (
             <Table id="table-with-action-column">
                 <Header title={"Secteurs"}>
                 </Header>
-                <Content dataSource={dataSource}>
+                <Content dataSource={this.dataSource}>
                     <Columns>
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
@@ -162,24 +169,25 @@ class tableTest extends BaseTest {
                         <ActionColumn keyColumn="editer"
                             srcImg={Picto.blue.editer}
                             alt={"Editer {label}"}
-                            action={() => { }} />
+                            action={() => { }}
+                            keyShouldComponentUpdate="id"/>
                         <MoreInfoColumn keyColumn="idMore" visible={(value) => true}
                             alt={"Plus d'info sur {label} {desc}"}
-                            headers={["label", "desc"]}>
+                            headers={[ "label", "desc" ]}>
                         </MoreInfoColumn>
                     </Columns>
                 </Content>
                 <Footer>
-                    <Pager dataSource={dataSource} id="maTable-paginate-with-action-column" />
+                    <Pager dataSource={this.dataSource} id="maTable-paginate-with-action-column" />
                 </Footer>
             </Table>
         );
 
-        tableElementWithActionColumnsSupprimer = (
+        this.tableElementWithActionColumnsSupprimer = (
             <Table id="table-with-action-column-supprimer">
                 <Header title={"test"}>
                 </Header>
-                <Content dataSource={dataSource}>
+                <Content dataSource={this.dataSource}>
                     <Columns>
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
@@ -189,11 +197,19 @@ class tableTest extends BaseTest {
                             titleAlert={"Suppression de ${label} alert title"}
                             messageAlert={"Voulez-vous vraiment supprimer ${label}"}
                             alt={"Supprimer {label}"}
-                            action={() => { }} />
+                            action={() => { }}
+                            keyShouldComponentUpdate="id" />
+                        <ActionColumn keyColumn="editer"
+                            srcImg={Picto.white.supprimer}
+                            alt={"Editer {label}"}
+                            hasPopUp={true}
+                            action={() => { }}
+                            visible={(value) => value.label !== "libelle1"}
+                            keyShouldComponentUpdate="id" />
                     </Columns>
                 </Content>
                 <Footer>
-                    <Pager dataSource={dataSource} id="maTable-paginate-with-action-column-supprimer" />
+                    <Pager dataSource={this.dataSource} id="maTable-paginate-with-action-column-supprimer" />
                 </Footer>
             </Table>
         );
@@ -207,87 +223,86 @@ class tableTest extends BaseTest {
 
     @Decorators.it("afficher 10 éléments par page à l'init")
     selectionUnElement() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        expect(document.querySelectorAll(`#${id} .datatable-data tr`).length).to.equal(10);
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElement, this.id);
+        expect(document.querySelectorAll(`#${this.id} .datatable-data tr`).length).to.equal(10);
         this.end();
     }
 
     @Decorators.it("afficher la dernière page")
     goToLastPage() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSource.on("pagination", (value) => {
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSource.on("pagination", (value) => {
             expect(value.list.length).to.equal(9);
-            expect(value.list[0].id).to.equal(41);
-            expect(document.querySelector(`#${id} .datatable-data #lite-0-colBody-0-1`).innerHTML, value.list[0].label);
+            expect(value.list[ 0 ].id).to.equal(41);
+            expect(document.querySelector(`#${this.id} .datatable-data #lite-0-colBody-0-1`).innerHTML, value.list[ 0 ].label);
             this.end();
         });
-        this.triggerMouseEvent(document.querySelector(`#${id} .datatable-pagination-button-lastpage`), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} .datatable-pagination-button-lastpage`), "click");
     }
 
     @Decorators.it("supprimer la selection")
     deleteSelectedItem() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSource.on("delete", () => {
-            expect(dataSource.selected === undefined).to.true;
-            expect(document.querySelectorAll(`#${id} .datatable-data tr`).length).to.equal(10);
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSource.on("delete", () => {
+            expect(this.dataSource.selected === undefined).to.true;
+            expect(document.querySelectorAll(`#${this.id} .datatable-data tr`).length).to.equal(10);
             this.end();
         });
-        dataSource.on("select", (value) => {
-            if (value.length > 0) dataSource.deleteAll();
+        this.dataSource.on("select", (value) => {
+            if (value.length > 0) this.dataSource.deleteAll();
 
         });
-        this.triggerMouseEvent(document.querySelector(`#${id} .datatable-data #lite-0-colBody-0-0 input`), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} .datatable-data #lite-0-colBody-0-0 input`), "click");
     }
 
     @Decorators.it("test d'un appel de pagination programmatiquement")
     goToPageCall() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSource.on("pagination", (value) => {
-            expect(document.querySelector(`#${id} .datatable-pagination-input`)["value"]).to.equal("2");
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${this.id} .datatable-pagination-input`)[ "value" ]).to.equal("2");
             this.end();
         });
-        dataSource.goToPage(2);
+        this.dataSource.goToPage(2);
     }
 
     @Decorators.it("test du rendu de l'action column après pagination sur la page 2")
     testRenderActionColumnAfterPaginationToPage2() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElementWithActionColumns, id);
-        dataSource.on("pagination", (value) => {
-            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-3 a`)["title"]).to.equal("Editer libelle11");
-            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-4 a`)["title"]).
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithActionColumns, this.id);
+        this.dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${this.id} #table-with-action-column-0-colBody-0-3 a`)[ "title" ]).to.equal("Editer libelle11");
+            expect(document.querySelector(`#${this.id} #table-with-action-column-0-colBody-0-4 a`)[ "title" ]).
                 to.equal("Plus d'info sur libelle11 desc0");
             this.end();
         });
-        dataSource.goToPage(2);
+        this.dataSource.goToPage(2);
     }
-
 
     @Decorators.it("test du rendu de l'action column après pagination sur la page 3")
     testRenderActionColumnAfterPaginationToPage3() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElementWithActionColumns, id);
-        dataSource.on("pagination", (value) => {
-            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-3 a`)["title"]).to.equal("Editer libelle21")
-            expect(document.querySelector(`#${id} #table-with-action-column-0-colBody-0-4 a`)["title"])
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithActionColumns, this.id);
+        this.dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${this.id} #table-with-action-column-0-colBody-0-3 a`)[ "title" ]).to.equal("Editer libelle21")
+            expect(document.querySelector(`#${this.id} #table-with-action-column-0-colBody-0-4 a`)[ "title" ])
                 .to.equal("Plus d'info sur libelle21 desc0");
             this.end();
         });
-        dataSource.goToPage(3);
+        this.dataSource.goToPage(3);
     }
 
     @Decorators.it("test du rendu de la modale suite au clic sur le bouton de l'action column supprimer après pagination sur la page 2")
     testRenderActionColumnAlertAfterPaginationToPage2() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElementWithActionColumnsSupprimer, id);
-        dataSource.on("pagination", (value) => {
-            expect(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`)["title"])
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithActionColumnsSupprimer, this.id);
+        this.dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`)[ "title" ])
                 .to.equal("Supprimer libelle11");
-            this.triggerMouseEvent(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
             setTimeout(() => {
                 expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
                 expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
@@ -298,17 +313,17 @@ class tableTest extends BaseTest {
                 this.end();
             }, 200);
         });
-        dataSource.goToPage(2);
+        this.dataSource.goToPage(2);
     }
 
     @Decorators.it("test du rendu de la modale suite au clic sur le bouton de l'action column supprimer après pagination sur la page 3")
     testRenderActionColumnAlertAfterPaginationToPage3() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElementWithActionColumnsSupprimer, id);
-        dataSource.on("pagination", (value) => {
-            expect(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`)["title"])
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithActionColumnsSupprimer, this.id);
+        this.dataSource.on("pagination", (value) => {
+            expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`)[ "title" ])
                 .to.equal("Supprimer libelle21");
-            this.triggerMouseEvent(document.querySelector(`#${id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
             setTimeout(() => {
                 expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
                 expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
@@ -319,7 +334,23 @@ class tableTest extends BaseTest {
                 this.end();
             }, 200);
         });
-        dataSource.goToPage(3);
+        this.dataSource.goToPage(3);
+    }
+
+    @Decorators.it("test de la props visible d'une actionColum avant et après pagination")
+    testRenderActionColumnMaJPropsIsVisible() {
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithActionColumnsSupprimer, this.id);
+        expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-4`).innerHTML).to.equal("");
+
+        this.dataSource.on("pagination", (value) => {
+            setTimeout(() => {
+                expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-4 a`).innerHTML).to.exist;
+                this.end();
+            }, 200);
+        });
+        this.dataSource.goToPage(2);
+
     }
 }
 

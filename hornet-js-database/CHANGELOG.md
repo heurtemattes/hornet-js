@@ -1,3 +1,7 @@
+# hornet-js-database 5.2.3
+
+- 3ea2e0e9e FIX - [M67512] - hornet-js-database : Impossible de mapper un champ custom dans un objet métier
+
 # hornet-js-database 5.2.2
 
 - 31a12528 FIX - [m69679] - hornet-js-database: correction du bug sur les transactions

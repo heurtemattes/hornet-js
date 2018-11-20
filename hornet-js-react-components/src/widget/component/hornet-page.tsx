@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,6 @@ import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils
 import { Logger } from "hornet-js-utils/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { ExpandingLayout } from "hornet-js-core/src/services/default/expanding-layout";
-import { ServiceRequest } from "hornet-js-core/src/services/service-request";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.component.hornet-page");
 
@@ -130,7 +129,6 @@ export interface HornetPageProps extends HornetComponentProps {
  * Composant de haut-niveau : correspond à une page.
  */
 export class HornetPage<T extends IService, P extends HornetPageProps, S extends HornetPageProps> extends HornetComponent<HornetPageProps, S> implements IHornetPage<P, S> {
-
 
     static defaultProps = {};
 
@@ -239,6 +237,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     }
 
     render(): React.ReactNode {
+        logger.debug("HornetPage render");
         if (this.state.hasError) {
             return <h1>Something went wrong.</h1>;
         }
@@ -259,8 +258,8 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     listenUpdatePageExpandEvent(): void {
         this.listen(UPDATE_PAGE_EXPAND, (ev: HornetEvent<boolean>) => {
             this.layoutService.isExpandedLayout().then((retourApi: any) => {
-                const body = retourApi.body;
-                if (body && body.isExpandedLayout) {
+                const isExpandedLayout = retourApi && retourApi.body && retourApi.body.isExpandedLayout;
+                if (isExpandedLayout == "true") {
                     this.fetchHtmlElementsToSetClassBy("mainLayoutClassNameExpanded", "mainLayoutClassName", this.state.workingZoneWidth);
                     this.setIsLayoutExpandedThroughService(false);
                 } else {
@@ -332,7 +331,6 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     protected setIsLayoutExpandedThroughService(value: boolean) {
         this.layoutService.setExpandedLayout({ isExpandedLayout: value }).then((retourApi) => {
             logger.trace("Retour API ExpandingLayoutRequest.setExpandedLayout :", retourApi.body.isExpandedLayout);
-            Utils.appSharedProps.set("isExpandedLayout", retourApi.body.isExpandedLayout);
             fireHornetEvent(UPDATE_PAGE_EXPAND_MENU.withData(true));
         });
     }
@@ -347,7 +345,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
         // préparation de la taille pour le layout expanding
         let maxWidth;
         let classNameExpanded = "mainLayoutClassNameExpanded";
-        if (!(Utils.appSharedProps.get("isExpandedLayout"))) {
+        if (!Utils.getCls("hornet.expandedLayout")) {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }

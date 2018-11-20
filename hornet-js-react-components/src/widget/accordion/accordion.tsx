@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -129,16 +129,20 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
     componentDidMount() {
         super.componentDidMount();
         this.trackInputFieldFromChildren(document.getElementById(this.getAccordionLiId()));
-        this.listen(FOCUS_ON_ACCORDION, (ev: HornetEvent<string>) => {
-            if (ev.detail === this.getAccordionPanelId()) {
-                const element = document.getElementById(ev.detail);
-                element.className = element.className.replace("hidden", "visible");
-            }
-        });
+        this.listen(FOCUS_ON_ACCORDION, this.focusInputAccordion);
 
         this.listen(ADD_NOTIFICATION_EVENT, this.accordionHasError);
         this.listen(CLEAN_NOTIFICATION_EVENT, this.accordionHasError);
         this.listen(CLEAN_ALL_NOTIFICATION_EVENT, this.accordionHasError);
+    }
+
+    focusInputAccordion(ev: HornetEvent<string>) {
+
+            if (ev.detail === this.getAccordionPanelId()) {
+                const element = document.getElementById(ev.detail);
+                element.className = element.className.replace("hidden", "visible");
+            }
+
     }
 
     /**
@@ -149,6 +153,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
         this.remove(ADD_NOTIFICATION_EVENT, this.accordionHasError);
         this.remove(CLEAN_NOTIFICATION_EVENT, this.accordionHasError);
         this.remove(CLEAN_ALL_NOTIFICATION_EVENT, this.accordionHasError);
+        this.remove(FOCUS_ON_ACCORDION, this.focusInputAccordion);
     }
 
     protected getAccordionPanelId(): string {
@@ -166,7 +171,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
                     this.trackInputFieldFromChildren(element);
                 });
             } else {
-                if (node.localName === "input" && !node.hidden) {
+                if (node.localName === "input" || node.localName === "textarea" && !node.hidden) {
                     node.setAttribute("accordion", this.getAccordionPanelId());
                     node.setAttribute("accordionIndex", this.state.panelIndex);
                 } else if (node.children) {
@@ -184,6 +189,8 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+
+        logger.debug("Accordion render : ", this.state.id);
 
         const classNameLi = classNames({
             "accordion-header": true,
@@ -215,7 +222,6 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
             "accordion-errors-open": this.state.isOpen,
             fr: true,
         });
-
 
         const classNameAccordion = classNames({
             "accordion-label": true,
@@ -279,7 +285,6 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
         );
     }
 
-
     /**
      * Gestion aux clavier
      * @param e
@@ -292,7 +297,6 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
         const keyCode: number = e.keyCode;
         let preventDefault: boolean = true;
         const maxAccordion = ((this.props as any).totalAccordion - 1);
-
 
         if (e.ctrlKey) {
             this.handleKeyDownPanel(e, preventDefault);
@@ -439,7 +443,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
      */
     protected isErrorInAccordion(elem, error) {
         let errors = 0;
-        if (elem.props) {
+        if (elem && elem.props) {
 
             // Gestion de champs dans un tableau
             // todo: améliorer la recherche des champs en erreur présents dans un tablea éditable

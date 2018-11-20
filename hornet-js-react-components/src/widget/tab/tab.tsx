@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,6 @@ import * as classNames from "classnames";
 import { HornetComponentProps, IHornetComponentAsync } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { SpinnerComponentInput } from "src/widget/spinner/spinner-component-input";
-import { SpinnerProps } from "src/widget/spinner/spinner-component";
 
 const logger = Utils.getLogger("hornet-js-react-components.widget.tab.tab");
 
@@ -136,13 +135,12 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
             if (this.state.children && this.state.children.props && this.state.children.props.dataSource) {
                 if (!this.state.children.props.dataSource.status) {
                     this.state.children.props.dataSource.on("loadingData", (value) => {
-                        this.setState({spinner: value});
+                        this.setState({ spinner: value });
                     });
                 }
             }
         }
     }
-
 
     /**
      * @inheritDoc
@@ -164,6 +162,49 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
         }
     }
 
+    /**
+    * @inheritDoc
+    */
+    componentDidMount() {
+        super.componentDidMount();
+        this.trackInputFieldFromChildren(document.getElementById(this.getTabPanelId()));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    render(): JSX.Element {
+
+        logger.debug("rendu composant Tab: ", this.props.index);
+
+        const classNameContent = classNames({
+            "tab-panel": true,
+            "tab-panel-selected": this.state.isVisible,
+        });
+
+        let errorMessage = "";
+        if (this.state.errors > 0) {
+            errorMessage = this.state.errors + " ";
+            errorMessage += this.state.errors === 1 ? this.i18n("form.accordion.error") : this.i18n("form.accordion.errors");
+        }
+
+        return (
+            <section key={this.props.prefixId + "sectionTabPanel-" + this.props.index}
+                style={{ display: this.state.isVisible ? "block" : "none" }}
+                id={this.props.prefixId + "sectionTabPanel-" + this.props.index}
+                role="tabpanel"
+                aria-hidden={!this.state.isVisible}
+                aria-labelledby={this.props.prefixId + "tabList-item-" + this.props.index}>
+                <SpinnerComponentInput ref="spinnerComponent" isVisible={this.state.spinner && this.state.isVisible} />
+                {this.state.mount ?
+                    <div id={this.state.panelId}
+                        className={classNameContent}>
+                        {this.state.children}
+                    </div>
+                    : null}
+            </section>);
+    }
+
     displaySpinner(flag: boolean) {
         flag ? this.showSpinnerComponent() : this.hideSpinnerComponent();
     }
@@ -183,28 +224,53 @@ export class Tab extends HornetComponent<TabProps, any> implements IHornetCompon
     }
 
     /**
-     * @inheritDoc
+     * Méthode permettant d'ajout des attributs permettant de mapper un onglet à un champ
+     * @param node Element HTML
      */
-    render(): JSX.Element {
-        const classNameContent = classNames({
-            "tab-panel": true,
-            "tab-panel-selected": this.state.isVisible,
-        });
+    protected trackInputFieldFromChildren(node) {
+        if (node) {
+            if (Array.isArray(node)) {
+                node.forEach(element => {
+                    this.trackInputFieldFromChildren(element);
+                });
+            } else {
+                if ((node.localName === "input" || node.localName === "textarea") && !node.hidden) {
+                    node.setAttribute("data-tabId", this.getTabPanelId());
+                    node.setAttribute("data-tabIndex", this.state.index);
+                    if (this.isFormParentOfTab(node)) {
+                        node.setAttribute("data-tabTitle", this.i18n("tabs.tab", { tabTitle: this.state.title }));
+                    }
+                } else if (node.children) {
+                    this.trackInputFieldFromChildren(node.children);
+                } else if (node instanceof HTMLCollection) {
+                    for (let i = 0; i < node.length; i++) {
+                        this.trackInputFieldFromChildren(node[i]);
+                    }
+                }
+            }
+        }
+    }
 
-        return (
-            <section key={this.props.prefixId + "sectionTabPanel-" + this.props.index}
-                     style={{display: this.state.isVisible ? "block" : "none"}}
-                     id={this.props.prefixId + "sectionTabPanel-" + this.props.index}
-                     role="tabpanel"
-                     aria-hidden={!this.state.isVisible}
-                     aria-labelledby={this.props.prefixId + "tabList-item-" + this.props.index}>
-                <SpinnerComponentInput ref="spinnerComponent" isVisible={this.state.spinner && this.state.isVisible}/>
-                {this.state.mount ?
-                    <div id={this.state.panelId}
-                         className={classNameContent}>
-                        {this.state.children}
-                    </div>
-                    : null}
-            </section>);
+    /**
+     * Retourne true si le form contenant le node en paramètre contient le tab courant
+     * @param node Element HTML
+     */
+    protected isFormParentOfTab(node: Element): boolean {
+        let isFormParentOfTab: boolean = false;
+        if (node && (node.localName === "input" || node.localName === "textarea")) {
+            const form = (node as any).form;
+            const tab = document.getElementById(this.getTabPanelId());
+            if (form && tab && form.querySelector(`#${this.getTabPanelId()}`)) {
+                isFormParentOfTab = true;
+            }
+        }
+        return isFormParentOfTab;
+    }
+
+    /**
+     * Méthode permettant de récupérer l'ID du Panel propre à l'onglet
+     */
+    protected getTabPanelId(): string {
+        return this.props.prefixId + "sectionTabPanel-" + this.props.index;
     }
 }

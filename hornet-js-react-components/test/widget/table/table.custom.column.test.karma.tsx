@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -145,7 +145,7 @@ class tableTest extends HornetReactTest {
                 </Header>
                 <Content dataSource={dataSourceSortTitle}>
                     <Columns>
-                        <DateColumn keyColumn="date" title={"date"}/>
+                        <DateColumn keyColumn="date" title={"date"} titleCell={"coucou"}/>
                     </Columns>
                 </Content>
             </Table>
@@ -191,6 +191,7 @@ class tableTest extends HornetReactTest {
             const year = new Date().getFullYear().toString();
             const yearInTableDateColumn = document.querySelector(`#${id} #lite-0-colBody-0-0`).innerHTML.split("/");
             expect(yearInTableDateColumn[2]).to.be.equal(year);
+            expect(document.querySelector(`#${id} #lite-0-colBody-0-0`).getAttribute("title")).to.be.equal("coucou");
             this.end();
         });
         dataSourceSortTitle.reload();

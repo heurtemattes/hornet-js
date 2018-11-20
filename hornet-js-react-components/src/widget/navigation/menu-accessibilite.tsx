@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,7 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { HornetComponent } from "src/widget/component/hornet-component";
 import * as classNames from "classnames";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu.accessibilite");
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-accessibilite");
 
 /**
  * Menu d'Accessibilité
@@ -106,7 +106,7 @@ export class MenuAccessibilite extends HornetComponent<HornetComponentProps, any
      * @inheritDoc
      */
     render(): JSX.Element {
-
+        logger.debug("MenuAccessibilite render");
         const ulClasses: ClassDictionary = {
             "top-menu-accessibilite": true,
             focused: this.state.focused,

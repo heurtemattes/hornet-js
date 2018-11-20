@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,6 +95,8 @@ import { Row } from "src/widget/form/row";
 import { ButtonsArea } from "src/widget/form/buttons-area";
 import { Button } from "src/widget/button/button";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
+import { Utils } from "hornet-js-utils";
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
 
 let element: JSX.Element;
 const dataSet = { nom: "Secteur9", desc: "Secteur 9", date: new Date("2015-03-25") };
@@ -107,6 +109,7 @@ class FormValidateSubmit extends BaseTest {
 
     @Decorators.beforeEach
     beforeEach() {
+        Utils.setCls("hornet.internationalization", { messages });
         element = (
             <div>
                 <Form

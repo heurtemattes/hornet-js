@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -137,14 +137,14 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
     registerForm(formInstance: React.ReactInstance): void {
         this.formElement = formInstance as HTMLFormElement;
         if (this.formElement) {
-            this.formElement[ "__component" ] = this;
+            this.formElement["__component"] = this;
         }
     }
 
     registerFieldSet(fieldSetInstance: React.ReactInstance): void {
         this.fieldSetElement = fieldSetInstance as HTMLFieldSetElement;
         if (this.fieldSetElement) {
-            this.fieldSetElement[ "__component" ] = this;
+            this.fieldSetElement["__component"] = this;
         }
     }
 
@@ -154,9 +154,9 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * @return cet objet
      */
     protected updateReadOnlyFields(isReadOnly: boolean): this {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            const field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[key];
             if (field.props && field.props.writable && !isReadOnly) {
                 if (field.setState && (field && (field as any).mounted)) {
                     field.setState({ readOnly: isReadOnly });
@@ -179,9 +179,9 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * @return cet objet
      */
     protected updateDisabledFields(isDisabled: boolean): this {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            const field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[key];
             // if (field instanceof AbstractField) {
             if (field.setState && (field && (field as any).mounted)) {
                 field.setState({ disabled: isDisabled });
@@ -198,9 +198,9 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      * Propage les propriétés devant être transmises aux champs enfants
      */
     protected propagateParentState(): void {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
         Object.keys(fields).every(function (key: string): boolean {
-            const field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[key];
             if (this.state.readOnly === true) {
                 field.setReadOnly(this.state.readOnly);
             }
@@ -208,13 +208,13 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
                 field.setDisabled(this.state.disabled);
             }
             return true;
-        },                        this);
+        }, this);
     }
 
     /**
      * @returns {{}} un object associant les noms de champ aux composants HTML ou React correspondants
      */
-    protected abstract extractFields(): { [ key: string ]: DomAdapter<any, any> };
+    protected abstract extractFields(): { [key: string]: DomAdapter<any, any> };
 
     /**
      * Extrait les données du formulaire
@@ -224,9 +224,9 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      */
     extractData(removeEmptyStrings: boolean = true): Object {
         const data: Object = {};
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
         for (const name in fields) {
-            const value: any = fields[ name ].getCurrentValue(removeEmptyStrings);
+            const value: any = fields[name].getCurrentValue(removeEmptyStrings);
             if ((value !== "" && value !== null && !(fields[name].getType() === "number" && isNaN(value))) || !removeEmptyStrings) {
                 _.set(data, name, value);
             } else {
@@ -240,6 +240,26 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
                     }
                 }
             }
+        }
+        // Parcourir l'objet data et remplacer la valeur des sous objets contenant que des objets vides ex :{id: "", libelle: ""} par null
+        if (data && !removeEmptyStrings) {
+            Object.keys(data).forEach((key) => {
+                const currentData = data[key];
+
+                if (currentData && Object.keys(currentData) && Object.keys(currentData).length > 0) {
+                    let isObjectNotEmpty: boolean;
+                    let i = 0;
+                    while (i < Object.keys(currentData).length && !isObjectNotEmpty) {
+                        if (currentData[Object.keys(currentData)[i]]) {
+                            isObjectNotEmpty = true;
+                        }
+                        i++;
+                    }
+                    if (!isObjectNotEmpty) {
+                        data[key] = null;
+                    }
+                }
+            });
         }
         return data;
     }

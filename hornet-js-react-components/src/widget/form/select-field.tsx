@@ -73,12 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import {
     HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps, AbstractFieldProps } from "src/widget/form/abstract-field";
 
@@ -87,6 +89,8 @@ import { IHornetComponentDatasource, HornetComponentChoicesProps } from "hornet-
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import * as _ from "lodash";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.select-field");
 
 /**
  * Propriétés d'un champ de formulaire de type groupe de boutons radios
@@ -116,7 +120,6 @@ export interface SelectChoice {
     name: string;
 }
 
-
 /**
  * Composant liste déroulante
  */
@@ -143,6 +146,7 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
      * @returns {any}
      */
     renderWidget(): JSX.Element {
+        logger.debug("renderWidget selectField :", this.state.id ? this.state.id : this.state.name);
         const hasError = this.hasErrors() ? " has-error" : "";
         const htmlProps = this.getHtmlProps();
         _.assign(htmlProps, {
@@ -171,7 +175,6 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
             </select>
         );
     }
-
 
     // Setters
     setData(data: SelectChoice[] | any[], cb?): this {
@@ -260,6 +263,7 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
      * @override
      */
     protected handleChange(e: React.ChangeEvent<HTMLElement>) {
+        logger.trace("selectField handleChange:", e.target);
         this.setCurrentValue((e.target as any).value);
         if (this.state.onChange) {
             this.state.onChange(e);

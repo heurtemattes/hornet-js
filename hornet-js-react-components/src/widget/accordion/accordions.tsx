@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -124,6 +124,7 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
      */
     render(): JSX.Element {
         logger.trace("Rendu accordion, Nombre de composants fils =", React.Children.count(this.state.children));
+        logger.debug("Accordions render : ", this.state.id);
 
         const classNameUl = classNames({
             accordion: true,

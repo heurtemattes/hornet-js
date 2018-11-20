@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -120,8 +120,8 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
      * @inheritDoc
      */
     renderCell() {
-        logger.trace("render CheckHeaderCell-> column:",
-                     this.props.coordinates.column, " - line:", this.props.coordinates.row, "checked =>", this.props.isSelected);
+         logger.debug("render CheckHeaderCell-> column:",
+                      this.props.coordinates.column, " - line:", this.props.coordinates.row, "checked =>", this.props.isSelected);
 
         // todo: rajouter title à la checkbox action de masse
 
@@ -185,7 +185,7 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
      */
     handleChange(selectedItems: any[], all: boolean) {
         if (this.checkBoxRef) {
-            if (ArrayUtils.isInclude(this.props.contentState.items, selectedItems) 
+            if (ArrayUtils.isInclude(this.props.contentState.items, selectedItems)
             && !(this.props.contentState.items.length === 0 && selectedItems.length > 0)) {
                 this.setState({ isSelected: true });
             } else {

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,6 +81,10 @@
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+
+const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.line");
 
 export interface LineProps extends HornetComponentProps {
     displayed?: boolean;
@@ -97,6 +101,7 @@ export class Line<P extends LineProps, ColumnState> extends HornetComponent<P, C
         displayed: false};
 
     render() {
+        logger.debug("Line render");
         return <div />;
     }
 }

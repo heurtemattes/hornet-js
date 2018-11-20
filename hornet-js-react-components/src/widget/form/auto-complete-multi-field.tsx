@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,9 +94,7 @@ import FormEvent = __React.FormEvent;
 import HTMLAttributes = __React.HTMLAttributes;
 import ComponentClass = __React.ComponentClass;
 
-
 const logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-complete-multi-field");
-
 
 /**
  * Propriétés du composant d'auto-complétion
@@ -191,7 +189,8 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      * @returns {any}
      */
     renderWidget(): JSX.Element {
-        logger.trace("auto-complete multiple render");
+        const id = this.state.id ? this.state.id : this.getFreeTypingFieldName();
+        logger.debug("AutoCompleteMultiField renderWidget : ", id);
         const shouldShow: boolean = this.shouldShowChoices();
 
         const hasError = this.hasErrors() ? " has-error" : "";
@@ -214,7 +213,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             "aria-owns": this.state.ariaSelectorId,
             "aria-activedescendant": shouldShow ? this.state.ariaSelectorId + "_" + this.state.selectedIndex : undefined,
             "aria-multiselectable": true,
-            id: this.state.id ? this.state.id : this.getFreeTypingFieldName(),
+            id,
             type: "text",
             name: this.getFreeTypingFieldName(),
             className,

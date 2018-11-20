@@ -73,18 +73,21 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
-
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Button, ButtonProps } from "src/widget/button/button";
 import { Modal } from "src/widget/dialog/modal";
 import { Notification } from "src/widget/notification/notification";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.confirm");
 
 export interface ConfirmProps extends HornetComponentProps {
     isVisible?: boolean;
@@ -156,6 +159,8 @@ export class Confirm extends HornetComponent<ConfirmProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Confirm render : ", this.state.dialogId ? this.state.dialogId : this.state.title);
+
         if (!this.state.isVisible) return null;
 
         const notificationId: string = this.state.notificationId || "nConfirm";

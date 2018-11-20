@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,7 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { Notification } from "hornet-js-react-components/src/widget/notification/notification";
 import { BusinessErrorList } from "hornet-js-utils/src/exception/business-error-list";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.component.error-page");
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.component.error-page");
 
 export class ErrorPage extends HornetPage<any, HornetComponentProps, any> {
 
@@ -102,7 +102,8 @@ export class ErrorPage extends HornetPage<any, HornetComponentProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        logger.trace("VIEW ErreurPage render");
+        logger.debug("ErrorPage render");
+
         const error = Utils.getCls("hornet.currentError");
         let exceptions;
         if (error != null) {

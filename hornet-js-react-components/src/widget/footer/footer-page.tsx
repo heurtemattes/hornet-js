@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,7 +107,7 @@ export class FooterPage extends HornetComponent<FooterPageProps, any> {
         // préparation de la taille pour le layout expanding
         let maxWidth;
         let classNameExpanded = "mainLayoutClassNameExpanded";
-        if (!(Utils.appSharedProps.get("isExpandedLayout"))) {
+        if (!Utils.getCls("hornet.expandedLayout")) {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }
@@ -118,12 +118,11 @@ export class FooterPage extends HornetComponent<FooterPageProps, any> {
         };
     }
 
-
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
-        logger.trace("VIEW footerPage render");
+        logger.debug("FooterPage render : footer-container");
         return (
             <footer id="footer-container" className="footer" role="contentinfo">
                 <div className={"footer-content inside " + this.state.classNameExpanded}

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,7 +105,6 @@ import { Picto } from "src/img/picto";
 import * as classNames from "classnames";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-complete-field");
-
 
 export enum FilterTextType {
     beginWith = 1,
@@ -171,7 +170,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             resetTitle: "form.autoCompleteField.resetTitle",
         },
                                         AbstractField.defaultProps);
-
 
     protected _throttledTriggerAction: Function;
 
@@ -245,7 +243,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
 
         this.props.dataSource.on("fetch", this.fetchEventCallback);
         this.props.dataSource.on("add", this.addEventCallback);
-        this.props.dataSource.on("delete", this.setResultCallback);
+        this.props.dataSource.on("delete", this.setDeleteResultCallback);
         this.props.dataSource.on("sort", this.setResultCallback);
         this.props.dataSource.on("filter", this.filterEventCallback);
         this.props.dataSource.on("init", this.initEventCallback);
@@ -264,7 +262,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         this.props.dataSource.removeListener("add", this.addEventCallback);
         this.props.dataSource.removeListener("filter", this.filterEventCallback);
         this.props.dataSource.removeListener("init", this.initEventCallback);
-        this.props.dataSource.removeListener("delete", this.setResultCallback);
+        this.props.dataSource.removeListener("delete", this.setDeleteResultCallback);
         this.props.dataSource.removeListener("sort", this.setResultCallback);
         this.props.dataSource.removeListener("loadingData", this.displaySpinner);
 
@@ -294,6 +292,9 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             || (this.state.errors !== nextState.errors)
             || (this.state.readOnly !== nextState.readOnly)
             || (this.state.disabled !== nextState.disabled)
+            || (this.state.label !== nextState.label)
+            || (this.state.placeholder !== nextState.placeholder)
+            || (this.state.required !== nextState.required)
         ) {
             return true;
         }
@@ -305,7 +306,8 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @returns {any}
      */
     renderWidget(): JSX.Element {
-        logger.trace("auto-complete  render");
+        const id = this.state.id ? this.state.id : this.getFreeTypingFieldName();
+        logger.debug("AutoCompleteField renderWidget : ", id);
 
         if (this.state.readOnly && this.state.writable) {
             logger.warn("L'autocomplete ne peut pas être readonly et writable.. on considère donc qu'il est readonly");
@@ -332,7 +334,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             "aria-expanded": shouldShow,
             "aria-owns": this.state.ariaSelectorId,
             "aria-activedescendant": shouldShow ? this.state.ariaSelectorId + "_" + this.state.selectedIndex : undefined,
-            id: this.state.id ? this.state.id : this.getFreeTypingFieldName(),
+            id,
             type: "text",
             name: this.getFreeTypingFieldName(),
             className,
@@ -458,6 +460,16 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     protected setResultCallback(result) {
         (this.state as any).allChoices = this.props.dataSource.results;
+    }
+
+    /**
+     * récupération des choix dans le datasource
+     * mise à jour des choix possibles
+     * @param result
+     */
+    protected setDeleteResultCallback(result) {
+        this.setResultCallback(result);
+        this.choicesLoaderCallback(result);
     }
 
     /**

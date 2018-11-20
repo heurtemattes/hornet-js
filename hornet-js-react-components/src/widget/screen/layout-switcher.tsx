@@ -73,17 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
 import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { fireHornetEvent, HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+
+const logger: Logger = Utils.getLogger("hornet-js-components.widget.screen.layout-switcher");
 
 /**
  * Propriétés User
@@ -113,7 +116,7 @@ export class LayoutSwitcher<LayoutSwitcherProps, S> extends HornetComponent<any,
 
         this.state = {
             ...this.state,
-            modeFullscreen: Utils.appSharedProps.get("isExpandedLayout") || false
+            modeFullscreen: Utils.getCls("hornet.expandedLayout") || false
         };
     }
 
@@ -121,9 +124,9 @@ export class LayoutSwitcher<LayoutSwitcherProps, S> extends HornetComponent<any,
      * @inheritDoc
      */
     render(): JSX.Element {
-
-        let title = (!this.state.modeFullscreen) ? this.i18n("header.expand") : this.i18n("header.contract");
-        let srcImg = (!this.state.modeFullscreen) ? this.props.switchIcon : LayoutSwitcher.genUrlTheme("/img/header/ic_screen_ratio_contract.svg");
+        logger.debug("LayoutSwitcher render : ", this.props.id ? this.props.id : this.state.switchTitle);
+        const title = (!this.state.modeFullscreen) ? this.i18n("header.expand") : this.i18n("header.contract");
+        const srcImg = (!this.state.modeFullscreen) ? this.props.switchIcon : LayoutSwitcher.genUrlTheme("/img/header/ic_screen_ratio_contract.svg");
 
         return (
             <div className="larger-screen"
@@ -143,8 +146,8 @@ export class LayoutSwitcher<LayoutSwitcherProps, S> extends HornetComponent<any,
      */
     handleExpandPageToogle() {
         this.setState({
-            modeFullscreen: !this.state.modeFullscreen
-        }, () => {
+            modeFullscreen: !this.state.modeFullscreen,
+        },            () => {
             fireHornetEvent(UPDATE_PAGE_EXPAND.withData(!this.state.modeFullscreen));
         });
     }

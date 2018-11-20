@@ -1,3 +1,7 @@
+# hornet-js-passport 5.2.3
+
+- f04cc08b9 FIX [s267] - hornet-js-passport : SamlConfiguration - valorisation isMetadataAccessible à true par défaut
+
 # hornet-js-passport 5.2.0
 
 - DOC  - boolean pour desaction timeout session IDP

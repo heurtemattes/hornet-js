@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,6 +84,7 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
+import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-message-item");
 
@@ -108,7 +109,14 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
         let element = document.getElementsByName(this.state.field) ?
             document.getElementsByName(this.state.field)[ 0 ] : document.getElementById(this.state.field);
         if (element && element.focus) {
-            Accordion.handleFocusOnAccordion(element);
+
+            if (element && element.dataset && element.dataset.tabindex) {
+                Tabs.handleFocusOnTab(element);
+            }
+            else if (element.getAttribute("accordion")) {
+                Accordion.handleFocusOnAccordion(element);
+            }
+
             element.focus();
         } else {
             element = document.getElementsByName(this.state.field + "$text") ?
@@ -128,10 +136,16 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
      * @protected
      */
     protected renderLink() {
+        let message = this.i18n(this.state.text);
+        const element = document.getElementsByName(this.state.field) ?
+            document.getElementsByName(this.state.field)[ 0 ] : document.getElementById(this.state.field);
+        if (element && element.dataset && element.dataset.tabtitle) {
+            message = element.dataset.tabtitle + " - " + message;
+        }
         const id = this.props.id ? this.props.id : null;
         return (
             <a href="#" onClick={this.setFocus} className={this.props.className} id={id}>
-                {this.i18n(this.state.text)}
+                {message}
                 {this.props.children}
             </a>
         );
@@ -155,6 +169,7 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("MessageItem render");
         return (
             <li>
                 {(!this.state.anchor) ? this.renderSpan() : this.renderLink()}

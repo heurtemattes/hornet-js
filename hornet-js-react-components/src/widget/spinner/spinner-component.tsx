@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,7 +88,6 @@ import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { RequestEventDetail } from "hornet-js-core/src/event/hornet-event";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.spinner.spinner-component");
-
 
 /**
  * Propriétés du spinner
@@ -169,8 +168,9 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps> ex
             this.openSpinner();
         } else {
             this.count--;
-            if (this.count === 0)
+            if (this.count === 0) {
                 this.closeSpinner();
+            }
         }
     }
 
@@ -195,6 +195,7 @@ export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps> ex
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("SpinnerComponent render");
         return (
             (this.state.isVisible && this.count > 0) ?
                 <div className="component-spinner">

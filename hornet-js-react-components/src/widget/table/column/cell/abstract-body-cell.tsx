@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -143,13 +143,13 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
      */
     render(): JSX.Element {
 
-        logger.trace(
+        logger.debug(
             "render BodyCell -> column:",
             this.props.coordinates.column, " - line:",
             this.props.coordinates.row, "- isFocused:",
             this.state.isFocused, "- tabIndex:",
             this.state.tabIndex);
-            
+
         return (
             <td {...this.getDefaultTdProps()}>
                 {this.renderCell()}
@@ -160,7 +160,7 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
     /**
      * Retourne la value de la cellule du tableau grâce au mapping du keyColumn
      * // WARNING: keyColumn, value et replaceUndef sont obligatoire
-     * @param props 
+     * @param props
      */
     static getTemplatedValue(props) {
         const altValue = (typeof props.value[ props.keyColumn ] === "number") ? "0" : "";
@@ -170,7 +170,7 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
     /**
      * Retourne le title de la cellule du tableau grâce au mapping du keyColumn
      * // WARNING: keyColumn, value et replaceUndef sont obligatoire
-     * @param props 
+     * @param props
      */
     static getTemplatedTitleCell(props) {
         const altValue = (typeof props.value[ props.keyColumn ] === "number") ? "0" : "";

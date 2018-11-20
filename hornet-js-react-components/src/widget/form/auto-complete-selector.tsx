@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -175,7 +175,6 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         this.setState({ selectorId: value }, callback);
         return this;
     }
-
 
     public setShowComponent(value: string, callback?: () => any): this {
         this.setState({ showComponent: value }, callback);
@@ -349,7 +348,6 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         (this.state as any).onListClick = false;
     }
 
-
     /**
      * Retourne le rendu de la liste de choix
      **/
@@ -410,7 +408,6 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     multiClick(event) {
         (this.state as any).onListClick = true;
     }
-
 
     /**
      * Retourne le rendu de la liste de choix
@@ -477,7 +474,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      * @inheritDoc
      */
     render(): JSX.Element {
-        logger.trace("render AutoCompleteSelector");
+        logger.debug("AutoCompleteSelector render : ", this.state.selectorId);
         this.liElts = [];
         this.liReact = (this.props.isMultiple) ? this.renderOptionMultipleList() : this.renderOptionList();
 

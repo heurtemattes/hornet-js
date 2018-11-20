@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -133,8 +133,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
      * @inheritDoc
      */
     renderCell() {
-
-        logger.trace("render checkBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render checkBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
         const title: string = this.state.isSelected ? this.props.altUnselect : this.props.altSelect;
 
@@ -216,7 +215,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
     handleChange = (selectedItems: any[]) => {
         logger.trace("checkbodycell => handlChange", this.props.coordinates);
         // focus est calculé pour que le setState ne fasse pas perdre le focus a la case
-        const focus = (this.props.contentState.getFocusedCell() 
+        const focus = (this.props.contentState.getFocusedCell()
             && (this.props.contentState.getFocusedCell().column === this.props.coordinates.column)
             && (this.props.contentState.getFocusedCell().row === this.props.coordinates.row));
         if (this.checkBoxBodyRef) {

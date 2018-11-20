@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -153,14 +153,14 @@ if (typeof window !== "undefined") {
  * lanceur des tests
  * @param suite
  */
-export function runTest(suite) {
+export function runTest(suite, filename?: string) {
     let proto = Object.getPrototypeOf(suite);
     let suiteName = proto.constructor.suiteName;
     let annotations = getAnnotatedValues(proto);
 
     let { beforeFunc, beforeEachFunc, afterFunc, testName, testAsyncName, testThrowAsyncName, testXit } = annotations;
 
-    describe(suiteName, () => {
+    describe((filename && filename + " : " + suiteName) || suiteName, () => {
         before(function () {
             if (typeof document !== "undefined") {
                 let lista = document.body.childNodes;
@@ -191,6 +191,7 @@ export function runTest(suite) {
                     document.body.setAttribute("style", "padding:10px");
                     let fntError: ErrorEventHandler = window.onerror;
                     window.onerror = (errMsg, url, line, lline, err) => {
+                        console.log(errMsg, url, line, lline);
                         window.onerror = fntError;
                         gestureErr(test, _done, err)
                     };
@@ -223,6 +224,7 @@ export function runTest(suite) {
  * @returns {any}
  */
 function gestureErr(test, done, err) {
+    console.log(err);
     let fnt = false;
     if (test.testName[ 1 ]) {
         let isErrorType = false;

@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-core",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants qui forment le coeur de hornet-js",
   "bugs": {
@@ -12,14 +12,14 @@
   },
   "main": "./index.js",
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.2.2",
-    "hornet-js-utils-dts": "5.2.2",
-    "hornet-js-components-dts": "5.2.2",
-    "hornet-js-test-dts": "5.2.2"
+    "hornet-js-ts-typings": "5.2.3",
+    "hornet-js-utils-dts": "5.2.3",
+    "hornet-js-components-dts": "5.2.3",
+    "hornet-js-test-dts": "5.2.3"
   },
   "appDependencies": {
-    "hornet-js-components": "5.2.2",
-    "hornet-js-utils": "5.2.2",
+    "hornet-js-components": "5.2.3",
+    "hornet-js-utils": "5.2.3",
     "ajv": "6.1.1",
     "ajv-keywords": "3.1.0",
     "body-parser": "1.18.2",
@@ -55,7 +55,7 @@
   },
   "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.2.2",
+    "hornet-js-test": "5.2.3",
     "moment-timezone": "0.5.14",
     "log4js": "2.11.0",
     "config": "1.29.4",

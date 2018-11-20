@@ -30,10 +30,10 @@ Ajouter au package.json
 
 ```shell
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.1.X"
+    "hornet-js-ts-typings": "5.2.X"
   }
   "appDependencies": {
-    "hornet-js-passport": "5.1.X",
+    "hornet-js-passport": "5.2.X",
   }
 
 ```
@@ -128,7 +128,7 @@ Cette stratégie s'appuie sur la classe de configuration *hornet-js-passport/src
 - **`privateCert`**: clé privée de l'application
 - **`availableIdp`**: IDPs déclarés au sein de l'application: objet de type `IdentityProviderProps` ou tableau d'objet de type `IdentityProviderProps`
 - **`verifyFunction`**: Fonction de callback permettant de traiter la réponse du flux SAML
-- **`isMetadataAccessible`**: Détermine si le metadata de l'application est accessible via la route `/metadata-saml`
+- **`isMetadataAccessible`**: Détermine si le metadata de l'application est accessible via la route `/metadata-saml` (valorisé par défaut à true)
 
 ##### Propriétés de l'/des IDP(s): `availableIdp`
 

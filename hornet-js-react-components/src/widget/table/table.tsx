@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -140,7 +140,7 @@ export class Table extends HornetComponent<TableProps, any> {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.state.isVisible !== nextState.isVisible || this.props.children !== nextProps.children;
+        return this.state.isVisible !== nextState.isVisible;
     }
 
     componentWillUnmount(): void {
@@ -157,7 +157,7 @@ export class Table extends HornetComponent<TableProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        logger.trace("render Table");
+        logger.debug("Table render : ", this.props.id);
 
         // si au moins un content n'a pas de notifId specifé, on instancie le composant Notification
         const myContents: any[] = this.getComponentsBy(Content);
@@ -311,7 +311,7 @@ export class Table extends HornetComponent<TableProps, any> {
                         tabIndex: -1,
                         hiddenColumns: this.getHiddenColumns(myHeader),
                         title: (!myContent.props.title && myHeader && myHeader.props && myHeader.props.title) ? myHeader.props.title : myContent.props.title};
-                    Contents.push(React.createElement(Content,props ));
+                    Contents.push(React.createElement(Content, props ));
                 }
             });
             return Contents;

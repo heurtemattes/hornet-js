@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,10 @@ import * as React from "react";
 import { AbstractForm, AbstractFormProps } from "src/widget/form/abstract-form";
 import { DomAdapter } from "src/widget/form/dom-adapter";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.fieldset");
 /**
  * Propriétés du groupe de champs
  */
@@ -157,6 +160,7 @@ export class FieldSet extends AbstractForm<FieldSetProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("FieldSet render :", this.state.legend);
         return (
             <fieldset className={this.state.className} ref={this.registerFieldSet}>
                 <legend className="fieldset-legend">{this.state.legend}</legend>

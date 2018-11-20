@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,8 +106,7 @@ export class ActionHeaderCell<P extends ActionHeaderCellProps, S> extends Abstra
      * @inheritDoc
      */
     renderCell(): JSX.Element {
-
-        logger.trace("render ActionHeaderCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render ActionHeaderCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         return (
             (this.state.abbr) ?
                 <abbr lang={this.state.lang} title={this.state.abbr}>

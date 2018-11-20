@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,9 @@ import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
 import KeyboardEvent = __React.KeyboardEvent;
 import { UserInformations } from "hornet-js-utils/src/authentication-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 
+const logger: Logger = Utils.getLogger("hornet-js-component.widget.user.user");
 /**
  * Propriétés User
  */
@@ -163,6 +165,7 @@ export class User<UserProps, S> extends HornetComponent<any, any> {
     }
 
     render(): JSX.Element {
+        logger.debug("User render : ", this.props.id ? this.props.id : this.state.title);
         return (
             <div className="profil-container" id={this.props.id}>
                 <Dropdown

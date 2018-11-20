@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -115,6 +115,7 @@ export class Plan extends HornetComponent<PlanProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Plan render");
         return (
             <div key="div-planApplication">
                 <ul className="pap" key="ul-planApplication">

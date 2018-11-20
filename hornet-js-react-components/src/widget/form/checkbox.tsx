@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,6 +88,10 @@ import {
     ReactBasicMouseDOMAttributes,
 } from "src/widget/form/abstract-field";
 const ReactDOM = require("react-dom");
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.checkbox");
 
 export interface CheckboxProps {
     label?: string;
@@ -137,7 +141,7 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
      * @inheritDoc
      */
     render(): React.ReactElement<CheckboxProps> {
-
+        logger.debug("Checkbox render : ", this.props.id ? this.props.id : this.state.label);
         const labelProps: any = {
             className: "checkbox-content",
             disabled: this.props.disabled,
@@ -160,7 +164,7 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
             <label {...labelProps}>
                 <input type="checkbox" value="true" {...inputProps} ref={(ref) => { this.inputRef = ref; }} />
                 <span className="checkbox-material">
-                    <span className="check" ref= {(span) => {this.spanRef = span;}}></span>
+                    <span className="check" ref= {(span) => {this.spanRef = span; }}></span>
                 </span>
                 {(this.state.label) ? this.state.label : ""}
             </label>

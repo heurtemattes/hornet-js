@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,6 +99,7 @@ let element: JSX.Element;
 let element2: JSX.Element;
 let element3: JSX.Element;
 let element4: JSX.Element;
+let element5: JSX.Element;
 let textarea;
 
 @Decorators.describe("Test Karma textarea-field")
@@ -108,7 +109,7 @@ class TextareaFieldTestKarma extends BaseTest {
 
     @Decorators.beforeEach
     beforeEach() {
-        Utils.setCls("hornet.internationalization", { messages});
+        Utils.setCls("hornet.internationalization", { messages });
         element = (
             <TextAreaField
                 name={"textarea"}
@@ -144,24 +145,36 @@ class TextareaFieldTestKarma extends BaseTest {
                 alertMessage="alert message {count} superiere a {maxChar}"
                 alertTitle="alert title"
                 ref={(elt) => {
-                        this.test = elt;
-                    }
+                    this.test = elt;
+                }
                 }
                 displayMaxCharInLabel={true}
             />);
 
         element4 = (
-                <Form id="test" readOnly={true}>
+            <Form id="test" readOnly={true}>
                 <TextAreaField
+                    name={"textarea"}
+                    label={"test"}
+                    maxChar={255}
+                    ref={(elt) => {
+                        this.test = elt;
+                    }
+                    }
+                /></Form>
+        );
+
+        element5 = (
+            <TextAreaField
                 name={"textarea"}
                 label={"test"}
                 maxChar={255}
+                currentValue="abracadabresque"
                 ref={(elt) => {
                     this.test = elt;
                 }
-                }
-            /></Form>
-            );
+                } />
+        );
     }
 
     @Decorators.it("Test OK")
@@ -194,14 +207,14 @@ class TextareaFieldTestKarma extends BaseTest {
             setTimeout(() => {
                 expect(area.value).to.be.equal("m");
                 expect(charLabel.innerHTML).to.be.equal("1 caractère");
-                this.triggerKeydownEvent(area, "m", 77,  true);
+                this.triggerKeydownEvent(area, "m", 77, true);
                 setTimeout(() => {
                     expect(area.value).to.be.equal("mm");
                     expect(charLabel.innerHTML).to.be.equal("2 caractères");
                     this.end();
                 });
-            },         250);
-        },         250);
+            }, 250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'activation de l'alerte")
@@ -224,14 +237,15 @@ class TextareaFieldTestKarma extends BaseTest {
             expect(alertOk).to.exist;
             expect(alertTitle).to.exist;
             // Etant donné qu'il n y a pas de prop alertTitle on utilise le title défini dans i18n (clé:textarea.alertTitle)
-            expect(alertTitle.innerText).to.be.equals("Nombre de caractères trop élevé");
+            const titre: string = "Nombre de caractères trop élevé";
+            expect(alertTitle.innerText.toLowerCase()).to.be.equals(titre.toLowerCase());
             expect(alertBody).to.exist;
             // Etant donné qu'il n y a pas de prop alertMessage on utilise le title défini dans i18n (clé:textarea.alertMessage)
             expect(alertBody.innerText).to.be.equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (256/255).");
 
             (alertOk as any).click();
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'activation de l'alerte avec message et titre passés en props")
@@ -253,13 +267,14 @@ class TextareaFieldTestKarma extends BaseTest {
             const alertBody = document.querySelector(".widget-alert-body") as HTMLDivElement;
             expect(alertOk).to.exist;
             expect(alertTitle).to.exist;
-            expect(alertTitle.innerText).to.be.equals("alert title");
+            const titre: string = "alert title";
+            expect(alertTitle.innerText.toLowerCase()).to.be.equals(titre.toLowerCase());
             expect(alertBody).to.exist;
             expect(alertBody.innerText).to.be.equals("alert message 256 superiere a 255");
 
             (alertOk as any).click();
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de non activation de l'alerte")
@@ -276,7 +291,7 @@ class TextareaFieldTestKarma extends BaseTest {
             const alert = document.querySelector(".widget-alert-body");
             expect(alert).to.be.null;
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test du className du charLabel")
@@ -293,7 +308,7 @@ class TextareaFieldTestKarma extends BaseTest {
             const className = charLabel.className;
             expect(className).to.be.equals("textarea-character-value textarea-too-many-char");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'activation de l'alerte si dernier caractere est espace")
@@ -315,7 +330,7 @@ class TextareaFieldTestKarma extends BaseTest {
             expect(alertOk).to.exist;
             (alertOk as any).click();
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage du compteur via setCurrentValue")
@@ -329,7 +344,7 @@ class TextareaFieldTestKarma extends BaseTest {
             expect(charLabel.innerHTML).to.be.equal("123 caractères");
             expect(charLabel.className).to.be.equals("textarea-character-value");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage du label sans maxChar")
@@ -340,7 +355,7 @@ class TextareaFieldTestKarma extends BaseTest {
         setTimeout(() => {
             expect(label.innerHTML).to.be.equal("test");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage du label avec maxChar")
@@ -351,7 +366,7 @@ class TextareaFieldTestKarma extends BaseTest {
         setTimeout(() => {
             expect(label.innerHTML).to.be.equal("test (limite 255 caractères)");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test des attributs RGAA")
@@ -372,7 +387,7 @@ class TextareaFieldTestKarma extends BaseTest {
             expect(charLabel.getAttribute("role")).to.be.equals("log");
 
             this.end();
-        },         250);
+        }, 250);
     }
 
     /*****************************************************/
@@ -401,9 +416,21 @@ class TextareaFieldTestKarma extends BaseTest {
         textarea = this.renderIntoDocument(element4, id);
         const area = document.querySelector(`#${id} textarea`);
         setTimeout(() => {
-            expect(area.hasAttribute ("readonly")).to.be.true;
+            expect(area.hasAttribute("readonly")).to.be.true;
             this.end();
-        },         500);
+        }, 500);
+
+    }
+
+    @Decorators.it("Test valorisation de la prop currentValue")
+    testCurrentValueProp() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element5, id);
+        const area = document.querySelector(`#${id} textarea`);
+        setTimeout(() => {
+            expect(area.innerHTML).to.equal("abracadabresque");
+            this.end();
+        }, 250);
 
     }
 }

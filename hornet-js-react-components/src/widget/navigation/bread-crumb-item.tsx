@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,10 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { MenuItemConfig } from "src/widget/navigation/menu";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.bread-crumb-item");
 /**
  * Propriétés d'un item de breadcrumb
  */
@@ -99,7 +102,7 @@ export class BreadCrumbItem extends HornetComponent<BreadCrumbItemProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-
+        logger.debug("BreadCrumbItem render");
         const { maxIndice, item, currentIndice } = this.state.data;
 
         const liClass = (currentIndice === 1) ? "fil-ariane-racine" : (currentIndice === maxIndice) ? "fil-ariane-courant" : "fil-ariane-parent";

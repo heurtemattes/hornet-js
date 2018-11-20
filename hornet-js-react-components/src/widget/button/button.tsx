@@ -73,16 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
+import { Logger } from "hornet-js-utils/src/logger";
 import * as classNames from "classnames";
 import ReactDOM = __React.ReactDOM;
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.button.button");
 
 /**
  * Propriétés Button
@@ -141,6 +145,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Button render : ", this.state.id ? this.state.id : this.state.name);
 
         return (
             (this.state.type === "link") ? this.renderLink() : this.renderButton()
@@ -241,4 +246,3 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
         },         1500);
     }
 }
-

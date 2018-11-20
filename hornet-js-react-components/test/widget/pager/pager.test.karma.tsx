@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,7 +94,7 @@ import { Content } from "hornet-js-react-components/src/widget/table/content";
 import { Column } from "hornet-js-react-components/src/widget/table/column";
 import { Columns } from "hornet-js-react-components/src/widget/table/columns";
 import * as assert from "assert";
-
+import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
 
 var chai = require('chai');
 const expect = chai.expect;
@@ -109,6 +109,9 @@ let $element;
 class PagerTest extends HornetReactTest {
     @Decorators.beforeEach
     beforeEach() {
+
+        Utils.setCls("hornet.internationalization", { messages });
+
         let data = [];
 
         for (let i: number = 1; i < 150; i++) {
@@ -148,24 +151,25 @@ class PagerTest extends HornetReactTest {
 
     @Decorators.it("Test navigation Pager")
     testNavigationPager() {
-        $element = this.renderIntoDocument(element, "main2");
+        const id = this.generateMainId();
+        $element = this.renderIntoDocument(element, id);
 
         /* Existance du boutton dropdown */
-        expect(document.querySelector("#main2 .datatable-pagination"), "Problème élément Label non trouvé").to.exist;
-        this.triggerMouseEvent(document.querySelector("#main2 .datatable-pagination-button-nextpage"),
+        expect(document.querySelector(`#${id} .datatable-pagination`), "Problème élément Label non trouvé").to.exist;
+        this.triggerMouseEvent(document.querySelector(`#${id} .datatable-pagination-button-nextpage`),
             "click");
-
-        expect(document.querySelector("#main2 .datatable-pagination-input")[ "value" ]).to.equal("2");
         setTimeout(() => {
-            document.querySelector("#main2 .datatable-pagination-input")[ "value" ] = "";
-            this.triggerKeyPressEvent(document.querySelector("#main2 .datatable-pagination-input"), "3", "3".charCodeAt(0), true);
-            this.triggerKeydownEvent(document.querySelector("#main2 .datatable-pagination-input"), "Enter", 13, false); // Appuie de la touche Entrer
-            expect(document.querySelector(" #main2 .datatable-pagination-input")[ "value" ]).to.equal("3");
-            expect(document.querySelector("#main2 > div:nth-child(1) > button:nth-child(5)")[ "title" ]).to.equal("[page 4/15] table.nextPage");
+            expect(document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ]).to.equal("2");
+            document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ] = "";
+            this.triggerKeyPressEvent(document.querySelector(`#${id} .datatable-pagination-input`), "3", "3".charCodeAt(0), true);
+            this.triggerKeydownEvent(document.querySelector(`#${id} .datatable-pagination-input`), "Enter", 13, false); // Appuie de la touche Entrer
+            setTimeout(() => {
+                expect(document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ]).to.equal("3");
+                expect(document.querySelector(`#${id} .datatable-pagination .datatable-pagination-button-nextpage`)[ "title" ]).to.equal("Aller à la page suivante (page 4 sur 15) du tableau");
+                this.end();
+            }, 250);
+        }, 1000);
 
-        }, 2000);
-
-        this.end();
     }
 }
 

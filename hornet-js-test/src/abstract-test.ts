@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,16 +97,17 @@ export class AbstractTest {
      * @param {Error} err : err s'il en existe une
      **/
     public end(err?: Error) {
+        setTimeout(()=> {
+            if (http[ "__old_http_request" ] !== undefined) {
+                (http as any).request = http[ "__old_http_request" ];
+                (https as any).request = https[ "__old_https_reques" ];
+                delete http[ "__old_http_request" ];
+                delete https[ "__old_https_reques" ];
+            }
 
-        if (http[ "__old_http_request" ] !== undefined) {
-            (http as any).request = http[ "__old_http_request" ];
-            (https as any).request = https[ "__old_https_reques" ];
-            delete http[ "__old_http_request" ];
-            delete https[ "__old_https_reques" ];
-        }
 
-
-        this.endft(err);
+            this.endft(err);
+        }, 500);
     }
 
     /**

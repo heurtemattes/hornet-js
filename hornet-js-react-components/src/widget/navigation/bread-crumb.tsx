@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -117,7 +117,7 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-
+        logger.debug("Breadcrumb render");
         return (
             (this.state.data.length) ? this.renderBreadCrumb() : null
         );
@@ -185,6 +185,32 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
                     break;
                 }
             } else {
+                const url = menuDatas[i].url;
+                let newUrl = "";
+                let separator = "";
+
+                if (url) {
+                    const splitUrl = url.split("/");
+                    const splitcurrent = currentPath.split("/");
+
+                    for ( let i = 0 ; i < splitUrl.length; i++) {
+                        if (splitUrl[i] !== splitcurrent[i]) {
+                            const match = (splitcurrent[i]).match(splitUrl[i]);
+                            if (match && match.length > 1 && match[1] === splitcurrent[i]) {
+                                newUrl += separator + splitcurrent[i];
+                            }else {
+                                newUrl += separator + splitUrl[i];
+                            }
+                        }else {
+                            newUrl += separator + splitUrl[i];
+                        }
+                        if (i === 0 ) {
+                            separator = "/";
+                        }
+                    }
+
+                    menuDatas[i].url = newUrl;
+                }
                 datas.unshift(menuDatas[ i ]);
                 break;
             }

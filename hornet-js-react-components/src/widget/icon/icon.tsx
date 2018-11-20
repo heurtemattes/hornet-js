@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,7 +118,6 @@ export interface IconProps extends HornetComponentProps {
 /** Valeur de l'url par défaut lorsque la propriété url est vide */
 export const EMPTY_URL: string = "#";
 
-
 /**
  * Composant Icône
  */
@@ -150,6 +149,7 @@ export class Icon extends HornetComponent<IconProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Icon render : ", this.state.idLink ? this.state.idLink : this.state.title);
         let result: JSX.Element;
         if (this.state.url == null || this.state.url === EMPTY_URL) {
             /* L'URL n'est pas valorisée : le comportement est celui d'un bouton (raccourci clavier : Entrée OU Espace )

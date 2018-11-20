@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -131,7 +131,7 @@ class SelectFieldDataTest extends BaseTest {
         }
     ];
 
-    @Decorators.it("Test radiofields avec data sans valeur par défaut")
+    @Decorators.it("Test selectfield avec data sans valeur par défaut")
     testSelectField1() {
         element = (
             <div id="main1">

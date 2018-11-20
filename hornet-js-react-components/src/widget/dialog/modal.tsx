@@ -73,12 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
@@ -86,6 +87,8 @@ import { ReactAriaModal } from "src/widget/dialog/react-aria-modal";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 
 import * as classNames from "classnames";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.modal");
 
 import ReactNode = __React.ReactNode;
 import MouseEvent = __React.MouseEvent;
@@ -202,6 +205,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Modal render : ", this.state.dialogId ? this.state.dialogId : this.state.title);
         if (Utils.isServer) {
             return null;
         }
@@ -238,12 +242,10 @@ export class Modal extends HornetComponent<ModalProps, any> {
                 </div>);
         }
 
-
         const bodyClasses: ClassDictionary = {
             "widget-dialogue-body": true,
             "modal-overflow-y": !this.state.withoutOverflow,
         };
-
 
         return this.state.isVisible ?
             (
@@ -273,7 +275,6 @@ export class Modal extends HornetComponent<ModalProps, any> {
             ) : null;
 
     }
-
 
     /**
      * Extrait le titre passé dans les propriétés du composant ou indique un titre par défaut

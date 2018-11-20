@@ -68,7 +68,7 @@ export class SessionIdpExpireNotification extends HornetComponent<SessionIdpExpi
      * @returns {JSX.Element}
      */
     renderNotification(): JSX.Element {
-
+        logger.debug("SessionIdpExpireNotification renderNotification");
         this.activeElement = undefined;
         if(window && window.document && window.document.activeElement) {
             this.activeElement = document.activeElement;
@@ -133,11 +133,10 @@ export class SessionIdpExpireNotification extends HornetComponent<SessionIdpExpi
         let rect = elm.getBoundingClientRect();
         let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
 
-        //sauvegarde la la taille visible de l'élément
-        let height = -(rect.top - viewHeight) + 40;
+        // sauvegarde la la taille visible de l'élément
+        const height = -(rect.top - viewHeight) + 40;
         this.setState({ size: height });
 
         return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
     }
 }
-

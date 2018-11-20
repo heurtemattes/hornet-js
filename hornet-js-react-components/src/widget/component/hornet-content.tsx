@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,7 +110,7 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
         // préparation de la taille pour le layout expanding
         let maxWidth;
         let classNameExpanded = "mainLayoutClassNameExpanded";
-        if (!(Utils.appSharedProps.get("isExpandedLayout"))) {
+        if (!Utils.getCls("hornet.expandedLayout")) {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }
@@ -153,7 +153,10 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        logger.trace("VIEW Content render");
+        const id = this.props.id || "page";
+
+        logger.debug("HornetContent render : ", id);
+
         let content;
 
         if (this.state.error && !this.state.error.hasBeenReported) {
@@ -163,7 +166,7 @@ export class HornetContent extends HornetComponent<HornetContentProps, any> {
         }
 
         return (
-            <main id={this.props.id || "page"}
+            <main id={id}
                 role="main"
                 className={this.state.classNameExpanded}
                 style={{ maxWidth: this.state.currentWorkingZoneWidth }}

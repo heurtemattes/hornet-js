@@ -5,8 +5,8 @@ import { HornetComponent } from "hornet-js-react-components/src/widget/component
 import { SESSION_REFRESHED_NOTIFICATION_EVENT, SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT, SESSION_WILL_EXPIRE_NOTIFICATION_EVENT, SessionEvent } from "hornet-js-core/src/services/hornet-superagent";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-message-item");
-let notifyDesktop = (message: string) => {
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-session");
+const notifyDesktop = (message: string) => {
     logger.debug("notifyBesktop");
     // le navigateur supporte les notifications
     if (!("Notification" in window)) {
@@ -41,11 +41,11 @@ export class SessionExpireNotification extends HornetComponent<HornetComponentPr
     handleWillExpireStart(ev: HornetEvent<SessionEvent>) {
     }
     handleWillExpire(ev: HornetEvent<SessionEvent>) {
-        let expireIn = ev.detail.value / 1000;
+        const expireIn = ev.detail.value / 1000;
         notifyDesktop("Votre session expire dans " + expireIn + " seconde(s).");
     }
     render(): JSX.Element {
+        logger.debug("SessionExpireNotification render");
         return null;
     }
 }
-

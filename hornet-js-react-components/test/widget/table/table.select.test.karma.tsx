@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -104,28 +104,38 @@ import { Picto } from "src/img/picto";
 import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
 
 /** Tableau de liste de secteurs */
-let dataSourceTriTable: DataSource<any>;
-let tableElement, tableElementWithActionColumns: JSX.Element;
-let table;
-let data;
 
 @Decorators.describe("Test Karma table selection")
 class tableTest extends BaseTest {
 
-    @Decorators.beforeEach
-    beforeEach() {
-        data = [];
+    private dataSourceTriTableSelect: DataSource<any>;
+    private tableElement: JSX.Element;
+    private tableElementWithActionColumns: JSX.Element;
+    private data;
+    private id;
+    
+    @Decorators.before
+    before() {
+        this.data = [];
         let step = 1;
         for (let i: number = 1; i < 10; i++) {
-            data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
+            this.data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
-        dataSourceTriTable = new DataSource(data);
+    }
 
-        tableElement = (
+    @Decorators.beforeEach
+    beforeEach() {
+
+        if(this.dataSourceTriTableSelect) {
+            this.dataSourceTriTableSelect.removeAllListeners();
+        }
+        this.dataSourceTriTableSelect = new DataSource(this.data);
+
+        this.tableElement = (
             <Table id="lite">
                 <Header title={"Secteurs"}>
                 </Header>
-                <Content dataSource={dataSourceTriTable}>
+                <Content dataSource={this.dataSourceTriTableSelect}>
                     <Columns>
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
@@ -135,11 +145,11 @@ class tableTest extends BaseTest {
             </Table>
         );
 
-        tableElementWithActionColumns = (
+        this.tableElementWithActionColumns = (
             <Table id="table-with-action-column">
                 <Header title={"Secteurs"}>
                 </Header>
-                <Content dataSource={dataSourceTriTable}>
+                <Content dataSource={this.dataSourceTriTableSelect}>
                     <Columns>
                         <CheckColumn keyColumn="id" />
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
@@ -166,110 +176,117 @@ class tableTest extends BaseTest {
 
     @Decorators.it("selectionner un element dans le tableau")
     selectionUnElement() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSourceTriTable.on("fetch", () => {
-            this.triggerMouseEvent(document.querySelector(`#${id} #lite-0-colBody-1-0 input`), "click");
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSourceTriTableSelect.on("fetch", () => {
+            this.triggerMouseEvent(document.querySelector(`#${this.id} #lite-0-colBody-1-0 input`), "click");
         });
-        dataSourceTriTable.on("select", () => {
-            expect(_.isEqual(dataSourceTriTable.selected[0], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
+        this.dataSourceTriTableSelect.on("select", () => {
+            expect(_.isEqual(this.dataSourceTriTableSelect.selected[0], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
             this.end();
 
         });
-        dataSourceTriTable.reload();
+        this.dataSourceTriTableSelect.reload();
     }
 
     @Decorators.it("afficher un tableau avec des elements déjà sélectionnés")
     affichageElementSelectionne() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSourceTriTable.select([{ id: 2, label: "libelle2" }, { id: 4, label: "libelle4" }]);
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSourceTriTableSelect.select([{ id: 2, label: "libelle2" }, { id: 4, label: "libelle4" }]);
 
 
-        dataSourceTriTable.on("fetch", (value) => {
+        this.dataSourceTriTableSelect.on("fetch", (value) => {
 
-            expect(document.querySelector(`#${id} #lite-0-colBody-1-0 input:checked`)).to.exist;
-            expect(document.querySelector(`#${id} #lite-0-colBody-3-0 input:checked`)).to.exist;
+            expect(document.querySelector(`#${this.id} #lite-0-colBody-1-0 input:checked`)).to.exist;
+            expect(document.querySelector(`#${this.id} #lite-0-colBody-3-0 input:checked`)).to.exist;
             this.end();
 
         });
-        dataSourceTriTable.reload();
+        this.dataSourceTriTableSelect.reload();
     }
 
     @Decorators.it("trier un tableau sur une colonne")
     triSimple() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSourceTriTable.on("sort", () => {
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSourceTriTableSelect.on("sort", () => {
 
-            expect((document.querySelector(`#${id} #lite-0-colBody-0-1`) as any).innerText).to.be.equal("libelle9");
+            expect((document.querySelector(`#${this.id} #lite-0-colBody-0-1`) as any).innerHTML).to.be.equal("libelle9");
             this.end();
 
         });
 
-        dataSourceTriTable.sort({ sortDatas: [new SortData("label", SortDirection.DESC)] });
+        this.dataSourceTriTableSelect.sort({ sortDatas: [new SortData("label", SortDirection.DESC)] });
     }
 
     @Decorators.it("trier un tableau sur plusieurs colonnes part1")
     triMultiple1() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSourceTriTable.on("sort", () => {
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSourceTriTableSelect.on("sort", () => {
             setTimeout(() => {
-                expect((document.querySelector(`#${id} #lite-0-colBody-0-1`) as any).innerText).to.be.equal("libelle3");
-                expect((document.querySelector(`#${id} #lite-0-colBody-6-1`) as any).innerText).to.be.equal("libelle9");
-                expect((document.querySelector(`#${id} #lite-0-colBody-7-1`) as any).innerText).to.be.equal("libelle1");
-                expect((document.querySelector(`#${id} #lite-0-colBody-8-1`) as any).innerText).to.be.equal("libelle2");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-0-1`) as any).innerHTML).to.be.equal("libelle3");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-6-1`) as any).innerHTML).to.be.equal("libelle9");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-7-1`) as any).innerHTML).to.be.equal("libelle1");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-8-1`) as any).innerHTML).to.be.equal("libelle2");
                 this.end();
             }, 500);
 
         });
-        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.ASC), new SortData("label", SortDirection.ASC)] });
+        this.dataSourceTriTableSelect.sort({ sortDatas: [new SortData("desc", SortDirection.ASC), new SortData("label", SortDirection.ASC)] });
     }
 
     @Decorators.it("trier un tableau sur plusieurs colonnes part2")
     triMultiple2() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSourceTriTable.on("sort", () => {
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElement, this.id);
+        this.dataSourceTriTableSelect.on("sort", () => {
             setTimeout(() => {
-                expect((document.querySelector(`#${id} #lite-0-colBody-0-1`) as any).innerText).to.be.equal("libelle2");
-                expect((document.querySelector(`#${id} #lite-0-colBody-1-1`) as any).innerText).to.be.equal("libelle1");
-                expect((document.querySelector(`#${id} #lite-0-colBody-2-1`) as any).innerText).to.be.equal("libelle9");
-                expect((document.querySelector(`#${id} #lite-0-colBody-8-1`) as any).innerText).to.be.equal("libelle3");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-0-1`) as any).innerHTML).to.be.equal("libelle2");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-1-1`) as any).innerHTML).to.be.equal("libelle1");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-2-1`) as any).innerHTML).to.be.equal("libelle9");
+                expect((document.querySelector(`#${this.id} #lite-0-colBody-8-1`) as any).innerHTML).to.be.equal("libelle3");
                 this.end();
             }, 500);
         });
-        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.DESC), new SortData("label", SortDirection.DESC)] });
+        this.dataSourceTriTableSelect.sort({ sortDatas: [new SortData("desc", SortDirection.DESC), new SortData("label", SortDirection.DESC)] });
     }
 
     @Decorators.it("test du rendu de l'action column après tri colonnes part1")
     testRenderActionColumnAfterSortAscOnLabelAndDesc() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElementWithActionColumns, id);
-        dataSourceTriTable.on("sort", () => {
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElementWithActionColumns, this.id);
+        this.dataSourceTriTableSelect.on("sort", () => {
             setTimeout(() => {
-                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-6-3 a`) as any).title).to.be.equal("Editer libelle9");
-                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-6-4 a`) as any).title).to.be.equal("Plus d'info sur libelle9 desc0");
+                expect((document.querySelector(`#${this.id} #table-with-action-column-0-colBody-6-3 a`) as any).title).to.be.equal("Editer libelle9");
+                expect((document.querySelector(`#${this.id} #table-with-action-column-0-colBody-6-4 a`) as any).title).to.be.equal("Plus d'info sur libelle9 desc0");
                 this.end();
             }, 500);
         });
-        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.ASC), new SortData("label", SortDirection.ASC)] });
+        this.dataSourceTriTableSelect.sort({ sortDatas: [new SortData("desc", SortDirection.ASC), new SortData("label", SortDirection.ASC)] });
     }
 
 
     @Decorators.it("test du rendu de l'action column après tri colonnes part2")
     testRenderActionColumnAfterSortDescOnLabelAndDesc() {
-        const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElementWithActionColumns, id);
-        dataSourceTriTable.on("sort", () => {
+        this.id = this.generateMainId();
+        this.renderIntoDocument(this.tableElementWithActionColumns, this.id);
+        this.dataSourceTriTableSelect.on("sort", () => {
             setTimeout(() => {
-                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-2-3 a`) as any).title).to.be.equal("Editer libelle9");
-                expect((document.querySelector(`#${id} #table-with-action-column-0-colBody-2-4 a`) as any).title).to.be.equal("Plus d'info sur libelle9 desc0");
+                expect((document.querySelector(`#${this.id} #table-with-action-column-0-colBody-2-3 a`) as any).title).to.be.equal("Editer libelle9");
+                expect((document.querySelector(`#${this.id} #table-with-action-column-0-colBody-2-4 a`) as any).title).to.be.equal("Plus d'info sur libelle9 desc0");
                 this.end();
             }, 500);
         });
-        dataSourceTriTable.sort({ sortDatas: [new SortData("desc", SortDirection.DESC), new SortData("label", SortDirection.DESC)] });
+        this.dataSourceTriTableSelect.sort({ sortDatas: [new SortData("desc", SortDirection.DESC), new SortData("label", SortDirection.DESC)] });
+    }
+
+    @Decorators.after
+    after() {
+        if(this.dataSourceTriTableSelect) {
+            this.dataSourceTriTableSelect.removeAllListeners();
+        }
     }
 
 }

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Test gestion des erreurs tabs",
+  "description": "Validation des données de formulaire sur dans plusieurs tabs",
+  "type": "object",
+  "required": [
+    "nom",
+    "adresse"
+  ],
+  "properties": {
+    "nom": {
+      "type": "string"
+    },
+    "adresse": {
+      "type": "string"
+    }
+  }
+}

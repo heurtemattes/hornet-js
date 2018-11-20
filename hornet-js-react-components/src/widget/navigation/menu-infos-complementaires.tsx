@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,10 @@
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-infos-complementaires");
 
 /**
  * Elément de menu InformationsComplémentaires
@@ -92,6 +95,7 @@ export class MenuInfosComplementaires extends HornetComponent<HornetComponentPro
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("MenuInfosComplementaires render");
         return <li className="nav-item infocomp">{this.state.children}</li>;
     }
 }

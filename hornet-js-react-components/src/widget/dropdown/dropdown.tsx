@@ -73,18 +73,22 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { DropdownItem } from "src/widget/dropdown/dropdown-item";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetEvent, fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.dropdown");
 
 interface DropdownActivationEventDetail { id: string; }
 const DROPDOWN_ACTIVATION_EVENT = new HornetEvent<DropdownActivationEventDetail>("DROPDOWN_ACTIVATION_EVENT");
@@ -156,7 +160,6 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         this.listen(DROPDOWN_ACTIVATION_EVENT, this.handleOtherDropdownActivation);
     }
 
-
     /**
      * @inheritDoc
      */
@@ -199,6 +202,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Dropdown render :", this.state.id);
 
         const dropdownClasses: ClassDictionary = {
             "dropdown-container": true,
@@ -215,7 +219,6 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             </div>
         );
     }
-
 
     renderLink() {
 
@@ -302,7 +305,6 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         let items;
         const buildItem = (item, index) => {
 
-
             const dropdownItemsProps = {
                 label: item.label,
                 url: item.url,
@@ -358,7 +360,6 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 </ul>
             </div>);
     }
-
 
     calculPositionBox() {
         let valRightArrow = 0;
@@ -519,7 +520,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
 
     /**
      * Ferme le dropdown courrant à l'ouverture d'un autre dropdown
-     * @param event 
+     * @param event
      */
     private handleOtherDropdownActivation(event) {
         if (this.state.isActive && event && event.detail && event.detail.id !== this.state.id) {

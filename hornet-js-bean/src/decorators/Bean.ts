@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,7 +102,6 @@ export default function (target) {
                 }
             }
 
-
             if (destMap) {
                 for (let idxField = 0; idxField < destMap.length; idxField++) {
                     let result;
@@ -130,6 +129,10 @@ export default function (target) {
                             if (val) {
                                 prop = val;
                                 return false;
+                            }else {
+                                if (object.dataValues && object.dataValues[value]) {
+                                    prop = object.dataValues[value];
+                                }
                             }
                         });
                     }

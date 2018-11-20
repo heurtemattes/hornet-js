@@ -1,3 +1,10 @@
+# hornet-js-core 5.2.3
+
+- e68969b77 FIX - hornet-js-core - HornetSuperAgent : Renvoie le text si body vide
+- 48276c77b FIX - [70121] - hornet-js-core - HornetSuperAgent : nom du fichier pour le pipeStream
+- b3f02426c FIX - hornet-js-core - HornetResult : export contentType without download
+- bc277757b FIX - hornet-js-core - HornetSuperAgent : content-type vide sur des api's externes
+
 # hornet-js-core 5.2.2
 
 - 1df4ee94 FIX - [M69460] hornet-js-core - probleme utilisation query superagent pour les plugins

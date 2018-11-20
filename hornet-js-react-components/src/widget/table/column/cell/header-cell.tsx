@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,7 +98,6 @@ const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.
  */
 export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell<P, any> {
 
-
     constructor(props: P, context?: any) {
         super(props, context);
     }
@@ -106,7 +105,6 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
     static defaultProps = {
         sort: false,
     };
-
 
     /**
      * @inheritDoc
@@ -119,7 +117,7 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
      * @inheritDoc
      */
     renderCell(): JSX.Element {
-        logger.trace("render HeaderCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render HeaderCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         // Gestion du titre de l'entête
         const isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
         let urlImgArrow: string = "/img/tableau/ic_arrow_upward_black.svg";
@@ -163,7 +161,6 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
             logger.trace("prochain sens de tri :", nextSortDir);
         }
 
-
         /* Données de tri à appliquer au prochain clic sur cette colonne */
         const nextTableSort: SortData = {
             key: sortKey,
@@ -195,7 +192,6 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
 
         const titles = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none");
 
-
         const divProps: any = {
             "aria-sort": titles.ariasort,
             className: "datatable-header-sort-liner",
@@ -205,7 +201,6 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
             onKeyDown: handleOnKeyDown,
             tabIndex: this.getTabIndexFullKind(),
             title: titles.title,
-
 
         };
 

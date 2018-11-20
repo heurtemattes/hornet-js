@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,10 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Alert } from "src/widget/dialog/alert";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
 
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.chars-counter");
 
 export interface HornetCharsCounterAttributes {
     maxChar?: number;
@@ -131,6 +134,7 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("CharsCounter render : ", this.state.id);
         const className = this.props.className ? this.props.className : "chars-counter";
         return (
             <div>
@@ -162,7 +166,7 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
 
     /**
      * Méthode déclenchée sur détection du changement de texte du composant associé
-     * @param text 
+     * @param text
      */
     public handleTextChange(text: string) {
         let counterMessgae = "";

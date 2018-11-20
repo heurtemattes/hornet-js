@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,6 +107,7 @@ export class AccordionInfo extends HornetComponent<AccordionInfoProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("AccordionInfo render");
         return (
             <div className="accordion-info-container">
                 {this.props.children}

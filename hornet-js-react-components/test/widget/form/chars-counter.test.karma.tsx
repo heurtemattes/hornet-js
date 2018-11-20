@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -161,7 +161,8 @@ class CharsCounterTest extends HornetReactTest {
             const alertBody = document.querySelector(".widget-alert-body") as HTMLDivElement;
             expect(alertOk).to.exist;
             expect(alertTitle).to.exist;
-            expect(alertTitle.innerText).to.be.equals("Max char titre");
+            const titre: string = "Max char titre";
+            expect(alertTitle.innerText.toLowerCase()).to.be.equals(titre.toLowerCase());
             expect(alertBody).to.exist;
             expect(alertBody.innerText).to.be.equals("Le nombre de caractères saisi 21 dépasse le maximum 20");
 

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -258,9 +258,11 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
     }
 
     render() {
-        let transformValue = (this.state.verticallyCenter) ? "translate(-50%, -50%)" : "translateX(-50%)";
-        let topValue = (this.state.verticallyCenter) ? "50%" : "0";
-        let style: __React.CSSProperties = {
+        logger.debug("ReactAriaModalDialog render : " + this.state.dialogId);
+
+        const transformValue = (this.state.verticallyCenter) ? "translate(-50%, -50%)" : "translateX(-50%)";
+        const topValue = (this.state.verticallyCenter) ? "50%" : "0";
+        const style: __React.CSSProperties = {
             position: "absolute",
             left: this.state.isDraggable ? "40%" : "50%",
             top: this.state.isDraggable ? "35%" : topValue,
@@ -272,7 +274,6 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
             cursor: "default",
             outline: this.state.focusDialog ? 0 : undefined
         };
-
 
         let props = null;
         const labelledby = "dialogue-title".concat(this.state.alert ? " widget-alert-body" : "");
@@ -292,8 +293,8 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
         // if is draggable modal
         if (this.state.isDraggable) {
             props = {
-                "bounds": "html",
-                "handle": ".widget-dialogue-title"
+                bounds: "html",
+                handle: ".widget-dialogue-title",
             };
             return (
                 <Draggable {...props}>
@@ -332,18 +333,19 @@ export class ReactAriaModal extends HornetComponent<any, any> {
         underlayClickExits: false,
         underlayColor: "rgba(0,0,0,0.5)",
         escapeKeyExits: false,
-        isDraggable: false
+        isDraggable: false,
     };
     static number = 0;
 
     renderModal() {
+        logger.debug("ReactAriaModal renderModal");
         if (!this.state.container) (this.state as any).container = document.createElement("div");
         if (!this.state.idx) (this.state as any).idx = ++ReactAriaModal.number;
-        let nProps = {};
-        for (let prop in this.props) {
+        const nProps = {};
+        for (const prop in this.props) {
             nProps[ prop ] = this.props[ prop ];
         }
-        //this.state.idx = this.state.idx;
+        // this.state.idx = this.state.idx;
         nProps[ "idx" ] = this.state.idx;
         if (!this.state.firstRender) {
             document.body.appendChild(this.state.container);
@@ -359,7 +361,7 @@ export class ReactAriaModal extends HornetComponent<any, any> {
                     </ReactAriaModalDialog>
                 </ReactAriaModalUnderlay>
             ),
-            this.state.container as HTMLElement
+            this.state.container as HTMLElement,
         );
     }
 

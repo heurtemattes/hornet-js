@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,6 +90,10 @@ import {
 import * as _ from "lodash";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.checkbox-field");
 
 export interface CheckBoxFieldProps extends AbstractFieldProps, HornetClickableProps,
     HornetBasicFormFieldProps {
@@ -148,7 +152,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      * @override
      */
     renderWidget(): JSX.Element {
-
+        logger.debug("CheckBoxField renderWidget : ", this.props.id ? this.props.id : this.state.name);
         const cx = classNames(
             this.state.groupClass,
             "checkbox-container",

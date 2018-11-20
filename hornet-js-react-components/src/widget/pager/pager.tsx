@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -249,6 +249,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Pager render : ", this.props.id);
         logger.trace("render");
         const className: ClassDictionary = {
             "datatable-pagination": true,

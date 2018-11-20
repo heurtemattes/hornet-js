@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,6 +94,7 @@ import {
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
 import { NotificationType } from "hornet-js-core/src/notification/notification-manager";
+import { ScrollingUtils } from "hornet-js-components/src/utils/scrolling-utils";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification");
 
@@ -235,6 +236,7 @@ export class Notification extends HornetComponent<NotificationProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Notification render : ", this.state.id);
         return (
             <div id={this.state.id}>
                 <NotificationContent errorsTitle={this.state.errorsTitle}
@@ -303,7 +305,7 @@ export class Notification extends HornetComponent<NotificationProps, any> {
 /**
  * Composant Contenu de Notification
  */
-class NotificationContent extends HornetComponent<NotificationContentProps, any> {
+export class NotificationContent extends HornetComponent<NotificationContentProps, any> {
 
     static firstRender = true;
 
@@ -355,11 +357,9 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
     scrollToNotifications() {
         if (this.state.infos || this.state.errors || this.state.exceptions) {
             const element = ReactDom.findDOMNode(this) as any;
-            if (element && element.scrollIntoView) {
-                element.scrollIntoView();
-                // déplacement pour le sticky header
-                window.scroll(window.scrollX, window.scrollY - 59);
-            } else {
+            if (element) {
+                ScrollingUtils.smoothScrollToElementWithStickyHeader( element );
+            }else {
                 logger.warn("Impossible de scroller sur les notifications.");
             }
         }
@@ -377,10 +377,9 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
         }
     }
 
-
     /**
-     * 
-     * @param exception 
+     *
+     * @param exception
      */
     protected exceptionStackDev(exception: BaseError) {
         let stack;
@@ -455,7 +454,6 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
         } : {};
         const ulStyle = (notifType === notificationType.PERSONNALS) ? { color: this.state.color } : {};
 
-
         // on utilise la meme class css pour les errors et les exeptions
         notifType = (notifType === notificationType.EXCEPTION) ? "error" : notifType;
         return (
@@ -513,7 +511,7 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
 
     /**
      * Affiche/Masque les erreurs dans la zone de notification
-     * 
+     *
      */
     handleClickShowError(e) {
 
@@ -545,7 +543,7 @@ class NotificationContent extends HornetComponent<NotificationContentProps, any>
 
     /**
      * Suppression de la notification success(info)
-     * @param items 
+     * @param items
      */
     handleClickRemove(items) {
         items.map((id) => {

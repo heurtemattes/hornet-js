@@ -5,12 +5,14 @@ import { HornetComponent } from "hornet-js-react-components/src/widget/component
 import * as moment from "moment-timezone";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
 
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.count-down");
+
 (moment.duration as any).fn.format = function(){
     let str = "";
     if(this.days() > 1) str = str + Math.floor(this.days()) + "d ";
     if(this.hours() > 1) str = str + Math.floor(this.hours()) + "h ";
     if(this.minutes() > 1) str = str + Math.floor(this.minutes()) + "m ";
-    if(this.seconds() > 1) str = str + Math.floor(this.seconds()) + "s ";
+    if (this.seconds() > 1) str = str + Math.floor(this.seconds()) + "s ";
     return str
 };
 
@@ -59,9 +61,9 @@ export class Countdown extends HornetComponent<CountDownProps, any> {
      * @override
      */
     render(): JSX.Element {
-
+        logger.debug("Countdown render");
         let message:any = this.i18n(this.props.countDownExpiredMesage);
-        if(this.state.secondsRemaining != 0) {
+        if (this.state.secondsRemaining != 0) {
 
             // let s = Math.floor(this.state.secondsRemaining / 1000) % 60;
             // //minutes
@@ -69,8 +71,8 @@ export class Countdown extends HornetComponent<CountDownProps, any> {
             //
             // //affichage
             // let time = m + ":" + s;
-            let time = (moment.duration(this.state.secondsRemaining, "milliseconds") as any).format("H:mm:ss");
-            message = this.i18n(this.props.countDownNormalMessage) + time
+            const time = (moment.duration(this.state.secondsRemaining, "milliseconds") as any).format("H:mm:ss");
+            message = this.i18n(this.props.countDownNormalMessage) + time;
         }
 
         return (

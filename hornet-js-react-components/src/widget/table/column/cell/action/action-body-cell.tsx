@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,6 +110,10 @@ export interface ActionBodyCellProps extends AbstractBodyCellProps {
     hasPopUp?: string;
 
     label?: string;
+
+    /** Clé sur laquelle se base la méthode shouldComponentUpdate */
+    keyShouldComponentUpdate?: string;
+
 }
 
 export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBodyCell<P, S> {
@@ -117,16 +121,17 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
     private inferedAlertMessage: string;
     private inferedAlertTitle: string;
 
+    static defaultProps = {
+        keyShouldComponentUpdate: "id",
+    };
 
     constructor(props: P, context: any) {
         super(props, context);
 
-
         this.state = {
             ...this.state,
             url: this.props.url && this.genUrlWithParams(props.url, props.value),
-            visible: (this.props.visible && (typeof this.props.visible === "function")) ? this.props.visible(this.props.value) : true,
-            hasPopUp: this.props.messageAlert
+            hasPopUp: this.props.messageAlert,
         };
 
     }
@@ -136,15 +141,19 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      */
     shouldComponentUpdate(nextProps: any, nextState: any) {
         return super.shouldComponentUpdate(nextProps, nextState) ||
-        ((this.props.value as any).id !== (nextProps.value as any).id);
+            (this.props.value && nextProps.value &&
+                this.props.value[this.props.keyShouldComponentUpdate] !== nextProps.value[this.props.keyShouldComponentUpdate]);
+    }
+
+    isVisible() {
+        return (this.props.visible && (typeof this.props.visible === "function")) ? this.props.visible(this.props.value) : true;
     }
 
     /**
      * @inheritDoc
      */
     renderCell(): JSX.Element {
-
-        logger.trace("render ActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render ActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         this.title = this.getCellTitleWithProps(this.props);
 
         const classes: ClassDictionary = {
@@ -158,7 +167,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
 
         let img = null;
         if (typeof this.props.srcImg === "string") {
-            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title}/>;
+            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title} />;
         } else {
 
             img = this.props.srcImg;
@@ -176,7 +185,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
             "aria-haspopup": this.state.hasPopUp,
-            role: "button"
+            role: "button",
         };
 
         if (this.props.messageAlert) {
@@ -187,7 +196,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         }
 
         return (
-            this.state.visible ?
+            this.isVisible() ?
 
                 <a {...aProps}>
                     {img}

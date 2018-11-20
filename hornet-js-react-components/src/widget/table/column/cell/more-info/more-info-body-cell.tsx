@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,13 +88,15 @@ import * as classNames from "classnames";
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
 
 export interface MoreInfoBodyCellProps extends ActionBodyCellProps {
-
+    /** Clé sur laquelle se base la méthode shouldComponentUpdate */
+    keyShouldComponentUpdate? : string;
 }
 
 export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends ActionBodyCell<P, any> {
 
     static defaultProps = {
         srcImg: Picto.blue.user,
+        keyShouldComponentUpdate: "id",
     };
 
     constructor(props: P, context: any) {
@@ -124,8 +126,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
      * @inheritDoc
      */
     renderCell(): JSX.Element {
-
-        logger.trace("render MoreInfoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render MoreInfoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         this.title = this.getCellTitleWithProps(this.props);
 
         const classes: ClassDictionary = {

@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -110,13 +110,14 @@ import { Promise } from "hornet-js-utils/src/promise-api";
 import { AppSharedProps } from "hornet-js-utils/src/app-shared-props";
 
 import { Timer } from "src/timers/timer";
+import { DispositionType } from "src/result/disposition-type";
+import { ObjectUtils } from 'hornet-js-utils/src/object-utils';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap http & https afin de sécuriser l'utilisation de "continuation-local-storage" (perte ou mix de contexte) //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 import * as http from "http";
 import * as https from "https";
-import { DispositionType } from "src/result/disposition-type";
 
 if (http[ "__old_http_request" ] === undefined) {
     http[ "__old_http_request" ] = http.request;
@@ -175,6 +176,8 @@ export class HornetSuperAgent {
 
     /** pour du cache de la configuration globale  */
     public static globalClientSessionConfig: ClientSessionTimeout;
+
+    public static contentTypesNoExport:string[] = ["application/json", "text/plain"];
 
     /** pour sauvegarder l'handler du timeout */
     protected static sessionExpireTimeout: NodeJS.Timer;
@@ -403,7 +406,8 @@ export class HornetSuperAgent {
 
                         if (pipedStream) {
                             pipedStream[ "contentType" ](request.typeMime.MIME);
-                            pipedStream[ "attachment" ]("export." + request.typeMime.SHORT);
+                            let fileName = (request.resultDisposition && request.resultDisposition.type === ResultDispositionType.Default && request.resultDisposition.data && request.resultDisposition.data.name) || "export";
+                            pipedStream[ "attachment" ](fileName + "." + request.typeMime.SHORT);
 
                             resolve(ha.pipe(pipedStream));
 
@@ -484,51 +488,54 @@ export class HornetSuperAgent {
                         return Promise.reject(e);
                     }
                 }
-            } else {
-                const regexp = response.header[ "content-type" ].match(/([a-zA-Z]+)\/([a-zA-Z0-9.-]+)/);
-                if ("application/json" !== regexp[ 0 ].toLowerCase()) {
+            } else if (response.header[ "content-type" ]) {
+                let contentTyptExp = /([a-zA-Z]+)\/([a-zA-Z0-9.-]+)/;
+                if(contentTyptExp.test(response.header[ "content-type" ])) {
+                    const regexp = response.header[ "content-type" ].match(contentTyptExp);
+                    if (HornetSuperAgent.contentTypesNoExport.indexOf(regexp[ 0 ].toLowerCase()) === -1) {
 
-                    const attachFile = response.header[ "content-disposition" ]
-                        ? response.header[ "content-disposition" ].match(/(attachment|inline); filename="([^"]+)"/)
-                        : undefined;
-                    let attachFilename = undefined;
-                    // extract file name from header response
-                    if (attachFile) {
-                        attachFilename = attachFile[ 2 ];
-                    } else {
-                        attachFilename = "export." + MediaTypes.fromMime(regexp[ 0 ]).SHORT;
-                    }
-
-                    const res = response[ "xhr" ].response;
-                    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                        window.navigator.msSaveOrOpenBlob(
-                            res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }), attachFilename);
-                    }
-                    else {
-                        const objectUrl = window.URL.createObjectURL(
-                            // xhr.response is a blob
-                            res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }));  
-                        if (!request.resultDisposition) {
-                            if (!attachFile || attachFile[ 1 ] === DispositionType.ATTACHMENT) {
-                                const elemt = { a: null };
-                                elemt.a = document.createElement("a");
-                                elemt.a.href = objectUrl;
-                                elemt.a.download = attachFilename; // Set the file name.
-                                elemt.a.style.display = "none";
-                                document.body.appendChild(elemt.a);
-                                elemt.a.click();
-                                setTimeout(function () {
-                                    document.body.removeChild(elemt.a);
-                                    window.URL.revokeObjectURL(elemt.a.href);
-                                    delete elemt.a;
-                                },         0);
-                            }
+                        const attachFile = response.header[ "content-disposition" ]
+                            ? response.header[ "content-disposition" ].match(/(attachment|inline); filename="([^"]+)"/)
+                            : undefined;
+                        let attachFilename = undefined;
+                        // extract file name from header response
+                        if (attachFile) {
+                            attachFilename = attachFile[ 2 ];
                         } else {
-                            if (request.resultDisposition && request.resultDisposition.type === ResultDispositionType.Custom) {
-                                return objectUrl;
+                            attachFilename = "export." + MediaTypes.fromMime(regexp[ 0 ]).SHORT;
+                        }
+
+                        const res = response[ "xhr" ].response;
+                        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                            window.navigator.msSaveOrOpenBlob(
+                                res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }), attachFilename);
+                        }
+                        else {
+                            const objectUrl = window.URL.createObjectURL(
+                                // xhr.response is a blob
+                                res instanceof Blob ? res : new Blob([ res ], { type: regexp[ 0 ] }));  
+                            if (!request.resultDisposition) {
+                                if (!attachFile || attachFile[ 1 ] === DispositionType.ATTACHMENT) {
+                                    const elemt = { a: null };
+                                    elemt.a = document.createElement("a");
+                                    elemt.a.href = objectUrl;
+                                    elemt.a.download = attachFilename; // Set the file name.
+                                    elemt.a.style.display = "none";
+                                    document.body.appendChild(elemt.a);
+                                    elemt.a.click();
+                                    setTimeout(function () {
+                                        document.body.removeChild(elemt.a);
+                                        window.URL.revokeObjectURL(elemt.a.href);
+                                        delete elemt.a;
+                                    },         0);
+                                }
                             } else {
-                                const data = request.resultDisposition.data || {};
-                                window.open(objectUrl, data.name, data.specs, data.replace);
+                                if (request.resultDisposition && request.resultDisposition.type === ResultDispositionType.Custom) {
+                                    return objectUrl;
+                                } else {
+                                    const data = request.resultDisposition.data || {};
+                                    window.open(objectUrl, data.name, data.specs, data.replace);
+                                }
                             }
                         }
                     }
@@ -560,7 +567,8 @@ export class HornetSuperAgent {
             }
 
         } else {
-            return (response && response.body) || response;
+            return (response && ObjectUtils.isNotEmpty(response.body) && response.body)
+                    || (response && response.text) || response;
         }
     }
 

@@ -1,3 +1,36 @@
+# hornet-js 5.2.3
+
+- 1cd303bc6 FIX - hornet-js-react-components - Table: HornetComponent : modification componentWillReceiveProps
+- 0cf200130 FIX [T840] - hornet-js-react-components - Table: Tabs dans Form: correction calcul du nombre d'erreur dans le tabs
+- 01835fa55 FIX - hornet-js-react-components : correction pour TU async
+- 0640808d6 FIX [S337] - hornet-js-react-components : ajouter log DEBUG dans chacun des render avec id component
+- 69520bf1a FIX [s343] - hornet-js-react-components - Notification : correction scroll vers les notification
+- 1cbe9dbfc FIX [s341] - hornet-js-react-components - AutoCompleteField : liste non vidée si texte saisi dans le text input du composant
+- b505917c5 FIX [s341] - hornet-js-react-components - Form: Correction du TU validation de form pour I18N
+- 97822b1d2 FIX [s349] - hornet-js-react-components - Table: HeaderCellProps et getCellProps dans Content
+- 8b66f7dec PROJ - hornet-js-react-components - Table: ajout test tableau vide
+- 694e8beb8 FIX [S347] - hornet-js-react-components - Table: correction PERF shouldComponentUpdate et garde-fou sur children
+- 7a02e81c7 FIX [S345] - hornet-js-react-components - Notification : Suppression du préfixe de l'onglet s'il est dans le formulaire
+- b5b0404af FIX [S344] - hornet-js-react-components - NotificationContent: pas d'export sur composant
+- c39443fa8 FIX [S335] - hornet-js-react-components - Tabs : Mise à disposition de la collection de tabs dans Tab
+- f3d137e92 FIX [M70613] - hornet-js-react-components : correction deleteAll sur l'autocomplete
+- 6bb88640d FIX [s340] - hornet-js-react-components - Table: manque déclaration props replaceUndef dans ColumnProps
+- b31b00e87 FIX [S303] - hornet-js-react-components -  TABS: gestion des erreurs
+- ef829f24a FIX [m70524] - hornet-js-react-components - Textareafield : correction prise en compte currentValue
+- 557f2e898 FIX [m70185] - hornet-js-react-components - Form : Gestion de la props omitNull pour l'auto-complete
+- 89435f3e9 PROJ - hornet-js-react-components : Ajout test select
+- 937217648 FIX [M70094] - hornet-js-react-components : BreadCrumb - Les templates d'url sont mal gérés
+- a0cab1488 FIX - [s328] - hornet-js-react-components - Table : afficher un message seulement au premier rendu
+- 153d5aff1 FIX [s315] - hornet-js-react-components - ActionBodyCell : amélioration de la méthode shouldComponentUpdate
+- 5c5991257 PROJ - hornet-js-react-components - Table : Ajout d'un test titleCell
+- 4d7eb8c21 FIX - hornet-js-react-components - Table : Passage des props de la colonne
+- f04cc08b9 FIX [s267] - hornet-js-passport : SamlConfiguration - valorisation isMetadataAccessible à true par défaut
+- 3ea2e0e9e FIX[M67512] - hornet-js-database : Impossible de mapper un champ custom dans un objet métier
+- e68969b77 FIX - hornet-js-core - HornetSuperAgent : Renvoie le text si body vide
+- 48276c77b FIX [70121] - hornet-js-core - HornetSuperAgent : nom du fichier pour le pipeStream
+- b3f02426c FIX - hornet-js-core - HornetResult : export contentType without download
+- bc277757b FIX - hornet-js-core - HornetSuperAgent : content-type vide sur des api's externes
+
 # hornet-js 5.2.2
 
 - 8c890ae4 FIX - [s302] - hornet-js-react-components - TABLE : ajout event après MaJ Content

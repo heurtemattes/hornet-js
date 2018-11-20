@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -103,53 +103,29 @@ import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 
 /** Tableau de liste de secteurs */
-let dataSourceSortTitle: DataSource<any>;
-let tableElement: JSX.Element;
-let tableElement2: JSX.Element;
-let table;
-let data;
-
 @Decorators.describe("Test Karma table SortTitle")
 class tableTest extends HornetReactTest {
 
-    @Decorators.beforeEach
-    beforeEach() {
+    protected dataSourceSortTitle: DataSource<any>;
+    protected data = [];
+
+    @Decorators.before
+    before(){
         Utils.setCls("hornet.internationalization", { messages });
-        data = [];
+
+        this.data = [];
         let step = 1;
         for (let i: number = 1; i < 10; i++) {
-            data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
+            this.data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
-        dataSourceSortTitle = new DataSource(data);
-
-        tableElement = (
-            <Table id="lite">
-                <Header title={"Secteurs"}>
-                </Header>
-                <Content dataSource={dataSourceSortTitle}>
-                    <Columns>
-                        <CheckColumn keyColumn="id" />
-                        <Column keyColumn="label" title={"libelle"} sortable={true} />
-                        <Column keyColumn="desc" title={"desc"} sortable={true} />
-                    </Columns>
-                </Content>
-            </Table>
-        );
-
-
-        tableElement2 = (
-            <Table id="lite">
-                <Header title={"Secteurs"}>
-                </Header>
-                <Content dataSource={dataSourceSortTitle}>
-                    <Columns>
-                        <CheckColumn keyColumn="id" />
-                        <Column keyColumn="label" title={"libelle"} sortable={true} orderByLabelUp={"Custom Up"} orderByLabelDown={"Custom Down"} />
-                        <Column keyColumn="desc" title={"desc"} sortable={true} />
-                    </Columns>
-                </Content>
-            </Table>
-        );
+    }
+    @Decorators.beforeEach
+    beforeEach() {
+        
+        if(this.dataSourceSortTitle) {
+            this.dataSourceSortTitle.removeAllListeners();
+        }
+        this.dataSourceSortTitle = new DataSource(this.data);
     }
 
     @Decorators.it("Test OK")
@@ -161,25 +137,53 @@ class tableTest extends HornetReactTest {
 
     @Decorators.it("Manipuler des titres de tableaux d'entêtes classiques")
     renderTable() {
+        let tableElement = (
+            <Table id="lite">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={this.dataSourceSortTitle}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+            </Table>
+        );
+
         const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement, id);
-        dataSourceSortTitle.on("fetch", (value) => {
+        this.renderIntoDocument(tableElement, id);
+        this.dataSourceSortTitle.on("fetch", (value) => {
             expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).hasAttribute("title")).to.be.true;
             expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).getAttribute("title"))
                 .to.be.equal("Trier par libelle dans l'ordre croissant");
             this.end();
         });
-        dataSourceSortTitle.reload();
+        this.dataSourceSortTitle.reload();
     }
 
     @Decorators.it("Manipuler des titres de tableaux d'entêtes customisées")
     renderTableCustom() {
+
+        let tableElement2 = (
+            <Table id="lite">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={this.dataSourceSortTitle}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} orderByLabelUp={"Custom Up"} orderByLabelDown={"Custom Down"} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+            </Table>
+        );
+
         const id = this.generateMainId();
-        table = this.renderIntoDocument(tableElement2, id);
-        dataSourceSortTitle.on("fetch", (value) => {
+        this.renderIntoDocument(tableElement2, id);
+        this.dataSourceSortTitle.on("fetch", (value) => {
             expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).hasAttribute("title")).to.be.true;
             expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).getAttribute("title")).to.be.equal("Custom Up");
-
             this.triggerMouseEvent(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 .arrow-sort-container`), "click");
             setTimeout(() => {
                 expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).hasAttribute("title")).to.be.true;
@@ -187,9 +191,15 @@ class tableTest extends HornetReactTest {
                 this.end();
             },         1000);
         });
-        dataSourceSortTitle.reload();
+        this.dataSourceSortTitle.reload();
     }
 
+    @Decorators.after
+    after() {
+        if(this.dataSourceSortTitle) {
+            this.dataSourceSortTitle.removeAllListeners();
+        }
+    }
 }
 
 // lancement des Tests

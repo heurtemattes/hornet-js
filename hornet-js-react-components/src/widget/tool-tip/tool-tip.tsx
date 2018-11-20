@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,8 +83,9 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { Logger } from "hornet-js-utils/src/logger";
 
-const logger = Utils.getLogger("hornet-js-component.widget.tool-tip.tool-tip");
+const logger: Logger = Utils.getLogger("hornet-js-component.widget.tool-tip.tool-tip");
 
 /**
  * Propriétés du ToolTip
@@ -114,6 +115,7 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("ToolTip render : idSpan: ", this.state.idSpan);
         const urlIcoTooltip = this.state.src || ToolTip.genUrlTheme(this.state.icoToolTip);
         return (
 

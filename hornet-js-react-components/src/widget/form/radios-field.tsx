@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -327,6 +327,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
      * @returns {any}
      */
     renderWidget(): JSX.Element {
+        logger.debug("RadiosField renderWidget : ", this.state.id);
         const cx = classNames(
             "radio",
             { "flex-container": this.state.inline },

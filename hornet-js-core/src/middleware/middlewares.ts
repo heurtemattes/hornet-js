@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,7 @@ import { ServerConfiguration } from "src/server-conf";
 import ErrorObject = ajv.ErrorObject;
 import { Timer } from "src/timers/timer";
 
-const isEnvProduction: boolean = (process.env[ "NODE_ENV" ] === "production");
+const isEnvProduction: boolean = (process.env["NODE_ENV"] === "production");
 
 function isSecurityEnabled(envProduction: boolean, logger): boolean {
     let enabled: boolean = false;
@@ -125,8 +125,8 @@ function checkSecurityConfiguration(key: string, enabledKey: boolean, middleware
 
 function sanitizeErrorThrownInDomain(error) {
     if (error) {
-        delete error[ "error@context" ];
-        delete error[ "domain" ];
+        delete error["error@context"];
+        delete error["domain"];
     }
 }
 
@@ -237,7 +237,7 @@ export class HornetContextInitializerSubMiddleware extends AbstractHornetSubMidd
                 ? RouteType.DATA
                 : RouteType.PAGE);
             next();
-        },    null, config);
+        }, null, config);
     }
 
 }
@@ -248,7 +248,7 @@ export class HornetContextInitializerSubMiddleware extends AbstractHornetSubMidd
 const uuid = require("uuid");
 
 export class LoggerTIDMiddleware extends AbstractHornetMiddleware {
-    
+
     constructor() {
         super((req, res, next) => {
             Utils.setCls("hornet.tid", uuid.v4().substr(0, 8));
@@ -326,7 +326,7 @@ export class StaticNodeHttpHeaderMiddleware extends AbstractHornetMiddleware {
         super((req, res, next) => {
             res.setHeader("X-Static-From", "app");
             next();
-        },    staticUrl);
+        }, staticUrl);
     }
 }
 
@@ -363,7 +363,7 @@ export class StaticPathErrorMiddleware extends AbstractHornetMiddleware {
         super((err, req, res, next) => {
             res.status(404).send("Resource not found").end();
             StaticPathErrorMiddleware.logger.error("Ressource statique non trouvée", err);
-        },    staticUrl);
+        }, staticUrl);
     }
 }
 
@@ -480,7 +480,7 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
     protected hppConfiguration(app) {
         // Suppression des doublons de paramètres GET
         if (checkSecurityConfiguration("security.hpp", false,
-                                       "HPP 'HTTP Parameter Pollution'", SecurityMiddleware.logger)) {
+            "HPP 'HTTP Parameter Pollution'", SecurityMiddleware.logger)) {
             app.use(hpp());
         }
     }
@@ -488,7 +488,7 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
     protected ieNoOpenConfiguration(app) {
 
         if (checkSecurityConfiguration("security.ieNoOpen", false,
-                                       "ienoopen 'IE, restrict untrusted HTML: ieNoOpen'", SecurityMiddleware.logger)) {
+            "ienoopen 'IE, restrict untrusted HTML: ieNoOpen'", SecurityMiddleware.logger)) {
             // Pour IE8+: ajout le header X-Download-Options
             app.use(helmet.ieNoOpen());
         }
@@ -497,7 +497,7 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
     protected noSniffConfiguration(app) {
 
         if (checkSecurityConfiguration("security.noSniff", false,
-                                       "noSniff 'Don't infer the MIME type: noSniff'", SecurityMiddleware.logger)) {
+            "noSniff 'Don't infer the MIME type: noSniff'", SecurityMiddleware.logger)) {
             // Pour IE8+: ajout le header X-Download-Options
             app.use(helmet.noSniff());
         }
@@ -508,23 +508,23 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
         if (checkSecurityConfiguration("security.csp", true, "CSP 'Content Security Policy'", SecurityMiddleware.logger)) {
             const directives: any = {
                 // defaultSrc: Utils.config.getOrDefault("security.csp.defaultSrc", ["'self'", "'unsafe-inline'", "'unsafe-eval'"]),
-                baseUri: Utils.config.getOrDefault("security.csp.baseUri", [ "'self'" ]),
-                childSrc: Utils.config.getOrDefault("security.csp.childSrc", [ "'self'" ]),
-                connectSrc: Utils.config.getOrDefault("security.csp.connectSrc", [ "'self'" ]),
-                fontSrc: Utils.config.getOrDefault("security.csp.fontSrc", [ "'self'" ]),
-                formAction: Utils.config.getOrDefault("security.csp.formAction", [ "'self'" ]),
-                frameAncestors: Utils.config.getOrDefault("security.csp.frameAncestors", [ "'self'" ]),
-                frameSrc: Utils.config.getOrDefault("security.csp.frameSrc", [ "'self'" ]), // deprecated gestion ancien navigateur
-                imgSrc: Utils.config.getOrDefault("security.csp.imgSrc", [ "'self'" ]),
-                manifestSrc: Utils.config.getOrDefault("security.csp.manifestSrc", [ "'self'" ]),
-                mediaSrc: Utils.config.getOrDefault("security.csp.mediaSrc", [ "'self'" ]),
-                objectSrc: Utils.config.getOrDefault("security.csp.objectSrc", [ "'self'" ]),
+                baseUri: Utils.config.getOrDefault("security.csp.baseUri", ["'self'"]),
+                childSrc: Utils.config.getOrDefault("security.csp.childSrc", ["'self'"]),
+                connectSrc: Utils.config.getOrDefault("security.csp.connectSrc", ["'self'"]),
+                fontSrc: Utils.config.getOrDefault("security.csp.fontSrc", ["'self'"]),
+                formAction: Utils.config.getOrDefault("security.csp.formAction", ["'self'"]),
+                frameAncestors: Utils.config.getOrDefault("security.csp.frameAncestors", ["'self'"]),
+                frameSrc: Utils.config.getOrDefault("security.csp.frameSrc", ["'self'"]), // deprecated gestion ancien navigateur
+                imgSrc: Utils.config.getOrDefault("security.csp.imgSrc", ["'self'"]),
+                manifestSrc: Utils.config.getOrDefault("security.csp.manifestSrc", ["'self'"]),
+                mediaSrc: Utils.config.getOrDefault("security.csp.mediaSrc", ["'self'"]),
+                objectSrc: Utils.config.getOrDefault("security.csp.objectSrc", ["'self'"]),
                 // todo deal with missing directives
                 // reflectedXss: Utils.config.getOrDefault("security.csp.reflectedXss", "block"),
                 // todo create post route to report policy failures
                 // reportUri: Utils.config.getOrDefault("security.csp.reportUri", ""),
-                scriptSrc: Utils.config.getOrDefault("security.csp.scriptSrc", [ "'self'", "'unsafe-inline'", "'unsafe-eval'" ]),
-                styleSrc: Utils.config.getOrDefault("security.csp.styleSrc", [ "'self'", "'unsafe-inline'" ]),
+                scriptSrc: Utils.config.getOrDefault("security.csp.scriptSrc", ["'self'", "'unsafe-inline'", "'unsafe-eval'"]),
+                styleSrc: Utils.config.getOrDefault("security.csp.styleSrc", ["'self'", "'unsafe-inline'"]),
             };
             const sandbox = Utils.config.getOrDefault("security.csp.sandbox", false); // TODO A traiter spécifiquement
             if (sandbox) {
@@ -651,10 +651,10 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
      */
     static middleware(req, res: director.DirectorResponse, next) {
         if (req.method === "PUT" || req.method === "POST" || req.method === "PATCH" || req.method === "DELETE") {
-            let incomingCsrf = req.headers[ CsrfMiddleware.HEADER_CSRF_NAME ];
+            let incomingCsrf = req.headers[CsrfMiddleware.HEADER_CSRF_NAME];
             if (_.isUndefined(incomingCsrf)) {
                 CsrfMiddleware.logger.trace(CsrfMiddleware.HEADER_CSRF_NAME, "non present, recherche dans le body de la requête");
-                incomingCsrf = req.body && req.body[ CsrfMiddleware.HEADER_CSRF_NAME ];
+                incomingCsrf = req.body && req.body[CsrfMiddleware.HEADER_CSRF_NAME];
             }
             const sessionCsrf = req.getSession().getAttribute(CsrfMiddleware.CSRF_SESSION_KEY);
 
@@ -722,7 +722,7 @@ export class InternationalizationMiddleware extends AbstractHornetMiddleware {
                 const cookLocaleI18n = CookieManager.getCookie(req, "internationalization");
                 if (cookLocaleI18n !== undefined) {
                     const shortLang = cookLocaleI18n.split("-");
-                    localeI18n = { locale: cookLocaleI18n, lang: shortLang[ 1 ] };
+                    localeI18n = { locale: cookLocaleI18n, lang: shortLang[1] };
                 }
             }
 
@@ -737,7 +737,7 @@ export class InternationalizationMiddleware extends AbstractHornetMiddleware {
             }
 
             next();
-        },    null, config);
+        }, null, config);
     }
 }
 
@@ -760,7 +760,7 @@ export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
 
                 ChangeI18nLocaleMiddleware.logger.trace("ChangeI18nLocaleMiddleware :  Changement de la locale " + req.params.i18n);
                 const shortLang = req.params.i18n.split("-");
-                req.session.i18n = { locale: req.params.i18n, lang: shortLang[ 1 ] };
+                req.session.i18n = { locale: req.params.i18n, lang: shortLang[1] };
                 const i18n = appConfig.internationalization.getMessages(req.session.i18n);
                 Utils.setCls("hornet.internationalization", i18n);
                 CookieManager.setCookie(res, "internationalization", req.params.i18n);
@@ -791,11 +791,11 @@ export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
     protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SetExpandedLayoutMiddleware");
 
     constructor() {
-
         super((req, res, next: Function) => {
             SetExpandedLayoutMiddleware.logger.trace("SetLayoutMiddleware : set isExpandedLayout appSharedProps with value:",
-                                                     req.body.isExpandedLayout);
-            Utils.appSharedProps.set("isExpandedLayout", req.body.isExpandedLayout);
+                req.body.isExpandedLayout);
+            Utils.setCls("hornet.expandedLayout", req.body.isExpandedLayout);
+            CookieManager.setCookie(res, "expandedLayout", req.body.isExpandedLayout);
             res.type("application/json");
             res.status(200).send({ isExpandedLayout: req.body.isExpandedLayout });
             res.end();
@@ -815,7 +815,7 @@ export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
     constructor() {
 
         super((req, res, next: Function) => {
-            const isExpandedLayout = Utils.appSharedProps.get("isExpandedLayout");
+            const isExpandedLayout = CookieManager.getCookie(req, "expandedLayout");
             IsExpandedLayoutMiddleware.logger.trace("IsExpandedLayoutMiddleware : get isExpandedLayout appSharedProps: ", isExpandedLayout);
             res.type("application/json");
             res.set("Cache-Control", "no-cache");
@@ -828,7 +828,26 @@ export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 }
 
 // ------------------------------------------------------------------------------------------------------------------- //
-//                                      SetExpandedLayoutMiddleware
+//                                      ExpandedLayoutHandlerMiddleware
+// ------------------------------------------------------------------------------------------------------------------- //
+export class ExpandedLayoutHandlerMiddleware extends AbstractHornetMiddleware {
+
+    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.ExpandedLayoutHandlerMiddleware");
+
+    constructor(config?: ServerConfiguration) {
+
+        super((req, res, next: Function) => {
+            const isExpandedLayout = CookieManager.getCookie(req, "expandedLayout");
+            Utils.setCls("hornet.expandedLayout", isExpandedLayout == "true");
+            ExpandedLayoutHandlerMiddleware.logger.trace("ExpandedLayoutHandlerMiddleware valeur actuelle", isExpandedLayout);
+            next();
+        }, null, config);
+
+    }
+}
+
+// ------------------------------------------------------------------------------------------------------------------- //
+//                                      wakeUpNodeSessionMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class wakeUpNodeSessionMiddleware extends AbstractHornetMiddleware {
 
@@ -861,16 +880,16 @@ export class RouterServerMiddleware extends AbstractHornetMiddleware {
         super(null, null, config);
         const appConfig = this.config || AbstractHornetMiddleware.APP_CONFIG;
         this.router = new RouterServer(appConfig.defaultRoutesClass,
-                                       appConfig.routesLoaderfn,
-                                       appConfig.routesLoaderPaths,
-                                       appConfig.routesDataContext);
+            appConfig.routesLoaderfn,
+            appConfig.routesLoaderPaths,
+            appConfig.routesDataContext);
     }
 
     public insertMiddleware(app) {
         app.use(this.router.pageMiddleware());
         app.use(Utils.config.getOrDefault("fullSpa.name",
-                                          AbstractHornetMiddleware.APP_CONFIG.routesDataContext),
-                this.router.dataMiddleware());
+            AbstractHornetMiddleware.APP_CONFIG.routesDataContext),
+            this.router.dataMiddleware());
     }
 }
 
@@ -882,15 +901,15 @@ export class RouterServerSubMiddleware extends AbstractHornetSubMiddleware {
         super(null, null, config);
         const appConfig = this.config || AbstractHornetMiddleware.APP_CONFIG;
         this.router = new RouterServer(appConfig.defaultRoutesClass,
-                                       appConfig.routesLoaderfn,
-                                       appConfig.routesLoaderPaths,
-                                       appConfig.routesDataContext);
+            appConfig.routesLoaderfn,
+            appConfig.routesLoaderPaths,
+            appConfig.routesDataContext);
     }
 
     public insertRouterMiddleware(router: express.Router) {
         router.use(this.router.pageMiddleware());
         router.use(Utils.config.getOrDefault("fullSpa.name", (this.config || AbstractHornetMiddleware.APP_CONFIG).routesDataContext),
-                   this.router.dataMiddleware());
+            this.router.dataMiddleware());
     }
 }
 
@@ -1205,7 +1224,7 @@ export class AliveMiddleware extends AbstractHornetMiddleware {
     constructor(middlewareFunction?: RequestHandler, prefix?: string, config?: ServerConfiguration) {
         super((req, res, next) => {
             res.status(204).end();
-        },    prefix || "alive");
+        }, prefix || "alive");
     }
 
     /**
@@ -1242,6 +1261,7 @@ export const DEFAULT_HORNET_MIDDLEWARES: Array<Class<AbstractHornetMiddleware>> 
     MulterMiddleware,
     SetExpandedLayoutMiddleware,
     IsExpandedLayoutMiddleware,
+    ExpandedLayoutHandlerMiddleware,
 
     MenuConfigMiddleware,
     RouterServerMiddleware,

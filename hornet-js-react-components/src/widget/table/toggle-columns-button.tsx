@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -131,7 +131,6 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
 
     public readonly props: Readonly<ToggleColumnsButtonProps>;
 
-
     constructor(props: ToggleColumnsButtonProps, context?: any) {
         super(props, context);
 
@@ -159,7 +158,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
      * @inheritDoc
      */
     render(): JSX.Element {
-
+        logger.debug("ToggleColumnsButton render");
         return (
             <Dropdown
                 id="table-settings"
@@ -202,7 +201,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
                 <div className="toggle-column-item-label fl"><label htmlFor={checkBoxProps.id}>{column.title}</label></div>
             </div>
         );
-    }    
+    }
 
     /**
      * méthode permettant de configurer les items de la liste
@@ -349,7 +348,6 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
             (document.getElementsByName(this.props.columns.id + "-checkbox-" + keyColumn)[ 0 ] as any);
         checkbox.checked = checked;
     }
-
 
     /**
      * Permet de configurer l'item selectAll

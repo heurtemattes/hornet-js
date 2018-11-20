@@ -73,11 +73,11 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
+import { Logger } from "hornet-js-utils/src/logger";
 import * as React from "react";
 import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -93,6 +93,8 @@ import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { UPDATE_PAGE_EXPAND_MENU } from "src/widget/screen/layout-switcher";
 import { MENU_LINK_ACTIVATED } from "hornet-js-react-components/src/widget/navigation/menu-link";
 import HTMLAttributes = __React.HTMLAttributes;
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu");
 
 const showIconSize = 720;
 
@@ -119,7 +121,6 @@ export interface MenuItemConfig {
     /** Nom de rôle ou liste de noms de rôles autorisé(s) à accéder à ce menu */
     rolesAutorises?: string | string[];
 }
-
 
 export interface MenuProps extends HornetComponentProps {
     configMenu?: MenuItemConfig[];
@@ -231,7 +232,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-
+        logger.debug("Menu render");
         let classname: any = {};
         if (typeof window !== "undefined") {
             classname = {
@@ -344,17 +345,16 @@ export class Menu extends HornetComponent<MenuProps, any> {
         } else {
             document.addEventListener("keydown", this.handleKeyDown, false);
         }
-        
+
         if (this.state.onToggleClick) {
             this.state.onToggleClick();
         }
         this.setState({ isMenuActive: active }, () => {
-            if(this.burgerIcon) {
+            if (this.burgerIcon) {
                 this.burgerIcon.focus();
             }
         });
     }
-
 
     componentDidUpdate() {
         // gestion de levent click ua chargement de la page
@@ -380,7 +380,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         // préparation de la taille pour le layout expanding
         let maxWidth;
         let classNameExpanded = "mainLayoutClassNameExpanded";
-        if (!(Utils.appSharedProps.get("isExpandedLayout"))) {
+        if (!Utils.getCls("hornet.expandedLayout")) {
             maxWidth = this.state.workingZoneWidth;
             classNameExpanded = "mainLayoutClassName";
         }

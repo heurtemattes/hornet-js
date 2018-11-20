@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -171,13 +171,15 @@ export abstract class FormUtils {
             erreurNotification.id = "ACTION_ERREUR_" + index;
             erreurNotification.text = error.message;
             let fieldName: string = FormUtils.extractFieldName(error);
+
+            let message: string = null;
             if (fieldName) {
 
                 erreurNotification.anchor = fieldName + "_anchor";
                 erreurNotification.field = fieldName;
                 erreurNotification.additionalInfos = error.params;
 
-                let complement: any = {...error.params};
+                let complement: any = { ...error.params };
 
                 // Gestion des champs editables d'un tableau
                 if (fields[ fieldName ] && fields[ fieldName ].props && fields[ fieldName ].props.title) {
@@ -188,8 +190,7 @@ export abstract class FormUtils {
                     }
                 }
 
-                const message: string = FormUtils.extractMessage(error.keyword, fieldName, 
-                                                                 fieldsMessages, genericValidationMessages, complement, fields[ fieldName ]);
+                message = FormUtils.extractMessage(error.keyword, fieldName, fieldsMessages, genericValidationMessages, complement, fields[ fieldName ]);
                 if (message) {
                     /* Surcharge du message produit par ajv */
                     erreurNotification.text = message;

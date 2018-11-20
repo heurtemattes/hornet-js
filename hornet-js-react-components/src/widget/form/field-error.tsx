@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,6 +82,10 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { INotificationType } from "hornet-js-core/src/notification/notification-manager";
+import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-utils/src/logger";
+
+const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.field-error");
 
 export interface FieldErrorProps extends HornetComponentProps {
     /** Tableau de messages d'erreur */
@@ -118,6 +122,7 @@ export class FieldError extends HornetComponent<FieldErrorProps, any> {
             fieldErrors.length > 0 ?
                 <div className="fielderror-container">
                     {fieldErrors.map((error: INotificationType, i: number) => {
+                        logger.debug("FieldError render : ", `${this.props.fieldName}-${error.id}-error`);
                         return <div key={error.id} className="fielderror-content formmgr-message-text"
                             id={`${this.props.fieldName}-${error.id}-error`}>{error.text}</div>;
                     })}

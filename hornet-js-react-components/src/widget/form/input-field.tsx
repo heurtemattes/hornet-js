@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -124,6 +124,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      * @override
      */
     renderWidget(): JSX.Element {
+        logger.debug("InputField renderWidget : ", this.props.id ? this.props.id : this.state.name);
         const htmlProps = _.cloneDeep(this.getHtmlProps());
 
         if (this.state.currentValue != null) {

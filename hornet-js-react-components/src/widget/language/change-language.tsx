@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -143,6 +143,8 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
+        const id =  this.props.id || "Change-Language";
+        logger.debug("ChangeLanguage render : ", id);
         const dropdownItems = [];
 
         this.state.listLanguage.map((item) => {
@@ -162,7 +164,7 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
         return (
             <Dropdown
                 className={"language"}
-                id={this.props.id || "Change-Language"}
+                id={id}
                 title={this.state.switchTitle}
                 items={dropdownItems}
                 icon="language-arrow-down"

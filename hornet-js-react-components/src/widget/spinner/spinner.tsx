@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,6 @@ import { ASYNCHRONOUS_REQUEST_EVENT } from "hornet-js-core/src/event/hornet-even
 import { SpinnerComponent, SpinnerProps } from "src/widget/spinner/spinner-component";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.spinner.spinner");
-
 
 /**
  * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
@@ -115,6 +114,7 @@ export class Spinner<P extends SpinnerProps, S extends SpinnerProps> extends Spi
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("Logger render");
         return (this.state.isVisible ? this.renderLoader() : null);
     }
 
@@ -139,8 +139,9 @@ export class Spinner<P extends SpinnerProps, S extends SpinnerProps> extends Spi
             setTimeout(this.openSpinner, this.props.minimalShowTimeInMs);
         } else {
             this.count--;
-            if (this.count === 0)
+            if (this.count === 0) {
                 this.closeSpinner();
+            }
         }
     }
 
@@ -148,8 +149,9 @@ export class Spinner<P extends SpinnerProps, S extends SpinnerProps> extends Spi
      * Affichage Spinner
      */
     openSpinner() {
-        if (this.count > 0 && !this.state.isVisible)
+        if (this.count > 0 && !this.state.isVisible) {
             this.setState({ isVisible: true });
+        }
     }
 
     /**

@@ -139,7 +139,8 @@
     "arrow-right" : "Onglet suivant",
     "arrow-left": "Onglet précédent",
     "add-button": "Ajouter un onglet",
-    "delete-button": "Supprimer l'onglet"
+    "delete-button": "Supprimer l'onglet",
+    "tab": "Onglet {tabTitle}"
   },
   "table": {
     "pager": {

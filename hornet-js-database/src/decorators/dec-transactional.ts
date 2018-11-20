@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */

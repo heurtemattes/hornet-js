@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -163,6 +163,8 @@ export interface ColumnProps extends HornetComponentProps {
     orderByLabelUp?:string;
     /** Label de substitution dans le cas d'un tri custom descendant */
     orderByLabelDown?:string;
+    /** Valeur de remplacement dans le cas ou la valeur cherchée dans la value depuis le keyColumn ne renvoie rien */
+    replaceUndef?: string;
 }
 
 /**
@@ -207,7 +209,7 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
      * @inheritDoc
      */
     render(): JSX.Element {
-        logger.trace("render Column");
+        logger.debug("Column render : ", this.props.id ? this.props.id : this.props.keyColumn);
 
         const cellProps = this.getCellProps();
         cellProps.key = "wc-" + cellProps.key;
@@ -216,7 +218,7 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
         }
         return this.wrap(this.getBodyCell(), cellProps);
     }
-    
+
     /***
      * @deprecated
      * Méthode permettant de récupérer les propriétés d'une cellule
@@ -242,7 +244,7 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
         props.compareMethod = this.props.compareMethod || null;
 
         return props;
-    }    
+    }
 
     /**
      * Getter pour le composant générant le entête de colonne

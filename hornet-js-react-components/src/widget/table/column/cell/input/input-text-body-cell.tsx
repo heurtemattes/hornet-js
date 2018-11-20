@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -108,7 +108,7 @@ export class InputTextBodyCell<P extends InputTextBodyCellProps, S> extends Abst
      * @inheritDoc
      */
     renderCell() {
-        logger.trace("render InputTextBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render InputTextBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
         const inputTextProps: any = {
             name: this.props.id + "." + this.props.coordinates.row + "." + this.state.keyColumn,

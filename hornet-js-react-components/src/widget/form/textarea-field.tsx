@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -157,6 +157,8 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
      */
     renderWidget(): JSX.Element {
 
+        logger.debug("TextAreaField renderWidget : ", this.state.id ? this.state.id : this.state.name);
+
         const htmlProps = this.getHtmlProps();
         const hasError = this.hasErrors() ? " has-error" : "";
         const charsCounterId = `chars-counter-${this.state.id}`;
@@ -179,6 +181,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                         this.registerHtmlElement(elt);
                         this.element = elt;
                     }} {...htmlProps}>
+                    {this.state.currentValue}
                 </textarea>
                 {this.state.resettable && this.state.valued && !this.state.readOnly && !this.state.disabled ? this.renderResetButton() :
                     <div />}

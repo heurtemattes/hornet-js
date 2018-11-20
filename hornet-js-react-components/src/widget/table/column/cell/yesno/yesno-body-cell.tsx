@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -96,7 +96,7 @@ export class YesNoBodyCell<P extends YesNoBodyCellProps, S> extends AbstractBody
      * @inheritDoc
      */
     renderCell() {
-        logger.trace("render YesNoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug("render YesNoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         return (
             (this.state.value) ? this.i18n("table.booleanOui") : this.i18n("table.booleanNon")
         );

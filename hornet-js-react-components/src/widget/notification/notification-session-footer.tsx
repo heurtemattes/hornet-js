@@ -76,6 +76,7 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
     }
 
     render(): JSX.Element {
+        logger.debug("NotificationSessionFooter render");
         return (
             this.state.isVisible ? this.renderNotification() : <div />
         );

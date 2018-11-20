@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.2
+ * @version v5.2.3
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -124,6 +124,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
      * @inheritDoc
      */
     render(): JSX.Element {
+        logger.debug("MenuActions render : ", this.props.id ? this.props.id : this.state.title);
         logger.trace("render MenuActions");
         const actions = this.getMenuActions();
         return (
@@ -158,7 +159,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
         if (this.props.actions && this.props.actions.length > 0) {
             this.props.actions.map((action, index) => {
                 if ((action.props.typeAction === TypeAction.ACTION_MASSE && self.props.selectedItems && self.props.selectedItems.length > 0)
-                    || (action.props.typeAction === TypeAction.ACTION_UNITAIRE 
+                    || (action.props.typeAction === TypeAction.ACTION_UNITAIRE
                         && self.props.selectedItems && self.props.selectedItems.length === 1)
                     || !action.props.typeAction) {
                     const propsButtons: ActionButtonProps = {...action.props};
@@ -168,7 +169,6 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                     propsButtons.items = this.props.items;
                     propsButtons[ "key" ] = self.props.id + "-menuAction-" + index;
                     propsButtons[ "value" ] = item;
-
 
                     const isVisible: boolean = propsButtons.items.length > 0 || propsButtons.displayedWithoutResult;
 
