@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,6 +83,8 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
+
+import * as classNames from "classnames";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.row");
 
@@ -99,11 +101,6 @@ export interface RowProps extends HornetComponentProps {
  * Ligne de formulaire
  */
 export class Row extends HornetComponent<RowProps, any> {
-
-    /** Propriétés par défaut */
-    static defaultProps = {
-        className: "grid",
-    };
 
     /**
      * Construit une instance de Row
@@ -153,18 +150,23 @@ export class Row extends HornetComponent<RowProps, any> {
      */
     render(): JSX.Element {
         logger.debug("Row render");
+        const classes: ClassDictionary = {
+        };
+
+        if(this.state.className) {
+            classes[this.state.className] = true;
+        }
         /* Affecte automatiquement la classe pure css aux noeuds enfants qui n'en ont pas */
         const fraction: number = this.props.fraction || this.getPureChildFraction();
-        let className = "";
         if (!this.props.fraction) {
-            className = "has-gutter ";
+            classes["has-gutter"] = true;
         } else {
-            className = "fraction ";
+            classes["fraction"] = true;
         }
-        className += this.state.className;
         if (fraction !== 1) {
-            className += "-" + fraction;
+            classes[`grid-${fraction}`] = true;
         }
+        const className = classNames(classes)
         return (
             <div className={className}>
                 {React.Children.map(

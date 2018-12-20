@@ -1,4 +1,6 @@
-# hornet-js
+Hornet.js  :honeybee:
+====================
+
 
 Le framework `Hornet.js` est un framework open-source conçu pour développer des applications web basé sur le language `typescript`.
 
@@ -51,10 +53,10 @@ Ajouter au package.json
 
 ```shell
   "appDependencies": {
-    "hornet-js-components": "5.1.X",
-    "hornet-js-core": "5.1.X",
-    "hornet-js-ts-typings": "5.1.X",
-    "hornet-js-utils": "5.1.X"
+    "hornet-js-components": "5.X.X",
+    "hornet-js-core": "5.X.X",
+    "hornet-js-ts-typings": "5.X.X",
+    "hornet-js-utils": "5.X.X"
   }
 ```
 

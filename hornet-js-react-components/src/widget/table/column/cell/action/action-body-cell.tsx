@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -130,7 +130,6 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
 
         this.state = {
             ...this.state,
-            url: this.props.url && this.genUrlWithParams(props.url, props.value),
             hasPopUp: this.props.messageAlert,
         };
 
@@ -176,7 +175,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         const disabled: boolean = (typeof this.state.disabled === "function") ? this.state.disabled() : this.state.disabled;
 
         const aProps: any = {
-            href: this.state.url || "#",
+            href: this.props.url && this.genUrlWithParams(this.props.url, this.props.value) || "#",
             className: classNames(classes),
             title: this.state.titleCell instanceof Function ? this.state.titleCell(this.props.value) :
                 this.state.titleCell ? this.state.titleCell : this.title,
@@ -244,7 +243,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      */
     onAction(): void {
         if (this.state.url) {
-            window.location.href = this.state.url;
+            window.location.href = this.props.url && this.genUrlWithParams(this.props.url, this.props.value);
         } else if (this.props.action) {
             this.props.action(this.props.value);
         }

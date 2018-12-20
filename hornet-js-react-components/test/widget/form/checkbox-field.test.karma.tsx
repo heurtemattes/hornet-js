@@ -73,23 +73,23 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 "use strict";
 import { runTest } from "hornet-js-test/src/test-run";
-
-const chai = require("chai");
-const expect = chai.expect;
+import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 import * as React from "react";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 import { CheckBoxField } from "src/widget/form/checkbox-field";
+const chai = require("chai");
+const expect = chai.expect;
 
-let formElement, switchField, checkboxElement: JSX.Element;
+let formElement, switchField, switchFieldLabel, checkboxElement: JSX.Element;
 
 @Decorators.describe("Test Karma checkbox-field")
 class CheckBoxFieldTest extends HornetReactTest {
@@ -113,6 +113,11 @@ class CheckBoxFieldTest extends HornetReactTest {
         switchField = (
             <CheckBoxField name={"test-switch"} readOnly={true} switch={true}
                 label="Test-checkbox" ref={(elt) => { this.switch = elt; }} />
+        );
+
+        switchFieldLabel = (
+            <CheckBoxField name={"test-switch-label"} switch={true}
+                label="Test-checkbox-switch" ref={(elt) => { this.switch = elt; }} />
         );
     }
 
@@ -263,6 +268,23 @@ class CheckBoxFieldTest extends HornetReactTest {
                 });
             });
         });
+    }
+
+    @Decorators.it("Test que le clic sur le label associé au switch joue le onclick")
+    testswitchFieldClickOnLabel() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(switchFieldLabel, id);
+        const labelElement = document.querySelector(`#${id} #test-switch-labelLabel`);
+        this.triggerMouseEvent(labelElement, "click");
+        setTimeout(() => {
+            const checkboxElement = document.querySelector(`#${id} #test-switch-label`);
+            HornetTestAssert.assertTrue(checkboxElement["checked"], "Le switch n'a pas changé après le clic sur le label");
+            this.triggerMouseEvent(labelElement, "click");
+            setTimeout(() => {
+                HornetTestAssert.assertFalse(checkboxElement["checked"], "Le switch n'a pas changé après le clic sur le label");
+                this.end();
+            }, 250);
+        }, 250);
     }
 }
 

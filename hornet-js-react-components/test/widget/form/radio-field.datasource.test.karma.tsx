@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -160,12 +160,12 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main1");
-        let htmlElement = document.getElementById("exampleRadio-1-Client");
+        let htmlElement = document.getElementById("exampleRadio-1-client");
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Client n'a pas bien été généré");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-Client ne doit pas être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-1-Fournisseur");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-client ne doit pas être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-1-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Fournisseur n'a pas bien été généré");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-Fournisseur ne doit pas être sélectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-fournisseur ne doit pas être sélectionné");
         this.end();
     };
 
@@ -187,12 +187,12 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main2");
-        let htmlElement = document.getElementById("exampleRadio-2-Client");
+        let htmlElement = document.getElementById("exampleRadio-2-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-2-Client doit être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-2-Fournisseur");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-2-client doit être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-2-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-2-Fournisseur ne doit pas être sélectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-2-fournisseur ne doit pas être sélectionné");
         this.end();
     };
 
@@ -216,12 +216,12 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main3");
-        let htmlElement = document.getElementById("exampleRadio-3-Client");
+        let htmlElement = document.getElementById("exampleRadio-3-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-3-Client doit être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-3-Fournisseur");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-3-client doit être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-3-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-3-Fournisseur ne doit pas être sé7lectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-3-fournisseur ne doit pas être sé7lectionné");
         this.end();
     };
 
@@ -245,12 +245,12 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main4");
-        let htmlElement = document.getElementById("exampleRadio-4-Client");
+        let htmlElement = document.getElementById("exampleRadio-4-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-4-Client ne doit pas être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-4-Fournisseur");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-4-client ne doit pas être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-4-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-4-Fournisseur doit être sélectionné");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-4-fournisseur doit être sélectionné");
 
         this.end();
     };
@@ -276,16 +276,16 @@ class RadioFieldDataSourceTest extends BaseTest {
 
         $element = this.renderIntoDocument(element, "main5");
 
-        let htmlElement = document.getElementById("exampleRadio-5-Fournisseur");
-        this.triggerMouseEvent(document.getElementById("exampleRadio-5-Client"), "click");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-5-Fournisseur ne doit pas être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-5-Client");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-5-Client doit être sélectionné");
+        let htmlElement = document.getElementById("exampleRadio-5-fournisseur");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-5-client"), "click");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-5-fournisseur ne doit pas être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-5-client");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-5-client doit être sélectionné");
 
-        this.triggerMouseEvent(document.getElementById("exampleRadio-5-Fournisseur"), "click");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-5-Client ne doit pas être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-5-Fournisseur");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-5-Fournisseur doit être sélectionné");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-5-fournisseur"), "click");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-5-client ne doit pas être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-5-fournisseur");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-5-fournisseur doit être sélectionné");
 
         this.end();
     };
@@ -310,12 +310,12 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main6");
-        let htmlElement = document.getElementById("exampleRadio-6-Client");
+        let htmlElement = document.getElementById("exampleRadio-6-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-6-Client doit être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-6-Fournisseur");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-6-client doit être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-6-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-6-Fournisseur ne doit pas être sélectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-6-fournisseur ne doit pas être sélectionné");
         this.end();
     };
 
@@ -339,18 +339,18 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main7");
-        let htmlElement = document.getElementById("exampleRadio-7-Fournisseur");
+        let htmlElement = document.getElementById("exampleRadio-7-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-Fournisseur doit être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-7-Client");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-fournisseur doit être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-7-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-7-Client ne doit pas être sélectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-7-client ne doit pas être sélectionné");
 
-        this.triggerMouseEvent(document.getElementById("exampleRadio-7-Client"), "click");
-        htmlElement = document.getElementById("exampleRadio-7-Fournisseur");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-7-Fournisseur ne doit pas être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-7-Client");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-Client doit être sélectionné");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-7-client"), "click");
+        htmlElement = document.getElementById("exampleRadio-7-fournisseur");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-7-fournisseur ne doit pas être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-7-client");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-client doit être sélectionné");
 
         this.end();
     };
@@ -373,18 +373,18 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main8");
-        let htmlElement = document.getElementById("exampleRadio-8-Fournisseur");
+        let htmlElement = document.getElementById("exampleRadio-8-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-8-Fournisseur doit être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-8-Client");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-8-fournisseur doit être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-8-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-8-Client ne doit pas être sélectionné");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-8-client ne doit pas être sélectionné");
 
-        this.triggerMouseEvent(document.getElementById("exampleRadio-7-Client"), "click");
-        htmlElement = document.getElementById("exampleRadio-7-Fournisseur");
-        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-7-Fournisseur ne doit pas être sélectionné");
-        htmlElement = document.getElementById("exampleRadio-7-Client");
-        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-Client doit être sélectionné");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-7-client"), "click");
+        htmlElement = document.getElementById("exampleRadio-7-fournisseur");
+        HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-7-fournisseur ne doit pas être sélectionné");
+        htmlElement = document.getElementById("exampleRadio-7-client");
+        HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-client doit être sélectionné");
 
         this.end();
     };
@@ -409,9 +409,8 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main9");
-        // this.referencedElement.setCurrentValue("true");
-        const htmlElement = document.getElementById("exampleRadio-9-Client");
-        this.triggerMouseEvent(document.getElementById("exampleRadio-9-Client"), "click");
+        const htmlElement = document.getElementById("exampleRadio-9-client");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-9-client"), "click");
         setTimeout(() => {
         HornetTestAssert.assertEquals((htmlElement as any).value, this.referencedElement.getCurrentValue(), "la méthode getCurrentValue doit remonter la valeur TRUE");
         this.end();
@@ -439,8 +438,8 @@ class RadioFieldDataSourceTest extends BaseTest {
         );
 
         $element = this.renderIntoDocument(element, "main10");
-        let htmlElement = document.getElementById("exampleRadio-10-Autre");
-        this.triggerMouseEvent(document.getElementById("exampleRadio-10-Autre"), "click");
+        let htmlElement = document.getElementById("exampleRadio-10-autre");
+        this.triggerMouseEvent(document.getElementById("exampleRadio-10-autre"), "click");
         setTimeout(() => {
         HornetTestAssert.assertEquals((htmlElement as any).value, this.referencedElement.getCurrentValue(), "la méthode getCurrentValue doit remonter la valeur AUTRE");
         this.end();

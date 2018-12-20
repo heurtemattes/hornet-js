@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l"Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -152,9 +152,12 @@ export class ResultPDF extends ResultFile {
      * @vreturns {boolean} true pour envoyer la reponse [response.end]
      */
     protected configure(res: Response): boolean {
-        res.contentType(this.mediaType.MIME);
-        // res.attachment(this.options.filename);
-        res.writeHead(200); // send headers
+        const headers = {
+            "Content-Type": this.mediaType.MIME};
+        if (this.options.filename) {
+            headers["Content-Disposition"] = this.options.dispositionType + "; filename=\"" + this.options.filename + "\"";
+        }
+        res.writeHead(200, headers); // send headers
         this.options.data.pipe(res);
         this.options.data.end();
         return false;

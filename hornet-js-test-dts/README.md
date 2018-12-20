@@ -9,11 +9,11 @@ Ajouter la définition dans le fichier `package.json` du projet en plus de l'imp
 
 ```json
 "tsDefinitionDependencies": {
-    "hornet-js-test-dts": "5.1.X"
+    "hornet-js-test-dts": "5.X.X"
 }
 
 "appDependencies": {
-    "hornet-js-test": "5.1.X"
+    "hornet-js-test": "5.X.X"
 }
 ```
 

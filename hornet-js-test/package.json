@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-test",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants pour les tests hornet-js",
   "bugs": {
@@ -11,11 +11,11 @@
     "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
   },
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.2.3",
-    "hornet-js-utils-dts": "5.2.3"
+    "hornet-js-ts-typings": "5.2.4",
+    "hornet-js-utils-dts": "5.2.4"
   },
   "appDependencies": {
-    "hornet-js-utils": "5.2.3",
+    "hornet-js-utils": "5.2.4",
     "react": "16.4.2",
     "react-dom": "16.4.2",
     "chai": "4.1.2",

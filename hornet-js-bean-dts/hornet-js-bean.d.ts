@@ -220,7 +220,7 @@ declare module "hornet-js-bean/src/decorators/Alias" {
 	 * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -381,7 +381,7 @@ declare module "hornet-js-bean/src/decorators/Map" {
 	 * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

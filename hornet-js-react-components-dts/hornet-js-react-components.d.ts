@@ -73,7 +73,7 @@ declare module "hornet-js-react-components/src/img/picto" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2044,7 +2044,7 @@ declare module "hornet-js-react-components/src/widget/dialog/alert" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2184,7 +2184,7 @@ declare module "hornet-js-react-components/src/widget/dialog/confirm" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2684,7 +2684,7 @@ declare module "hornet-js-react-components/src/widget/dropdown/dropdown" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2897,448 +2897,6 @@ declare module "hornet-js-react-components/src/widget/footer/footer-page" {
 	     * @inheritDoc
 	     */
 	    render(): JSX.Element;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/group/abstract-group-component" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	/**
-	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
-	 *
-	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
-	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
-	 * @license CECILL-2.1
-	 */
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	export interface GroupComponentProps extends HornetComponentProps {
-	    id: any;
-	    key?: any;
-	}
-	export class GroupComponent<P extends GroupComponentProps, S extends GroupComponentProps> extends HornetComponent<P, S> {
-	    constructor(props?: P, context?: any);
-	    static generateKey(object: any, defaultKey?: string): string;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/header/header-page" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	export interface HeaderPageProps extends HornetComponentProps {
-	    /**
-	     * number
-	     * Hauteur en pixel du header en props pour afficher
-	     * la class css 'sticky'
-	     */
-	    scrollHeight?: number;
-	}
-	export class HeaderPage extends HornetComponent<HeaderPageProps, any> {
-	    /** ref */
-	    header?: any;
-	    height?: any;
-	    constructor(props: HeaderPageProps, context?: any);
-	    componentDidMount(): void;
-	    componentWillUnmount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     *
-	     * @param element
-	     * @returns {boolean}
-	     */
-	    isInView(element: any): boolean;
-	    /**
-	     *
-	     * @param e
-	     */
-	    handleScroll: (e: any) => void;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/icon/icon" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import * as React from "react";
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	/**
-	 * Propriétés d'une icône
-	 */
-	export interface IconProps extends HornetComponentProps {
-	    /** Url de l'image */
-	    src: string;
-	    /** Texte alternatif */
-	    alt: string;
-	    /** Identifiant HTML de l'image rendue */
-	    idImg?: string;
-	    /** Class CSS de l'image */
-	    classImg?: string;
-	    /** Url du lien */
-	    url?: string;
-	    /** Texte d'infobulle du lien */
-	    title: string;
-	    /** Identifiant HTML du lien */
-	    idLink?: string;
-	    /** Classe CSS du lien */
-	    classLink?: string;
-	    /** Cible du lien */
-	    target?: string;
-	    /** Fonction déclenchée lorsque le bouton correspondant à l'icône est pressé ou cliqué */
-	    action?: () => void;
-	    /** Valeur de l'attribut HTML tabIndex à affecter au lien ou bouton correspondant à l'icône*/
-	    tabIndex?: number;
-	    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
-	    hasPopUp?: boolean;
-	}
-	/** Valeur de l'url par défaut lorsque la propriété url est vide */
-	export const EMPTY_URL: string;
-	/**
-	 * Composant Icône
-	 */
-	export class Icon extends HornetComponent<IconProps, any> {
-	    static defaultProps: {
-	        url: string;
-	    };
-	    /**
-	     * Retire le focus de l'élément une fois cliqué de façon à permettre de scroller ou mettre le focus sur les
-	     * notifications éventuellement présentées suite à l'action.
-	     * @param event évènement
-	     * @protected
-	     */
-	    protected iconOnClick(event: React.MouseEvent<HTMLElement>): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/language/change-language" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	import { Position }  from "hornet-js-react-components/src/widget/dropdown/dropdown";
-	/**
-	 *
-	 * Propriétés ChangeLanguage
-	 */
-	export interface ChangeLanguageProps extends HornetComponentProps {
-	    /** id du composant */
-	    id?: string;
-	    /** Boolean permettant de savoir si la liste deroulante est affiché */
-	    isOpen?: boolean;
-	    /** Méthode appelé après un changement de langue */
-	    handleChangeLanguage?: (locale: string) => void;
-	    /** détermine la position du arrow */
-	    position?: Position;
-	    switchTitle?: string;
-	}
-	/**
-	 * Composant ChangeLanguage
-	 * Il permet de changer le langue sur le site via un menu deroulant
-	 */
-	export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
-	    /** Valeur de propriétés par défaut */
-	    static defaultProps: {
-	        isOpen: boolean;
-	        position: Position;
-	    };
-	    constructor(props: any, context?: any);
-	    componentDidMount(): void;
-	    componentDidUpdate(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Met à jour la la langue en fonction de la selection
-	     * @param locale de format Ii18n {locale:"fr-FR", lang:'fr'}
-	     * @param shortLabel bigramme de la nouvelle langue ( ex : 'en' , 'fr' )
-	     */
-	    selectLanguage(locale: string, shortLabel: string): void;
 	}
 	
 }
@@ -4665,6 +4223,11 @@ declare module "hornet-js-react-components/src/widget/form/auto-complete-multi-f
 	     */
 	    computeCurrentValues(value: any): this;
 	    /**
+	     * Retourne true si l'instance du composant est soumise à l'utilisation du placeholder
+	     * @param value tableau des données sélectionnées
+	     */
+	    protected isPlaceholderToUse(value: any): boolean;
+	    /**
 	     * set la value
 	     * @param value
 	     */
@@ -5008,7 +4571,7 @@ declare module "hornet-js-react-components/src/widget/form/auto-complete-state" 
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5622,7 +5185,7 @@ declare module "hornet-js-react-components/src/widget/form/checkbox" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6097,7 +5660,7 @@ declare module "hornet-js-react-components/src/widget/form/form-utils" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6386,6 +5949,8 @@ declare module "hornet-js-react-components/src/widget/form/form" {
 	     * @returns {boolean}
 	     */
 	    protected isOneRequired(items: Array<React.ReactChild>): boolean;
+	    getHtmlProps(): any;
+	    processHtmlProps(state: any): void;
 	    /**
 	     * @inheritDoc
 	     */
@@ -6475,7 +6040,7 @@ declare module "hornet-js-react-components/src/widget/form/html-attributes" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6563,7 +6128,7 @@ declare module "hornet-js-react-components/src/widget/form/html-const-attributes
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6696,7 +6261,7 @@ declare module "hornet-js-react-components/src/widget/form/input-field" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7086,7 +6651,7 @@ declare module "hornet-js-react-components/src/widget/form/select-field" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7239,7 +6804,7 @@ declare module "hornet-js-react-components/src/widget/form/textarea-field" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7455,6 +7020,448 @@ declare module "hornet-js-react-components/src/widget/form/upload-file-field" {
 	     * @param e
 	     */
 	    protected downloadButtonKeyDownHandler(e: React.KeyboardEvent<HTMLAnchorElement>): void;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/group/abstract-group-component" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	/**
+	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
+	 *
+	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+	 * @version v5.2.4
+	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
+	 * @license CECILL-2.1
+	 */
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	export interface GroupComponentProps extends HornetComponentProps {
+	    id: any;
+	    key?: any;
+	}
+	export class GroupComponent<P extends GroupComponentProps, S extends GroupComponentProps> extends HornetComponent<P, S> {
+	    constructor(props?: P, context?: any);
+	    static generateKey(object: any, defaultKey?: string): string;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/header/header-page" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	export interface HeaderPageProps extends HornetComponentProps {
+	    /**
+	     * number
+	     * Hauteur en pixel du header en props pour afficher
+	     * la class css 'sticky'
+	     */
+	    scrollHeight?: number;
+	}
+	export class HeaderPage extends HornetComponent<HeaderPageProps, any> {
+	    /** ref */
+	    header?: any;
+	    height?: any;
+	    constructor(props: HeaderPageProps, context?: any);
+	    componentDidMount(): void;
+	    componentWillUnmount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     *
+	     * @param element
+	     * @returns {boolean}
+	     */
+	    isInView(element: any): boolean;
+	    /**
+	     *
+	     * @param e
+	     */
+	    handleScroll: (e: any) => void;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/icon/icon" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import * as React from "react";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	/**
+	 * Propriétés d'une icône
+	 */
+	export interface IconProps extends HornetComponentProps {
+	    /** Url de l'image */
+	    src: string;
+	    /** Texte alternatif */
+	    alt: string;
+	    /** Identifiant HTML de l'image rendue */
+	    idImg?: string;
+	    /** Class CSS de l'image */
+	    classImg?: string;
+	    /** Url du lien */
+	    url?: string;
+	    /** Texte d'infobulle du lien */
+	    title: string;
+	    /** Identifiant HTML du lien */
+	    idLink?: string;
+	    /** Classe CSS du lien */
+	    classLink?: string;
+	    /** Cible du lien */
+	    target?: string;
+	    /** Fonction déclenchée lorsque le bouton correspondant à l'icône est pressé ou cliqué */
+	    action?: () => void;
+	    /** Valeur de l'attribut HTML tabIndex à affecter au lien ou bouton correspondant à l'icône*/
+	    tabIndex?: number;
+	    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
+	    hasPopUp?: boolean;
+	}
+	/** Valeur de l'url par défaut lorsque la propriété url est vide */
+	export const EMPTY_URL: string;
+	/**
+	 * Composant Icône
+	 */
+	export class Icon extends HornetComponent<IconProps, any> {
+	    static defaultProps: {
+	        url: string;
+	    };
+	    /**
+	     * Retire le focus de l'élément une fois cliqué de façon à permettre de scroller ou mettre le focus sur les
+	     * notifications éventuellement présentées suite à l'action.
+	     * @param event évènement
+	     * @protected
+	     */
+	    protected iconOnClick(event: React.MouseEvent<HTMLElement>): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/language/change-language" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { Position }  from "hornet-js-react-components/src/widget/dropdown/dropdown";
+	/**
+	 *
+	 * Propriétés ChangeLanguage
+	 */
+	export interface ChangeLanguageProps extends HornetComponentProps {
+	    /** id du composant */
+	    id?: string;
+	    /** Boolean permettant de savoir si la liste deroulante est affiché */
+	    isOpen?: boolean;
+	    /** Méthode appelé après un changement de langue */
+	    handleChangeLanguage?: (locale: string) => void;
+	    /** détermine la position du arrow */
+	    position?: Position;
+	    switchTitle?: string;
+	}
+	/**
+	 * Composant ChangeLanguage
+	 * Il permet de changer le langue sur le site via un menu deroulant
+	 */
+	export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
+	    /** Valeur de propriétés par défaut */
+	    static defaultProps: {
+	        isOpen: boolean;
+	        position: Position;
+	    };
+	    constructor(props: any, context?: any);
+	    componentDidMount(): void;
+	    componentDidUpdate(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Met à jour la la langue en fonction de la selection
+	     * @param locale de format Ii18n {locale:"fr-FR", lang:'fr'}
+	     * @param shortLabel bigramme de la nouvelle langue ( ex : 'en' , 'fr' )
+	     */
+	    selectLanguage(locale: string, shortLabel: string): void;
 	}
 	
 }
@@ -8623,234 +8630,6 @@ declare module "hornet-js-react-components/src/widget/navigation/plan" {
 	
 }
 
-declare module "hornet-js-react-components/src/widget/pager/pager" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import * as React from "react";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
-	import KeyboardEvent = React.KeyboardEvent;
-	/**
-	 * Propriétés de pagination de tableau Hornet
-	 */
-	export interface PaginationProps {
-	    /** Indice de la page courante (1 pour la première page) */
-	    pageIndex: number;
-	    /** Nombre maximum d'éléments par page */
-	    itemsPerPage: number;
-	    /** Nombre total d'éléments */
-	    totalItems: number;
-	}
-	/**
-	 * Elément de sélection de taille de page
-	 */
-	export interface PageSizeItem {
-	    /** Taille de page */
-	    value: number;
-	    /** Clé du libellé internationalisé */
-	    textKey: string;
-	    /** Title du lien */
-	    title?: string;
-	}
-	/**
-	 * Propriétés du composant pagination de tableau Hornet
-	 */
-	export interface PagerProps extends HornetComponentProps {
-	    /** Propriétés de pagination courante */
-	    dataSource: PaginateDataSource<any>;
-	    /** Classe CSS personnalisée */
-	    className?: string;
-	    /** Messages internationalisés du tableau */
-	    message?: MessagesProps;
-	    /** Choix de taille de page disponibles */
-	    pageSizeSelect?: PageSizeItem[];
-	    /** id html */
-	    id: string;
-	    /** indicateur disabled */
-	    disabled?: boolean;
-	    nextPageTitle?: string;
-	    lastPageTitle?: string;
-	    previousPageTitle?: string;
-	    firstPageTitle?: string;
-	    inputLabelTitle?: string;
-	    summary?: string;
-	}
-	/**
-	 * Propriétés des Messages du tableau Hornet
-	 */
-	export interface MessagesProps {
-	    firstPage?: string;
-	    prevPage?: string;
-	    nextPage?: string;
-	    lastPage?: string;
-	    displayAll?: string;
-	    pageFooter?: string;
-	    inputPage?: string;
-	}
-	/**
-	 * Valeur de la propriété de pagination itemsPerPage correspondant à "Afficher tout" les éléments.
-	 * Egale à la constante Java Integer.MAX_VALUE (2^32 - 1)
-	 */
-	export const ITEMS_PER_PAGE_ALL: number;
-	/**
-	 * Outils de pagination de tableau
-	 */
-	export class Pager extends HornetComponent<PagerProps, any> {
-	    protected tableInputPager: any;
-	    static defaultProps: {
-	        message: any;
-	        className: string;
-	        nextPageTitle: string;
-	        lastPageTitle: string;
-	        previousPageTitle: string;
-	        firstPageTitle: string;
-	        summary: string;
-	        inputLabelTitle: string;
-	        dropDownTitle: string;
-	    };
-	    protected defaultPageSizeSelect: PageSizeItem[];
-	    constructor(props: PagerProps, context?: any);
-	    componentDidMount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentWillUnmount(): void;
-	    shouldComponentUpdate(nextProps: any, nextState: any): boolean;
-	    /**
-	     * met a jour la pagination dans le state et la valeur de la page courante.
-	     * @param result (liste des resultats du dataSource)
-	     */
-	    protected updateOnFetch(result: any): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Génère la liste déroulante permettant de sélectionner le nombre d'éléments par page.
-	     * @returns {ReactElement}
-	     */
-	    protected renderSelectItemsPerPage(): React.ReactElement<PagerProps>;
-	    /**
-	     * @param totalItems nombre total d'éléments
-	     * @param itemsPerPage nombre d'éléments par page
-	     * @return le nombre total de pages
-	     */
-	    static getTotalPages(totalItems: number, itemsPerPage: number): number;
-	    /**
-	     * Méthode permettant de générer le code HTML lié aux boutons
-	     * @returns {JSX.Element[]}
-	     */
-	    protected getButtons(): JSX.Element[];
-	    /**
-	     * Génère le rendu d'un bouton de contrôle de pagination
-	     * @param infoTitle complement info title
-	     * @param page index de la page sélectionnée par le bouton
-	     * @param enabled indique si le bouton est actif
-	     * @param key clé de l'élément React
-	     * @returns l'élément React correspondant
-	     */
-	    protected renderButton(infoTitle: string, page: number, enabled: boolean, key: string): JSX.Element;
-	    /**
-	     * Rendu de l'input de saisie pour aller à une page précise
-	     * @param firstPage numéro de la première page
-	     * @param lastPage numéro de la dernière page
-	     * @returns rendu du composant
-	     */
-	    protected renderPageInput(firstPage: number, lastPage: number, title: string): JSX.Element;
-	    /**
-	     * Gestion de la validation clavier pour aller à la page saisie
-	     * dans l'input dédié
-	     * @param e : event
-	     */
-	    protected handleInputKeyDown(e: KeyboardEvent<HTMLElement>): void;
-	    /**
-	     * L'index de page étant dans un input mappé par la prop value
-	     * React oblige l'utilisation d'un event sur onChange pour valider la modification
-	     * @param e
-	     */
-	    protected handleChangeValue(e: any): void;
-	    /**
-	     * Méthode déclenchée sur un changement d'état de du formulaire de pagination
-	     * @param value
-	     * @param pageChanged
-	     */
-	    protected onFormChange(value: any, pageChanged: any): void;
-	    setClassName(className: string, callback?: () => any): this;
-	    setMessage(message: (PaginationProps: any) => void, callback?: () => any): this;
-	    setPageSizeSelect(pageSizeSelect: PageSizeItem[], callback?: () => any): this;
-	}
-	
-}
-
 declare module "hornet-js-react-components/src/widget/notification/count-down" {
 	import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
 	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -9349,6 +9128,234 @@ declare module "hornet-js-react-components/src/widget/notification/notification"
 	
 }
 
+declare module "hornet-js-react-components/src/widget/pager/pager" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import * as React from "react";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
+	import KeyboardEvent = React.KeyboardEvent;
+	/**
+	 * Propriétés de pagination de tableau Hornet
+	 */
+	export interface PaginationProps {
+	    /** Indice de la page courante (1 pour la première page) */
+	    pageIndex: number;
+	    /** Nombre maximum d'éléments par page */
+	    itemsPerPage: number;
+	    /** Nombre total d'éléments */
+	    totalItems: number;
+	}
+	/**
+	 * Elément de sélection de taille de page
+	 */
+	export interface PageSizeItem {
+	    /** Taille de page */
+	    value: number;
+	    /** Clé du libellé internationalisé */
+	    textKey: string;
+	    /** Title du lien */
+	    title?: string;
+	}
+	/**
+	 * Propriétés du composant pagination de tableau Hornet
+	 */
+	export interface PagerProps extends HornetComponentProps {
+	    /** Propriétés de pagination courante */
+	    dataSource: PaginateDataSource<any>;
+	    /** Classe CSS personnalisée */
+	    className?: string;
+	    /** Messages internationalisés du tableau */
+	    message?: MessagesProps;
+	    /** Choix de taille de page disponibles */
+	    pageSizeSelect?: PageSizeItem[];
+	    /** id html */
+	    id: string;
+	    /** indicateur disabled */
+	    disabled?: boolean;
+	    nextPageTitle?: string;
+	    lastPageTitle?: string;
+	    previousPageTitle?: string;
+	    firstPageTitle?: string;
+	    inputLabelTitle?: string;
+	    summary?: string;
+	}
+	/**
+	 * Propriétés des Messages du tableau Hornet
+	 */
+	export interface MessagesProps {
+	    firstPage?: string;
+	    prevPage?: string;
+	    nextPage?: string;
+	    lastPage?: string;
+	    displayAll?: string;
+	    pageFooter?: string;
+	    inputPage?: string;
+	}
+	/**
+	 * Valeur de la propriété de pagination itemsPerPage correspondant à "Afficher tout" les éléments.
+	 * Egale à la constante Java Integer.MAX_VALUE (2^32 - 1)
+	 */
+	export const ITEMS_PER_PAGE_ALL: number;
+	/**
+	 * Outils de pagination de tableau
+	 */
+	export class Pager extends HornetComponent<PagerProps, any> {
+	    protected tableInputPager: any;
+	    static defaultProps: {
+	        message: any;
+	        className: string;
+	        nextPageTitle: string;
+	        lastPageTitle: string;
+	        previousPageTitle: string;
+	        firstPageTitle: string;
+	        summary: string;
+	        inputLabelTitle: string;
+	        dropDownTitle: string;
+	    };
+	    protected defaultPageSizeSelect: PageSizeItem[];
+	    constructor(props: PagerProps, context?: any);
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentWillUnmount(): void;
+	    shouldComponentUpdate(nextProps: any, nextState: any): boolean;
+	    /**
+	     * met a jour la pagination dans le state et la valeur de la page courante.
+	     * @param result (liste des resultats du dataSource)
+	     */
+	    protected updateOnFetch(result: any): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Génère la liste déroulante permettant de sélectionner le nombre d'éléments par page.
+	     * @returns {ReactElement}
+	     */
+	    protected renderSelectItemsPerPage(): React.ReactElement<PagerProps>;
+	    /**
+	     * @param totalItems nombre total d'éléments
+	     * @param itemsPerPage nombre d'éléments par page
+	     * @return le nombre total de pages
+	     */
+	    static getTotalPages(totalItems: number, itemsPerPage: number): number;
+	    /**
+	     * Méthode permettant de générer le code HTML lié aux boutons
+	     * @returns {JSX.Element[]}
+	     */
+	    protected getButtons(): JSX.Element[];
+	    /**
+	     * Génère le rendu d'un bouton de contrôle de pagination
+	     * @param infoTitle complement info title
+	     * @param page index de la page sélectionnée par le bouton
+	     * @param enabled indique si le bouton est actif
+	     * @param key clé de l'élément React
+	     * @returns l'élément React correspondant
+	     */
+	    protected renderButton(infoTitle: string, page: number, enabled: boolean, key: string): JSX.Element;
+	    /**
+	     * Rendu de l'input de saisie pour aller à une page précise
+	     * @param firstPage numéro de la première page
+	     * @param lastPage numéro de la dernière page
+	     * @returns rendu du composant
+	     */
+	    protected renderPageInput(firstPage: number, lastPage: number, title: string): JSX.Element;
+	    /**
+	     * Gestion de la validation clavier pour aller à la page saisie
+	     * dans l'input dédié
+	     * @param e : event
+	     */
+	    protected handleInputKeyDown(e: KeyboardEvent<HTMLElement>): void;
+	    /**
+	     * L'index de page étant dans un input mappé par la prop value
+	     * React oblige l'utilisation d'un event sur onChange pour valider la modification
+	     * @param e
+	     */
+	    protected handleChangeValue(e: any): void;
+	    /**
+	     * Méthode déclenchée sur un changement d'état de du formulaire de pagination
+	     * @param value
+	     * @param pageChanged
+	     */
+	    protected onFormChange(value: any, pageChanged: any): void;
+	    setClassName(className: string, callback?: () => any): this;
+	    setMessage(message: (PaginationProps: any) => void, callback?: () => any): this;
+	    setPageSizeSelect(pageSizeSelect: PageSizeItem[], callback?: () => any): this;
+	}
+	
+}
+
 declare module "hornet-js-react-components/src/widget/screen/layout-switcher" {
 	/**
 	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
@@ -9461,6 +9468,441 @@ declare module "hornet-js-react-components/src/widget/screen/layout-switcher" {
 	
 }
 
+declare module "hornet-js-react-components/src/widget/spinner/spinner-autocomplete" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import { SpinnerComponent, SpinnerProps }  from "hornet-js-react-components/src/widget/spinner/spinner-component";
+	/**
+	 * Composant affichant une image sur un champ autocomplete
+	 */
+	export class SpinnerAutoComplete<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
+	    constructor(props?: P, context?: any);
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/spinner/spinner-component-input" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import { SpinnerComponent, SpinnerProps }  from "hornet-js-react-components/src/widget/spinner/spinner-component";
+	/**
+	 * Composant affichant une image sur un champ type field
+	 */
+	export class SpinnerComponentInput<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
+	    constructor(props?: P, context?: any);
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/spinner/spinner-component" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
+	import { RequestEventDetail } from "hornet-js-core/src/event/hornet-event";
+	/**
+	 * Propriétés du spinner
+	 */
+	export interface SpinnerProps extends HornetComponentProps {
+	    /** Temps d'attente minimal (en ms) avant affichage */
+	    minimalShowTimeInMs?: number;
+	    /** Titre de la fenêtre modale*/
+	    loadingTitle?: string;
+	    /** Texte affiché dans la modale */
+	    loadingText?: string;
+	    /** Image d'attente */
+	    imageLoadingUrl?: string;
+	    /** visibilité */
+	    isVisible?: boolean;
+	    /** méthode appelée lors de la fermeture du spinner **/
+	    onHideSpinner?: Function;
+	}
+	/**
+	 * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
+	 * dans une fenêtre modale en attendant la fin d'une action longue.
+	 */
+	export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps> extends HornetComponent<SpinnerProps, SpinnerProps> {
+	    /** Décompte le nombre d'évènements en attente de terminaison */
+	    protected count: number;
+	    /**delay permettant de decaler dans le temps les demandes d'affichage du spinner fixé à 500ms (optimisation)*/
+	    protected static defaultProps: {
+	        minimalShowTimeInMs: number;
+	    };
+	    constructor(props?: P, context?: any);
+	    /**
+	     * @inheritDoc
+	     */
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentWillUnmount(): void;
+	    protected asyncRequestEventTreatment(ev: HornetEvent<RequestEventDetail>): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    shouldComponentUpdate(nextProps: any, nextState: any): boolean;
+	    /**
+	     * gestion des compteurs d'affichage/fermeture du spinner
+	     */
+	    progress(inProgress: boolean): void;
+	    /**
+	     * Affichage Spinner
+	     */
+	    openSpinner(): void;
+	    /**
+	     * Fermeture Spinner
+	     */
+	    closeSpinner(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Return l'url de l'image spinner
+	     * @returns Url image spinner
+	     * @protected
+	     */
+	    protected getSpinnerImage(): string;
+	    /**
+	     * Extrait le libelle loadingText passé dans les propriétés du composant ou indique un libellé par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getLoadingText(): string;
+	    /**
+	     * Extrait le libelle loadingTitle passé dans les propriétés du composant ou indique un libellé par défaut
+	     * @returns Titre
+	     * @protected
+	     */
+	    protected getLoadingTitle(): string;
+	}
+	
+}
+
+declare module "hornet-js-react-components/src/widget/spinner/spinner" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import { SpinnerComponent, SpinnerProps }  from "hornet-js-react-components/src/widget/spinner/spinner-component";
+	/**
+	 * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
+	 * dans une fenêtre modale en attendant la fin d'une action longue.
+	 */
+	export class Spinner<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
+	    constructor(props?: P, context?: any);
+	    /**
+	     * @inheritDoc
+	     */
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentWillUnmount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * Methode de rendu du loader
+	     */
+	    renderLoader(): JSX.Element;
+	    /**
+	     * gestion des compteurs d'affichage/fermeture du spinner
+	     */
+	    progress(inProgress: boolean): void;
+	    /**
+	     * Affichage Spinner
+	     */
+	    openSpinner(): void;
+	    /**
+	     * Fermeture Spinner
+	     */
+	    closeSpinner(): void;
+	}
+	
+}
+
 declare module "hornet-js-react-components/src/widget/tab/tab-content" {
 	/**
 	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
@@ -9536,7 +9978,7 @@ declare module "hornet-js-react-components/src/widget/tab/tab-content" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -9627,7 +10069,7 @@ declare module "hornet-js-react-components/src/widget/tab/tab-header" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -10154,563 +10596,6 @@ declare module "hornet-js-react-components/src/widget/tab/tabs" {
 	     * @param {HornetEvent} ev
 	     */
 	    protected handleNotificationEvent(ev: HornetEvent<any>): void;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/spinner/spinner-autocomplete" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import { SpinnerComponent, SpinnerProps }  from "hornet-js-react-components/src/widget/spinner/spinner-component";
-	/**
-	 * Composant affichant une image sur un champ autocomplete
-	 */
-	export class SpinnerAutoComplete<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
-	    constructor(props?: P, context?: any);
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/spinner/spinner-component-input" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import { SpinnerComponent, SpinnerProps }  from "hornet-js-react-components/src/widget/spinner/spinner-component";
-	/**
-	 * Composant affichant une image sur un champ type field
-	 */
-	export class SpinnerComponentInput<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
-	    constructor(props?: P, context?: any);
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/spinner/spinner-component" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
-	import { RequestEventDetail } from "hornet-js-core/src/event/hornet-event";
-	/**
-	 * Propriétés du spinner
-	 */
-	export interface SpinnerProps extends HornetComponentProps {
-	    /** Temps d'attente minimal (en ms) avant affichage */
-	    minimalShowTimeInMs?: number;
-	    /** Titre de la fenêtre modale*/
-	    loadingTitle?: string;
-	    /** Texte affiché dans la modale */
-	    loadingText?: string;
-	    /** Image d'attente */
-	    imageLoadingUrl?: string;
-	    /** visibilité */
-	    isVisible?: boolean;
-	    /** méthode appelée lors de la fermeture du spinner **/
-	    onHideSpinner?: Function;
-	}
-	/**
-	 * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
-	 * dans une fenêtre modale en attendant la fin d'une action longue.
-	 */
-	export class SpinnerComponent<P extends SpinnerProps, S extends SpinnerProps> extends HornetComponent<SpinnerProps, SpinnerProps> {
-	    /** Décompte le nombre d'évènements en attente de terminaison */
-	    protected count: number;
-	    /**delay permettant de decaler dans le temps les demandes d'affichage du spinner fixé à 500ms (optimisation)*/
-	    protected static defaultProps: {
-	        minimalShowTimeInMs: number;
-	    };
-	    constructor(props?: P, context?: any);
-	    /**
-	     * @inheritDoc
-	     */
-	    componentDidMount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentWillUnmount(): void;
-	    protected asyncRequestEventTreatment(ev: HornetEvent<RequestEventDetail>): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    shouldComponentUpdate(nextProps: any, nextState: any): boolean;
-	    /**
-	     * gestion des compteurs d'affichage/fermeture du spinner
-	     */
-	    progress(inProgress: boolean): void;
-	    /**
-	     * Affichage Spinner
-	     */
-	    openSpinner(): void;
-	    /**
-	     * Fermeture Spinner
-	     */
-	    closeSpinner(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Return l'url de l'image spinner
-	     * @returns Url image spinner
-	     * @protected
-	     */
-	    protected getSpinnerImage(): string;
-	    /**
-	     * Extrait le libelle loadingText passé dans les propriétés du composant ou indique un libellé par défaut
-	     * @returns Titre
-	     * @protected
-	     */
-	    protected getLoadingText(): string;
-	    /**
-	     * Extrait le libelle loadingTitle passé dans les propriétés du composant ou indique un libellé par défaut
-	     * @returns Titre
-	     * @protected
-	     */
-	    protected getLoadingTitle(): string;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/spinner/spinner" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import { SpinnerComponent, SpinnerProps }  from "hornet-js-react-components/src/widget/spinner/spinner-component";
-	/**
-	 * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente
-	 * dans une fenêtre modale en attendant la fin d'une action longue.
-	 */
-	export class Spinner<P extends SpinnerProps, S extends SpinnerProps> extends SpinnerComponent<P, S> {
-	    constructor(props?: P, context?: any);
-	    /**
-	     * @inheritDoc
-	     */
-	    componentDidMount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentWillUnmount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * Methode de rendu du loader
-	     */
-	    renderLoader(): JSX.Element;
-	    /**
-	     * gestion des compteurs d'affichage/fermeture du spinner
-	     */
-	    progress(inProgress: boolean): void;
-	    /**
-	     * Affichage Spinner
-	     */
-	    openSpinner(): void;
-	    /**
-	     * Fermeture Spinner
-	     */
-	    closeSpinner(): void;
-	}
-	
-}
-
-declare module "hornet-js-react-components/src/widget/tool-tip/tool-tip" {
-	/**
-	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * Ce logiciel est un programme informatique servant à faciliter la création
-	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
-	 * <p/>
-	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
-	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
-	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
-	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
-	 * sur le site "http://www.cecill.info".
-	 * <p/>
-	 * En contrepartie de l'accessibilité au code source et des droits de copie,
-	 * de modification et de redistribution accordés par cette licence, il n'est
-	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
-	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
-	 * titulaire des droits patrimoniaux et les concédants successifs.
-	 * <p/>
-	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
-	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
-	 * développement et à la reproduction du logiciel par l'utilisateur étant
-	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
-	 * manipuler et qui le réserve donc à des développeurs et des professionnels
-	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
-	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
-	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
-	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
-	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
-	 * <p/>
-	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
-	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
-	 * termes.
-	 * <p/>
-	 * <p/>
-	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
-	 * <p/>
-	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
-	 * <p/>
-	 * This software is a computer program whose purpose is to facilitate creation of
-	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
-	 * <p/>
-	 * This software is governed by the CeCILL license under French law and
-	 * abiding by the rules of distribution of free software.  You can  use,
-	 * modify and/ or redistribute the software under the terms of the CeCILL
-	 * license as circulated by CEA, CNRS and INRIA at the following URL
-	 * "http://www.cecill.info".
-	 * <p/>
-	 * As a counterpart to the access to the source code and  rights to copy,
-	 * modify and redistribute granted by the license, users are provided only
-	 * with a limited warranty  and the software's author,  the holder of the
-	 * economic rights,  and the successive licensors  have only  limited
-	 * liability.
-	 * <p/>
-	 * In this respect, the user's attention is drawn to the risks associated
-	 * with loading,  using,  modifying and/or developing or reproducing the
-	 * software by the user in light of its specific status of free software,
-	 * that may mean  that it is complicated to manipulate,  and  that  also
-	 * therefore means  that it is reserved for developers  and  experienced
-	 * professionals having in-depth computer knowledge. Users are therefore
-	 * encouraged to load and test the software's suitability as regards their
-	 * requirements in conditions enabling the security of their systems and/or
-	 * data to be ensured and,  more generally, to use and operate it in the
-	 * same conditions as regards security.
-	 * <p/>
-	 * The fact that you are presently reading this means that you have had
-	 * knowledge of the CeCILL license and that you accept its terms.
-	 *
-	 */
-	import * as React from "react";
-	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
-	/**
-	 * Propriétés du ToolTip
-	 */
-	export interface ToolTipProps extends HornetComponentProps {
-	    src?: string;
-	    icoToolTip?: string;
-	    alt: string;
-	    idImg?: string;
-	    classImg?: string;
-	    idSpan: string;
-	    classSpan?: string;
-	}
-	/**
-	 * Composant ToolTip
-	 */
-	export class ToolTip extends HornetComponent<ToolTipProps, any> {
-	    static defaultProps: {
-	        classImg: string;
-	        classSpan: string;
-	        icoToolTip: string;
-	    };
-	    /**
-	     * @inheritDoc
-	     */
-	    render(): JSX.Element;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentDidMount(): void;
-	    /**
-	     * @inheritDoc
-	     */
-	    componentWillUnmount(): void;
-	    /**
-	     * Gestion des touches du clavier
-	     * @param event
-	     */
-	    protected handleKeyDown(event: any): void;
-	    /**
-	     * Fonction déclenchée lorsque le champ de saisie libre perd le focus
-	     * @param event
-	     */
-	    protected hideTip(event: React.SyntheticEvent<HTMLElement>): void;
-	    protected showTip(event: React.SyntheticEvent<HTMLElement>): void;
 	}
 	
 }
@@ -12114,7 +11999,7 @@ declare module "hornet-js-react-components/src/widget/table/navigation-direction
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -12317,7 +12202,7 @@ declare module "hornet-js-react-components/src/widget/table/table-button-info-ac
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -12424,7 +12309,7 @@ declare module "hornet-js-react-components/src/widget/table/table-state" {
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -12791,6 +12676,128 @@ declare module "hornet-js-react-components/src/widget/table/toggle-columns-butto
 	
 }
 
+declare module "hornet-js-react-components/src/widget/tool-tip/tool-tip" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import * as React from "react";
+	import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
+	import { HornetComponent }  from "hornet-js-react-components/src/widget/component/hornet-component";
+	/**
+	 * Propriétés du ToolTip
+	 */
+	export interface ToolTipProps extends HornetComponentProps {
+	    src?: string;
+	    icoToolTip?: string;
+	    alt: string;
+	    idImg?: string;
+	    classImg?: string;
+	    idSpan: string;
+	    classSpan?: string;
+	}
+	/**
+	 * Composant ToolTip
+	 */
+	export class ToolTip extends HornetComponent<ToolTipProps, any> {
+	    static defaultProps: {
+	        classImg: string;
+	        classSpan: string;
+	        icoToolTip: string;
+	    };
+	    /**
+	     * @inheritDoc
+	     */
+	    render(): JSX.Element;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentDidMount(): void;
+	    /**
+	     * @inheritDoc
+	     */
+	    componentWillUnmount(): void;
+	    /**
+	     * Gestion des touches du clavier
+	     * @param event
+	     */
+	    protected handleKeyDown(event: any): void;
+	    /**
+	     * Fonction déclenchée lorsque le champ de saisie libre perd le focus
+	     * @param event
+	     */
+	    protected hideTip(event: React.SyntheticEvent<HTMLElement>): void;
+	    protected showTip(event: React.SyntheticEvent<HTMLElement>): void;
+	}
+	
+}
+
 declare module "hornet-js-react-components/src/widget/user/user" {
 	/**
 	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
@@ -13001,7 +13008,7 @@ declare module "hornet-js-react-components/src/widget/table/column/action-column
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -13132,7 +13139,7 @@ declare module "hornet-js-react-components/src/widget/table/column/check-column"
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -13240,7 +13247,7 @@ declare module "hornet-js-react-components/src/widget/table/column/date-column" 
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -13340,7 +13347,7 @@ declare module "hornet-js-react-components/src/widget/table/column/edition-actio
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -13460,7 +13467,7 @@ declare module "hornet-js-react-components/src/widget/table/column/input-text-co
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -13561,7 +13568,7 @@ declare module "hornet-js-react-components/src/widget/table/column/more-info-col
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -13659,7 +13666,7 @@ declare module "hornet-js-react-components/src/widget/table/column/yesno-column"
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -14483,7 +14490,7 @@ declare module "hornet-js-react-components/src/widget/table/column/cell/cell-coo
 	 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

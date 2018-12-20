@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -973,7 +973,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
             }
         }
 
-        if (this.hasErrors()) {
+        if (this.hasErrors() && !(this.props && this.props.groupClass && this.props.groupClass.indexOf("table-cell-container") >= 0)) {
             htmlProps["aria-describedby"] = "";
             const errors = this.getNamesFieldsError();
             for (let i = 0; i < errors.length; i++) {

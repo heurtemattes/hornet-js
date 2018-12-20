@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,7 +97,6 @@ import * as schema2 from "test/widget/notification/validation2.json";
 import * as schema3 from "test/widget/notification/validation3.json";
 import * as schema4 from "test/widget/notification/validation4.json";
 
-let formElement: JSX.Element;
 let renderedElement;
 
 /**
@@ -106,17 +105,19 @@ let renderedElement;
  */
 @Decorators.describe("Test Karma Notification form dispatching")
 class NotificationFormDispatchingTest extends HornetReactTest {
-
+    protected id;
+    protected formElement: JSX.Element;
 
     @Decorators.before
     before() {
-        formElement = (
+        this.formElement = (
             <div>
                 {this.generateAccordionsIntoForm()}
                 {this.generateFormsIntoAccordions()}
             </div>
         );
-        renderedElement = this.renderIntoDocument(formElement, "main1");
+        this.id = this.generateMainId();
+        renderedElement = this.renderIntoDocument(this.formElement, this.id);
     };
 
     /**
@@ -270,16 +271,9 @@ class NotificationFormDispatchingTest extends HornetReactTest {
         console.log("Validation du formulaire");
     }
 
-
-    @Decorators.it("Test OK")
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
-    };
-
     @Decorators.it("Valider formulaire 1")
     validerForm1() {
-        this.triggerMouseEvent(document.querySelector("#main1 #envoi-form1"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} #envoi-form1`), "click");
         setTimeout(() => {
             let element = this.getNotificationMessageListForm("Form-0", "error-message-list");
             HornetTestAssert.assertEquals(5, element.length, "La zone de notification doit contenir 5 messages d'erreurs");
@@ -302,14 +296,15 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     };
 
     protected getNotificationMessageListForm(form: string, className: string) {
-        let formElement = document.getElementById(form);
-        let messageList = formElement.getElementsByClassName(className)[ 0 ];
+        let messageList = document.querySelectorAll(`#${this.id} .${className}`)[0];
+        if (form !== "Form-0") {
+            messageList = document.querySelectorAll(`#${this.id} #${form} .${className}`)[0];
+        }
         return (messageList) ? messageList.children : null;
     }
 
     protected getNotificationNumberErrorAccordionForm(form: string, className: string): number {
-        let formElement = document.getElementById(form);
-        let errorTagAccordion = formElement.getElementsByClassName(className);
+        const errorTagAccordion = document.querySelectorAll(`#${this.id} #${form} .${className}`);
         let count: number = 0;
         for (let i = 0; i < errorTagAccordion.length; i++) {
             count += Number(errorTagAccordion[ i ].textContent.split(" ")[ 0 ]);
@@ -319,7 +314,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
 
     @Decorators.it("Valider formulaire 2")
     validerForm2() {
-        this.triggerMouseEvent(document.querySelector("#main1 #envoi-form2"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} #envoi-form2`), "click");
         setTimeout(() => {
             let element = this.getNotificationMessageListForm("Form-0", "error-message-list");
             HornetTestAssert.assertEquals(5, element.length, "La zone de notification doit contenir 5 messages d'erreurs");
@@ -343,7 +338,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
 
     @Decorators.it("Valider formulaire 3")
     validerForm3() {
-        this.triggerMouseEvent(document.querySelector("#main1 #envoi-form3"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} #envoi-form3`), "click");
         setTimeout(() => {
             let element = this.getNotificationMessageListForm("Form-0", "error-message-list");
             HornetTestAssert.assertEquals(5, element.length, "La zone de notification doit contenir 5 messages d'erreurs");
@@ -367,7 +362,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
 
     @Decorators.it("Valider formulaire 4")
     validerForm4() {
-        this.triggerMouseEvent(document.querySelector("#main1 #envoi-form4"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} #envoi-form4`), "click");
         setTimeout(() => {
             let element = this.getNotificationMessageListForm("Form-0", "error-message-list");
             HornetTestAssert.assertEquals(5, element.length, "La zone de notification doit contenir 5 messages d'erreurs");

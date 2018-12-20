@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -175,6 +175,8 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
             }
         }
 
+        // FIXME le setState ici provoque un render d'accordions et donc de chaque accordion
+        // ce qui n'a pas de sens si un seul a besoin d'être à nouveau rendu => problèmes de perf
         this.setState({ visibleAccordion }, () => {
             accordion = _.find(this.accordionList, { props: { panelIndex: index } });
             if (accordion && accordion.state.isOpen && this.props.afterShowAccordion) {

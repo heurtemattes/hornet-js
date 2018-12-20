@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -169,7 +169,7 @@ export class ActionButton<P extends ActionButtonProps, S extends ActionButtonSta
 
         const aProps: any = {
             disabled: this.state.disabled,
-        };
+            id: this.props.id};
 
         return (
             this.state.visible ?

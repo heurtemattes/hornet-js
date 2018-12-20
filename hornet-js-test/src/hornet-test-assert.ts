@@ -79,7 +79,7 @@ const expect = chai.expect;
  *
  * @class HornetTestAssert
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  *

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -102,7 +102,7 @@ import { SelectField } from "src/widget/form/select-field";
 import { ButtonsArea } from "src/widget/form/buttons-area";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
-
+import { HTML_ATTRIBUTES } from "src/widget/form/html-attributes";
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.form");
 
 /**
@@ -660,6 +660,30 @@ export class Form extends AbstractForm<FormProps, any> {
         return true;
     }
 
+    getHtmlProps(): any {
+        /* On n'inclut pas les propriétés spécifiques qui ne concernent pas un champ HTML standard */
+        const htmlProps: any = { name: "" };
+        for (const key in this.state) {
+            if (key in HTML_ATTRIBUTES) {
+                htmlProps[key] = this.state[key];
+            }
+        }
+
+        this.processHtmlProps(htmlProps);
+        return htmlProps;
+    }
+
+    processHtmlProps(state: any): void {
+        if (state) {
+
+            /* Si l'id n'est pas explicitement spécifié, on lui affecte la même valeur que le nom, car il sera utilisé
+             * comme ancre pour les messages d'erreur de validation */
+            if (state.name && !state.id) {
+                state.id = state.name;
+            }
+        }
+    }
+
     /**
      * @inheritDoc
      */
@@ -699,11 +723,13 @@ export class Form extends AbstractForm<FormProps, any> {
         const textHtmlProps = {
             lang: this.props.textLang ? this.props.textLang : null,
         };
+
+        const htmlProps = _.cloneDeep(this.getHtmlProps);
         return (
             <section className="form-container">
                 {customNotif}
                 <div className={classNames(classes)}>
-                    <form  {...formProps}>
+                    <form  {...htmlProps}{...formProps}>
                         {(this.state.subTitle || this.state.text
                             || (this.state.markRequired && !this.state.isMandatoryFieldsHidden)) ?
                             <div className="form-titles">

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,7 +95,6 @@ import { InputField } from "hornet-js-react-components/src/widget/form/input-fie
 
 import * as schema2 from "test/widget/notification/validation2.json";
 
-let formElement: JSX.Element;
 let renderedElement;
 let maModal1: Modal;
 let maModal2: Modal;
@@ -106,39 +105,50 @@ let maModal2: Modal;
  */
 @Decorators.describe("Test Karma Notification pop in to page")
 class NotificationFormDispatchingTest extends HornetReactTest {
+    protected formElement: JSX.Element;
+    protected id;
+    protected myModal1Id;
+    protected myModal2Id;
 
     @Decorators.before
     before() {
-        formElement = (
-            <div>
+        this.myModal1Id = this.generateMainId();
+        this.myModal2Id = this.generateMainId();
+        this.formElement = (
+            <React.Fragment>
                 <Notification id="notifZone" />
                 <Modal ref={(modal: Modal) => {
                     maModal1 = modal
                 }}
                     withoutOverflow={true} underlayClickExits={false}
                     focusDialog={false} onClickClose={this.closeModal1}>
-                    <Form id={"modalForm1"} onSubmit={this.onSubmitModalForm1}>
-                        {this.renderButtons("modalForm1")}
-                    </Form>
+                    <div id={this.myModal1Id}>
+                        <Form id={`${this.myModal1Id}modalForm1`} onSubmit={this.onSubmitModalForm1}>
+                            {this.renderButtons(`${this.myModal1Id}modalForm1`)}
+                        </Form>
+                    </div>
                 </Modal>
                 <Modal ref={(modal: Modal) => {
                     maModal2 = modal
                 }}
                     withoutOverflow={true} underlayClickExits={false}
                     focusDialog={false} onClickClose={this.closeModal2}>
-                    <Form id={"modalForm2"} onSubmit={this.onSubmitModalForm2} schema={schema2}>
-                        <InputField
-                            name={"input6"}
-                            label="Champ à renseigner"
-                            required={true}
-                            maxLength={250}
-                        />
-                        {this.renderButtons("modalForm2")}
-                    </Form>
+                    <div id={this.myModal2Id}>
+                        <Form id={`${this.myModal2Id}modalForm2`} onSubmit={this.onSubmitModalForm2} schema={schema2}>
+                            <InputField
+                                name={"input6"}
+                                label="Champ à renseigner"
+                                required={true}
+                                maxLength={250}
+                            />
+                            {this.renderButtons(`${this.myModal2Id}modalForm2`)}
+                        </Form>
+                    </div>
                 </Modal>
-            </div>
+            </React.Fragment>
         );
-        renderedElement = this.renderIntoDocument(formElement, "main1");
+        this.id = this.generateMainId();
+        renderedElement = this.renderIntoDocument(this.formElement, this.id);
         maModal1.open();
     };
 
@@ -191,7 +201,8 @@ class NotificationFormDispatchingTest extends HornetReactTest {
      */
     @Decorators.it("Validation ok du formulaire d'une pop in")
     validerPopInForm() {
-        this.triggerMouseEvent(document.querySelector("#envoi-modalForm1"), "click");
+        const envoiModalHtmlElement = document.querySelector(`#envoi-${this.myModal1Id}modalForm1`);
+        this.triggerMouseEvent(envoiModalHtmlElement, "click");
         setTimeout(() => {
             HornetTestAssert.assertFalse(maModal1.state.isVisible, "le modal modal1 ne doit plus être visible");
             let element = this.getNotificationMessageListForm("notifZone", "info-message-list");
@@ -207,19 +218,24 @@ class NotificationFormDispatchingTest extends HornetReactTest {
     validerKOPopInForm() {
         maModal2.open();
         setTimeout(() => {
-            this.triggerMouseEvent(document.querySelector("#envoi-modalForm2"), "click");
+            this.triggerMouseEvent(document.querySelector(`#envoi-${this.myModal2Id}modalForm2`), "click");
             setTimeout(() => {
                 HornetTestAssert.assertTrue(maModal2.state.isVisible, "Le modal maModal2 doit être visible");
                 let element = this.getNotificationMessageListForm("Form-1", "error-message-list");
                 HornetTestAssert.assertEquals(1, element.length, "La zone de notification doit contenir un message d'error");
-                this.end();
+                maModal2.close();
+                setTimeout(() => {
+                    this.end();
+                }, 250);
             }, 500);
         }, 500);
     };
 
     protected getNotificationMessageListForm(form: string, className: string) {
-        let formElement = document.getElementById(form);
-        let messageList = formElement.getElementsByClassName(className)[ 0 ];
+        let messageList = document.querySelectorAll(`#${this.myModal2Id} .${className}`)[0];
+        if (form !== "Form-1") {
+            messageList = document.querySelectorAll(`#${this.id} #${form} .${className}`)[0];
+        }
         return (messageList) ? messageList.children : null;
     }
 }

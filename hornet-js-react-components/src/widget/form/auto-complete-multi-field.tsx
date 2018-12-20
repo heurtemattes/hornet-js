@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -496,14 +496,26 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
     }
 
     /**
+     * Retourne true si l'instance du composant est soumise à l'utilisation du placeholder
+     * @param value tableau des données sélectionnées
+     */
+    protected isPlaceholderToUse(value: any): boolean {
+        return (!value || value.length === 0) && this.state.placeholder && this.state.placeholder !== "";
+    }
+
+    /**
      * set la value
      * @param value
      */
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
         if (this.textInput) {
-            this.textInput.placeholder = this.state.itemSelectedLabel.replace("{count}", value ? value.length : 0)
-                || this.i18n("form.autoCompleteField.selectedItem", { count: value ? value.length : 0 });
+            if (!this.isPlaceholderToUse(value)) {
+                this.textInput.placeholder = this.state.itemSelectedLabel.replace("{count}", value ? value.length : 0)
+                    || this.i18n("form.autoCompleteField.selectedItem", { count: value ? value.length : 0 });
+            } else {
+                this.textInput.placeholder = this.state.placeholder;
+            }
         }
         this.changeSelectedChoice();
 

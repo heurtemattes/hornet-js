@@ -287,7 +287,7 @@
   },
   "error": {
     "message": {
-      "ERR_HORNET_SECURITY": "Authentification refusée: l'utilisateur ne possède pas les droits suffisants pour accéder cette page",
+      "ERR_HORNET_SECURITY": "Authentification refusée: l'utilisateur ne possède pas les droits suffisants pour accéder à cette page",
       "ERR_HORNET_RESOURCE_NOTFOUND": "Ressource non trouvée",
       "ERR_TECH_UNKNOWN": "Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_AUTHENTICATION_FAILED": "Votre identifiant ou votre mot de passe est incorrect",

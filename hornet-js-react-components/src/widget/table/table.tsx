@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -174,7 +174,7 @@ export class Table extends HornetComponent<TableProps, any> {
         if (this.state.isVisible) {
             return componentContent ?
                 <div><Notification id={notifId} /> {this.renderTable(myContents)}</div> :
-                <div> {this.renderTable(myContents)} </div>;
+                <div className = {this.state.className} > {this.renderTable(myContents)} </div>;
         }
 
         return <div />;
@@ -195,7 +195,7 @@ export class Table extends HornetComponent<TableProps, any> {
     protected renderTable(myContents): JSX.Element {
         const myHeader: any = this.getComponentBy(Header);
         return (
-            <div className="datatable-container">
+            <div className="datatable-container" id={this.props.id}>
                 {this.renderHeader(myHeader, myContents)}
                 {this.renderContent(myHeader, myContents)}
                 <div className="hornet-datatable-bottom">

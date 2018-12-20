@@ -165,7 +165,7 @@ declare module "hornet-js-database/src/decorators/dec-seq-entity" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -428,7 +428,7 @@ declare module "hornet-js-database/src/sequelize/database" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -528,7 +528,7 @@ declare module "hornet-js-database/src/sequelize/dbconnect-sequelize" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -785,7 +785,7 @@ declare module "hornet-js-database/src/sequelize/hornet-sequelize-attributes" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.3
+	 * @version v5.2.4
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

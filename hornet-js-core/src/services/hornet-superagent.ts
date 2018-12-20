@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -276,7 +276,8 @@ export class HornetSuperAgent {
             _.merge(this.clientSessionConfig, request.clientTimeout);
         }
         if (!this.superAgentRequest) {
-            this.superAgentRequest = superagent(request.method || "get", request.url);
+
+            this.superAgentRequest = superagent((request.method && request.method.toUpperCase()) || "get", request.url);
 
             this.plugins.list.forEach((name: String) => {
                 const config: HornetPluginConfig<any> = this.plugins.mapPlugins[ "" + name ];
@@ -369,6 +370,7 @@ export class HornetSuperAgent {
                     p = Promise.resolve(cacheResponse);
                 } else {
                     p = new Promise<any>((resolve, reject) => {
+
                         const ha: superagent.SuperAgentRequest = this.initSuperAgent(request);
                         ha.accept((request.typeMime && request.typeMime.MIME) || "json"); // ajoute le format attendu sinon json par defaut
                         if (request.headers) {
@@ -521,8 +523,15 @@ export class HornetSuperAgent {
                                     elemt.a.href = objectUrl;
                                     elemt.a.download = attachFilename; // Set the file name.
                                     elemt.a.style.display = "none";
-                                    document.body.appendChild(elemt.a);
+
+                                    const modalQuery = document.querySelector('[role="dialog"]');
+                                    if (modalQuery) {
+                                        modalQuery.appendChild(elemt.a);
+                                    } else {
+                                        document.body.appendChild(elemt.a);
+                                    }
                                     elemt.a.click();
+
                                     setTimeout(function () {
                                         document.body.removeChild(elemt.a);
                                         window.URL.revokeObjectURL(elemt.a.href);

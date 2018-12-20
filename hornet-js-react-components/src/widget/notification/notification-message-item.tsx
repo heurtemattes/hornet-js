@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,7 +106,8 @@ export class MessageItem extends HornetComponent<MessageItemProps, any> {
 
     setFocus(e: React.MouseEvent<HTMLElement>) {
         e.preventDefault();
-        let element = document.getElementsByName(this.state.field) ?
+        const elem = document.getElementsByName(this.state.field);
+        let element = elem && elem.length > 0 ?
             document.getElementsByName(this.state.field)[ 0 ] : document.getElementById(this.state.field);
         if (element && element.focus) {
 

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -158,7 +158,9 @@ class FormValidateSubmit extends BaseTest {
     @Decorators.it("Test validation du formulaire avec schema par défaut")
     testDefaultValidationForm() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
+        this.renderIntoDocument(element, `${this.className}-main${id}`);
+        let form = document.getElementById("modalForm");
+        HornetTestAssert.assertNotNull(form, " le form est présent");
         const valide: boolean = this.monForm.validate(false);
         HornetTestAssert.assertTrue(valide, "Le formulaire n'est pas correctement validé");
         this.end();
@@ -167,7 +169,7 @@ class FormValidateSubmit extends BaseTest {
     @Decorators.it("Test validation du formulaire avec schema custom")
     testCustomValidationForm() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
+        this.renderIntoDocument(element, `${this.className}-main${id}`);
         const valide: boolean = this.monForm.validate(false, schema);
         HornetTestAssert.assertTrue(valide, "Le formulaire n'est pas correctement validé");
         this.end();
@@ -176,7 +178,7 @@ class FormValidateSubmit extends BaseTest {
     @Decorators.it("Test invalidation du formulaire avec schema par défaut")
     testDefaultInvalidationForm() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
+        this.renderIntoDocument(element, `${this.className}-main${id}`);
         const invalideData = { desc: "Secteur 9" };
         this.monForm.updateFields(invalideData);
         const valide: boolean = this.monForm.validate(false);
@@ -187,7 +189,7 @@ class FormValidateSubmit extends BaseTest {
     @Decorators.it("Test invalidation du formulaire avec schema custom")
     testCustomInvalidationForm() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
+        this.renderIntoDocument(element, `${this.className}-main${id}`);
         const invalideData = { nom: "Secteur 9" };
         this.monForm.updateFields(invalideData);
         const valide: boolean = this.monForm.validate(false, schema);
@@ -200,7 +202,7 @@ class FormValidateSubmit extends BaseTest {
     @Decorators.it("Test invalidation du formulaire avec schema par défaut et notification des erreurs")
     testCustomInvalidationFormWithNotify() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${this.className}-main${id}`);
+        this.renderIntoDocument(element, `${this.className}-main${id}`);
         const invalideData = { nom: "Secteur 9" };
         this.monForm.updateFields(invalideData);
         const valide: boolean = this.monForm.validate(true);

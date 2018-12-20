@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.3
+ * @version v5.2.4
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -95,9 +95,9 @@ import { Column } from "hornet-js-react-components/src/widget/table/column";
 import { Columns } from "hornet-js-react-components/src/widget/table/columns";
 import * as assert from "assert";
 import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 
 var chai = require('chai');
-const expect = chai.expect;
 
 
 const logger = Utils.getLogger("hornet-js-react-components.test.pager.pager");
@@ -142,10 +142,11 @@ class PagerTest extends HornetReactTest {
 
     @Decorators.it("Test Affichage Pager")
     testAffichage() {
-        $element = this.renderIntoDocument(element, "main1");
+        const id = this.generateMainId();
+        $element = this.renderIntoDocument(element, id);
         /* Existance du boutton dropdown */
-        expect(document.querySelector("#main1 .datatable-pagination"), "Problème élément Label non trouvé").to.exist;
-        expect(document.querySelector("#main1 .datatable-pagination-input")[ "max" ]).to.equal("15");
+        HornetTestAssert.assertNotNull(document.querySelector(`#${id} .datatable-pagination`), "Problème élément Label non trouvé");
+        HornetTestAssert.assertEquals("15",document.querySelector(`#${id} .datatable-pagination-input`)[ "max" ], "");
         this.end();
     }
 
@@ -155,17 +156,17 @@ class PagerTest extends HornetReactTest {
         $element = this.renderIntoDocument(element, id);
 
         /* Existance du boutton dropdown */
-        expect(document.querySelector(`#${id} .datatable-pagination`), "Problème élément Label non trouvé").to.exist;
+        HornetTestAssert.assertNotNull(document.querySelector(`#${id} .datatable-pagination`), "Problème élément Label non trouvé");
         this.triggerMouseEvent(document.querySelector(`#${id} .datatable-pagination-button-nextpage`),
             "click");
         setTimeout(() => {
-            expect(document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ]).to.equal("2");
+            HornetTestAssert.assertEquals("2", document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ], "");
             document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ] = "";
             this.triggerKeyPressEvent(document.querySelector(`#${id} .datatable-pagination-input`), "3", "3".charCodeAt(0), true);
             this.triggerKeydownEvent(document.querySelector(`#${id} .datatable-pagination-input`), "Enter", 13, false); // Appuie de la touche Entrer
             setTimeout(() => {
-                expect(document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ]).to.equal("3");
-                expect(document.querySelector(`#${id} .datatable-pagination .datatable-pagination-button-nextpage`)[ "title" ]).to.equal("Aller à la page suivante (page 4 sur 15) du tableau");
+                HornetTestAssert.assertEquals("3", document.querySelector(`#${id} .datatable-pagination-input`)[ "value" ], "");
+                HornetTestAssert.assertEquals("Aller à la page suivante (page 4 sur 15) du tableau", document.querySelector(`#${id} .datatable-pagination .datatable-pagination-button-nextpage`)[ "title" ], "");
                 this.end();
             }, 250);
         }, 1000);

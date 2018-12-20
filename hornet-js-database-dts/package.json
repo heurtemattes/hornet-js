@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-database-dts",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "license": "CECILL-2.1",
   "description": "Définition Typescript du module hornet-js-database",
   "bugs": {
