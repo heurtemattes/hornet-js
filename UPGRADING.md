@@ -1,3 +1,14 @@
+# Montée de version vers Hornet.js 5.3.0
+
+## Reprise accéssibilité props hasPopup
+
+Un audit d'accéssibilité a révélé qu'il n'était pas pertinent d'utiliser la balise aria-haspopup hors de l'ouverture d'un menu. Les composants suivant n'ont plus de raisons d'utiliser la props hasPopUp :
+- Button
+- Icon
+- ActionColumn
+
+Si vous utilisez cette props dans vos projets pour ces composants ou des composants issus de ceux-ci, vous rencontrerez une erreur de compilation jusqu'à retrait de la valorisation de la props.
+
 # Montée de version vers Hornet.js 5.2.2
 
 ## prototypage de la localisation des logs

@@ -57,12 +57,12 @@ Ajouter au package.json
 
 ```shell
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.X.X"
+    "hornet-js-ts-typings": "5.3.X"
   }
   "appDependencies": {
-    "hornet-js-react-components": "5.X.X",
-    "hornet-js-core": "5.X.X",
-    "hornet-js-utils": "5.X.X"
+    "hornet-js-react-components": "5.3.X",
+    "hornet-js-core": "5.3.X",
+    "hornet-js-utils": "5.3.X"
   }
   
 ```

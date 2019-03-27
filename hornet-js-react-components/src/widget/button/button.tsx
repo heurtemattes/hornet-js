@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,6 @@ import { HornetComponentProps, HornetComponentState } from "hornet-js-components
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Logger } from "hornet-js-utils/src/logger";
 import * as classNames from "classnames";
-import ReactDOM = __React.ReactDOM;
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.button.button");
 
@@ -102,8 +101,7 @@ export interface ButtonProps extends HornetComponentProps {
     title?: string;
     disabled?: boolean;
     url?: string;
-    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
-    hasPopUp?: boolean;
+    target?: LinkTarget
 }
 
 export interface ButtonState extends ButtonProps, HornetComponentState {
@@ -111,6 +109,13 @@ export interface ButtonState extends ButtonProps, HornetComponentState {
     effect?: boolean;
     css?: any;
     unmount?: boolean;
+}
+
+export enum LinkTarget {
+    BLANK = "_blank",
+    SELF = "_self",
+    PARENT = "_parent",
+    TOP = "_top",
 }
 
 /**
@@ -173,8 +178,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
                 onClick={this.handleClick}
                 className={classNames(classes)}
                 title={this.state.title}
-                disabled={this.state.disabled}
-                aria-haspopup={this.props.hasPopUp}>
+                disabled={this.state.disabled}>
                 {this.state.label}
                 {this.state.effect ? <div className="ripple-effect" style={this.state.css} /> : null}
             </button>
@@ -200,6 +204,10 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
             onClick: this.handleClick,
             disabled: this.state.disabled,
         };
+
+        if(this.state.target) {
+            aProps.target = this.state.target;
+        }
 
         return (
             <a {...aProps}

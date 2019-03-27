@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -113,6 +113,9 @@ export interface HornetRequest {
     resultDisposition?: HornetRequestResultDisposition;
     clientTimeout?: ClientSessionTimeout;
     manageError?: ErrorManagementType;
+    manageTransformResponse?: ResponseManagementType;
+    hooks?: HookSteps;
+    query?: any; // see superagent.query
 }
 
 export interface HornetRequestTimeOut {
@@ -170,4 +173,27 @@ export enum ErrorManagementType {
     Business = "business",
     Technical = "technical",
     All = "all",
+}
+
+/**
+ * Type de management de la réponse pour la requête
+ * valeur possible (None, OK, Error, All)
+ */
+export enum ResponseManagementType {
+    None = "",
+    OK = "OK",
+    Error = "ERROR",
+    All = "ALL",
+}
+
+
+/**
+ * Type de management de la réponse pour la requête
+ * valeur possible (None, OK, Error, All)
+ */
+export interface HookSteps {
+    afterInit?: (su: SuperAgentRequest, request: HornetRequest) => void;
+    beforeRequest?: (su: SuperAgentRequest, request: HornetRequest) => void;
+    afterRequestSuccess?: (response: Response, request: HornetRequest) => any;
+    afterRequestError?: (response: Response|Error, request: HornetRequest) => Error;
 }

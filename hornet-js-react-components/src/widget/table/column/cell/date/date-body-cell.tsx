@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -126,8 +126,8 @@ export class DateBodyCell<P extends DateBodyCellProps, S> extends AbstractBodyCe
             value = props.value;
         } else if (!isNaN(props.value) && isFinite(props.value)) {
             value = Number(props.value); // nombre de milliseconds
-        } else if (props.inputFormat) {
-            const mom = moment(props.value, props.inputFormat, true);
+        } else if (props.inputFormat || typeof props.value  === "string") {
+            const mom = moment(props.value, props.inputFormat || this.getI18n("calendar.dateFormat"), true);
             if (mom.isValid()) {
                 value = mom.toDate(); // nombre de milliseconds
             }

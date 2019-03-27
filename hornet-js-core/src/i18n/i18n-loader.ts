@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -145,7 +145,8 @@ export class I18nLoader extends AbstractI18nLoader {
                     _.merge(i18nMessages, require(path.join(this.pathLang, "messages-" + locales.locale + ".json")));
                 }
             }
-            return { locale: locales.locale, lang: locales.lang, messages: i18nMessages };
+            this.messagesLang[locales.locale] = { locale: locales.locale, lang: locales.lang, messages: i18nMessages };
+            return this.messagesLang[locales.locale];
         }
     }
 

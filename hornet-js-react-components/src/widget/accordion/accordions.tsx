@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -105,12 +105,15 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
     /** liste des instances Accordion*/
     protected accordionList: Array<Accordion> = [];
 
+    protected visibleAccordion : boolean[];
+    protected tabIndex: number[];
+
     constructor(props?: P, context?: any) {
         super(props, context);
+        this.visibleAccordion  = this.initializeAccordions();
+        this.tabIndex = [0];
         this.state = {
             ...this.state,
-            visibleAccordion: this.initializeAccordions(),
-            tabIndex: [0],
         };
 
     }
@@ -140,6 +143,15 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
     }
 
     /**
+     * Tableau contenant pour chaque accordion un booléen indiquant
+     * son état de visibilité
+     * @return {boolean[]} visibleAccordion
+     */
+    public getAccordionVisibility(): boolean[] {
+        return this.visibleAccordion;
+    }
+
+    /**
      * Initialisation des accordions
      */
     initializeAccordions() {
@@ -159,7 +171,7 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
      */
     handleClickAccordion(index: number, strDomId = "", callback: any) {
         let accordion;
-        const visibleAccordion = _.cloneDeep(this.state.visibleAccordion);
+        const visibleAccordion = _.cloneDeep(this.visibleAccordion);
         if (this.state.multiSelectable) {
             visibleAccordion[ index ] = !visibleAccordion[ index ];
             if (!visibleAccordion[ index ]) {
@@ -168,25 +180,43 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
         } else {
             const cpt = React.Children.count(this.state.children);
             for (let i = 0; i < cpt; i++) {
-                if (this.state.visibleAccordion[ i ]) {
+                if (this.visibleAccordion[ i ]) {
                     this.handleBeforeHideAccordion(i);
                 }
                 visibleAccordion[ i ] = (index === i) ? !visibleAccordion[ i ] : false;
             }
         }
 
-        // FIXME le setState ici provoque un render d'accordions et donc de chaque accordion
-        // ce qui n'a pas de sens si un seul a besoin d'être à nouveau rendu => problèmes de perf
-        this.setState({ visibleAccordion }, () => {
-            accordion = _.find(this.accordionList, { props: { panelIndex: index } });
-            if (accordion && accordion.state.isOpen && this.props.afterShowAccordion) {
-                this.props.afterShowAccordion(accordion, index);
-            }
-            if (typeof callback === "function") {
-                callback(strDomId);
-            }
-        });
+        this.visibleAccordion = visibleAccordion;
+
+        const cpt = React.Children.count(this.state.children);
+        for (let i = 0; i < cpt; i++) {
+            this.updateIsOpen(i, strDomId, callback);
+        }
     }
+
+    /**
+     * Mets a jour la valeur isOpen d'un accordion
+     * @param index index de l'accordion
+     * @param strDomId
+     * @param callback function
+     */
+    protected updateIsOpen(index: number, strDomId = "", callback: any) {
+        if (this.visibleAccordion[ index ] && this.accordionList[index].state && this.accordionList[index].state.isOpen === false ) {
+            this.accordionList[index].setState({isOpen: true}, () => {
+                const accordion = _.find(this.accordionList, { props: { panelIndex: index } });
+                if (accordion && accordion.state.isOpen && this.props.afterShowAccordion) {
+                    this.props.afterShowAccordion(accordion, index);
+                }
+                if (typeof callback === "function") {
+                    callback(strDomId);
+                }
+            });
+        }else if (!this.visibleAccordion[ index ] && this.accordionList[index].state && this.accordionList[index].state.isOpen === true ){
+            this.accordionList[index].setState({isOpen: false});
+        }
+    }
+
 
     protected handleBeforeHideAccordion(index: number) {
         const accordion = _.find(this.accordionList, { props: { panelIndex: index } });
@@ -218,11 +248,11 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
 
         if (isAccordionElement === -1) {
             // controle si l'accordion est deja ouvert
-            if (!this.state.visibleAccordion[ index ]) {
+            if (!this.visibleAccordion[ index ]) {
                 this.handleClickAccordion(index, strDomId, this.scrollToFocus);
             }
         } else {
-            const tabIndex = _.cloneDeep(this.state.tabIndex);
+            const tabIndex = _.cloneDeep(this.tabIndex);
             if (this.state.children) {
                 if (this.state.children.length > 1 ) {
                     this.state.children.map((child, i) => {
@@ -232,7 +262,14 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
                     tabIndex[ 0 ] = (0 === index) ? 0 : -1;
                 }
             }
-            this.setState({ tabIndex });
+
+            this.tabIndex = tabIndex;
+            const cpt = React.Children.count(this.state.children);
+            for (let i = 0; i < cpt; i++) {
+                if (this.accordionList[i] && this.accordionList[i].state && this.accordionList[i].state.tabIndex !== this.tabIndex[ i ] ) {
+                    this.accordionList[i].setState({tabIndex: this.tabIndex[ i ]});
+                }
+            }
         }
     }
 
@@ -241,9 +278,9 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
      */
     protected renderAccordion() {
         return React.Children.map(this.state.children, (child: any, index) => {
-            if (child.type === Accordion) {
-                if (this.state.tabIndex[ index ] == null || typeof (this.state.tabIndex[ index ]) === "undefined") {
-                    this.state.tabIndex[ index ] = -1;
+            if (child.type === Accordion || child.type.prototype instanceof Accordion) {
+                if (this.tabIndex[ index ] == null || typeof (this.tabIndex[ index ]) === "undefined") {
+                    this.tabIndex[ index ] = -1;
                 }
                 const defaultKey: string = this.state.id + "-" + index;
                 const key: string = Accordions.generateKey(child, defaultKey);
@@ -251,8 +288,8 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
                     id: this.state.id + "-",
                     key,
                     panelIndex: index,
-                    isOpen: this.state.visibleAccordion[ index ],
-                    tabIndex: (this.state.tabIndex[ index ]),
+                    isOpen: this.visibleAccordion[ index ],
+                    tabIndex: this.tabIndex[ index ],
                     handleClickAccordion: this.handleClickAccordion,
                     handleFocusAccordion: this.handleFocusAccordion,
                     totalAccordion: this.state.children.length,

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,8 +84,6 @@ import * as React from "react";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
-import * as assert from "assert";
 
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { Table } from "hornet-js-react-components/src/widget/table/table";
@@ -95,10 +93,8 @@ import { Content } from "hornet-js-react-components/src/widget/table/content";
 /*  Colonne du tableau */
 import { Column } from "hornet-js-react-components/src/widget/table/column";
 import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { CheckColumn } from "src/widget/table/column/check-column";
 import { EditionActionColumn } from "hornet-js-react-components/src/widget/table/column/edition-action-column";
 import { Notification } from "hornet-js-react-components/src/widget/notification/notification";
-import { NotificationManager, Notifications } from "hornet-js-core/src/notification/notification-manager";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 
 
@@ -106,9 +102,7 @@ import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 /** Tableau de liste de secteurs */
 let dataSourceTableEditable: DataSource<any>;
 let tableEditableElement: JSX.Element;
-let table;
 let data;
-let schemaEditionTable;
 
 @Decorators.describe('Test Karma table editable')
 class tableTest extends HornetReactTest {
@@ -148,17 +142,11 @@ class tableTest extends HornetReactTest {
         );
     };
 
-    
-    @Decorators.it('Test OK')
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
-    };
 
     @Decorators.it('afficher une cellule editable ')
     editerElement() {
         const id = this.generateMainId();
-        table = this.renderIntoDocument(tableEditableElement, id);
+        this.renderIntoDocument(tableEditableElement, id);
         dataSourceTableEditable.on("fetch", (value) => {
             this.triggerMouseEvent(document.querySelector(`#${id} #lite1-0-colBody-0-2 .edition-button-action-before`), "click");
             const cellElement = document.querySelector(`#${id} #lite1-0-colBody-0-0 .table-cell-input`);
@@ -173,14 +161,14 @@ class tableTest extends HornetReactTest {
     @Decorators.it("Annuler modification cellule editable")
     annulerElement() {
         const id = this.generateMainId();
-        table = this.renderIntoDocument(tableEditableElement, id);
+        this.renderIntoDocument(tableEditableElement, id);
 
         this.triggerMouseEvent(document.querySelector(`#${id} #lite1-0-colBody-0-2 .edition-button-action-before`), "click");
         setTimeout(() => {
             HornetTestAssert.assertNotNull(document.querySelector(`#${id} #lite1-0-colBody-0-0 .table-cell-input`), "L'élement basé sur table-cell-input aux coordonées 0-0 n'a pas été trouvé");
             HornetTestAssert.assertNotNull(document.querySelector(`#${id} #lite1-0-colBody-0-2 button[title=Annuler]`), "L'élement bouton aux coordonnées 0-2 n'a pas été trouvé");
             this.triggerMouseEvent(document.querySelector(`#${id} #lite1-0-colBody-0-2 button[title=Annuler]`), "click");
-    
+
             setTimeout(() => {
                 HornetTestAssert.assertNotNull(document.querySelector(".widget-dialogue-header"), "widget-dialogue-header non trouvé");
                 HornetTestAssert.assertNotNull(document.querySelector("#confirmOK"), "Le bouton de confirmation n'a pas été trouvé");
@@ -188,9 +176,24 @@ class tableTest extends HornetReactTest {
                 this.triggerMouseEvent(document.querySelector("#confirmOK"), "click");
                 setTimeout(() => {
                     HornetTestAssert.assertNull(document.querySelector(".widget-dialogue-header"), "Le header ne devrait pas être trouvé");
+                    HornetTestAssert.assertTrue(document.activeElement == document.querySelector(`#${id} #lite1-0-colBody-0-2 .edition-button-action-before`),
+                        "L'élémet ayant le focus n'est pas l'action bouton d'id lite1-0-colBody-0-2");
+                    dataSourceTableEditable.removeAllListeners();
                     this.end();
                 }, 250);
             }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Tester la présence du button reset à l'affichage de l'input")
+    testPresenceResetButton() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(tableEditableElement, id);
+
+        this.triggerMouseEvent(document.querySelector(`#${id} #lite1-0-colBody-0-2 .edition-button-action-before`), "click");
+        setTimeout(() => {
+            HornetTestAssert.assertTrue(document.querySelector(`#${id} #labelResetButton`) !== null, "Le bouton reset n'est pas présent");
+            this.end();
         }, 250);
     }
 

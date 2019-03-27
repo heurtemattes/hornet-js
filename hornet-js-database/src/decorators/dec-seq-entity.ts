@@ -73,13 +73,15 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import Sequelize = require("sequelize");
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
+import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
+import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import * as _ from "lodash";
 
 /**
@@ -97,13 +99,11 @@ import * as _ from "lodash";
  *   ...
  * }
  */
-export function Entity(tableName: string, Model: Sequelize.DefineAttributes, options?: any) {
+export function Entity(tableName: string, Model: Sequelize.DefineAttributes, options?: any|{version?: Version}) {
     return (target: Object, propertyKey: string | symbol) => {
-        let confOptions = options;
+        let confOptions = options || {};
         let conFreezeTableName: boolean;
-        if (!confOptions) {
-            confOptions = {};
-        }
+
         conFreezeTableName = (options && options.freezeTableName) ? options.freezeTableName : true;
         confOptions.freezeTableName = conFreezeTableName;
         Object.defineProperty(target, propertyKey.toString(), {
@@ -134,6 +134,27 @@ export function Entity(tableName: string, Model: Sequelize.DefineAttributes, opt
             target["config"] = {};
         }
         const myObject = _.assignIn({ table: tableName, Model: Model }, confOptions);
+
+
+        if(confOptions.version && (!myObject.hooks || !myObject.hooks.beforeUpdate)) {
+            myObject.hooks = myObject.hooks || {};
+            myObject.hooks.beforeUpdate = instance => {
+                let versionAttributName = confOptions.version.attributName ||  "version";
+                if(instance[versionAttributName] !== instance._previousDataValues[versionAttributName]) {
+                    throw new TechnicalError("ERR_TECH_" + CodesError.SEQUELIZE_OPTIMISTIC_LOCK_ERROR, {message: `Entity Version not match, current in database ${instance[versionAttributName]} and your is ${instance.dataValues[versionAttributName]}`});
+                }
+                instance.dataValues[versionAttributName] = (confOptions.version.nextVal || nextversionTimestamp)(instance[versionAttributName]);//Date.now();
+            }
+        }
+
         target["config"][propertyKey.toString()] = myObject;
     };
+}
+
+export const nextversionTimestamp = Date.now;
+export const nextversionInteger = (version: number) => { return version + 1};
+
+export interface Version {
+    attributName?: string;
+    nextVal?: (currentValue) => any;
 }

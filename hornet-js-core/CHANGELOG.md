@@ -1,10 +1,9 @@
 # hornet-js-core 5.2.4
 
-- FIX - hornet-js-core - Correction message I18N
-- PROJ [s382] - hornet-js-core : possibilité de mettre un nom de fichier aux PDF
-- FIX [m70820] - hornet-js-core: probleme requete patch en minuscule
-- FIX [m70834]: - hornet-js-core - hornet-superagent:  la modale empêche le téléchargement
-
+- 7a1a96cc FIX - hornet-js-core - Correction message I18N
+- 0bf2a714 PROJ [s382] - hornet-js-core : possibilité de mettre un nom de fichier aux PDF
+- 53fa4eb0 FIX [m70820] - hornet-js-core: probleme requete patch en minuscule
+- 772aa50e FIX [m70834]: - hornet-js-core - hornet-superagent:  la modale empêche le téléchargement
 # hornet-js-core 5.2.3
 
 - e68969b77 FIX - hornet-js-core - HornetSuperAgent : Renvoie le text si body vide

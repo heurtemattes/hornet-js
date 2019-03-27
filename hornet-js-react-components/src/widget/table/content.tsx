@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,6 +109,7 @@ import * as classNames from "classnames";
 import * as _ from "lodash";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { ICustomValidation } from "hornet-js-core/src/validation/data-validator";
+import { AlertDiv } from "src/widget/table/alert-div";
 
 export const UNIT_SIZE = "em";
 export const UPDATE_COLUMN_VISIBILITY = new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY");
@@ -168,6 +169,8 @@ export interface ContentProps extends HornetComponentProps, HornetComponentDatas
      * en oeuvre simplement avec un schéma json-schema. Ils sont appliqués après la validation basée sur le schéma
      * de validation, donc les données du formulaire ont déjà éventuellement bénéficié de la coercition de types. */
     customValidators?: ICustomValidation[];
+
+    onRerender?: Function | any;
 }
 
 /**
@@ -193,6 +196,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     protected spinnerLoader: any;
 
     protected spinnerOverlay: any;
+
+    protected alertDiv: AlertDiv;
 
     /** Collection de colonne avec coordonnées et état */
     protected columnsWithVisibilityMap: Array<ColumnState> = new Array<ColumnState>();
@@ -232,6 +237,16 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
 
         this.initializeColumnVisibilityWithCoord();
         this.handleChangeHiddenColumns(this.hiddenColumns);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    componentDidUpdate(prevProps, prevState, prevContext) {
+        super.componentDidUpdate(prevProps, prevState, prevContext);
+        if (this.props.onRerender) {
+            this.props.onRerender();
+        }
     }
 
     /**
@@ -329,8 +344,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         this.hiddenColumns = hiddenColumns;
         // this.columnsWithVisibilityMap.push({
         this.columnsWithVisibilityMap.forEach((column, index) => {
-            if (!_.isUndefined(hiddenColumns[ this.columnsWithVisibilityMap[ index ].column ])) {
-                this.columnsWithVisibilityMap[ index ].isVisible = !hiddenColumns[ this.columnsWithVisibilityMap[ index ].column ];
+            if (!_.isUndefined(hiddenColumns[this.columnsWithVisibilityMap[index].column])) {
+                this.columnsWithVisibilityMap[index].isVisible = !hiddenColumns[this.columnsWithVisibilityMap[index].column];
             }
         });
         this.totalColumns = this.getTotalColumnsVisibleFromState();
@@ -348,7 +363,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             const expandableCells = document.getElementsByClassName(`expandable-line-cell-${this.state.id}`);
             if (expandableCells) {
                 for (let i = 0; i < expandableCells.length; i++) {
-                    const expandableCell = expandableCells[ i ];
+                    const expandableCell = expandableCells[i];
                     if (expandableCell) {
                         expandableCell.setAttribute("colSpan", `${this.totalColumns}`);
                     }
@@ -445,7 +460,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             const item = this.props.contentState.itemInEdition;
             // merge les data avec l'item
             for (const name in data) {
-                item[ name ] = data[ name ];
+                item[name] = data[name];
             }
 
             Promise.resolve()
@@ -480,6 +495,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                     onHideSpinner={this.onHideSpinner}
                     nbColumns={this.getTotalColumnsVisibleFromState()}
                     width={this.props.width} />
+                {this.renderDivAlert()}
                 <table {...tableProps} summary={this.props.summary}>
                     {this.renderCaption(columns)}
                     {headerTable}
@@ -491,6 +507,13 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                     onClickClose={this.closeAlert} />
             </div>
         );
+    }
+
+    renderDivAlert() {
+        const id = this.props.id + "-table-div-alert";
+        return (<AlertDiv id={id}
+        ref={(div) => {this.alertDiv = div; }}>
+        </AlertDiv>);
     }
 
     /**
@@ -524,7 +547,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         }
 
         return (
-            <caption className={"hidden"}>{title}</caption>
+            <caption className="table-caption">{title}</caption>
         );
     }
 
@@ -535,17 +558,17 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     public onSort(sortData: SortData, thElement, compareMethod?: Function) {
 
         const conf: any = sortData;
-        this.sortData = [ sortData ];
+        this.sortData = [sortData];
 
         if (this.state.clientSideSorting) {
             conf.clientSideSorting = true;
         }
 
         this.thElementToFocus = thElement;
-        const options = { sortDatas: [ sortData ] };
+        const options = { sortDatas: [sortData] };
 
         if (compareMethod) {
-            options[ "compare" ] = compareMethod;
+            options["compare"] = compareMethod;
         }
 
         (this.props.dataSource as DataSource<any>).sort(options);
@@ -651,7 +674,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     renderTBody(columns): JSX.Element {
         logger.trace("renderTBody ");
         const rows = [];
-         if (!(this.state.items && this.state.items.length > 0 && this.state.isContentVisible)) {
+        if (!(this.state.items && this.state.items.length > 0 && this.state.isContentVisible)) {
             // Cas d'un tableau sans résultats
             rows.push(this.renderDatatableMessage(this.state.emptyResult || this.i18n("table.emptyResult")));
         } else {
@@ -756,7 +779,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                         "datatable-expandable-line-displayed": LineComponent.props.displayed,
                     };
 
-                    trClassName[ this.props.id + "-tr-with-colspan" ] = true;
+                    trClassName[this.props.id + "-tr-with-colspan"] = true;
 
                     const trProps: any = {
                         ref: (instance: HTMLTableCellElement) => {
@@ -800,8 +823,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         if (this.state.customRowsClass) {
             classNamesRow = this.state.customRowsClass(item);
         }
-        classNamesRow[ "datatable-odd" ] = (lineIndex % 2) !== 0;
-        classNamesRow[ "datatable-even" ] = (lineIndex % 2) === 0;
+        classNamesRow["datatable-odd"] = (lineIndex % 2) !== 0;
+        classNamesRow["datatable-even"] = (lineIndex % 2) === 0;
 
         columns.map((column: any, index) => {
 
@@ -907,7 +930,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
 
         columns.map((cell, index) => {
             if (!cell.props.width) {
-                columns[ index ].props.width = defaultColumnWidth;
+                columns[index].props.width = defaultColumnWidth;
             }
         });
 
@@ -984,19 +1007,36 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     }
 
     /**
+     * Mets à jour le message d'alerte
+     * @param message message d'alerte
+     */
+    updateAlertDiv(message) {
+        if (this.alertDiv) {
+            this.alertDiv.setMessage(message);
+        }
+    }
+
+    /**
      *  Méthode permettant de cocher/décocher une(des) ligne(s) du tableau
      * @param item (l'item selectioonné : deselectioné)
-     * @param selectAll (le teoggle de selection multiple
      */
     protected toggleSelectLines(item: any) {
+        this.updateAlertDiv(null);
         if (this.state.contentState.hasCheckColumnMassSelection) {
-
             const items = _.cloneDeep(this.state.items);
 
             // recupere la liste des items selectionnés sur la page courante
-            let selectedItems: any[] = ArrayUtils.intersectionWith(this.props.dataSource.selected, this.props.dataSource.results, this.state.contentState.keyColumnMassSelection);
+            let selectedItems: any[] = ArrayUtils.intersectionWith(this.props.dataSource.selected,
+                                                                   this.props.dataSource.results,
+                                                                   this.state.contentState.keyColumnMassSelection);
             if (item) { // si on a un item, on met a jour la liste des items selectionés sur la page
                 this.removeOrPush(selectedItems, item, true);
+                let message = this.i18n("table.lineUnselected");
+                const indexOf = ArrayUtils.getIndexById(selectedItems, item);
+                if (indexOf !== -1) {
+                    message = this.i18n("table.lineSelected");
+                }
+                this.updateAlertDiv(message);
             } else if (selectedItems.length !== items.length) { // sinon s'il faut sélectionner tous les items
                 // si le tableau porte une sélection multiple
                 // Si l'ensemble des items à sélectionner sont déjà sélectionnés alors on déselectionne
@@ -1010,15 +1050,16 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 if (!shouldSelect) {
                     this.props.dataSource.removeUnSelectedItem(items);
                     selectedItems = [];
+                    this.updateAlertDiv(this.i18n("table.linesUnselected"));
                 } else {
                     selectedItems = items;
+                    this.updateAlertDiv(this.i18n("table.linesSelected"));
                 }
             } else {
-                const data = items;
-                selectedItems = selectedItems;
-                for (let i = 0; i < data.length; i++) {
-                    this.removeOrPush(selectedItems, data[ i ]);
+                for (let i = 0; i < items.length; i++) {
+                    this.removeOrPush(selectedItems, items[i]);
                 }
+                this.updateAlertDiv(this.i18n("table.linesUnselected"));
             }
             this.props.dataSource.select(selectedItems);
         }
@@ -1032,8 +1073,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     intersectionWith(object: any[], other: any[]): any[] {
         const listResult: any[] = _.intersectionWith(object, other,
-                                                     (item1, item2) => {
-                return item1[ this.state.contentState.keyColumnMassSelection ] === item2[ this.state.contentState.keyColumnMassSelection ];
+            (item1, item2) => {
+                return item1[this.state.contentState.keyColumnMassSelection] === item2[this.state.contentState.keyColumnMassSelection];
             });
 
         return listResult;
@@ -1047,7 +1088,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     static intersectionWith(object: any[], other: any[]): any[] {
         const listResult: any[] = _.intersectionWith(object, other,
-                                                     (item1, item2) => {
+            (item1, item2) => {
                 return item1.id === item2.id;
             });
 
@@ -1072,10 +1113,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 break;
             case NavigateDirection.LEFT:
                 targetColumn = coordinates.column - 1;
-                columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                columnState = this.columnsWithVisibilityMap[targetColumn];
                 while (columnState && !columnState.isVisible) {
                     targetColumn -= 1;
-                    columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                    columnState = this.columnsWithVisibilityMap[targetColumn];
                 }
                 if (columnState) {
                     focusCell = new CellCoordinates(targetColumn, coordinates.row);
@@ -1083,10 +1124,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 break;
             case NavigateDirection.RIGHT:
                 targetColumn = coordinates.column + 1;
-                columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                columnState = this.columnsWithVisibilityMap[targetColumn];
                 while (columnState && !columnState.isVisible) {
                     targetColumn += 1;
-                    columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                    columnState = this.columnsWithVisibilityMap[targetColumn];
                 }
                 if (columnState) {
                     focusCell = new CellCoordinates(targetColumn, coordinates.row);
@@ -1094,19 +1135,19 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 break;
             case NavigateDirection.HOME_COL:
                 targetColumn = 0;
-                columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                columnState = this.columnsWithVisibilityMap[targetColumn];
                 while (columnState && !columnState.isVisible) {
                     targetColumn += 1;
-                    columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                    columnState = this.columnsWithVisibilityMap[targetColumn];
                 }
                 focusCell = new CellCoordinates(targetColumn, coordinates.row);
                 break;
             case NavigateDirection.END_COL:
                 targetColumn = this.columnsWithVisibilityMap.length - 1;
-                columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                columnState = this.columnsWithVisibilityMap[targetColumn];
                 while (columnState && !columnState.isVisible) {
                     targetColumn -= 1;
-                    columnState = this.columnsWithVisibilityMap[ targetColumn ];
+                    columnState = this.columnsWithVisibilityMap[targetColumn];
                 }
                 focusCell = new CellCoordinates(targetColumn, coordinates.row);
                 break;
@@ -1136,7 +1177,6 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      */
     getColProps(columns: any, columnIndex: number): any {
         logger.trace("getColProps ");
-
         const props: any = {};
 
         props.coordinates = { column: columnIndex };
@@ -1151,21 +1191,21 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         props.dataSource = this.props.dataSource;
         props.id = this.props.id;
 
-        const style: any = Content.mergeObjects({}, columns[ columnIndex ].props.style);
+        const style: any = Content.mergeObjects({}, columns[columnIndex].props.style);
 
-        if (columns[ columnIndex ].props.width) {
-            style[ "width" ] = columns[ columnIndex ].props.width;
+        if (columns[columnIndex].props.width) {
+            style["width"] = columns[columnIndex].props.width;
         }
 
         // Permet de masquer des colonnes par défaut
-        if (this.hiddenColumns && this.hiddenColumns[ columns[ columnIndex ].props.keyColumn ]) {
+        if (this.hiddenColumns && this.hiddenColumns[columns[columnIndex].props.keyColumn]) {
             style.display = "none";
-            this.hiddenColumns[ "hidden_" + columnIndex ] = props.keyColumn;
+            this.hiddenColumns["hidden_" + columnIndex] = props.keyColumn;
         } else {
             style.display = "table-cell";
         }
 
-        props.style = Content.mergeObjects(columns[ columnIndex ].props.defaultStyle, style);
+        props.style = Content.mergeObjects(columns[columnIndex].props.defaultStyle, style);
 
         return props;
     }
@@ -1253,7 +1293,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 return true;
             }
         });
-        this.props.contentState.setFirstVisibleColumnState(visibleColumnStates[ 0 ]);
+        this.props.contentState.setFirstVisibleColumnState(visibleColumnStates[0]);
     }
 
     /**

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -243,7 +243,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             let accordionsTagErrorNumber = this.getNotificationNumberErrorAccordionForm("form1", "errors-content");
             HornetTestAssert.assertEquals(5, accordionsTagErrorNumber, "Le tag d'erreur de l'accordion doit indiquer 5 erreurs");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     /**
@@ -262,7 +262,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             accordionsTagErrorNumber = this.getNotificationNumberErrorAccordionForm("form1", "errors-content");
             HornetTestAssert.assertEquals(5, accordionsTagErrorNumber, "Le tag d'erreur de l'accordion doit indiquer 5 erreurs");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     protected getNotificationMessageListForm(form: string, className: string) {

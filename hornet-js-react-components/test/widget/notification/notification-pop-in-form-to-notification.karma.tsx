@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -208,7 +208,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             let element = this.getNotificationMessageListForm("notifZone", "info-message-list");
             HornetTestAssert.assertEquals(1, element.length, "La zone de notification doit contenir un message d'info");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     /**
@@ -227,7 +227,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
                 setTimeout(() => {
                     this.end();
                 }, 250);
-            }, 500);
+            }, 750);
         }, 500);
     };
 

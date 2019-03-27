@@ -73,7 +73,7 @@ declare module "hornet-js-core/src/client-conf" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -310,7 +310,7 @@ declare module "hornet-js-core/src/server-conf" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -409,6 +409,10 @@ declare module "hornet-js-core/src/server-conf" {
 	    includeSessionKey?: {
 	        [key: string]: string[];
 	    };
+	    initCls?: InitCls;
+	}
+	export abstract class InitCls {
+	    abstract evaluateInitCls(): any;
 	}
 	
 }
@@ -786,7 +790,7 @@ declare module "hornet-js-core/src/component/hornet-component-errors" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -888,7 +892,7 @@ declare module "hornet-js-core/src/component/sort-data" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -991,7 +995,7 @@ declare module "hornet-js-core/src/data/file" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1313,7 +1317,7 @@ declare module "hornet-js-core/src/executor/async-executor-context" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1401,7 +1405,7 @@ declare module "hornet-js-core/src/executor/async-executor" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1817,7 +1821,7 @@ declare module "hornet-js-core/src/inject/inject" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1907,7 +1911,7 @@ declare module "hornet-js-core/src/inject/injectable" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2008,7 +2012,7 @@ declare module "hornet-js-core/src/inject/injector" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2426,7 +2430,7 @@ declare module "hornet-js-core/src/mail/mailer" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3021,7 +3025,7 @@ declare module "hornet-js-core/src/notification/notification-events" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3408,7 +3412,7 @@ declare module "hornet-js-core/src/result/disposition-type" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3494,7 +3498,7 @@ declare module "hornet-js-core/src/result/hornet-result-interface" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3622,7 +3626,7 @@ declare module "hornet-js-core/src/result/hornet-result" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -3990,7 +3994,7 @@ declare module "hornet-js-core/src/result/result-file" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4166,7 +4170,7 @@ declare module "hornet-js-core/src/result/result-json" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4423,7 +4427,7 @@ declare module "hornet-js-core/src/result/result-open-document" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -4688,7 +4692,7 @@ declare module "hornet-js-core/src/result/result-stream" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5479,7 +5483,7 @@ declare module "hornet-js-core/src/security/client-input-channel" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5574,7 +5578,7 @@ declare module "hornet-js-core/src/services/api-callback" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -5657,11 +5661,11 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
-	import { Request } from "superagent";
+	import { Request, Response, SuperAgentRequest } from "superagent";
 	import { MediaType }  from "hornet-js-core/src/protocol/media-type";
 	import { CacheKey }  from "hornet-js-core/src/services/hornet-superagent";
 	import { ClientSessionTimeout }  from "hornet-js-core/src/session/client-session-configuration";
@@ -5691,6 +5695,9 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	    resultDisposition?: HornetRequestResultDisposition;
 	    clientTimeout?: ClientSessionTimeout;
 	    manageError?: ErrorManagementType;
+	    manageTransformResponse?: ResponseManagementType;
+	    hooks?: HookSteps;
+	    query?: any;
 	}
 	export interface HornetRequestTimeOut {
 	    response?: number;
@@ -5740,6 +5747,26 @@ declare module "hornet-js-core/src/services/hornet-superagent-request" {
 	    Business = "business",
 	    Technical = "technical",
 	    All = "all"
+	}
+	/**
+	 * Type de management de la réponse pour la requête
+	 * valeur possible (None, OK, Error, All)
+	 */
+	export enum ResponseManagementType {
+	    None = "",
+	    OK = "OK",
+	    Error = "ERROR",
+	    All = "ALL"
+	}
+	/**
+	 * Type de management de la réponse pour la requête
+	 * valeur possible (None, OK, Error, All)
+	 */
+	export interface HookSteps {
+	    afterInit?: (su: SuperAgentRequest, request: HornetRequest) => void;
+	    beforeRequest?: (su: SuperAgentRequest, request: HornetRequest) => void;
+	    afterRequestSuccess?: (response: Response, request: HornetRequest) => any;
+	    afterRequestError?: (response: Response | Error, request: HornetRequest) => Error;
 	}
 	
 }
@@ -5875,10 +5902,10 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	     * */
 	    protected preProcessRequest(request: HornetRequest): Promise<Response>;
 	    /**
-	     * Methode executer sur  la reception d'une requete (gestion spinner et du cache)
-	     * @param {HornetRequest} request requete envoyée
-	     * @param {Response} response réponse recue
-	     * @param {boolean} throwed permet de jeter l'exception recu pour la manager
+	     * Méthode exécutée sur la réception d'une requête (gestion spinner et du cache)
+	     * @param {HornetRequest} request requête envoyée
+	     * @param {Response} response réponse reçue
+	     * @param {boolean} throwed permet d'indiquer qu'on est dans le processus de gestion d'erreur et de jeter l'exception reçue pour la manager
 	     * @returns Response
 	     * */
 	    protected postProcessRequest(request: HornetRequest, response: Response, throwed?: boolean): Response;
@@ -5897,6 +5924,8 @@ declare module "hornet-js-core/src/services/hornet-superagent" {
 	    /**
 	     * Formate la réponse pour le serveur afin de traiter les erreurs automatiquement
 	     * @param {Response} response reponse de superagent
+	     * @param {HornetRequest} request objet de paramètrage de la requête
+	     * @param {boolean} throwed indicateur d'étape (false => ok, true => erreur)
 	     */
 	    protected manageServerResult(response: Response, request: HornetRequest, throwed?: boolean): any;
 	    /**
@@ -6062,7 +6091,7 @@ declare module "hornet-js-core/src/services/service-api-results" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6217,7 +6246,7 @@ declare module "hornet-js-core/src/services/service-api" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -6301,7 +6330,7 @@ declare module "hornet-js-core/src/services/service-page" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7184,7 +7213,7 @@ declare module "hornet-js-core/src/session/store" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7323,7 +7352,7 @@ declare module "hornet-js-core/src/upload/custom-store-engine" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7582,7 +7611,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-linked" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7698,7 +7727,7 @@ declare module "hornet-js-core/src/component/datasource/datasource-master" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -7813,7 +7842,7 @@ declare module "hornet-js-core/src/component/datasource/datasource" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -8757,7 +8786,7 @@ declare module "hornet-js-core/src/component/datasource/config/datasource-map" {
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -8846,7 +8875,7 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -8859,7 +8888,8 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	export enum CompareMethod {
 	    COMPARE_DEFAULT = 1,
 	    COMPARE_WITH_LOWERCASE = 2,
-	    COMPARE_WITH_UPPERCASE = 3
+	    COMPARE_WITH_UPPERCASE = 3,
+	    WITHOUT_CASE_AND_ACCENT = 4
 	}
 	export type CompareFn = (sortData: any, a: any, b: any) => number;
 	/**
@@ -8885,6 +8915,28 @@ declare module "hornet-js-core/src/component/datasource/options/datasource-optio
 	    compare: (sort: any, a: any, b: any) => number;
 	    compareUpperCase: (sort: any, a: any, b: any) => number;
 	    compareLowerCase: (sort: any, a: any, b: any) => number;
+	    compareWithoutCaseAndAccent: (sort: any, a: any, b: any) => number;
+	    /**
+	    * méthode de tri qui remplace les accents est passe en lowercase avant la comparaison
+	    * @param {SortData[]} sortDatas  données de tri
+	    * @param {any} a object 1 à comparer.
+	    * @param {any} b object 2 à comparer.
+	    */
+	    static compareIgnoreCaseAndAccent(sortDatas: any, a: any, b: any): number;
+	    /**
+	    * méthode de tri qui passe en lowercase avant la comparaison
+	    * @param {SortData[]} sortDatas  données de tri
+	    * @param {any} a object 1 à comparer.
+	    * @param {any} b object 2 à comparer.
+	    */
+	    static compareLowerCase(sortDatas: any, a: any, b: any): number;
+	    /**
+	     * méthode de tri qui passe en uppercase avant la comparaison
+	     * @param {SortData[]} sortDatas  données de tri
+	     * @param {any} a object 1 à comparer.
+	     * @param {any} b object 2 à comparer.
+	     */
+	    static compareUpperCase(sortDatas: any, a: any, b: any): number;
 	}
 	export class SpinnerOption implements DataSourceOption {
 	    type: SpinnerType;
@@ -9009,7 +9061,7 @@ declare module "hornet-js-core/src/component/datasource/config/service/datasourc
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -9102,7 +9154,7 @@ declare module "hornet-js-core/src/component/datasource/config/service/datasourc
 	 * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

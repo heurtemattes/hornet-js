@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,6 +90,7 @@ import {
 } from "src/widget/form/abstract-field";
 import { UploadedFile } from "hornet-js-core/src/data/file";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import FormEvent = __React.FormEvent;
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.upload-file-field");
 
@@ -121,6 +122,8 @@ export interface UploadFileFieldProps extends HornetClickableProps,
 export class UploadFileField<P extends UploadFileFieldProps> extends AbstractField<UploadFileFieldProps, any> {
 
     protected inputFileElement: HTMLElement;
+    protected deleteButton: HTMLButtonElement;
+    protected link: HTMLLinkElement;
     public readonly props: Readonly<UploadFileFieldProps>;
 
     static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
@@ -152,13 +155,19 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     protected handleChange(e: __React.SyntheticEvent<HTMLElement>): void {
         const input: HTMLInputElement = e.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {
-            this.setState({ activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: input.files.length }) });
+            this.setState({
+                activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: input.files.length }),
+                focusInput: false, focusButton: true,
+            });
 
         } else {
-            this.setState({ activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: 0 }) });
+            this.setState({
+                activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: 0 }),
+                focusInput: true, focusButton: false,
+            });
         }
 
-        /* Déclenchement de la fonction onChange éventuellement passée en propriété */
+        // Déclenchement de la fonction onChange éventuellement passée en propriété
         if (this.state.onChange) {
             this.state.onChange(e);
         }
@@ -170,12 +179,12 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     protected getDataFileProps(): any {
         const dataProps: any = {};
         if (this.state.defaultFile) {
-            dataProps[ "data-file-id" ] = this.state.defaultFile.id;
-            dataProps[ "data-file-originalname" ] = this.state.defaultFile.originalname;
-            dataProps[ "data-file-name" ] = this.state.defaultFile.name;
-            dataProps[ "data-file-mime-type" ] = this.state.defaultFile.mimeType;
-            dataProps[ "data-file-encoding" ] = this.state.defaultFile.encoding;
-            dataProps[ "data-file-size" ] = this.state.defaultFile.size;
+            dataProps["data-file-id"] = this.state.defaultFile.id;
+            dataProps["data-file-originalname"] = this.state.defaultFile.originalname;
+            dataProps["data-file-name"] = this.state.defaultFile.name;
+            dataProps["data-file-mime-type"] = this.state.defaultFile.mimeType;
+            dataProps["data-file-encoding"] = this.state.defaultFile.encoding;
+            dataProps["data-file-size"] = this.state.defaultFile.size;
         }
         return dataProps;
     }
@@ -184,15 +193,15 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * @override
      */
     setCurrentValue(formData: any): this {
-        // let value:any = _.get(formData, this.state.name);
-        if (!formData) {
-            this.handleDelete();
+        if (this.getCurrentValue() !== formData && !(this.getCurrentValue() === undefined && formData === null)) {
+            if (!formData) {
+                this.handleDelete();
+            }
+            this.setState({
+                readOnlyFile: formData,
+                defaultFile: formData,
+            });
         }
-        this.setState({
-            readOnlyFile: formData,
-            defaultFile: formData,
-        });
-
         return this;
     }
 
@@ -214,12 +223,18 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
             preview = this.props.renderPreviewFile(this.state.readOnlyFile);
         }
 
-        /* On n'inclut pas les propriétés spécifiques ou celles dont on surcharge la valeur */
-        const htmlProps = _.omit(this.getHtmlProps(), [ "defaultFile", "type", "onChange" ]);
-        _.assign(htmlProps, { className: htmlProps[ "className" ] ? htmlProps[ "className" ] + " uploadfile" : " uploadfile" });
-        _.assign(htmlProps, { "data-multiple-caption": this.state.fileSelectedLabel });
+        // On n'inclut pas les propriétés spécifiques ou celles dont on surcharge la valeur
+        const htmlProps = _.omit(this.getHtmlProps(), ["defaultFile", "type", "onChange"]);
+        _.assign(htmlProps, { className: htmlProps["className"] ? htmlProps["className"] + " uploadfile" : " uploadfile" });
+        _.assign(htmlProps, {
+            "data-multiple-caption": this.state.fileSelectedLabel,
+            disabled: this.state.disabled,
+            readOnly: this.state.disabled || this.state.readOnly,
+        });
 
-        const cssDelete = (this.props.classNameDelete) ? "hornet-button hornet-button-right upload-delete-button " + this.props.classNameDelete : "hornet-button hornet-button-right upload-delete-button";
+        const cssDelete = this.props.classNameDelete ?
+            "hornet-button hornet-button-right upload-delete-button " + this.props.classNameDelete :
+            "hornet-button hornet-button-right upload-delete-button";
         /* On ne peut assigner programmatiquement la valeur d'un champ de type fichier (problème de sécurité potentiel)
          * on utilise donc ici les attributs data-* pour stocker les propriétés de l'éventuel fichier déjà sélectionné.
          * Celles-ci seront ensuite récupérées lors de l'envoi du formulaire, si un autre fichier n'a pas été sélectionné.*/
@@ -233,48 +248,63 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
                 onChange={this.handleChange}
                 {...dataProps}
                 {...htmlProps}
+                disabled={this.state.disabled || this.state.readOnly}
             />;
-
-        const labelProps = {
-            htmlFor: htmlProps[ "id" ],
-            readOnly: htmlProps[ "readOnly" ],
-            className: "upload-content",
-            title: htmlProps["title"],
-        };
 
         const aProps: any = {
             href: "#",
+            className: "upload-content",
             onClick: this.downloadButtonActionHandler,
             onKeyDown: this.downloadButtonKeyDownHandler,
-            disabled: htmlProps[ "readOnly" ],
-            "aria-haspopup": true,
+            disabled: htmlProps["readOnly"],
+            title: htmlProps["title"],
+            readOnly: htmlProps["readOnly"],
+            role: "button",
+            ref: (link) => {
+                this.link = link;
+                if (this.link && this.state.focusInput) { this.link.focus(); }
+            },
         };
-
         return (
             <div className="upload-container">
                 {inputFile}
-                <label {...labelProps}>
-
-                    <a {...aProps}>
-                        <span className="upload-text">{this.state.activeButtonLabel}</span>
-                    </a>
-                </label>
+                <a {...aProps}>
+                    <span className="upload-text">{this.state.activeButtonLabel}</span>
+                </a>
                 {(this.htmlElement) && this.htmlElement.files.length && this.state.resettable ?
                     <button type="button"
                         className={cssDelete}
-                        onClick={this.handleDelete}
+                        ref={(button) => {
+                            this.deleteButton = button;
+                            if (this.deleteButton && this.state.focusButton) { this.deleteButton.focus(); }
+                        }}
+                        onClick={this.state.readOnly ? null : this.handleDelete}
                         aria-label={this.i18n("uploadFile.labelSupprimer")}
-                        disabled={this.state.readOnly}>X</button>
+                        disabled={this.state.disabled}>X</button>
                     : ""}
                 {preview}
             </div>);
     }
 
-    /* suppression du fichier sélectionné  dans le champs input */
-    handleDelete() {
+    /**
+     * Gère le clic sur le bouton reset
+     */
+    handleDelete(): void {
         this.htmlElement.value = "";
-        this.setState({ defaultFile: null, activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: 0 }) });
-
+        this.setState({
+            defaultFile: null,
+            activeButtonLabel: this.i18n(this.state.i18nLabelKey, { count: 0 }),
+            focusInput: true,
+            focusButton: false,
+        });
+        if (this.state.onChange) {
+            this.state.onChange({
+                target: this.htmlElement,
+                currentTarget: this.htmlElement,
+                preventDefault: () => { },
+                stopPropagation: () => { },
+            } as FormEvent<HTMLElement>);
+        }
     }
 
     /**

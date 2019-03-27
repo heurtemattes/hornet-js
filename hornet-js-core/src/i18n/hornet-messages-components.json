@@ -143,6 +143,10 @@
     "tab": "Onglet {tabTitle}"
   },
   "table": {
+    "linesUnselected":"Tout désélectionné",
+    "linesSelected":"Tout sélectionné",
+    "lineUnselected": "Ligne désélectionnée",
+    "lineSelected":"Ligne sélectionnée",
     "pager": {
       "dropdownTitle": "Nombre d'éléments du {summary}",
       "inputLabel": "Numéro de la page affichée du {summary}",
@@ -207,9 +211,7 @@
       "lineBeginning": "Début de ligne",
       "lineEnd": "Fin de ligne",
       "selectAll": "Sélectionner toutes les lignes",
-      "selectCurrentLine": "Sélectionner la ligne courante",
-      "toggleMode": "Basculer entre mode navigation simple (la tabulation fait sortir du tableau) et mode édition (la tabulation navigue entre les différents boutons d'action)",
-      "escape": "Retourner au mode navigation simple (la tabulation fait sortir du tableau)"
+      "selectCurrentLine": "Sélectionner la ligne courante"
     },
     "booleanOui": "oui",
     "booleanNon": "non"

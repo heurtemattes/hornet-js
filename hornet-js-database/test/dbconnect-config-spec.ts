@@ -73,41 +73,42 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 // dossiers de configuration
+process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
+
 import { TestUtils } from "hornet-js-test/src/test-utils";
 import { Logger } from "hornet-js-utils/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    appenders: {
-        console: {
-            type: "console",
-            layout: {
-                type: "pattern",
-                pattern: "%[%d{ISO8601}|%p|%c|%m%]"
+    "appenders": {
+        "console": {
+            "type": "console",
+            "layout": {
+                "type": "pattern",
+                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
             }
         }
     },
-    categories: {
-        default: { appenders: [ "console" ], level: "INFO"}
+    "categories": {
+        "default": { "appenders": ["console"], "level": "INFO" }
     }
 });
+
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
 
-const expect = TestUtils.chai.expect;
-// dossiers de configuration
-process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
+let expect = TestUtils.chai.expect;
 
 const dbConfig1 = "configTest";
 const dbConfig2 = "configTestBis";
 describe("Test DBConnect Sequelize", () => {
 
     const namespace = "namespace_unit_test";
-    it("Test chargement configuration configApplituto, doit passer", () => {
+    it("Test chargement configuration configTest, doit passer", (done) => {
 
         DbConnect.init(dbConfig1);
         const configuration = DbConnect.getConfiguration(dbConfig1);
@@ -115,15 +116,18 @@ describe("Test DBConnect Sequelize", () => {
         expect(configuration.basename).to.be.equals(
             "sequelizeOne"
         );
+        done();
     });
 
-    it("Test chargement configuration configTest, doit passer", () => {
+    it("Test chargement configuration configTestBis, doit passer", (done) => {
 
-        DbConnect.init(dbConfig1);
+        DbConnect.init(dbConfig2);
         const configuration = DbConnect.getConfiguration(dbConfig2);
 
         expect(configuration.basename).to.be.equals(
             "sequelizeTwo"
         );
+        done();
     });
-})
+
+});

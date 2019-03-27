@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -101,6 +101,7 @@ export class DataSourceMaster<T> extends DataSource<T>{
      * @return une promise du result modifié
      */
     public addSlave(datasource: DataSource<any>): void {
+        datasource.isSlave = true;
         this._datasources.push(datasource);
     }
 

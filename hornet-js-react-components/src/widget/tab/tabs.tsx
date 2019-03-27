@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,12 +107,13 @@ export interface TabsProps extends HornetComponentProps {
     panelId?: string;
     selectedTabIndex?: number;
     dataSource?: DataSource<any>;
-    beforeHideTab?: (tabRef?: Tab, index?: number) => void;
+    beforeHideTab?: (tabRef?: Tab, index?: number) => void|boolean;
     afterShowTab?: (tabRef?: Tab, index?: number) => void;
     addTabFunction?: void | Function;
     addButtonTtitle?: string;
     deleteTabFunction?: void | Function;
     deleteButtonTitle?: string;
+    afterNotificationHandle?: Function | void;
 }
 
 export enum TabsButtonScrolling {
@@ -225,7 +226,6 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
                 {this.props.isDeletable ?
                     <button id={key + "-delete-tab-button"}
                         type={"button"}
-                        tabIndex={-1}
                         className={deleteButtonClasses}
                         onClick={this.deleteTabFunction}
                         title={this.props.deleteButtonTitle ? this.props.deleteButtonTitle : this.i18n("tabs.delete-button")}
@@ -827,7 +827,11 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
             if (this.state.beforeSelected !== -1) {
                 const tab = _.find(this.elementsTab, { props: { index: this.state.beforeSelected } });
                 if (tab && this.props.beforeHideTab) {
-                    this.props.beforeHideTab(tab, this.state.beforeSelected);
+                    if (this.props.beforeHideTab(tab, this.state.beforeSelected) === false) {
+                        (this.state as any).selectedTabIndex = this.state.beforeSelected;
+                        this.setSelectedTabIndexAndFocus(undefined);
+                        return;
+                    }
                 }
             }
             (this.state as any).beforeSelected = index;
@@ -995,9 +999,11 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
     }
 
     protected setSelectedTabIndexAndFocus(mode: TabsKeyboardNavigation) {
-        const source = _.findIndex(this.elementsHeaderReact, { props: { index: this.state.selectedTabIndex } });
-        const next = this.setSelectedIndexByKeyboard(source, mode);
-        (this.state as any).selectedTabIndex = this.elementsHeaderReact[ next ].props.index;
+        if (mode) {
+            const source = _.findIndex(this.elementsHeaderReact, { props: { index: this.state.selectedTabIndex } });
+            const next = this.setSelectedIndexByKeyboard(source, mode);
+            (this.state as any).selectedTabIndex = this.elementsHeaderReact[ next ].props.index;
+        }
         const target = _.find(this.elementsHeaderTech, { props: { index: this.state.selectedTabIndex } }) as any;
         target.refs.link.focus();
     }
@@ -1080,7 +1086,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
         logger.debug("l'evènement propagé est", ev);
 
         // on va boucler sur tous les tabs pour rechercher les champs en erreur
-        this.elementsHeaderTech.map((element) => {
+        this.elementsHeaderTech.forEach((element) => {
             let errors: number = 0;
             if (ev && ev.detail && ev.detail.errors && ev.detail.errors.notifications) {
                 ev.detail.errors.notifications.map((error) => {
@@ -1096,7 +1102,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
                 });
             }
             if (errors !== this.state.errors) {
-                element.setState({ errors });
+                element.setState({ errors }, this.state.afterNotificationHandle);
             }
         });
     }

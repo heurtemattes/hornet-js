@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -109,7 +109,6 @@ export interface CharsCounterProps extends HornetComponentProps, HornetCharsCoun
  * Composant de compteur de caractères
  */
 export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
-    protected errorShowed: boolean;
     protected alert: Alert;
     protected content: HTMLDivElement;
     private currentText: string;
@@ -139,11 +138,12 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
         return (
             <div>
                 <div className={className} id={this.state.id} role="log" ref={elt => { this.content = elt; }}></div>
-                <Alert ref={
-                    (elt) => {
-                        this.alert = elt;
-                    }
-                } message="" title="" onClickClose={this.closeAlert} onClickOk={this.closeAlert} />
+                {this.props.showAlert && <Alert
+                        ref={(elt) => { this.alert = elt; }}
+                        message=""
+                        title=""
+                        onClickClose={this.closeAlert}
+                        onClickOk={this.closeAlert} />}
             </div>
 
         );
@@ -154,7 +154,7 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
      * @param text{string} : contenu du composant associé
      */
     private handleAlert() {
-        if (this.currentText && this.props.maxChar && this.currentText.length > this.props.maxChar && !this.errorShowed && this.props.showAlert) {
+        if (this.currentText && this.props.maxChar && this.currentText.length > this.props.maxChar && this.props.showAlert) {
             const message = this.i18n(this.props.alertMessage, { count: this.currentText.length, maxChar: this.props.maxChar });
             const title = this.i18n(this.props.alertTitle, { count: this.currentText.length, maxChar: this.props.maxChar });
             this.alert.setMessage(message);
@@ -174,7 +174,7 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
         if (text != null && text !== undefined) {
             counterMessgae = this.i18n(this.props.charLabel, { count: text.length });
         }
-        this.content.innerHTML = counterMessgae;
+        this.content.innerText = counterMessgae;
 
         const tooManyCharClass: string = this.props.tooManyCharsClassName
             ? this.props.tooManyCharsClassName
@@ -187,8 +187,7 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
                     this.handleAlert();
                 },
                 150);
-        } else if ((text && text.length <= this.props.maxChar && this.errorShowed) || !text) {
-            this.errorShowed = false;
+        } else if ((text && text.length <= this.props.maxChar && this.content.className.indexOf(tooManyCharClass) >= 0) || !text) {
             this.content.classList.remove(tooManyCharClass);
         }
     }
@@ -197,7 +196,6 @@ export class CharsCounter extends HornetComponent<CharsCounterProps, any> {
     * Méthode déclenchant la fermeture de l'alerte
     */
     protected closeAlert(): void {
-        this.errorShowed = true;
         if (this.alert) {
             this.alert.close();
         }

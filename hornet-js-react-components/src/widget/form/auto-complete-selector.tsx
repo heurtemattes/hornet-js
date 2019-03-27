@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -116,9 +116,8 @@ export interface AutoCompleteSelectorProps extends HornetComponentProps {
  * Liste de choix de l'auto completion
  */
 export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorProps, any> {
-
     static defaultProps = {
-        onOptionSelected (event: __React.MouseEvent<HTMLElement>, choice: any): void {
+        onOptionSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
             event.preventDefault();
         },
         currentTypedText: "",
@@ -277,6 +276,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     scrollToElement(checkedElement: HTMLElement) {
 
         const element = document.getElementById(this.state.selectorId);
+        
         if (this.isBefore(element, checkedElement)) {
             if (this.hasBigGap(element, checkedElement)) {
                 this.goToElement(element, checkedElement);
@@ -355,50 +355,45 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         logger.trace("render AutoCompleteSelector option list");
         const res: JSX.Element[] = [];
 
-        if (this.state.choices) {
-            this.state.choices.forEach((choice, indexTab) => {
-                if (choice) {
-                    const choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
-                    const currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
-                    let index = choiceTextFormatted.indexOf(currentTextFormatted);
-                    if (index === -1) {
-                        if (currentTextFormatted !== "") {
-                            return null;
-                        } else {
-                            index = 0;
-                        } // Valeur saisie non présente
-                    }
-
-                    const classes: ClassDictionary = {
-                        "autocomplete-item": true,
-                        // "autocomplete-item-active": this.props.autoCompleteState.choiceFocused === indexTab
-                    };
-
-                    const classList: string = classNames(classes);
-                    const checkboxChecked: boolean = false;
-                    res.push((
-                        <li onMouseDown={!this.props.readOnly && !this.props.disabled ? (event) => this.onListClick(event, choice) : null}
-                            id={this.state.selectorId + "_" + indexTab}
-                            className={classList}
-                            aria-selected={this.state.choicesSelected === choice.value}
-                            data-real-value={choice.value}
-                            role="option"
-                            key={this.state.selectorId + "autocomplete-" + choice.text + "-" + choice.value}
-                            ref={(liElt) => {
-                                if (liElt != null) this.liElts.push(liElt);
-                            }}>
-
-                            {choice.text ? choice.text.substring(0, index) : ""}
-                            <b>
-                                {this.state.currentTypedText}
-                            </b>
-                            {choice.text ? choice.text.substring(index + this.state.currentTypedText.length) : ""}
-
-                        </li>
-                    ));
+        this.state.choices && this.state.choices.forEach((choice, indexTab) => {
+            if (choice && choice.text) {
+                const choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
+                const currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
+                let index = choiceTextFormatted.indexOf(currentTextFormatted);
+                if (index === -1 && currentTextFormatted !== "") {
+                    return null;
                 }
-            });
-        }
+                if (!currentTextFormatted) {
+                    index = -1;
+                }
+                const classes: ClassDictionary = {
+                    "autocomplete-item": true,
+                };
+
+                const classList: string = classNames(classes);
+                res.push((
+                    <li onMouseDown={!this.props.readOnly && !this.props.disabled ? (event) => this.onListClick(event, choice) : null}
+                        id={this.state.selectorId + "_" + indexTab}
+                        className={classList}
+                        aria-selected={this.state.choicesSelected === choice.value}
+                        data-real-value={choice.value}
+                        role="option"
+                        key={this.state.selectorId + "autocomplete-" + choice.text + "-" + choice.value}
+                        ref={(liElt) => {
+                            if (liElt != null) this.liElts.push(liElt);
+                        }}>
+
+                        {choice.text.substring(0, index)}
+                        <b>
+                            {choice.text.substring(index, index + this.state.currentTypedText.length)}
+                        </b>
+                        {choice.text.substring(index + this.state.currentTypedText.length)}
+
+                    </li>
+                ));
+            }
+        });
+
         return res;
     }
 
@@ -488,8 +483,14 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
         const styleUl: CSSProperties = {
             minWidth: "100%",
-            maxHeight: this.props.maxHeight ? this.props.maxHeight + "px" : "none",
+            maxHeight: this.props.maxHeight ? this.props.maxHeight + "px" : "none"
         };
+        
+        const styleWrap: CSSProperties = {
+            width: '100%',
+            left: '0',
+            bottom: '0'
+        };        
 
         if (this.props.maxHeight) {
             styleUl.overflow = "auto";
@@ -505,7 +506,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
         const classContentList: string = classNames(classesContent);
         return (
-            <div className={classList}>
+            <div className={classList} style={styleWrap}>
                 <div className={classContentList}>
                     <ul className="autocomplete-selector-list" role="listbox" id={this.state.selectorId} style={styleUl} aria-multiselectable={this.props.isMultiple}>
                         {this.liReact.length > 0 ? this.liReact : no_result}
@@ -533,7 +534,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
             }
         } else {
             if (newChoiceFocused !== undefined && newChoiceFocused != null && newChoiceFocused >= 0 && this.liElts.length > 0) {
-                const elmt = this.liElts[ newChoiceFocused ];
+                const elmt = this.liElts[newChoiceFocused];
                 if (elmt && this.props.isMultiple) {
                     this.setFocusElement(elmt);
                 } else {

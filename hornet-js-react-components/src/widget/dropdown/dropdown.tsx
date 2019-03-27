@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -114,6 +114,7 @@ export interface DropdownProps extends HornetComponentProps {
     labelClassName?: string;
     disabled?: boolean;
     icon?: string;
+    srcImg?: string;
     items?: any;
     valueCurrent?: number;
     // label du lien généré par le dropdown
@@ -220,14 +221,27 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         );
     }
 
-    renderLink() {
-
+    /**
+     * retourne l'image du dropdown
+     */
+    getImage() {
         let img = null;
-        if (typeof this.props.icon === "string") {
-            img = <span className={"icon " + this.props.icon} />;
-        } else {
+        if (this.props.icon) {
             img = this.props.icon;
+            if (typeof this.props.icon === "string") {
+                img = <span className={"icon " + this.props.icon} />;
+            }
+        } else if (this.props.srcImg) {
+            img = <img
+                src={this.props.srcImg}
+                className={"icon"} />;
         }
+
+        return img;
+    }
+
+    renderLink() {
+        const img = this.getImage();
 
         const labelClass: string = this.props.labelClassName || "dropdown-label-span";
 
@@ -317,6 +331,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 valueCurrent: item.valueCurrent,
                 lang: item.lang,
                 title: item.title,
+                id: item.id,
             };
 
             if (item.action) {
@@ -354,7 +369,6 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 <ul
                     className={"dropdown-list " + position}
                     ref={dropDown => this.dropDown = dropDown}
-                    aria-expanded={this.state.isActive}
                 >
                     {items}
                 </ul>

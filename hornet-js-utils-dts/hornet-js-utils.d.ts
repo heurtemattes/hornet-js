@@ -73,7 +73,7 @@ declare module "hornet-js-utils/src/app-shared-props" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -297,6 +297,65 @@ declare module "hornet-js-utils/src/authentication-utils" {
 	
 }
 
+declare module "hornet-js-utils/src/cancellable-promise" {
+	export class CancellablePromise {
+	    static readonly CANCELLABLE_PROMISE: string;
+	    static readonly CANCELLABLE_PROMISES: string;
+	    /**
+	     * Retourne une promesse pouvant etre annulée
+	     * en même temps que les autres promesses annulables
+	     * elle sera enregistrée dans la variable "cancellablePromises" du cls
+	     * aves les autres promesses annulables
+	     * @param {any} executor
+	     */
+	    static getPromise(executor: any): Promise<any>;
+	    /**
+	     * Retourne une promesse pouvant etre annulée à n'importe quel moment
+	     * elle sera enregistrée dans la variable "cancellablePromise[name]" du cls
+	     * @param {any} executor
+	     * @param {string} name nom de la promesse
+	     */
+	    static getNamedPromise(executor: any, name: string): Promise<any>;
+	    /**
+	     * Enregistre la promesse dans le Cls
+	     * @param {Promise<any>} promise promesse à enregistrer
+	     */
+	    static registerPromiseInCls(promise: Promise<any>): void;
+	    /**
+	     * Enregistre la promesse dans le Cls à l'aide de son nom
+	     * @param {Promise<any>} promise promesse à enregistrer
+	     * @param {string} name nom de la promesse
+	     */
+	    static registerPromiseInClsWithName(promise: Promise<any>, name: string): void;
+	    /**
+	     * Desenregistre la promesse dans le Cls à l'aide de son nom
+	     * @param {string} name nom de la promesse
+	     */
+	    static unregisterPromiseInClsWithName(name: string): void;
+	    /**
+	     * Cancel et désenregistre la promesse dans le Cls à l'aide de son nom
+	     * @param {string} name nom de la promesse
+	     */
+	    static cancelPromiseWithName(name: string): void;
+	    /**
+	     * Cancel et désenregistre les promesses présentes dans le Cls
+	     * @param includeNamed inclure les promesses nommées
+	     */
+	    static clearAllCancellablePromises(includeNamed?: boolean): void;
+	    /**
+	     * Cancel et désenregistre les promesses présentes dans le Cls
+	     * Ces promesses ne sont pas nommées
+	     */
+	    static clearAllUnamedCancellablePromises(): void;
+	    /**
+	     * Cancel et désenregistre les promesses présentes dans le Cls
+	     * Ces promesses sont nommées
+	     */
+	    static clearAllNamedPromises(): void;
+	}
+	
+}
+
 declare module "hornet-js-utils/src/common-register" {
 	/**
 	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
@@ -372,7 +431,7 @@ declare module "hornet-js-utils/src/common-register" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -721,7 +780,7 @@ declare module "hornet-js-utils/src/date-utils" {
 	     */
 	    static parseMultipleFmt(dateStr: string, dateFormats: Array<string>, calendarLocale: any, locale?: any): any;
 	    /**
-	     * Anlyse la chaîne de caractères indiquée et essaie de créer l'objet Date correspondant.
+	     * Analyse la chaîne de caractères indiquée et essaie de créer l'objet Date correspondant.
 	     * @param dateStr chaîne de caractères représentant une date
 	     * @param format le format de la date au format Moment
 	     * @param timezone le fuseau horaire sur lequel formatter la date (Europe/Paris, America/Los_Angeles,
@@ -730,6 +789,16 @@ declare module "hornet-js-utils/src/date-utils" {
 	     * @returns {Date} une instance de Date ou undefined en cas d'erreur
 	     */
 	    static parseInTZ(dateStr: string, format: string, timezone?: string, locale?: string): Date;
+	    /**
+	     * Analyse la chaîne de caractères indiquée et essaie de créer l'objet Date correspondant.
+	     * @param dateStr chaîne de caractères représentant une date
+	     * @param formats formats de date
+	     * @param timezone le fuseau horaire sur lequel formatter la date (Europe/Paris, America/Los_Angeles,
+	     * Australia/Sydney, ...). Par défaut : le fuseau horaire du navigateur/serveur node est utilisé
+	     * @param locale codes langue et pays (fr_FR, en_US, ...). Par défaut : fr_FR
+	     * @returns {Date} une instance de Date ou undefined en cas d'erreur
+	     */
+	    static parseInTZMultipleFmt(dateStr: string, formats: string[], timezone?: string, locale?: string): Date;
 	    /**
 	     * Crée un objet Date à partir de la chaîne de caractères indiquée en utilisant la fonction Date.parse(str)
 	     * @param dateStr chaîne de caractères représentant une date générée par Date.toString(),
@@ -744,6 +813,13 @@ declare module "hornet-js-utils/src/date-utils" {
 	     * @returns {string} la chaîne de caractères formatée suivant calendarLocale.dateFormat ou une chaîne vide en cas d'erreur
 	     */
 	    static format(time: any, calendarLocale: any): string;
+	    /**
+	     * Formatte la date correspondant à time en utilisant le format spécifié dans la locale
+	     * @param time temps en millisecondes UTC depuis 'epoch'
+	     * @param dateFormats formats de date
+	     * @returns {string}  la chaîne de caractères formatée suivant calendarLocale.dateFormat ou une chaîne vide en cas d'erreur
+	     */
+	    static formatMultipleFmt(time: any, dateFormats: string[]): any;
 	    /**
 	     * Formatte la date correspondant à time en utilisant le format spécifié dans la locale
 	     * @param date un objet Date
@@ -1526,7 +1602,7 @@ declare module "hornet-js-utils/src/object-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1706,7 +1782,7 @@ declare module "hornet-js-utils/src/string-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -1718,6 +1794,7 @@ declare module "hornet-js-utils/src/string-utils" {
 	     * @returns {string}
 	     */
 	    static replaceCharacters(value: string, sep?: string): string;
+	    static removeAccents(str: string): string;
 	}
 	
 }
@@ -1894,7 +1971,7 @@ declare module "hornet-js-utils/src/typescript-utils" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2079,7 +2156,7 @@ declare module "hornet-js-utils/src/exception/business-error-list" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2171,7 +2248,7 @@ declare module "hornet-js-utils/src/exception/business-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2260,7 +2337,7 @@ declare module "hornet-js-utils/src/exception/codes-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2284,6 +2361,7 @@ declare module "hornet-js-utils/src/exception/codes-error" {
 	    static SEQUELIZE_VALIDATION_ERROR: number;
 	    static SEQUELIZE_UNIQUE_ERROR: number;
 	    static SEQUELIZE_DATABASE_ERROR: number;
+	    static SEQUELIZE_OPTIMISTIC_LOCK_ERROR: number;
 	    /**
 	     * codes error BINDING 10100 - 10199
 	     */
@@ -2413,7 +2491,7 @@ declare module "hornet-js-utils/src/exception/http-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2582,7 +2660,7 @@ declare module "hornet-js-utils/src/exception/security-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2671,7 +2749,7 @@ declare module "hornet-js-utils/src/exception/technical-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2761,7 +2839,7 @@ declare module "hornet-js-utils/src/exception/validation-error" {
 	 * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -2773,6 +2851,99 @@ declare module "hornet-js-utils/src/exception/validation-error" {
 	    constructor(code?: string, args?: {
 	        [key: string]: any;
 	    }, cause?: Error);
+	}
+	
+}
+
+declare module "hornet-js-utils/src/logger/dec-logger" {
+	/**
+	 * Copyright ou © ou Copr. Ministère de l'Europe et des Affaires étrangères (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * Ce logiciel est un programme informatique servant à faciliter la création
+	 * d'applications Web conformément aux référentiels généraux français : RGI, RGS et RGAA
+	 * <p/>
+	 * Ce logiciel est régi par la licence CeCILL soumise au droit français et
+	 * respectant les principes de diffusion des logiciels libres. Vous pouvez
+	 * utiliser, modifier et/ou redistribuer ce programme sous les conditions
+	 * de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+	 * sur le site "http://www.cecill.info".
+	 * <p/>
+	 * En contrepartie de l'accessibilité au code source et des droits de copie,
+	 * de modification et de redistribution accordés par cette licence, il n'est
+	 * offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+	 * seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+	 * titulaire des droits patrimoniaux et les concédants successifs.
+	 * <p/>
+	 * A cet égard  l'attention de l'utilisateur est attirée sur les risques
+	 * associés au chargement,  à l'utilisation,  à la modification et/ou au
+	 * développement et à la reproduction du logiciel par l'utilisateur étant
+	 * donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+	 * manipuler et qui le réserve donc à des développeurs et des professionnels
+	 * avertis possédant  des  connaissances  informatiques approfondies.  Les
+	 * utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+	 * logiciel à leurs besoins dans des conditions permettant d'assurer la
+	 * sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+	 * à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+	 * <p/>
+	 * Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+	 * pris connaissance de la licence CeCILL, et que vous en avez accepté les
+	 * termes.
+	 * <p/>
+	 * <p/>
+	 * Copyright or © or Copr. Ministry for Europe and Foreign Affairs (2017)
+	 * <p/>
+	 * pole-architecture.dga-dsi-psi@diplomatie.gouv.fr
+	 * <p/>
+	 * This software is a computer program whose purpose is to facilitate creation of
+	 * web application in accordance with french general repositories : RGI, RGS and RGAA.
+	 * <p/>
+	 * This software is governed by the CeCILL license under French law and
+	 * abiding by the rules of distribution of free software.  You can  use,
+	 * modify and/ or redistribute the software under the terms of the CeCILL
+	 * license as circulated by CEA, CNRS and INRIA at the following URL
+	 * "http://www.cecill.info".
+	 * <p/>
+	 * As a counterpart to the access to the source code and  rights to copy,
+	 * modify and redistribute granted by the license, users are provided only
+	 * with a limited warranty  and the software's author,  the holder of the
+	 * economic rights,  and the successive licensors  have only  limited
+	 * liability.
+	 * <p/>
+	 * In this respect, the user's attention is drawn to the risks associated
+	 * with loading,  using,  modifying and/or developing or reproducing the
+	 * software by the user in light of its specific status of free software,
+	 * that may mean  that it is complicated to manipulate,  and  that  also
+	 * therefore means  that it is reserved for developers  and  experienced
+	 * professionals having in-depth computer knowledge. Users are therefore
+	 * encouraged to load and test the software's suitability as regards their
+	 * requirements in conditions enabling the security of their systems and/or
+	 * data to be ensured and,  more generally, to use and operate it in the
+	 * same conditions as regards security.
+	 * <p/>
+	 * The fact that you are presently reading this means that you have had
+	 * knowledge of the CeCILL license and that you accept its terms.
+	 *
+	 */
+	import "reflect-metadata";
+	export interface LoggerOptions {
+	    level?: LogLevels;
+	    identification?: string;
+	    message?: {
+	        template: any;
+	        values?: any;
+	        remplaceUndef?: string;
+	    };
+	}
+	export default function logger(options?: LoggerOptions): (target: any, key: any, descriptor?: any) => any;
+	export enum LogLevels {
+	    FATAL = "fatal",
+	    ERROR = "error",
+	    WARN = "warn",
+	    INFO = "info",
+	    DEBUG = "debug",
+	    TRACE = "trace"
 	}
 	
 }

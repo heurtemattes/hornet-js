@@ -165,7 +165,7 @@ declare module "hornet-js-database/src/decorators/dec-seq-entity" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -185,7 +185,15 @@ declare module "hornet-js-database/src/decorators/dec-seq-entity" {
 	 *   ...
 	 * }
 	 */
-	export function Entity(tableName: string, Model: Sequelize.DefineAttributes, options?: any): (target: Object, propertyKey: string | symbol) => void;
+	export function Entity(tableName: string, Model: Sequelize.DefineAttributes, options?: any | {
+	    version?: Version;
+	}): (target: Object, propertyKey: string | symbol) => void;
+	export const nextversionTimestamp: () => number;
+	export const nextversionInteger: (version: number) => number;
+	export interface Version {
+	    attributName?: string;
+	    nextVal?: (currentValue: any) => any;
+	}
 	
 }
 
@@ -428,7 +436,7 @@ declare module "hornet-js-database/src/sequelize/database" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -528,7 +536,7 @@ declare module "hornet-js-database/src/sequelize/dbconnect-sequelize" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -785,7 +793,7 @@ declare module "hornet-js-database/src/sequelize/hornet-sequelize-attributes" {
 	 * hornet-js-database - Ensemble des composants de gestion de base hornet-js
 	 *
 	 * @author
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

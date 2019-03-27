@@ -53,10 +53,10 @@ Ajouter au package.json
 
 ```shell
   "appDependencies": {
-    "hornet-js-components": "5.X.X",
-    "hornet-js-core": "5.X.X",
-    "hornet-js-ts-typings": "5.X.X",
-    "hornet-js-utils": "5.X.X"
+    "hornet-js-components": "5.3.X",
+    "hornet-js-core": "5.3.X",
+    "hornet-js-ts-typings": "5.3.X",
+    "hornet-js-utils": "5.3.X"
   }
 ```
 

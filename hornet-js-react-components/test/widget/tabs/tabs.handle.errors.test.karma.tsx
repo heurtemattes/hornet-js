@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -174,10 +174,10 @@ class TabsErrorsTest extends BaseTest {
                         expect(document.querySelector(`#${id} #tabs-1`).getAttribute("tabIndex")).to.equal("-1");
                         expect(document.querySelector(`#${id} #nom`) === document.activeElement).to.equal(true);
                         this.end();
-                    }, 500);
-                });
-            }, 500);
-        }, 500);
+                    }, 750);
+                }, 750);
+            }, 750);
+        }, 750);
     }
 
 

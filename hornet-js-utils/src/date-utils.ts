@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -128,7 +128,6 @@ export class DateUtils {
         }
         return calendar;
     }
-
 
     /**
      * Crée un objet Moment à partir de la chaîne de caractère dateStr et en utilisant
@@ -192,7 +191,7 @@ export class DateUtils {
     }
 
     /**
-     * Anlyse la chaîne de caractères indiquée et essaie de créer l'objet Date correspondant.
+     * Analyse la chaîne de caractères indiquée et essaie de créer l'objet Date correspondant.
      * @param dateStr chaîne de caractères représentant une date
      * @param format le format de la date au format Moment
      * @param timezone le fuseau horaire sur lequel formatter la date (Europe/Paris, America/Los_Angeles,
@@ -212,7 +211,11 @@ export class DateUtils {
                     // la date est instanciée avec le fuseau local (UTC+2).
                     // L'heure étant 00h00, la date UTC (renvoyee par getTime) correspond au jour precedent à 22h (15/04/2014)
                     // afin d'éviter le problème on instancie la date sur le fuseau UTC
-                    parsed = new Date(Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()));
+                    const year = parsed.getFullYear();
+                    parsed = new Date(Date.UTC(year, parsed.getMonth(), parsed.getDate()));
+                    if (year >= 0 && year < 1000 ) {
+                        parsed.setFullYear(year);
+                    }
                 }
             }
         } catch (err) {
@@ -220,6 +223,39 @@ export class DateUtils {
         }
         logger.trace("Date parsée : ", parsed + "  -- à partir de la chaîne ", dateStr, ", du fuseau horaire ",
                      timezone, " et de la locale", locale);
+        return parsed;
+    }
+
+    /**
+     * Analyse la chaîne de caractères indiquée et essaie de créer l'objet Date correspondant.
+     * @param dateStr chaîne de caractères représentant une date
+     * @param formats formats de date
+     * @param timezone le fuseau horaire sur lequel formatter la date (Europe/Paris, America/Los_Angeles,
+     * Australia/Sydney, ...). Par défaut : le fuseau horaire du navigateur/serveur node est utilisé
+     * @param locale codes langue et pays (fr_FR, en_US, ...). Par défaut : fr_FR
+     * @returns {Date} une instance de Date ou undefined en cas d'erreur
+     */
+    static parseInTZMultipleFmt(dateStr: string, formats: string[], timezone?: string, locale: string = "fr_FR"): Date {
+        let parsed ;
+        if (!formats || formats.length < 1) {
+            parsed = DateUtils.parse(dateStr, formats, locale);
+        } else {
+
+            let index: string;
+            for (index in formats) {
+                try {
+                    parsed = DateUtils.parseInTZ(dateStr, formats[ index ], timezone, locale);
+                } catch (err) {
+                    logger.debug("Erreur pour parser la date avec le format : ", formats[ index ]);
+                }
+                if (parsed) {
+                    break;
+                }
+            }
+            if (!parsed) {
+                return undefined;
+            }
+        }
         return parsed;
     }
 
@@ -254,6 +290,36 @@ export class DateUtils {
         try {
             const calendar = moment(time);
             strValue = calendar.format(calendarLocale.dateFormat);
+        } catch (err) {
+            logger.trace("Erreur pour formater la date suivante : ", err);
+        }
+        logger.trace("Date formatée : ", strValue + " -- à partir de la valeur", time);
+        return strValue;
+    }
+
+    /**
+     * Formatte la date correspondant à time en utilisant le format spécifié dans la locale
+     * @param time temps en millisecondes UTC depuis 'epoch'
+     * @param dateFormats formats de date
+     * @returns {string}  la chaîne de caractères formatée suivant calendarLocale.dateFormat ou une chaîne vide en cas d'erreur
+     */
+    static formatMultipleFmt(time, dateFormats: string[]): any {
+        logger.trace("format(time, calendarLocale):string", time);
+
+        let strValue = "";
+        try {
+            let index: string;
+            for (index in dateFormats) {
+                try {
+                    const calendar = moment(time);
+                    strValue = calendar.format(dateFormats[index]);
+                } catch (err) {
+                    logger.debug("Erreur pour formater la date avec le format : ", dateFormats[ index ]);
+                }
+                if (strValue) {
+                    break;
+                }
+            }
         } catch (err) {
             logger.trace("Erreur pour formater la date suivante : ", err);
         }

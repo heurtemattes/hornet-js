@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -143,7 +143,6 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
                     url={"#"}
                     src={this.props.srcImg || ButtonInfoAccessibilite.genUrlTheme() + "/img/button/icon_info.svg"}
                     classLink="button-info-accessibilite-button button-action"
-                    hasPopUp={true}
                     ref={(icon) => { this.htmlIcon = icon; }}
                 />
                 {this.renderModal()}
@@ -209,6 +208,5 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
                 el.focus();
             }
         });
-
     }
 }

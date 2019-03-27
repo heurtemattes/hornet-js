@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -107,9 +107,11 @@ export class NotificationManager {
      * @param infos informations éventuelles détail des informations éventuelles
      * @param exceptions exceptions détail des exceptions éventuelles
      * @param warnings détail des warnings éventuelles
+     * @param personnals messages personnalisés
+     * @param cb callback
      */
-    static notify(id: string, idComponent: string, errors: any, infos?: any, exceptions?: BaseError[], warnings?: any, personnals?: any) {
-        fireHornetEvent(ADD_NOTIFICATION_EVENT.withData({ id, idComponent, errors, infos, exceptions, warnings, personnals }));
+    static notify(id: string, idComponent: string, errors: any, infos?: any, exceptions?: BaseError[], warnings?: any, personnals?: any, cb?: Function) {
+        fireHornetEvent(ADD_NOTIFICATION_EVENT.withData({ id, idComponent, errors, infos, exceptions, warnings, personnals, cb }));
     }
 }
 

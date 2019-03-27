@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-batch",
-  "version": "5.2.4",
+  "version": "5.3.0",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants de gestion de base hornet-js",
   "bugs": {
@@ -11,23 +11,23 @@
     "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
   },
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.2.4",
-    "hornet-js-utils-dts": "5.2.4",
-    "hornet-js-core-dts": "5.2.4",
-    "hornet-js-components-dts": "5.2.4",
-    "hornet-js-test-dts": "5.2.4"
+    "hornet-js-ts-typings": "5.3.0",
+    "hornet-js-utils-dts": "5.3.0",
+    "hornet-js-core-dts": "5.3.0",
+    "hornet-js-components-dts": "5.3.0",
+    "hornet-js-test-dts": "5.3.0"
   },
   "appDependencies": {
-    "hornet-js-utils": "5.2.4",
-    "hornet-js-core": "5.2.4",
-    "hornet-js-components": "5.2.4",
+    "hornet-js-utils": "5.3.0",
+    "hornet-js-core": "5.3.0",
+    "hornet-js-components": "5.3.0",
     "sequelize": "4.33.0",
     "terraformer": "1.0.8",
     "terraformer-wkt-parser": "1.1.2"
   },
   "buildDependencies": {},
   "testDependencies": {
-    "hornet-js-test": "5.2.4"
+    "hornet-js-test": "5.3.0"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

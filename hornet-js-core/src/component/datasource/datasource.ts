@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,6 @@ import * as _ from "lodash";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
-import { SortData } from "src/component/sort-data";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 import { DataSourceOption, DefaultSort, InitAsync } from "src/component/datasource/options/datasource-option";
 import { DataSourceMap } from "src/component/datasource/config/datasource-map";
@@ -181,6 +180,8 @@ export class DataSource<T> extends events.EventEmitter {
      * statut datasource
      */
     protected _status;
+
+    isSlave: boolean;
 
     /***
      * @param {DataSourceConfig|DataSourceConfigPage|Array<T>}
@@ -344,6 +345,10 @@ export class DataSource<T> extends events.EventEmitter {
 
     get status() {
         return this._status;
+    }
+
+    isDatasourceArray() {
+        return this.isDataSourceArray;
     }
 
     /**
@@ -801,7 +806,7 @@ export class DataSource<T> extends events.EventEmitter {
      * @param {objet} value valeur de l'attribut ajouter
      * @param {objet=} param
      */
-    protected getFetchArgs(attrName: string, value: any, param?: any) {
+    public getFetchArgs(attrName: string, value: any, param?: any) {
         let fetchArgs = value;
 
         if (param || this.fetchArgsSaved) {
@@ -817,5 +822,12 @@ export class DataSource<T> extends events.EventEmitter {
         }
 
         return fetchArgs;
+    }
+
+    /**
+     * Retourne le backup des resultats du datatSource
+     */
+    public getResultBackup() {
+        return [...this._results_backup];
     }
 }

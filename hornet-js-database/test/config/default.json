@@ -7,13 +7,21 @@
       "username": "test",
       "password": "test",
       "options": {
-        "dialect": "sqlite",
-        "pool": {
-          "max": 15,
-          "min": 0,
-          "idle": 1000
-        }
-      }
+          "dialect": "sqlite",
+          "storage": "/database/database1.sqlite",
+          "pool": {
+              "max": 15,
+              "min": 0,
+              "idle": 1000
+          },
+          "timestamps": false,
+          "loggingLevel": "INFO",
+          "define": {
+              "timestamps": false,
+              "version": false
+          }
+      },
+      "reload": true
     },
     "configTestBis": {
       "basename": "sequelizeTwo",
@@ -21,12 +29,20 @@
       "password": "test",
       "options": {
         "dialect": "sqlite",
+        "storage": "/database/database2.sqlite",
         "pool": {
           "max": 15,
           "min": 0,
           "idle": 1000
+        },
+        "timestamps": false,
+        "loggingLevel": "DEBUG",
+        "define": {
+          "timestamps": false,
+          "version": false
         }
-      }
+      },
+      "reload": true
 
     }
   }

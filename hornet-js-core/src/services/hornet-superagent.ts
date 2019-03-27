@@ -73,19 +73,19 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-utils/src/logger";
-
+import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 import * as _ from "lodash";
 import * as superagent from "superagent";
 import { Response } from "superagent";
 import {
-    HornetRequest, HornetSuperAgentRequest, SpinnerType, ResultDispositionType, ErrorManagementType,
+    HornetRequest, HornetSuperAgentRequest, SpinnerType, ResultDispositionType, ErrorManagementType, ResponseManagementType,
 } from "src/services/hornet-superagent-request";
 import { ClientSessionTimeout } from "src/session/client-session-configuration";
 import { ServiceEvent } from "hornet-js-core/src/event/hornet-event";
@@ -111,7 +111,6 @@ import { AppSharedProps } from "hornet-js-utils/src/app-shared-props";
 
 import { Timer } from "src/timers/timer";
 import { DispositionType } from "src/result/disposition-type";
-import { ObjectUtils } from 'hornet-js-utils/src/object-utils';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap http & https afin de sécuriser l'utilisation de "continuation-local-storage" (perte ou mix de contexte) //
@@ -289,6 +288,10 @@ export class HornetSuperAgent {
 
         }
 
+        if (request.hooks && request.hooks.afterInit) {
+            request.hooks.afterInit.bind(this)(this.superAgentRequest, request);
+        }
+
         return this.superAgentRequest;
     }
 
@@ -319,7 +322,7 @@ export class HornetSuperAgent {
         if (!Utils.isServer) {
             this.setClientEventForRequest(true, request.spinnerType);
         }
-        if ((this.enableCache || request.timeToLiveInCache) && request.method === "get") {
+        if ((this.enableCache || request.timeToLiveInCache) && (request.method || "get") === "get") {
             return this.getFromCache(request);
         } else if (this.enableCache && (request.method === "post" || request.method === "put" || request.method === "patch" || request.method === "delete")) {
             return this.removeInCache(request);
@@ -327,14 +330,14 @@ export class HornetSuperAgent {
     }
 
     /**
-     * Methode executer sur  la reception d'une requete (gestion spinner et du cache)
-     * @param {HornetRequest} request requete envoyée 
-     * @param {Response} response réponse recue
-     * @param {boolean} throwed permet de jeter l'exception recu pour la manager
+     * Méthode exécutée sur la réception d'une requête (gestion spinner et du cache)
+     * @param {HornetRequest} request requête envoyée 
+     * @param {Response} response réponse reçue
+     * @param {boolean} throwed permet d'indiquer qu'on est dans le processus de gestion d'erreur et de jeter l'exception reçue pour la manager
      * @returns Response
      * */
     protected postProcessRequest(request: HornetRequest, response: Response, throwed?: boolean): Response {
-        if ((this.enableCache || request.timeToLiveInCache) && request.method === "get") {
+        if ((this.enableCache || request.timeToLiveInCache) && (request.method || "get") === "get") {
             if (response && !request.noCached) {
                 this.setInCache(response, request, request.timeToLiveInCache || this.timeToLiveInCache);
             }
@@ -395,6 +398,9 @@ export class HornetSuperAgent {
                         } else {
                             (ha as any).timeout(this.getTimeoutConfig());
                         }
+                        if(request.query) {
+                            ha.query(request.query);
+                        }
                         if (request.attach && request.attach.length > 0) {
                             (<any>ha).field("content", JSON.stringify(request.data));
                             request.attach.forEach((attachFile) => {
@@ -404,6 +410,10 @@ export class HornetSuperAgent {
                             // ajoute le format envoyé sinon json par defaut
                             ha.type((request.headers && request.headers.contentType) || "json");
                             ha.send(request.data); // ajout du body
+                        }
+
+                        if (request.hooks && request.hooks.beforeRequest) {
+                            request.hooks.beforeRequest.bind(this)(ha, request);
                         }
 
                         if (pipedStream) {
@@ -424,22 +434,43 @@ export class HornetSuperAgent {
                 }
                 return p.then((response: Response) => {
                     Timer.stopTimer(Timer.TIMER_AJAX_REQUEST);
+
                     this.response = response;
-                    return this.postProcessRequest(request, response);
+                    if (request.hooks && request.hooks.afterRequestSuccess) {
+                        return this.postProcessRequest(request, request.hooks.afterRequestSuccess.bind(this)(response, request));
+                    } else {
+                        return this.postProcessRequest(request, response);
+                    }
                 });
             }).catch((e) => {
                 Timer.stopTimer(Timer.TIMER_AJAX_REQUEST);
                 let except = e;
-                // c'est une exception pas encore gérer (code autre que 200)
+                // c'est une exception pas encore gérée (code autre que 200)
                 if (e.response) {
                     try {
-                        // en cas d'erreur un ferme le spinner
-                        // exception pouvant être générer
+                        // en cas d'erreur on ferme le spinner
+                        // exception pouvant être générée
                         this.postProcessRequest(request, e.response, true);
-                        except = new HttpError(e.response.status, "ERR_HORNET_HTTP", e.response.body);
+
+                        if (request.hooks && request.hooks.afterRequestError) {
+                            except = request.hooks.afterRequestError.bind(this)(e.response, request);
+                        } 
+                        if(request.manageTransformResponse !== ResponseManagementType.All && request.manageTransformResponse !== ResponseManagementType.Error) {
+                            except = new HttpError(e.response.status, "ERR_HORNET_HTTP", e.response.body);
+                        } else {
+                            except = e.response;
+                        }
                     } catch (e) {
                         // on sauvegarde l'exception pour pouvoir la gérer si besoin
                         except = e;
+                    }
+                } else {
+                    if((request.manageTransformResponse === ResponseManagementType.All || request.manageTransformResponse === ResponseManagementType.Error)
+                        && request.manageError === ErrorManagementType.All) {
+                        return Promise.reject(e);
+                    }
+                    if (request.hooks && request.hooks.afterRequestError) {
+                        except = request.hooks.afterRequestError.bind(this)(e, request);
                     }
                 }
 
@@ -473,6 +504,15 @@ export class HornetSuperAgent {
      * @param {Response} response reponse de superagent
      */
     protected manageClientResult(response: Response, request: HornetRequest, throwed?: boolean): any {
+
+        if(request.manageTransformResponse) {
+            if(request.manageTransformResponse === ResponseManagementType.All
+                || (request.manageTransformResponse === ResponseManagementType.Error && throwed)
+                || (request.manageTransformResponse === ResponseManagementType.OK && !throwed)) {
+                return response;
+            }
+        }
+
         // try catch car impossible de catcher les erreurs asynchrones sur le Client
         if (response) {
             if (response.body && this.hasHornetBody(response.body)) {
@@ -557,8 +597,18 @@ export class HornetSuperAgent {
     /**
      * Formate la réponse pour le serveur afin de traiter les erreurs automatiquement
      * @param {Response} response reponse de superagent
+     * @param {HornetRequest} request objet de paramètrage de la requête
+     * @param {boolean} throwed indicateur d'étape (false => ok, true => erreur) 
      */
     protected manageServerResult(response: Response, request: HornetRequest, throwed?: boolean): any {
+
+        if(request.manageTransformResponse) {
+            if(request.manageTransformResponse === ResponseManagementType.All
+                || (request.manageTransformResponse === ResponseManagementType.Error && throwed)
+                || (request.manageTransformResponse === ResponseManagementType.OK && !throwed)) {
+                return response;
+            }
+        }
 
         if (response && response.body && this.hasHornetBody(response.body)) {
             // Result OK || Erreur gérée par la backend

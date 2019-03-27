@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -131,6 +131,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         this.state = {
             ...this.state,
             hasPopUp: this.props.messageAlert,
+            visible: this.isVisible(),
         };
 
     }
@@ -139,13 +140,25 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      * @inheritDoc
      */
     shouldComponentUpdate(nextProps: any, nextState: any) {
-        return super.shouldComponentUpdate(nextProps, nextState) ||
-            (this.props.value && nextProps.value &&
-                this.props.value[this.props.keyShouldComponentUpdate] !== nextProps.value[this.props.keyShouldComponentUpdate]);
+        return super.shouldComponentUpdate(nextProps, nextState)
+        || this.calculVisiblity(nextProps) !== this.state.visible
+        || (this.props.value && nextProps.value &&
+            this.props.value[this.props.keyShouldComponentUpdate] !== nextProps.value[this.props.keyShouldComponentUpdate]);
     }
 
+    /**
+     * indique si le composant est visible ou non
+     */
     isVisible() {
-        return (this.props.visible && (typeof this.props.visible === "function")) ? this.props.visible(this.props.value) : true;
+        return this.calculVisiblity(this.props);
+    }
+
+    /**
+     * calcul de la visibilité en fonction des propriétés passées
+     * @param props propriétés prises en compte pour le calcul de la visibilité
+     */
+    protected calculVisiblity(props: ActionBodyCellProps){
+        return (props.visible && (typeof props.visible === "function")) ? props.visible(props.value) : true;
     }
 
     /**
@@ -179,11 +192,10 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
             className: classNames(classes),
             title: this.state.titleCell instanceof Function ? this.state.titleCell(this.props.value) :
                 this.state.titleCell ? this.state.titleCell : this.title,
-            onClick: this.onClick,
+            onMouseDown: this.onClick,
             disabled: (this.props.contentState.itemInEdition && this.state.isEditing === false) || disabled,
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
-            "aria-haspopup": this.state.hasPopUp,
             role: "button",
         };
 
@@ -194,9 +206,11 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
                 && new Template(this.props.titleAlert).process(this.props.value, this.props.replaceUndef || "?");
         }
 
+        // Ne pas retirer cette ligne, sert a l'update du composant
+        this.state = {...this.state, visible: this.isVisible()};
+
         return (
             this.isVisible() ?
-
                 <a {...aProps}>
                     {img}
                     {this.state.label ? <span className="label-button-action">{this.state.label}</span> : null}
@@ -228,24 +242,32 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      * Click sur le lien
      */
     onClick(e): void {
-        if (this.props.messageAlert) {
-            e.stopPropagation();
-            setTimeout(() => {
-                this.props.showAlert(this.inferedAlertMessage, this.inferedAlertTitle, this.onAction);
-            },         150);
-        } else {
-            this.onAction();
+        if (!e.button || (e.button && e.button !== 2)) {
+            if (this.props.messageAlert) {
+                e.persist();
+                e.stopPropagation();
+                setTimeout(() => {
+                    this.props.showAlert(this.inferedAlertMessage, this.inferedAlertTitle, ()=>{this.onAction(e)});
+                },         150);
+            } else {
+                if (e.button && e.button === 1 && this.state.url) {
+                    const url = this.props.url && this.genUrlWithParams(this.props.url, this.props.value);
+                    window.open(url, "_blank");
+                }else{
+                    this.onAction(e);
+                }
+            }
         }
     }
 
     /**
      * action sur la confirmation
      */
-    onAction(): void {
+    onAction(e): void {
         if (this.state.url) {
             window.location.href = this.props.url && this.genUrlWithParams(this.props.url, this.props.value);
         } else if (this.props.action) {
-            this.props.action(this.props.value);
+            this.props.action(this.props.value, e);
         }
     }
 

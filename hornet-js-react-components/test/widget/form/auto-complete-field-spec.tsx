@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -135,7 +135,7 @@ describe.skip("AutoComplete", () => {
                 />);
 
             /* Deux champs input : un caché pour la valeur, et un champ de saisie libre */
-            expect($("input").length).equals(2);
+            expect($("input").length, "Le nombre d'inputs n'est pas égal à deux").equals(2);
 
             /* Existance de lattribut id */
             let $input = $(`input[name="civilite.libelle"]`);

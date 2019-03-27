@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -111,8 +111,6 @@ export interface IconProps extends HornetComponentProps {
     action?: () => void;
     /** Valeur de l'attribut HTML tabIndex à affecter au lien ou bouton correspondant à l'icône*/
     tabIndex?: number;
-    /** Indicateur d'ouverture d'un popup suite à clic sur bouton */
-    hasPopUp?: boolean;
 }
 
 /** Valeur de l'url par défaut lorsque la propriété url est vide */
@@ -157,8 +155,7 @@ export class Icon extends HornetComponent<IconProps, any> {
             result = <button type="button" title={this.state.title} id={this.state.idLink}
                 className={this.props.classLink}
                 onClick={this.iconOnClick}
-                tabIndex={this.props.tabIndex}
-                aria-haspopup={this.props.hasPopUp}>
+                tabIndex={this.props.tabIndex}>
                 <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
                     className={this.state.classImg} />
             </button>;

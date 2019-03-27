@@ -136,13 +136,14 @@ pipeline {
         }
 
         stage("Test") {
+
             steps {
 				dir("${WORKSPACE}") {
 					script {
                         mapEnv["NODE_ENV"] = "integration"
 						def propEnv = mapEnv.collect { key, value -> return key+'='+value }
 						withEnv(propEnv) {
-			                sh "bash hbw.sh test"
+						    sh "xvfb-run bash hbw.sh test"
 						}
 					}
 				}

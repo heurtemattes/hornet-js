@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -187,17 +187,17 @@ export class Notification extends HornetComponent<NotificationProps, any> {
                 }
 
                 if (!ev.detail.id || !(ev.detail.id in Notification.INSTANCES)) {
-                    ev.detail.id = Notification.ORDER[ Notification.ORDER.length - 1 ];
+                    ev.detail.id = Notification.ORDER[Notification.ORDER.length - 1];
                 }
-                Notification.INSTANCES[ ev.detail.id ].setState(state);
+                Notification.INSTANCES[ ev.detail.id ].setState(state, ev.detail.cb);
             });
 
             this.listen(CLEAN_NOTIFICATION_EVENT, (ev) => {
                 if (!ev.detail.id) {
-                    ev.detail.id = Notification.ORDER[ Notification.ORDER.length - 1 ];
+                    ev.detail.id = Notification.ORDER[Notification.ORDER.length - 1];
                 }
-                else if (Notification.INSTANCES[ ev.detail.id ]) {
-                    Notification.INSTANCES[ ev.detail.id ].setState({
+                else if (Notification.INSTANCES[ev.detail.id]) {
+                    Notification.INSTANCES[ev.detail.id].setState({
                         infos: null,
                         errors: null,
                         exceptions: null,
@@ -206,12 +206,12 @@ export class Notification extends HornetComponent<NotificationProps, any> {
                     });
                 }
                 else if (ev.detail.id) {
-                    let idComponent = Notification.ORDER[ Notification.ORDER.length - 1 ];
+                    let idComponent = Notification.ORDER[Notification.ORDER.length - 1];
                     if (ev.detail.idComponent) {
                         idComponent = ev.detail.idComponent;
                     }
                     const messages = [];
-                    const currentNotification = Notification.INSTANCES[ idComponent ];
+                    const currentNotification = Notification.INSTANCES[idComponent];
 
                     if (currentNotification && currentNotification.state) {
                         currentNotification.state.infos.map((message) => {
@@ -252,7 +252,7 @@ export class Notification extends HornetComponent<NotificationProps, any> {
                     logo={this.state.logo}
                     ref={(component) => {
                         if (component === null) {
-                            delete Notification.INSTANCES[ this.state.id ];
+                            delete Notification.INSTANCES[this.state.id];
                             const idx = Notification.ORDER.indexOf(this.state.id);
                             Notification.ORDER.splice(idx, 1);
                         } else {
@@ -261,7 +261,7 @@ export class Notification extends HornetComponent<NotificationProps, any> {
                                 Notification.ORDER.splice(idx, 1);
                             }
                             Notification.ORDER.push(this.state.id);
-                            Notification.INSTANCES[ this.state.id ] = component;
+                            Notification.INSTANCES[this.state.id] = component;
                         }
                     }}
                     idComponent={this.props.id}
@@ -335,9 +335,9 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
         if (this.state.errors !== prevState.errors) {
             if (this.state.errors && Array.isArray(this.state.errors) && this.state.errors.length > 0) {
                 const element = document.getElementsByName(
-                    this.state.errors[ 0 ].field) ?
-                    document.getElementsByName(this.state.errors[ 0 ].field)[ 0 ] :
-                    document.getElementById(this.state.errors[ 0 ].field);
+                    this.state.errors[0].field) ?
+                    document.getElementsByName(this.state.errors[0].field)[0] :
+                    document.getElementById(this.state.errors[0].field);
                 if (element && element.focus) {
                     Accordion.handleFocusOnAccordion(element);
                     element.focus();
@@ -345,7 +345,7 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
                     setTimeout(() => {
                         document.getElementById(this.props.idComponent).scrollIntoView();
                         window.scroll(window.scrollX, window.scrollY - 59);
-                    },         250);
+                    }, 250);
                 }
             }
         }
@@ -358,8 +358,8 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
         if (this.state.infos || this.state.errors || this.state.exceptions) {
             const element = ReactDom.findDOMNode(this) as any;
             if (element) {
-                ScrollingUtils.smoothScrollToElementWithStickyHeader( element );
-            }else {
+                ScrollingUtils.smoothScrollToElementWithStickyHeader(element);
+            } else {
                 logger.warn("Impossible de scroller sur les notifications.");
             }
         }
@@ -439,9 +439,11 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
         });
 
         let button;
+        const ariaControls = this.inferAriaControls(notifType);
         if (notifType !== notificationType.INFOS) {
             button = <button type="button" className="error-button-open" ref={(btnError) => (this.btnError = btnError)}
-                onClick={this.handleClickShowError.bind(this)} title={this.i18n("notification.hideShowTitle")} />;
+                onClick={this.handleClickShowError.bind(this)} aria-controls={ariaControls}
+                title={this.i18n("notification.hideShowTitle")} aria-expanded={true} />;
         } else {
             button = <button type="button" className="info-button" ref={(btnInfo) => (this.btnInfo = btnInfo)}
                 onClick={this.handleClickRemove.bind(this, idMessages)} title={this.i18n("notification.deleteTitle")} />;
@@ -467,12 +469,13 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
                             style={customContentStyle}>
                             {this._getTitle()}
                         </h1>
-                        <ul style={ulStyle} className={notifType + "-message-list"} role ={"alert"} ref={(listError) => {
-                            if (listError && !this.listError[ this.props.idComponent + notifType ]) {
-                                this.listError[ this.props.idComponent + notifType ] = listError;
-                                this.width = listError.clientWidth;
-                            }
-                        }} >
+                        <ul style={ulStyle} className={notifType + "-message-list"} role="alert"
+                            id={ariaControls} ref={(listError) => {
+                                if (listError && !this.listError[this.props.idComponent + notifType]) {
+                                    this.listError[this.props.idComponent + notifType] = listError;
+                                    this.width = listError.clientWidth;
+                                }
+                            }} >
                             {messages}
                         </ul>
                     </div>
@@ -519,17 +522,19 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
         if (this.btnError && this.btnError.classList.contains("error-button-open")) {
             this.btnError.classList.add("error-button-close");
             this.btnError.classList.remove("error-button-open");
+            this.btnError.setAttribute("aria-expanded", "false");
         } else {
             this.btnError.classList.add("error-button-open");
             this.btnError.classList.remove("error-button-close");
+            this.btnError.setAttribute("aria-expanded", "true");
         }
 
         // affiche ou masque la liste
         if (this.listError) {
 
-            const errorList = this.listError[ this.props.idComponent + notificationType.ERROR ]
-                || this.listError[ this.props.idComponent + notificationType.PERSONNALS ]
-                || this.listError[ this.props.idComponent + notificationType.WARNING ];
+            const errorList = this.listError[this.props.idComponent + notificationType.ERROR]
+                || this.listError[this.props.idComponent + notificationType.PERSONNALS]
+                || this.listError[this.props.idComponent + notificationType.WARNING];
 
             if (errorList && errorList.classList && errorList.classList.contains("close")) {
                 errorList.classList.remove("close");
@@ -549,5 +554,16 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
         items.map((id) => {
             this.fire(CLEAN_NOTIFICATION_EVENT.withData({ id, idComponent: this.props.idComponent }));
         });
+    }
+
+    /**
+     * Déduit la valeur de l'attribut aria-controls du button
+     * @param {string} - notifType : le type de notification
+     * @returns {string} - la valeur de l'attribut
+     */
+    inferAriaControls(notifType: string): string {
+        // Les notifications de type EXCEPTION sont considérées comme des erreurs
+        const realNotifType = notifType === notificationType.EXCEPTION ? "error" : notifType;
+        return `${realNotifType}-message-list`;
     }
 }

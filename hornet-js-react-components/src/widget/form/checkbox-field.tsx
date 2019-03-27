@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -133,10 +133,10 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
         }
     }
 
-        /**
-     * Méthode permettant de calculer les classNames du label
-     */
-    protected calculateLabelClassName():ClassDictionary {
+    /**
+ * Méthode permettant de calculer les classNames du label
+ */
+    protected calculateLabelClassName(): ClassDictionary {
 
         const classes: ClassDictionary = {
             ...super.calculateLabelClassName(),
@@ -215,20 +215,18 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         const classNamesSpan: ClassDictionary = {
             check: true,
-            readonly: this.state.readOnly ,
+            readonly: this.state.readOnly,
             disabled: this.state.disabled,
-            "has-error":this.hasErrors(),
+            "has-error": this.hasErrors(),
         };
 
         return (
-            <div className="checkbox-container">
-                <label className="checkbox-content" onKeyDown={this.handleKeyDown}>
-                    <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"  {...htmlProps} value="true" />
-                    <span className="checkbox-material">
-                        <span className={classNames(classNamesSpan)}></span>
-                    </span>
-                </label>
-            </div>
+            <label className="checkbox-content" onKeyDown={this.handleKeyDown}>
+                <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"  {...htmlProps} value="true" />
+                <span className="checkbox-material">
+                    <span className={classNames(classNamesSpan)}></span>
+                </span>
+            </label>
         );
     }
 

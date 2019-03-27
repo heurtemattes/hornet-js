@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,12 +87,17 @@ import * as classNames from "classnames";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
 
+const LINE_BEFORE = "before";
+const LINE_AFTER = "after";
+
 export interface MoreInfoBodyCellProps extends ActionBodyCellProps {
     /** Clé sur laquelle se base la méthode shouldComponentUpdate */
-    keyShouldComponentUpdate? : string;
+    keyShouldComponentUpdate?: string;
 }
 
 export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends ActionBodyCell<P, any> {
+
+    link: HTMLLinkElement;
 
     static defaultProps = {
         srcImg: Picto.blue.user,
@@ -101,7 +106,6 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
 
     constructor(props: P, context: any) {
         super(props, context);
-
         this.state = {
             ...this.state,
             url: (props.url) ? this.genUrlWithParams(props.url, props.value) : null,
@@ -116,24 +120,26 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
     componentWillReceiveProps(nextProps: MoreInfoBodyCellProps, context) {
         super.componentWillReceiveProps(nextProps as any, context);
         // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
-         this.state = {...this.state, ...nextProps,
+        this.state = {
+            ...this.state, ...nextProps,
             url: (nextProps.url) ? this.genUrlWithParams(nextProps.url, nextProps.value) : null,
-            visible:(nextProps.visible) ? nextProps.visible(nextProps.value) : true,
-         };
+            visible: (nextProps.visible) ? nextProps.visible(nextProps.value) : true,
+        };
     }
 
     /**
      * @inheritDoc
      */
     renderCell(): JSX.Element {
-        logger.debug("render MoreInfoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug(`render MoreInfoBodyCell-> column, ${this.props.coordinates.column} - line , ${this.props.coordinates.row}`);
+
         this.title = this.getCellTitleWithProps(this.props);
 
         const classes: ClassDictionary = {
             "button-action": true,
         };
         if (this.state.className) {
-            classes[ this.state.className ] = true;
+            classes[this.state.className] = true;
         }
         const aProps: any = {
             href: this.state.url || "#",
@@ -143,7 +149,10 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
             disabled: this.props.contentState.itemInEdition && this.state.isEditing === false,
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
-            "aria-haspopup": this.state.hasPopUp,
+            role: "button",
+            "aria-controls": this.buildExpandableLineId(),
+            "aria-expanded": false,
+            ref: (a) => { this.link = a; },
         };
 
         return (
@@ -162,35 +171,56 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
      * Click sur le lien
      */
     onClick(e): void {
-        // Gestion de la line-before
-        this.expandLine(true);
-
-        // Gestion de la line-after
-        this.expandLine(false);
+        // toggle line
+        this.expandLine();
     }
 
     /**
      * Permet de masquer/afficher  une ligne de tableau
-     * @param before
      */
-    expandLine(before ? : boolean) {
-        const type: string = before ? "before" : "after";
-        const selector: string = this.props.id + "-expandable-line-" + type + "-" + this.props.coordinates.row;
+    expandLine() {
+        const selector: string = this.buildExpandableLineId();
 
         const element = document.getElementById(selector);
 
-        if (element) {
-            if (element.classList && element.classList.contains("datatable-expandable-line-hidden")) {
-                element.classList.remove("datatable-expandable-line-hidden");
-                element.classList.add("datatable-expandable-line-displayed");
-            } else {
-                element.classList.remove("datatable-expandable-line-displayed");
-                element.classList.add("datatable-expandable-line-hidden");
-            }
+        if (element && element.classList && element.classList.contains("datatable-expandable-line-hidden")) {
+            element.classList.remove("datatable-expandable-line-hidden");
+            element.classList.add("datatable-expandable-line-displayed");
+            this.setLinkAriaExpandedAttribute(true);
 
-            if (this.props.action) {
-                this.props.action(this.props.value);
-            }
+        } else if (element) {
+            element.classList.remove("datatable-expandable-line-displayed");
+            element.classList.add("datatable-expandable-line-hidden");
+            this.setLinkAriaExpandedAttribute(false);
         }
+
+        if (this.props.action) {
+            this.props.action(this.props.value);
+        }
+    }
+
+    /**
+     * Valorise l'attribut aria-expanded du lien avec la value passée en paramètre
+     * @param {boolean} - value : Valeur de l'attribut aria-expanded du lien
+     */
+    setLinkAriaExpandedAttribute(value: boolean) {
+        if (this.link) {
+            this.link.setAttribute("aria-expanded", `${value}`);
+        }
+    }
+
+    /**
+     * Construit l'id de l'expandable line
+     * @returns {string} - l'id de l'expandable line
+     */
+    buildExpandableLineId(): string {
+        const childrenType:string = this.props.children && (this.props.children as any).type && (this.props.children as any).type.name;
+        let lineType:string;
+        if (childrenType === "LineAfter") {
+            lineType = LINE_AFTER;
+        } else if (childrenType === "LineBefore") {
+            lineType = LINE_BEFORE;
+        }
+        return this.props.coordinates && `${this.props.id}-expandable-line-${lineType}-${this.props.coordinates.row}`;
     }
 }

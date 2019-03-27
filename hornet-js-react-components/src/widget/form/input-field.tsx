@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,6 +92,7 @@ import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { CharsCounter, HornetCharsCounterAttributes } from "src/widget/form/chars-counter";
+import FormEvent = __React.FormEvent;
 import { ToolTip } from "src/widget/tool-tip/tool-tip";
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.input-field");
@@ -108,15 +109,22 @@ export interface InputFieldProps extends AbstractFieldProps, HornetWrittableProp
     resettable?: boolean;
     displayMaxCharInLabel?: boolean;
     displayCharNumber?: boolean;
-    resetTitle?:string;
+    resetTitle?: string;
 }
 
 export class InputField<P extends InputFieldProps, S> extends AbstractField<InputFieldProps, S> {
 
-    static defaultProps = _.assign({ type: "text", resettable: true,  resetTitle: "inputField.resetTitle"}, AbstractField.defaultProps);
+    static defaultProps = _.assign({ type: "text", resettable: true, resetTitle: "inputField.resetTitle" }, AbstractField.defaultProps);
 
     public readonly props: Readonly<InputFieldProps>;
     protected charsCounter: CharsCounter;
+
+    constructor(props?: InputFieldProps, context?: any) {
+        super(props, context);
+        if (this.props.currentValue) {
+            this.state = { ...this.state, valued: true };
+        }
+    }
 
     /**
      * Génère le rendu spécifique du champ
@@ -136,31 +144,27 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
             input: true,
         };
 
-        if (htmlProps[ "className" ]) {
-            inputClasses[ htmlProps[ "className" ] ] = true;
+        if (htmlProps["className"]) {
+            inputClasses[htmlProps["className"]] = true;
         }
 
         if (this.state.alignment) {
-            inputClasses[ this.state.alignment ] = true;
+            inputClasses[this.state.alignment] = true;
         }
 
-        if (htmlProps[ "type" ] && htmlProps[ "type" ].toLowerCase() === "hidden") {
-            htmlProps[ "type" ] = "text";
-            htmlProps[ "hidden" ] = true;
+        if (htmlProps["type"] && htmlProps["type"].toLowerCase() === "hidden") {
+            htmlProps["type"] = "text";
+            htmlProps["hidden"] = true;
         }
 
-        htmlProps[ "onChange" ] = this.state.resettable ? this.handleChangeInput : htmlProps[ "onChange" ];
-        htmlProps[ "className" ] = classNames(inputClasses);
+        htmlProps["onChange"] = this.state.resettable ? this.handleChangeInput : htmlProps["onChange"];
+        htmlProps["className"] = classNames(inputClasses);
         if (this.props.displayCharNumber) {
             const charsCounterId = `chars-counter-${this.state.id}`;
-            htmlProps[ "aria-labelledby" ] = `${this.state.name}-span-label ${charsCounterId}`;
+            htmlProps["aria-labelledby"] = `${this.state.name}-span-label ${charsCounterId}`;
         } else {
-            htmlProps[ "aria-labelledby" ] = `${this.state.name}-span-label`;
+            htmlProps["aria-labelledby"] = `${this.state.name}-span-label`;
         }
-
-        const message = this.props.alertMessage || "inputField.alertMessage";
-        const title = this.props.alertTitle || "inputField.alertTitle";
-        const label = this.props.charLabel || "inputField.charLabel";
 
         return (
             <div>
@@ -198,7 +202,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         const htmlProps = _.cloneDeep(this.getHtmlProps());
 
-        const hidden = htmlProps[ "type" ] === "hidden";
+        const hidden = htmlProps["type"] === "hidden";
 
         const classList: ClassDictionary = {
             "input-reset": true,
@@ -207,16 +211,16 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         const aProps: any = {};
         if (this.isValued()) {
-            aProps[ "onClick" ] = this.resetValue;
-            aProps[ "tabIndex" ] = 0;
-            aProps[ "title"] = this.i18n(this.state.resetTitle, {...this.state});
+            aProps["onClick"] = this.resetValue;
+            aProps["tabIndex"] = 0;
+            aProps["title"] = this.i18n(this.state.resetTitle, { ...this.state });
+            aProps["role"] = "button";
         }
 
         const prefixID: string = this.props.id || this.props.name;
 
         return (
             <span className={classNames(classList)}
-                role="button"
                 aria-hidden={!this.state.valued}
                 id={prefixID + "ResetButton"}
                 onKeyDown={this.handleResetKeyDown}
@@ -243,14 +247,18 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      */
     resetValue(e): void {
         this.htmlElement.value = null;
-        if (this.htmlElement && this.htmlElement.onchange) this.htmlElement.onchange();
         fireHornetEvent(VALUE_CHANGED_EVENT.withData(this.htmlElement));
         if (this.charsCounter) {
             this.charsCounter.handleTextChange(null);
         }
         this.setState({ valued: false }, () => {
             if (this.props.onChange) {
-                this.props.onChange(e);
+                this.props.onChange({
+                    target: this.htmlElement,
+                    currentTarget: this.htmlElement,
+                    preventDefault: () => { },
+                    stopPropagation: () => { },
+                } as FormEvent<HTMLElement>);
             }
         });
     }
@@ -270,8 +278,8 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         const htmlProps = this.getHtmlProps();
 
-        if (_.isFunction(htmlProps[ "onChange" ])) {
-            htmlProps[ "onChange" ](e);
+        if (_.isFunction(htmlProps["onChange"])) {
+            htmlProps["onChange"](e);
         }
         if (this.charsCounter) {
             this.charsCounter.handleTextChange(this.htmlElement.value);

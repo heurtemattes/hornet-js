@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,14 +88,13 @@ import {
 import * as _ from "lodash";
 import { Picto } from "src/img/picto";
 import * as classNames from "classnames";
-import { InputField } from "src/widget/form/input-field";
-import { VALUE_CHANGED_EVENT } from "./event";
+import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
-import * as ReactDOM from "react-dom";
 import { Alert } from "src/widget/dialog/alert";
 import { CharsCounter, HornetCharsCounterAttributes } from "src/widget/form/chars-counter";
 import { ToolTip } from "src/widget/tool-tip/tool-tip";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import FormEvent = __React.FormEvent;
 
 const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.textarea-field");
 
@@ -139,7 +138,8 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
             || this.state.currentValue !== nextState.currentValue
             || this.state.errors !== nextState.errors
             || this.state.readOnly !== nextState.readOnly
-            || this.state.disabled !== nextState.disabled;
+            || this.state.disabled !== nextState.disabled
+            || this.state.required !== nextState.required;
     }
 
     /**
@@ -169,14 +169,15 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
             "aria-labelledby": `${this.state.name}-span-label ${charsCounterId}`,
         });
         const classList = {
-            "textarea-resizable": (this.props.extendable),
-            "textarea-unresizable": (!this.props.extendable)};
+            "textarea-unresizable": this.props.extendable,
+            "textarea-resizable": !this.props.extendable};
         const classListStr = classNames(classList);
         _.assign(htmlProps, { className: `${htmlProps["className"]} ${classListStr}` });
+        htmlProps["onChange"] =  this.valueChange;
 
         return (
             <div className={"textarea-container"}>
-                <textarea onChange={this.valueChange} readOnly = {this.state.readOnly} ref={
+                <textarea readOnly = {this.state.readOnly} ref={
                     (elt) => {
                         this.registerHtmlElement(elt);
                         this.element = elt;
@@ -265,16 +266,16 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
 
         const aProps: any = {};
         if (this.isValued()) {
-            aProps[ "onClick" ] = this.resetValue;
-            aProps[ "tabIndex" ] = 0;
-            aProps[ "title"] = this.i18n(this.state.resetTitle, {...this.state});
+            aProps["onClick"] = this.resetValue;
+            aProps["tabIndex"] = 0;
+            aProps["title"] = this.i18n(this.state.resetTitle, { ...this.state });
+            aProps["role"] = "button";
         }
 
         const identifiant = this.getResetButtonId();
 
         return (
             <span className={classNames(classList)}
-                role="button"
                 aria-hidden={!this.state.valued}
                 onKeyDown={this.handleResetKeyDown}
                 id={ identifiant }>
@@ -285,6 +286,10 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
         );
     }
 
+    /**
+     * Gère le clic sur les touches entrée et barre d'espace sur le button reset
+     * @param {React.KeyboardEvent} - e l'évènement écouté
+     */
     handleResetKeyDown(e: React.KeyboardEvent<HTMLElement>): void {
         const key: number = e.keyCode;
         if (key === KeyCodes.ENTER || key === KeyCodes.SPACEBAR) {
@@ -295,10 +300,17 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
         }
     }
 
+    /**
+     * retourne l'id  du button reset
+     * @returns {string} l'identifiant du button reset
+     */
     protected getResetButtonId(): string {
         return this.props.id || this.props.name + "ResetButton";
     }
 
+    /**
+     * Met  à jour minHeight
+     */
     protected setMinHeight(): void {
         this.minHeight = this.element.clientHeight;
     }
@@ -353,18 +365,24 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
      * @param event
      */
     valueChange(event: any) {
-        // if (this.state.extendable) {
         this.setClientHeight(event);
-        // }
 
-        // mise à jour du texte d'affichage du nombre de caractère
         const value = event.target.value;
 
+        const onChangeHandler = () => {
+            this.fireOnChangeEvent({target: this.element,
+                currentTarget: this.element,
+                preventDefault: () => {},
+                stopPropagation: () => {},
+            } as FormEvent<HTMLElement>);
+        };
+
         if (value) {
-            this.setState({ valued: true, currentValue: value });
+            this.setState({ valued: true, currentValue: value }, onChangeHandler);
         } else if (!value && this.state.valued) {
-            this.setState({ valued: false, currentValue: value });
+            this.setState({ valued: false, currentValue: value }, onChangeHandler);
         }
+        // mise à jour du texte d'affichage du nombre de caractères
         if (this.charsCounter) {
             this.charsCounter.handleTextChange(value);
         }
@@ -373,7 +391,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
     /**
      * Surcharge de la méthode
      * @param value
-     * @returns {InputField}
+     * @returns {TextAreaField}
      */
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
@@ -397,16 +415,27 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
      * Permet de rendre à null la valeur du champ
      */
     resetValue(): void {
-
-        if (this.htmlElement && this.htmlElement.onchange) {
-            this.htmlElement.onchange();
-        }
         this.htmlElement.value = "";
         fireHornetEvent(VALUE_CHANGED_EVENT.withData(this.htmlElement));
         this.charsCounter.handleTextChange(null);
         this.setState({ valued: false, currentValue: undefined }, () => {
             this.setClientHeight();
+            this.fireOnChangeEvent({target: this.element,
+                currentTarget: this.element,
+                preventDefault: () => {},
+                stopPropagation: () => {},
+            } as FormEvent<HTMLElement>);
         });
+    }
+
+    /**
+     * Propage l'évènement onChange si la props onChange est passée
+     * @param {FormEvent<HTMLElement>} - e l'évènement à propager
+     */
+    fireOnChangeEvent(e): void {
+        if (this.props.onChange) {
+            this.props.onChange(e);
+        }
     }
 
 }

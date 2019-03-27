@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -114,6 +114,7 @@ class tableTest extends BaseTest {
     /** Tableau de liste de secteurs */
     private dataSource: PaginateDataSource<any>;
     private tableElement: JSX.Element;
+    private tableElementWithTotal: JSX.Element;
     private tableElementWithActionColumns: JSX.Element;
     private tableElementWithActionColumnsSupprimer: JSX.Element;
     private table;
@@ -202,7 +203,6 @@ class tableTest extends BaseTest {
                         <ActionColumn keyColumn="editer"
                             srcImg={Picto.white.supprimer}
                             alt={"Editer {label}"}
-                            hasPopUp={true}
                             action={() => { }}
                             visible={(value) => value.label !== "libelle1"}
                             keyShouldComponentUpdate="id" />
@@ -210,6 +210,23 @@ class tableTest extends BaseTest {
                 </Content>
                 <Footer>
                     <Pager dataSource={this.dataSource} id="maTable-paginate-with-action-column-supprimer" />
+                </Footer>
+            </Table>
+        );
+
+        this.tableElementWithTotal = (
+            <Table id="lite">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={this.dataSource}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+                <Footer>
+                    <Pager dataSource={this.dataSource} id="maTable-paginate" showTotalPage={true}/>
                 </Footer>
             </Table>
         );
@@ -302,16 +319,17 @@ class tableTest extends BaseTest {
         this.dataSource.on("pagination", (value) => {
             expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`)[ "title" ])
                 .to.equal("Supprimer libelle11");
-            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            const selector = document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`);
+            this.triggerMouseEvent(selector, "mousedown");
             setTimeout(() => {
                 expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
                 expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
-                expect(document.querySelector(`#dialogue-title h1`).innerHTML).to.equal("Suppression de libelle11 alert title");
-                expect(document.querySelector(`#widget-alert-body`)).to.exist;
-                expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle11");
+                expect(document.querySelector(`#dialogue-title h1`).innerHTML, "vérification du libelle1 failed").to.equal("Suppression de libelle11 alert title");
+                expect(document.querySelector(`#widget-alert-body`), "le widget alert n'existe pas").to.exist;
+                expect(document.querySelector(`#widget-alert-body`).innerHTML, "vérification du libelle1 pour suppression failed").to.equal("Voulez-vous vraiment supprimer libelle11");
                 this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
                 this.end();
-            }, 200);
+            }, 750);
         });
         this.dataSource.goToPage(2);
     }
@@ -323,7 +341,7 @@ class tableTest extends BaseTest {
         this.dataSource.on("pagination", (value) => {
             expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`)[ "title" ])
                 .to.equal("Supprimer libelle21");
-            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "mousedown");
             setTimeout(() => {
                 expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
                 expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
@@ -332,7 +350,7 @@ class tableTest extends BaseTest {
                 expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle21");
                 this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
                 this.end();
-            }, 200);
+            }, 12000);
         });
         this.dataSource.goToPage(3);
     }
@@ -347,10 +365,26 @@ class tableTest extends BaseTest {
             setTimeout(() => {
                 expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-4 a`).innerHTML).to.exist;
                 this.end();
-            }, 200);
+            }, 750);
         });
         this.dataSource.goToPage(2);
 
+    }
+
+    @Decorators.it("test de la props showTotalPage a true")
+    testRenderTotalPage() {
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithTotal, this.id);
+        expect(document.querySelector(`#${this.id} .datatable-pagination-total-page`)).to.exist;
+        this.end();
+    }
+
+    @Decorators.it("test de la props showTotalPage a false")
+    testRenderTotalPageFalse() {
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElement, this.id);
+        expect(document.querySelector(`#${this.id} .datatable-pagination-total-page`)).to.not.exist;
+        this.end();
     }
 }
 

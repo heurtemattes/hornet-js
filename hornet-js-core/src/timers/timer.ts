@@ -33,7 +33,7 @@ export class Timer {
         } 
 
         if (timers[timerName].length % 2 !== 0) {
-            Timer.logger.warn(`startTimer : Problème de Timers (${timerName}) non stoppé.`);
+            Timer.logger.debug(`startTimer : Problème de Timers (${timerName}) non stoppé.`);
         } else {
             timers[timerName].push(new Date().getTime());
             Timer.setTimers("hornet.timers", timers);
@@ -53,7 +53,7 @@ export class Timer {
         const timers = Timer.getTimers("hornet.timers");
         
         if (!timers || !timers[timerName] || timers[timerName].length % 2 === 0) {
-            Timer.logger.warn(`startTimer : Problème de Timers (${timerName}) non démarré.`);
+            Timer.logger.debug(`startTimer : Problème de Timers (${timerName}) non démarré.`);
         } else {
             timers[timerName].push(new Date().getTime());
             Timer.setTimers("hornet.timers", timers);
@@ -94,7 +94,7 @@ export class Timer {
             Timer.TIMERS_ORDER.forEach((timer) => {
                 if (timers[timer]) {
                     if (timers[timer].length % 2 !== 0) {
-                        Timer.logger.warn(`Problème de Timers (${timer}) non stoppé. Ajout automatique du stop.`);
+                        Timer.logger.debug(`Problème de Timers (${timer}) non stoppé. Ajout automatique du stop.`);
                         timers[timer].push(new Date().getTime());
                     }
                     for (let tCount = 0; tCount < timers[timer].length; tCount += 2) {

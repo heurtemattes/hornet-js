@@ -7,3 +7,7 @@ node_modules
 **/test/**/*.js.map
 **/package.json
 **/test_report
+**/istanbul
+**/karma_html
+hornet-js-*/index.js
+hornet-js-*/index.js.map

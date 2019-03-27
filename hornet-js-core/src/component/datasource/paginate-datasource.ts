@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -623,7 +623,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
     /***
      * @inheritdoc
      */
-    protected getFetchArgs(attrName: string, value: any, param?: any) {
+    public getFetchArgs(attrName: string, value: any, param?: any) {
 
         let fetchArgs = param || {};
         if (!param && this.fetchArgsSaved) {

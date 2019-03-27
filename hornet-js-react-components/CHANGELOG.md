@@ -1,20 +1,20 @@
 # hornet-js 5.2.4
 
-- PROJ - hornet-js-react-components - Tabs et Accordion : performances et render intempestif liés à la gestion d'erreur sur accordions et tabs
-- FIX - hornet-js-react-components - Table: Ajout d'id sur le container du tableau
-- FIX - hornet-js-react-components - Form: désactivation TU form-props à cause de phantomJS et son accès aux attributs html obsolete
-- FIX [m71066] - hornet-js-react-components - CheckBoxField : prise en compte de l'action clic sur le label du switch
-- FIX [m70149] - hornet-js-react-components - Row : Fix gestion props className
-- FIX [m71360] - hornet-js-react-components - MessageItem: Gestion de l'erreur rémontée lorsque la méthode document.getElementsByName envoie un tableau vide
-- PROJ - hornet-js-react-components - correction des TU
-- PROJ - hornet-js-react-components - ActionButton :  Ajout id 
-- FIX [s378] - hornet-js-react-components - Table: suprression aria-describedby dans un champs de tableau éditable
-- FIX [s325] - hornet-js-react-components - RadioField: formatage de l'id en kebab case
-- FIX [s369] - hornet-js-react-components - Form : possibilité d'ajouter des props générique html - correction pour ne prendre que les props html
-- FIX [m69816] - hornet-js-react-components - ActionBodyCell : Calcul de l'url du lien de l'action colonne
-- FIX [s356] - hornet-js-react-components - AutoCompleteField: regression sur autocomplete multi avec value undefined
-- FIX [m70816]  - hornet-js-react-components - AutoCompleteField: Correction placeholder sur autocomplete multi 
-- FIX [m70802]: - hornet-js-react-components - Table: prise en compte du className sur le table
+- 2ada8b13 PROJ - hornet-js-react-components - Tabs et Accordion : performances et render intempestif liés à la gestion d'erreur sur accordions et tabs
+- 679f0316 FIX - hornet-js-react-components - Table: Ajout d'id sur le container du tableau
+- 1770165e FIX - hornet-js-react-components - Form: désactivation TU form-props à cause de phantomJS et son accès aux attributs html obsolete
+- 734251d7 FIX [m71066] - hornet-js-react-components - CheckBoxField : prise en compte de l'action clic sur le label du switch
+- 14a9266e FIX [m70149] - hornet-js-react-components - Row : Fix gestion props className
+- d4200d62 FIX [m71360] - hornet-js-react-components - MessageItem: Gestion de l'erreur rémontée lorsque la méthode document.getElementsByName envoie un tableau vide
+- d9a87f70 PROJ - hornet-js-react-components - correction des TU
+- 7577bd8a PROJ - hornet-js-react-components - ActionButton :  Ajout id 
+- 2e5f2db9 FIX [s378] - hornet-js-react-components - Table: suprression aria-describedby dans un champs de tableau éditable
+- 3737d875 FIX [s325] - hornet-js-react-components - RadioField: formatage de l'id en kebab case
+- 13169cec FIX [s369] - hornet-js-react-components - Form : possibilité d'ajouter des props générique html - correction pour ne prendre que les props html
+- b965d8a6 FIX [m69816] - hornet-js-react-components - ActionBodyCell : Calcul de l'url du lien de l'action colonne
+- 4fd5e780 FIX [s356] - hornet-js-react-components - AutoCompleteField: regression sur autocomplete multi avec value undefined
+- a95af28a FIX [m70816]  - hornet-js-react-components - AutoCompleteField: Correction placeholder sur autocomplete multi 
+- fd05382e FIX [m70802]: - hornet-js-react-components - Table: prise en compte du className sur le table
 
 # hornet-js-react-components 5.2.3
 

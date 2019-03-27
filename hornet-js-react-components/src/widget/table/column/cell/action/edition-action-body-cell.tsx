@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -116,6 +116,9 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
     // gestion de la liste des refs des boutons
     protected buttonsRef: Array<any>;
 
+    protected editionButton: any;
+    protected focusEdition: boolean = false;
+
     constructor(props: P, context: any) {
         super(props, context);
 
@@ -130,6 +133,14 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
 
     shouldComponentUpdate(nextProps, nextState) {
         return super.shouldComponentUpdate(nextProps, nextState) || nextState.isEditing !== this.state.isEditing;
+    }
+
+    componentDidUpdate(nextProps, nextState, nextContent){
+        super.componentDidUpdate(nextProps, nextState, nextContent);
+        if (this.editionButton && this.focusEdition && (this.editionButton as HTMLElement).focus) {
+            (this.editionButton as HTMLElement).focus();
+            this.focusEdition = false;
+        }
     }
 
     /**
@@ -175,6 +186,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         if (this.buttonsRef.indexOf(e.currentTarget) === 1 && this.props.messageAlert && this.props.showAlert) {
             e.stopPropagation();
             this.props.showAlert(this.state.messageAlert, this.state.titleAlert, this.setItemInEdition);
+            this.focusEdition = true;
         } else {
             this.setItemInEdition();
         }
@@ -202,6 +214,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      */
     renderEditionBoutton(classes: ClassDictionary): JSX.Element {
         return (<a
+        ref={(ref) =>{this.editionButton = ref;}}
             className={classNames(classes)}
             title={this.i18n(this.state.titleEdit, this.props.value)}
             aria-label={this.i18n(this.state.titleEdit, this.props.value)}

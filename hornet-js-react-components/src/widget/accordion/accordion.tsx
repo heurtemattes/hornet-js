@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -121,7 +121,7 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
     constructor(props?: AccordionProps, context?: any) {
         super(props, context);
         this.state = {
-            ...this.state, id: this.props.id + this.props.panelIndex,
+            ...this.state, id: this.props.id + this.props.panelIndex, errors: 0
             };
 
     }
@@ -140,6 +140,12 @@ export class Accordion extends HornetComponent<AccordionProps, any> {
 
             if (ev.detail === this.getAccordionPanelId()) {
                 const element = document.getElementById(ev.detail);
+                const isVisible = element.className.indexOf("visible") >= 0;
+                if (!isVisible) {
+                    const accordionTabId: string = this.getAccordionPanelId().replace("-panel", "-tab");
+                    const accordionTabElement = document.getElementById(accordionTabId);
+                    accordionTabElement.click();
+                }
                 element.className = element.className.replace("hidden", "visible");
             }
 

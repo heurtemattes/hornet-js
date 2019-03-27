@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -178,8 +178,14 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         }
     }
 
-    handleChange(event) {
-        return true;
+    /**
+     * Gère les changements sur les radios bouton
+     * @param {anay} event Evènement propagé
+     */
+    handleChange(event: any): void {
+        if (this.props.onChange) {
+            this.props.onChange(event);
+        }
     }
 
     protected isDataSourceSelectedArray(): boolean {
@@ -241,16 +247,16 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         const cx = classNames({
             "fl radio-inline": this.state.inline === InlineStyle.ALL || this.state.inline === InlineStyle.FIELD,
         });
-        const label = choice[ this.state.labelKey ] ?
-            choice[ this.state.labelKey ] :
-            choice[ this.state.valueKey ];
+        const label = choice[this.state.labelKey] ?
+            choice[this.state.labelKey] :
+            choice[this.state.valueKey];
 
         const idInput = `${this.state.id}-${_.kebabCase(label)}`;
         const key = `${idInput}-${choice.value}`;
 
         const classNamesSpan: ClassDictionary = {
             outer: true,
-            "has-error":this.hasErrors(),
+            "has-error": this.hasErrors(),
         };
 
         // positioning an input inside a label
@@ -265,7 +271,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
                         ref={(elt) => this.registerHtmlElement(elt)}
                         type="radio"
                         onClick={() => this.handleClick(choice)}
-                        value={choice[ this.state.valueKey ]}
+                        value={choice[this.state.valueKey]}
                         id={idInput}
                         checked={this.shouldRadioBeChecked(choice)}
                         onChange={this.handleChange}
@@ -279,21 +285,20 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
     }
 
     protected shouldRadioBeChecked(choice: any): boolean {
-        if (this.state.selected !== undefined) {
+        let shouldRadioBeChecked: boolean;
+        if (this.state.selected !== undefined && this.state.selected !== null) {
+            shouldRadioBeChecked = choice === this.state.selected;
             if (this.state.dataSource) {
                 let mySelected;
-                if (this.state.selected[ this.props.valueKey ] !== undefined) {
-                    mySelected = this.state.selected[ this.props.valueKey ];
+                if (this.state.selected[this.props.valueKey] !== undefined) {
+                    mySelected = this.state.selected[this.props.valueKey];
                 } else {
-                    mySelected = this.state.selected[ this.state.dataSource.keysMap[ this.props.valueKey ] ];
+                    mySelected = this.state.selected[this.state.dataSource.keysMap[this.props.valueKey]];
                 }
-                return choice[ this.state.valueKey ] === mySelected;
-            } else {
-                return choice === this.state.selected;
+                shouldRadioBeChecked = choice[this.state.valueKey] === mySelected;
             }
-        } else {
-            return false;
         }
+        return shouldRadioBeChecked;
     }
 
     /**
@@ -307,16 +312,15 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
      * @returns {any}
      */
     renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
-
         const hasData = this.state.data && this.state.data.length > 0;
         const hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
         let id = "";
         if (hasData) {
-            id = fieldId + "-" + this.state.data[ 0 ][ this.state.labelKey ];
+            id = fieldId + "-" + this.state.data[0][this.state.labelKey];
         }
 
         if (hasDataSource) {
-            id = fieldId + "-" + this.state.items[ 0 ][ this.state.labelKey ];
+            id = fieldId + "-" + this.state.items[0][this.state.labelKey];
         }
 
         return super.renderLabel(id, fieldName, label, required);
@@ -338,7 +342,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         const hasDataSource = this.state.dataSource && this.state.dataSource.results && this.state.dataSource.results.length > 0;
 
         return (
-            <ul className={cx}>
+            <ul className={cx} id={this.state.id + "_items"}>
                 {hasData ? this.state.data.map(this.renderRadioItem) : null}
                 {hasDataSource ? this.renderRadioItemdataSource() : null}
                 {!hasData && !hasDataSource ?
@@ -353,18 +357,18 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
      */
     setCurrentValue(value): this {
         super.setCurrentValue(value);
-        /* L'adaptateur DOM met à jour l'élément dans le DOM : on met ici à jour l'état interne du composant */
+        // L'adaptateur DOM met à jour l'élément dans le DOM : on met ici à jour l'état interne du composant
         this.setState({ currentValue: value });
         if (this.state.items && this.state.items.length > 0) {
             const itemToSelected = _.find(this.state.items, (element) => {
-                const elementValue = element[ this.state.valueKey ] !== null && element[ this.state.valueKey ] !== undefined ?
-                element[ this.state.valueKey ].toString() : element[ this.state.valueKey ];
+                const elementValue = element[this.state.valueKey] !== null && element[this.state.valueKey] !== undefined ?
+                    element[this.state.valueKey].toString() : element[this.state.valueKey];
 
                 const incomingValue = value !== null && value !== undefined ? value.toString() : value;
 
                 return elementValue === incomingValue;
             },
-        );
+            );
             if (this.props.dataSource) {
                 this.props.dataSource.select(itemToSelected);
             } else {

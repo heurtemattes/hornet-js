@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -361,21 +361,24 @@ export class Table extends HornetComponent<TableProps, any> {
     protected getCheckColumnChildrenDeep(startElement: any, childrenList?: any[]): any[] {
         let children: any[] = childrenList ? childrenList : [];
 
-        React.Children.map(startElement.props.children, (child: React.ReactChild) => {
-            const reactElement = (child as React.ReactElement<any>);
-            if (reactElement) {
-                if (reactElement.type === CheckColumn) {
-                    children.push(child);
-                    children = this.getCheckColumnChildrenDeep(child, children);
-                } else if (Array.isArray(reactElement.props.children)) {
-                    React.Children.map(startElement.props.children, (subChild: React.ReactChild) => {
-                        children = this.getCheckColumnChildrenDeep(subChild, children);
-                    });
-                } else {
-                    children = this.getCheckColumnChildrenDeep(child, children);
+        if(startElement && startElement.props) {
+
+            React.Children.map(startElement.props.children, (child: React.ReactChild) => {
+                const reactElement = (child as React.ReactElement<any>);
+                if (reactElement) {
+                    if (reactElement.type === CheckColumn) {
+                        children.push(child);
+                        children = this.getCheckColumnChildrenDeep(child, children);
+                    } else if (reactElement.props && Array.isArray(reactElement.props.children)) {
+                        React.Children.map(startElement.props.children, (subChild: React.ReactChild) => {
+                            children = this.getCheckColumnChildrenDeep(subChild, children);
+                        });
+                    } else {
+                        children = this.getCheckColumnChildrenDeep(child, children);
+                    }
                 }
-            }
-        });
+            });
+        }
         return children.filter((element) => (element != null && element));
     }
 }

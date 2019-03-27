@@ -70,22 +70,99 @@
  */
 
 /**
- * hornet-js-database - Ensemble des composants de gestion de base hornet-js
+ * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
- * @author 
- * @version v5.2.4
+ * @author MEAE - Ministère de l'Europe et des Affaires étrangères
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { CalendarField, CalendarFieldProps,  CalendarFieldState} from "src/widget/form/calendar-field";
+import * as React from "react";
+import { Utils } from "hornet-js-utils";
 
-import { injectable } from "hornet-js-core/src/inject/injectable";
-import { HornetSequelizeEntity } from "hornet-js-database/src/sequelize/hornet-sequelize-entity";
-import { inject } from "hornet-js-core/src/inject/inject";
-import { ModelDAO } from "test/dao/model-dao";
+export class CalendarAutocomplete<P extends CalendarFieldProps,
+ S extends CalendarFieldState> extends CalendarField<P, S>{
 
-export class EntityDAO extends HornetSequelizeEntity<ModelDAO> {
+    protected separator;
+    protected formatLengths = [];
 
-    constructor() {
-        super(new ModelDAO());
+    constructor(props?: P, context?: any) {
+        super(props, context);
+
+        const formats = this.props.dateFormats ?
+        {dateFormats: this.props.dateFormats, dateFormat: this.props.dateFormats[0]} : {};
+
+        const calendarLocale = Utils.getCls("hornet.internationalization") ?
+            {...this.i18n("calendar"), ...formats} : {formats, ...{dateFormat:"DD/MM/YYYY"}};
+
+        if (calendarLocale.dateFormat) {
+            this.getFormatValues(calendarLocale.dateFormat);
+        }
     }
+
+    protected getFormatValues(format: string) {
+        const separators = ["-", "/", "."];
+        for ( const cpt in separators) {
+            const sep = separators[cpt];
+            const index = format.indexOf(sep);
+            if (index > -1) {
+                this.separator = sep;
+                this.formatLengths[0] = index;
+                const value = format.substr(index + 1, format.length);
+                this.formatLengths[1] = value.indexOf(this.separator) + index;
+                this.formatLengths[2] = format.length - 2;
+            }
+        }
+    }
+
+    /**
+     * Méthode délenchée lors d'une intéraction avec le champ input du composant Calendar
+     * @param e
+     */
+    protected handleInputChange(e: React.SyntheticEvent<HTMLElement>): void {
+        /* L'attribut DOM onChange est éventuellement aussi renseigné sur le composant */
+        if (this.state.onChange) {
+            this.state.onChange(e);
+        }
+
+        const input: HTMLInputElement = e.target as HTMLInputElement;
+
+        if (input.value && !this.state.valued) {
+            this.setState({valued: true});
+        } else if (!input.value && this.state.valued) {
+            this.setState({valued: false});
+        }
+
+        if (this.state.currentValue !== input.value) {
+            this.FormatInputChange(e);
+            this.setState({currentValue: input.value}, () => {
+                if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
+            });
+        }
+    }
+
+    /**
+     * formatte le champs en ajoutant les séparateurs si nécessaire
+     * @param e
+     */
+    protected FormatInputChange(e) {
+        const value = e.target.value;
+        /** Suppression des caractères : -, espace, _, . */
+        if (!(value.charAt(value.length - 1 ) === this.separator)) {
+            const val = value.replace(/[\D\s\._\-]+/g, "").substr(0, this.formatLengths[2]);
+            const chunk = [];
+            chunk.push(val.substr(0, this.formatLengths[0]));
+            // >= pour ajouter le séprateur automatiquement, > pour qu'il s'ajoute après
+            if (val.length > this.formatLengths[0]) {
+                chunk.push(val.substr(this.formatLengths[0], this.formatLengths[1] - this.formatLengths[0]));
+            }
+            // >= pour ajouter le séprateur automatiquement, > pour qu'il s'ajoute après
+            if (val.length > this.formatLengths[1]) {
+                chunk.push(val.substr(this.formatLengths[1]));
+            }
+            e.target.value = chunk.join(this.separator).toUpperCase();
+        }
+    }
+
 }

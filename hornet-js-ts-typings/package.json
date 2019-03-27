@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-ts-typings",
-  "version": "5.2.4",
+  "version": "5.3.0",
   "license": "CECILL-2.1",
   "description": "Fichiers de définition des modules TypeScript d'hornet-js",
   "bugs": {

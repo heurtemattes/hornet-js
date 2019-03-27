@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,6 +90,7 @@ import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data"
 import * as assert from "assert";
 
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
+import { DefaultSort } from "hornet-js-core/src/component/datasource/options/datasource-option";
 import { Table } from "hornet-js-react-components/src/widget/table/table";
 import { Header } from "hornet-js-react-components/src/widget/table/header";
 /* Composant Content */
@@ -109,8 +110,15 @@ class tableTest extends HornetReactTest {
     protected dataSourceSortTitle: DataSource<any>;
     protected data = [];
 
+    readonly dataForCustomSortAccent = new DataSource<any>([
+        { nom: "Contexte international et géopolitique" },
+        { nom: "Défense" },
+        { nom: "Droit / Réglementation" },
+        { nom: "Economie/Finances" },
+    ]);
+
     @Decorators.before
-    before(){
+    before() {
         Utils.setCls("hornet.internationalization", { messages });
 
         this.data = [];
@@ -118,6 +126,8 @@ class tableTest extends HornetReactTest {
         for (let i: number = 1; i < 10; i++) {
             this.data.push({ id: i, label: "libelle" + i, desc: (step % 3 === 0) ? "desc" + 0 : "desc" + step++ });
         }
+
+
     }
     @Decorators.beforeEach
     beforeEach() {
@@ -189,7 +199,41 @@ class tableTest extends HornetReactTest {
                 expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).hasAttribute("title")).to.be.true;
                 expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-1 div`).getAttribute("title")).to.be.equal("Custom Down");
                 this.end();
-            },         1000);
+            },         100);
+        });
+        this.dataSourceSortTitle.reload();
+    }
+
+    @Decorators.it("Manipuler des titres de tableaux avec un tri sur une colonne ")
+    renderTableCustomSort() {
+
+        let tableElement2 = (
+            <Table id="lite">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={this.dataForCustomSortAccent}>
+                    <Columns>
+                        <Column keyColumn="nom" title={"nom"} sortable={true} 
+                        compareMethod={ DefaultSort.compareIgnoreCaseAndAccent } />
+                    </Columns>
+                </Content>
+            </Table>
+        );
+
+        const id = this.generateMainId();
+        this.renderIntoDocument(tableElement2, id);
+        this.dataSourceSortTitle.on("fetch", (value) => {
+            expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-0 div`).hasAttribute("title"), "on a un titre de tri").to.be.true;
+            expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-0 div`).getAttribute("title"), "le prochain tri est accendant").to.be.equal("Trier par nom dans l'ordre croissant");
+            this.triggerMouseEvent(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-0 .arrow-sort-container`), "click");
+            setTimeout(() => {
+                this.triggerMouseEvent(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-0 .arrow-sort-container`), "click");
+                setTimeout(() => {
+                    expect(document.querySelector(`#${id} #lite-0 #lite-0-colHeader-0-0 div`).getAttribute("title"), "après de tri, on est renevu au prochain tri est accendant").to.be.equal("Trier par nom dans l'ordre croissant");
+                    expect(document.querySelector(`#${id}  tbody tr:nth-child(3) td`).innerHTML, "Le caractère accenté est substituer pour la comparaison").to.be.equal("Défense");
+                    this.end();
+                }, 100);
+            }, 100);
         });
         this.dataSourceSortTitle.reload();
     }

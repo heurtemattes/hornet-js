@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -204,6 +204,8 @@ import { RouteType } from "src/routes/abstract-routes";
 export class HornetContextInitializerMiddleware extends AbstractHornetMiddleware {
     constructor() {
         const callbacksStorage = Utils.getContinuationStorage();
+        const appConfig = AbstractHornetMiddleware.APP_CONFIG;
+
         const dataPathPrefix = Utils.buildContextPath(
             Utils.config.getOrDefault("fullSpa.name", AbstractHornetMiddleware.APP_CONFIG.routesDataContext));
         super((req, res, next) => {
@@ -221,6 +223,13 @@ export class HornetContextInitializerMiddleware extends AbstractHornetMiddleware
                 const relativePathname = currentUrl.replace(Utils.getContextPath(), "");
                 callbacksStorage.set("hornet.routePath", relativePathname);
                 callbacksStorage.set("hornet.currentUrl", currentUrl);
+
+                if (appConfig.initCls) {
+                    const initCls = appConfig.initCls.evaluateInitCls();
+                    if (initCls) {
+                        callbacksStorage.set("hornet.initCls", initCls);
+                    }
+                }
                 next();
             });
         });
@@ -1183,6 +1192,8 @@ export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
                         res.status(err.status);
                     } else if (err.args && err.args.httpStatus && typeof err.args.httpStatus === "number") { // gestion avec les NodeApiError
                         res.status(err.args.httpStatus);
+                    } else if (err.httpStatus && typeof err.httpStatus === "number") {// gestion avec les HttpError
+                        res.status(err.httpStatus);
                     } else {
                         res.status(500);
                     }

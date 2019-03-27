@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -92,12 +92,18 @@ module.exports = {
     config: {
         autoGenerateIndex: true,
         karma: {
-            /*browsers: ["Firefox"],
+            browsers: ["FirefoxHeadless"],
+            customLaunchers: {
+              FirefoxHeadless: {
+                base: 'Firefox',
+                flags: [ '-headless' ],
+              },
+            },
             template: {
                debug: "./test/template/debug.html",
                context: "./test/template/context.html",
                clientContext: "./test/template/client_with_context.html"
-            },*/
+            },
             clientContext: [
                 [/moment[\/\\]locale$/, /fr|en/],
                 [/intl[\/\\]locale-data[\/\\]jsonp$/, /fr|en/],

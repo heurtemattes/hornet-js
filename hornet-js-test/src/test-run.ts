@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -132,8 +132,9 @@ if (typeof window !== "undefined") {
 
 
 } else {
-    if (typeof process !== "undefined") {
+    if (typeof process !== "undefined" && (<any> process).hasEventTest) {
         // NOTE: event name is camelCase as per node convention
+        (<any> process).hasEventTest = true;
         process.on("unhandledRejection", function (reason, promise) {
             // See Promise.onPossiblyUnhandledRejection for parameter documentation
             console.error("unhandledRejection : ", reason);

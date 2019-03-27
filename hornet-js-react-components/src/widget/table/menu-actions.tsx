@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -176,11 +176,13 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
 
                         if (!propsButtons.priority) {
                             dropdownItems.push({
+                                id: propsButtons.id,
                                 label: propsButtons.label,
                                 action: propsButtons.action,
                                 url: propsButtons.url ? this.genUrlWithParams(propsButtons.url, item || {}) : null,
                                 srcImg: propsButtons.srcImg,
-                                className: "material-dropdown-menu__link",
+                                className: propsButtons.className ? "material-dropdown-menu__link " + propsButtons.className :
+                                    "material-dropdown-menu__link",
                                 key: propsButtons.id || index + "-menuAction-" + index,
                                 valueCurrent: item,
                                 title: propsButtons.title,

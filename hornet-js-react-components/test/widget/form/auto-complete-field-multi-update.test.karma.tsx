@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,7 +94,7 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Form } from "src/widget/form/form";
 import * as _ from "lodash";
 
-let dataSourceInt:  DataSource<any>;
+let dataSourceInt: DataSource<any>;
 let dataSourceString: DataSource<any>;
 let element: JSX.Element;
 let element2: JSX.Element;
@@ -119,7 +119,7 @@ class AutoCompleteMultiFieldUpdateTest extends BaseTest {
         }
         dataSourceInt = new DataSource(data, { value: "id", text: "label" });
 
-        this.selectedInt  = [ data[0], data[1]];
+        this.selectedInt = [data[0], data[1]];
 
         element = (
             <Form
@@ -128,20 +128,20 @@ class AutoCompleteMultiFieldUpdateTest extends BaseTest {
                     this.monFormInt = form;
                 }}
             >
-            <AutoCompleteMultiField dataSource={dataSourceInt}
-                maxHeight={200}
-                name="testmulti"
+                <AutoCompleteMultiField dataSource={dataSourceInt}
+                    maxHeight={200}
+                    name="testmulti"
 
 
-                label="testmulti"
-                required={true}
-                labelKey="libelle"
-                valueKey="id"
-                noResultLabel="test"
-                ref={(auto) => {
-                    this.autocompleteInt = auto;
-                }}
-            />
+                    label="testmulti"
+                    required={true}
+                    labelKey="libelle"
+                    valueKey="id"
+                    noResultLabel="test"
+                    ref={(auto) => {
+                        this.autocompleteInt = auto;
+                    }}
+                />
             </Form>);
 
         const data2 = [];
@@ -151,7 +151,7 @@ class AutoCompleteMultiFieldUpdateTest extends BaseTest {
 
         dataSourceString = new DataSource(data2, { value: "id", text: "label" });
 
-        this.selectedString  = [ data2[0], data2[1]];
+        this.selectedString = [data2[0], data2[1]];
 
         element2 = (
             <Form
@@ -160,18 +160,18 @@ class AutoCompleteMultiFieldUpdateTest extends BaseTest {
                     this.monFormString = form;
                 }}
             >
-            <AutoCompleteMultiField dataSource={dataSourceString}
-                maxHeight={200}
-                name="testmulti"
-                label="testmulti"
-                required={true}
-                labelKey="libelle"
-                valueKey="id"
-                noResultLabel="test"
-                ref={(auto) => {
-                    this.autocompleteString = auto;
-                }}
-            />
+                <AutoCompleteMultiField dataSource={dataSourceString}
+                    maxHeight={200}
+                    name="testmulti"
+                    label="testmulti"
+                    required={true}
+                    labelKey="libelle"
+                    valueKey="id"
+                    noResultLabel="test"
+                    ref={(auto) => {
+                        this.autocompleteString = auto;
+                    }}
+                />
             </Form>);
     }
 
@@ -184,67 +184,67 @@ class AutoCompleteMultiFieldUpdateTest extends BaseTest {
     @Decorators.it("Update fields - values:integer - selected:integer")
     update() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${id}`);
-        const autocompleteData = { testmulti: {id: [1, 2]} };
+        this.renderIntoDocument(element, `${id}`);
+        const autocompleteData = { testmulti: { id: [1, 2] } };
         this.monFormInt.updateFields(autocompleteData);
-        setTimeout( () => {
+        setTimeout(() => {
 
-            expect(this.autocompleteInt.state.listDefaultValue).to.include.ordered.members([1, 2]);
-            expect(this.autocompleteInt.state.currentValue).to.include.ordered.members([1, 2]);
+            expect(this.autocompleteInt.state.listDefaultValue, "Les valeurs 1, 2 ne se suivent pas dans listDefaultValue").to.include.ordered.members([1, 2]);
+            expect(this.autocompleteInt.state.currentValue, "Les valeurs 1, 2 ne se suivent pas dans currentValue").to.include.ordered.members([1, 2]);
             this.autocompleteInt.state.dataSource._selected.forEach((value, index) => {
-                expect(value.value).to.be.equals(this.selectedInt[index].id);
+                expect(value.value, `l'item situé à l'index ${index} des éléments sélectionnés du datasource n'est pas correct`).to.be.equals(this.selectedInt[index].id);
             });
             this.end();
-        },          250);
+        }, 250);
     }
 
     @Decorators.it("Update fields - values:integer - selected:string")
-   updateString() {
+    updateString() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element, `${id}`);
-        const autocompleteData = { testmulti: {id: ["1", "2"]} };
+        this.renderIntoDocument(element, `${id}`);
+        const autocompleteData = { testmulti: { id: ["1", "2"] } };
         this.monFormInt.updateFields(autocompleteData);
-        setTimeout( () => {
-            expect(this.autocompleteInt.state.listDefaultValue).to.include.ordered.members([1, 2]);
-            expect(this.autocompleteInt.state.currentValue).to.include.ordered.members([1, 2]);
+        setTimeout(() => {
+            expect(this.autocompleteInt.state.listDefaultValue, "Les valeurs 1, 2 ne se suivent pas dans listDefaultValue").to.include.ordered.members([1, 2]);
+            expect(this.autocompleteInt.state.currentValue, "Les valeurs 1, 2 ne se suivent pas dans currentValue").to.include.ordered.members([1, 2]);
             this.autocompleteInt.state.dataSource._selected.forEach((value, index) => {
-                expect(value.value).to.be.equals(this.selectedInt[index].id);
+                expect(value.value, `l'item situé à l'index ${index} des éléments sélectionnés du datasource n'est pas correct`).to.be.equals(this.selectedInt[index].id);
             });
             this.end();
-        },          250);
+        }, 250);
     }
 
     @Decorators.it("Update fields - values:string - selected:string")
     blobupdateString() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element2, `${id}`);
-        const autocompleteData = { testmulti: {id: ["1", "2"]} };
+        this.renderIntoDocument(element2, `${id}`);
+        const autocompleteData = { testmulti: { id: ["1", "2"] } };
         this.monFormString.updateFields(autocompleteData);
-        setTimeout( () => {
-            expect(this.autocompleteString.state.listDefaultValue).to.include.ordered.members(["1", "2"]);
-            expect(this.autocompleteString.state.currentValue).to.include.ordered.members(["1", "2"]);
+        setTimeout(() => {
+            expect(this.autocompleteString.state.listDefaultValue, "Les valeurs 1, 2 ne se suivent pas dans listDefaultValue").to.include.ordered.members(["1", "2"]);
+            expect(this.autocompleteString.state.currentValue, "Les valeurs 1, 2 ne se suivent pas dans currentValue").to.include.ordered.members(["1", "2"]);
             this.autocompleteString.state.dataSource._selected.forEach((value, index) => {
-                expect(value.value).to.be.equals(this.selectedString[index].id);
+                expect(value.value, `l'item situé à l'index ${index} des éléments sélectionnés du datasource n'est pas correct`).to.be.equals(this.selectedString[index].id);
             });
             this.end();
-        },          250);
+        }, 250);
     }
 
     @Decorators.it("Update fields - values:string - selected:integer")
     stringupdateString() {
         const id = this.generateMainId();
-        const document = this.renderIntoDocument(element2, `${id}`);
-        const autocompleteData = { testmulti: {id: [1, 2]} };
+        this.renderIntoDocument(element2, `${id}`);
+        const autocompleteData = { testmulti: { id: [1, 2] } };
         this.monFormString.updateFields(autocompleteData);
-        setTimeout( () => {
+        setTimeout(() => {
 
-            expect(this.autocompleteString.state.listDefaultValue).to.include.ordered.members(["1", "2"]);
-            expect(this.autocompleteString.state.currentValue).to.include.ordered.members(["1", "2"]);
+            expect(this.autocompleteString.state.listDefaultValue, "Les valeurs 1, 2 ne se suivent pas dans listDefaultValue").to.include.ordered.members(["1", "2"]);
+            expect(this.autocompleteString.state.currentValue, "Les valeurs 1, 2 ne se suivent pas dans currentValue").to.include.ordered.members(["1", "2"]);
             this.autocompleteString.state.dataSource._selected.forEach((value, index) => {
-                expect(value.value).to.be.equals(this.selectedString[index].id);
+                expect(value.value, `l'item situé à l'index ${index} des éléments sélectionnés du datasource n'est pas correct`).to.be.equals(this.selectedString[index].id);
             });
             this.end();
-        },          250);
+        }, 250);
     }
 
 }

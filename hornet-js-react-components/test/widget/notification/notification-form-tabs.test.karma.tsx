@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -145,7 +145,7 @@ class NotificationTabsErrorsTest extends BaseTest {
             expect(document.querySelector(`#${id} #ACTION_ERREUR_0`).innerHTML).to.equal("Onglet tab1 - Le champ « Nom » est obligatoire. Veuillez saisir ce champ.");
             expect(document.querySelector(`#${id} #ACTION_ERREUR_1`).innerHTML).to.equal("Onglet tab2 - Le champ « Adresse » est obligatoire. Veuillez saisir ce champ.");
             this.end();
-        }, 500);
+        }, 750);
     }
 
     @Decorators.it("Test erreur d'un formulaire contenu dans un tabs")

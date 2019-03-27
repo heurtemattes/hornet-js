@@ -73,7 +73,7 @@ declare module "hornet-js-test/src/abstract-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -191,7 +191,7 @@ declare module "hornet-js-test/src/base-mocha-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -281,7 +281,7 @@ declare module "hornet-js-test/src/base-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -374,7 +374,7 @@ declare module "hornet-js-test/src/decorators" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -484,7 +484,7 @@ declare module "hornet-js-test/src/hornet-react-test" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */
@@ -604,7 +604,7 @@ declare module "hornet-js-test/src/hornet-test-assert" {
 	 *
 	 * @class HornetTestAssert
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 *
@@ -662,6 +662,20 @@ declare module "hornet-js-test/src/hornet-test-assert" {
 	     * @param {string} message
 	     */
 	    static assertLesserThan(reference: any, actual: any, message: string): void;
+	    /**
+	     * Valide l'assert si actual est supérieur ou égal à reference
+	     * @param reference
+	     * @param actual
+	     * @param {string} message
+	     */
+	    static assertGreaterOrEqualThan(reference: any, actual: any, message: string): void;
+	    /**
+	     * Valide l'assert si actuel est inférieur ou égal à reference
+	     * @param reference
+	     * @param actual
+	     * @param {string} message
+	     */
+	    static assertLesserOrEqualThan(reference: any, actual: any, message: string): void;
 	    /**
 	     * Prépare le message d'erreur pour des asserts d'égalité
 	     * @param actual
@@ -1121,7 +1135,7 @@ declare module "hornet-js-test/src/test-wrapper" {
 	 * hornet-js-test - Ensemble des composants pour les tests hornet-js
 	 *
 	 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-	 * @version v5.2.4
+	 * @version v5.3.0
 	 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 	 * @license CECILL-2.1
 	 */

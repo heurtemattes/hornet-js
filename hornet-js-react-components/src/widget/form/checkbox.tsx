@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.3.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,6 +99,7 @@ export interface CheckboxProps {
     id?: string;
     checked?: boolean;
     tabIndex?: number;
+    className?: string;
 }
 
 /**
@@ -143,7 +144,7 @@ export class CheckBox extends HornetComponent<CheckboxProps & ReactFormDOMAttrib
     render(): React.ReactElement<CheckboxProps> {
         logger.debug("Checkbox render : ", this.props.id ? this.props.id : this.state.label);
         const labelProps: any = {
-            className: "checkbox-content",
+            className: `checkbox-content ${this.props.className ? this.props.className : ""}`.trim(),
             disabled: this.props.disabled,
             title: this.props.title,
         };
