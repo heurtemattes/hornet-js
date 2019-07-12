@@ -73,16 +73,11 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-import { AbstractTest } from "hornet-js-test/src/abstract-test";
-import { Utils } from "hornet-js-utils";
-const Module = require("module").Module;
-import * as fs from "fs";
-import * as path from "path";
-
+import { AbstractTest } from "src/abstract-test";
 
 /**
  * classe abstraite de Test

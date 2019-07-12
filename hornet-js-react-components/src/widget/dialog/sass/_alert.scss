@@ -1,0 +1,11 @@
+@import '../../sass/core';
+
+.hornet-alert-buttons {
+    &.button-group {
+        text-align: center;
+    }
+}
+
+#alertCancel {
+    margin-right: 0;
+}

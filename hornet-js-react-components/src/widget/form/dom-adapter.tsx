@@ -73,18 +73,17 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as React from "react";
+import * as _ from "lodash";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { FormUtils } from "src/widget/form/form-utils";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.dom-adapter");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.dom-adapter");
 
 /**
  * Adaptateur DOM pour un champ de formulaire
@@ -147,31 +146,17 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
 
     addHtmlElement(elt) {
         if (this.htmlElement) {
-            const type = this.getElementType(elt);
-            if (this.type === type && type === "radio") {
-                if (!this.multipleElement) {
-                    this.multipleElement = [];
-                    if(this.htmlElement) {
-                        this.multipleElement.push(this.htmlElement);
-                        this.htmlElement = null;
-                    }
+            if (!this.multipleElement) {
+                this.multipleElement = [];
+                if (this.htmlElement) {
+                    this.multipleElement.push(this.htmlElement);
+                    this.htmlElement = null;
                 }
-
-                elt[ "__component" ] = this;
-
-                if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
-                    this.multipleElement.push(elt);
-                }
-            } else {
-                logger.error("DomAdapter.addHtmlElement > different or unallowed types : " + this.type + " and " + type);
             }
-        } else {
-            elt[ "__component" ] = this;
-
-            if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
-                this.multipleElement.push(elt);
-            }
-
+        }
+        elt[ "__component" ] = this;
+        if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
+            this.multipleElement.push(elt);
         }
     }
 
@@ -296,17 +281,8 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
                     }
                 }
             } else if (type === "checkbox") {
-                // if(!_.isEmpty(this.htmlElement.value) && this.htmlElement.value != "on") {
-                //     /* Cas où une valeur est explicitement spécifiée */
-                //     if (this.htmlElement.checked) {
-                //         val = this.htmlElement.value;
-                //     } else {
-                //         val = "";
-                //     }
-                // } else {
-                /* Pas de valeur spécifique : la valeur est un booléen égal à checked */
+                // Pas de valeur spécifique : la valeur est un booléen égal à checked
                 val = this.htmlElement.checked;
-                // }
             } else if (type === "file") {
                 const fileList: FileList = this.htmlElement.files;
                 if (fileList && fileList.length >= 1) {

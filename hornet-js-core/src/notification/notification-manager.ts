@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import {
     ADD_NOTIFICATION_EVENT,
     CLEAN_NOTIFICATION_EVENT,
     CLEAN_ALL_NOTIFICATION_EVENT,
-} from "hornet-js-core/src/notification/notification-events"
+} from "src/notification/notification-events"
 import { fireHornetEvent } from "src/event/hornet-event";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 
@@ -119,12 +119,14 @@ export class Notifications implements INotifications {
 
     color: string;
     logo: string;
+    isAlert?: boolean;
     notifications: Array<INotificationType>;
     canRenderRealComponent: boolean;
 
-    constructor(color?: string, logo?: string) {
+    constructor(color?: string, logo?: string, isAlert?: boolean) {
         this.notifications = new Array<INotificationType>();
         this.canRenderRealComponent = false;
+        this.isAlert = (isAlert) ? isAlert : false;
         this.color = (color) ? color : "black";
         this.logo = (logo) ? logo : "";
     }
@@ -154,14 +156,15 @@ export class Notifications implements INotifications {
      * @param id identifiant de la notification à créer
      * @param text message de la notification
      */
-    static makeSingleNotification(id: string, text: string): Notifications {
+    static makeSingleNotification(id: string, text: string, alert?:boolean): Notifications {
         const notif: NotificationType = new NotificationType();
         notif.id = id;
         notif.text = text;
-
+        alert ? notif.isAlert = alert : notif.isAlert = false;       
+        
         const notifs: Notifications = new Notifications();
         notifs.addNotification(notif);
-
+        
         return notifs;
     }
 }
@@ -171,6 +174,7 @@ export class NotificationType implements INotificationType {
     text: string;
     anchor: string;
     field: string;
+    isAlert?: boolean;
     canRenderRealComponent: boolean;
     additionalInfos: any;
 
@@ -192,6 +196,7 @@ export interface INotificationType {
     text: string;
     anchor: string;
     field: string;
+    isAlert?: boolean;
     canRenderRealComponent: boolean;
     additionalInfos: AdditionalInfos;
 }

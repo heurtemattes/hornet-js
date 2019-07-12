@@ -73,40 +73,40 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 "use strict";
-const chai = require("chai");
-const expect = chai.expect;
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
+
 import * as _ from "lodash";
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
 import * as assert from "assert";
 
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
+import { Content } from "src/widget/table/content";
 /*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
 import { CheckColumn } from "src/widget/table/column/check-column";
-
-import { Footer } from "hornet-js-react-components/src/widget/table/footer";
-import { Picto } from "hornet-js-react-components/src/img/picto";
-import { Pager, PaginationProps } from "hornet-js-react-components/src/widget/pager/pager";
+import { Footer } from "src/widget/table/footer";
+import { Pager, PaginationProps } from "src/widget/pager/pager";
 import { ActionColumn } from "src/widget/table/column/action-column";
 import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
-import { LineAfter } from "src/widget/table/line/line-after";
 
 
 @Decorators.describe("Test Karma table paginate")
@@ -168,7 +168,7 @@ class tableTest extends BaseTest {
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
                         <Column keyColumn="desc" title={"desc"} sortable={true} />
                         <ActionColumn keyColumn="editer"
-                            srcImg={Picto.blue.editer}
+                            // srcImg={Picto.blue.editer}
                             alt={"Editer {label}"}
                             action={() => { }}
                             keyShouldComponentUpdate="id"/>
@@ -194,14 +194,14 @@ class tableTest extends BaseTest {
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
                         <Column keyColumn="desc" title={"desc"} sortable={true} />
                         <ActionColumn keyColumn="supprimer"
-                            srcImg={Picto.white.supprimer}
+                            // srcImg={Picto.white.supprimer}
                             titleAlert={"Suppression de ${label} alert title"}
                             messageAlert={"Voulez-vous vraiment supprimer ${label}"}
                             alt={"Supprimer {label}"}
                             action={() => { }}
                             keyShouldComponentUpdate="id" />
                         <ActionColumn keyColumn="editer"
-                            srcImg={Picto.white.supprimer}
+                            // srcImg={Picto.white.supprimer}
                             alt={"Editer {label}"}
                             action={() => { }}
                             visible={(value) => value.label !== "libelle1"}
@@ -350,7 +350,7 @@ class tableTest extends BaseTest {
                 expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle21");
                 this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
                 this.end();
-            }, 12000);
+            }, 500);
         });
         this.dataSource.goToPage(3);
     }

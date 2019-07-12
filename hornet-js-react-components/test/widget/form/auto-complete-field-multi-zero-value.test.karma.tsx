@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,14 +81,16 @@
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { AutoCompleteMultiField } from "src/widget/form/auto-complete-multi-field";
 import { Form } from "src/widget/form/form";
-import * as _ from "lodash";
 
 let element: JSX.Element;
 
@@ -140,8 +142,9 @@ class AutoCompleteMultiFieldZeroValueTest extends BaseTest {
         setTimeout( () => {
             autocomplete.click();
             setTimeout( () => {
-                const elt = document.querySelector(`#${id} #autocomplete-selector-checkbox-0`);
+                const elt:HTMLElement = document.querySelector(`#${id} #autocomplete-selector-checkbox-0`);
                 this.triggerMouseEvent(elt, "mousedown");
+                //elt.click();
                 setTimeout( () => {
                     const value = this.autocompleteInt.getCurrentValue();
                     expect(value.length, "nombre de choix sélectionné").equals(1);

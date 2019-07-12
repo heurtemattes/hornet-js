@@ -1,0 +1,65 @@
+@import '../../sass/core';
+
+$breadcrumbRacineColor: theme-color($variant: 'primary');
+$breadcrumbCurrentColor: theme-color($variant: 'texts');
+$breadcrumbParentColor: rgba(116, 116, 116, 1); //#747474
+$breadcrumbChevronColor: rgba(4, 76, 160, 1); //#044ca0
+
+#breadcrumb {
+    overflow: hidden;
+    clear: both;
+
+    .fil-ariane {
+        margin: 0;
+        padding-left: 0;
+        padding-top: 0.875em;
+        overflow: hidden;
+        list-style: outside none none;
+        font-family: $notoRegular;
+        font-size: 0.938em;
+
+        li {
+            display: inline-block;
+            vertical-align: middle;
+            width: auto;
+        }
+
+        a {
+            text-decoration: none;
+            padding: 0 0.2em;
+
+            &:hover {
+                outline: 1px solid $breadcrumbRacineColor;
+            }
+        }
+
+        .fil-ariane-racine {
+            margin-right: 0.2em;
+            color: $breadcrumbRacineColor;
+        }
+        
+        .fil-ariane-courant {
+            margin-right: 0.2em;
+            color: $breadcrumbCurrentColor;
+        }
+        
+        .fil-ariane-parent {
+            margin-right: 0.2em;
+            color: $breadcrumbParentColor;
+        }
+        
+        .fil-ariane-strong {
+            color: inherit;
+            font-weight: normal;
+        }
+        
+        .fil-ariane-chevron {
+            margin-right: 0.2em;
+            color: $breadcrumbChevronColor;
+
+            &:after {
+                content: ">";
+            }
+        }
+    }
+}

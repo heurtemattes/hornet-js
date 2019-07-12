@@ -73,20 +73,20 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { MediaTypes } from "src/protocol/media-type";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Utils } from "hornet-js-utils";
 import { OptionsOpenDocument } from "src/result/hornet-result-interface";
 import { ResultOpenDocument } from "src/result/result-open-document";
 
 const carbone = require("carbone");
 
-const logger: Logger = Utils.getLogger("hornet-js-core.src.result.result-odt");
+const logger: Logger = Logger.getLogger("hornet-js-core.src.result.result-odt");
 
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      ResultODT

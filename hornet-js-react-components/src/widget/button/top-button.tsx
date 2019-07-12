@@ -73,26 +73,27 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetComponent } from "src/widget/component/hornet-component";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.button.top-button");
+import "src/widget/button/sass/_top-button.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.button.top-button");
 /**
  * Propriétés de la classe TopButton
  */
 export interface TopButtonProps extends HornetComponentProps {
     className?: string;
-    /*id de la balise du header*/
+    // id de la balise du header
     header?: string;
-    /*id de la balise du footer*/
+    // id de la balise du footer
     footer?: string;
     id?: string;
     name?: string;
@@ -132,13 +133,13 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
     render(): JSX.Element {
         logger.debug("TopButton render : ", this.state.id ? this.state.id : this.state.name);
 
-        /* calcul de la position du scroll*/
+        // calcul de la position du scroll
         let scroll: number = 0;
         if (typeof window !== "undefined") {
             scroll = window.scrollY || window.pageYOffset;
         }
 
-        /*si le footer est visible, le composant s'affichera au dessus de celui-ci*/
+        // si le footer est visible, le composant s'affichera au dessus de celui-ci
         let style = {};
         if (this.state.visible) {
             style = { bottom: this.state.size };
@@ -146,27 +147,30 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
 
         const shouldShow = scroll > this.state.offset;
 
-        const contentButton = this.state.children || this.renderDefaultTopButtonContent();
+        //const contentButton = this.state.children || this.renderDefaultTopButtonContent();
         const tabIndex = 0; // Permet d'avoir le focus sur le champs lorsqu'on navigue au clavier
 
         const aProps: any = {
-            className: this.state.className || "top-button",
+            tabIndex,
             style,
+            className: this.state.className || "top-button",
             onClick: this.scrolltop,
             id: this.state.id,
             name: this.state.name,
             title: this.state.title,
-            tabIndex,
             onKeyDown: this.handleKeyDown,
             role: "button",
         };
 
         if (shouldShow) {
             return (
-                <div {...aProps}
-                >
-                    {contentButton}
-                </div>
+                <React.Fragment>
+                    {this.state.children ? <div>{this.state.children}</div> : null}
+                    <div {...aProps}>
+                        { this.renderDefaultTopButtonContent() }
+                    </div>
+                </React.Fragment>
+                
             );
         }
         return null;
@@ -177,15 +181,14 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
      * @param {Element} elm - l'élément a rechercher
      * @return {boolean} true si l'élément est présent
      */
-    protected checkvisible(elm) {
+    protected checkvisible(elm):{visible?: boolean, size?: number} {
         const rect = elm.getBoundingClientRect();
         const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
 
         // sauvegarde la la taille visible du footer
-        const height = -(rect.top - viewHeight) + 16;
-        this.setState({ size: height });
+        const height:number = -(rect.top - viewHeight) + 16;
 
-        return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+        return { visible: !(rect.bottom < 0 || rect.top - viewHeight >= 0), size: height };
     }
 
     /**
@@ -197,7 +200,7 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
         const footer = document.getElementById(this.state.footer);
         const notificationSession = document.getElementById(this.state.notificationSession);
 
-        /* récupération de la hauteur du header : le composant ne s'affichera qu'au dela de cette hauteur */
+        // récupération de la hauteur du header : le composant ne s'affichera qu'au dela de cette hauteur
         let height: number = 0;
         if (header) {
             height = header.getBoundingClientRect().height;
@@ -207,17 +210,17 @@ export class TopButton extends HornetComponent<TopButtonProps, any> {
             height += notificationSession.getBoundingClientRect().height;
         }
 
-        /*si le notificationSession est visible, le composant s'affichera au dessus de celui-ci*/
-        let visible: boolean = false;
+        // si le notificationSession est visible, le composant s'affichera au dessus de celui-ci
+        let visibleState: {visible?: boolean, size?: number} = { visible: false };
         if (footer && notificationSession) {
-            visible = this.checkvisible(notificationSession);
+            visibleState = this.checkvisible(notificationSession);
         } else if (footer) {
-            visible = this.checkvisible(footer);
+            visibleState = this.checkvisible(footer);
         }
 
         this.setState({
+            ...visibleState,
             offset: height,
-            visible,
         });
     }
 

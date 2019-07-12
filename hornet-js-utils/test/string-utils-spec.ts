@@ -78,8 +78,9 @@
  * @license CECILL-2.1
  */
 
-import chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import { StringUtils } from "src/string-utils";
 
 describe("StringUtils", () => {

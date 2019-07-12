@@ -73,12 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import * as classNames from "classnames";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -86,21 +86,21 @@ import { HornetComponent } from "src/widget/component/hornet-component";
 import { Tab } from "src/widget/tab/tab";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import * as ReactDOM from "react-dom";
-import KeyboardEvent = __React.KeyboardEvent;
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import {
     ADD_NOTIFICATION_EVENT,
     CLEAN_NOTIFICATION_EVENT,
     CLEAN_ALL_NOTIFICATION_EVENT
 } from "hornet-js-core/src/notification/notification-events";
-import FocusEventHandler = __React.FocusEventHandler;
 import { fireHornetEvent, HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { TabHeader } from "src/widget/tab/tab-header";
 import * as _ from "lodash";
-const logger = Utils.getLogger("hornet-js-react-components.widget.tab.tabs");
+const logger = Logger.getLogger("hornet-js-react-components.widget.tab.tabs");
 
 export const FOCUS_ON_TAB = new HornetEvent<string>("FOCUS_ON_TAB");
 export const TAB_INDEX_NUMBER_ATTRIBUTE = "tabIndexNumber";
+
+import "src/widget/tab/sass/_tabs.scss";
 
 export interface TabsProps extends HornetComponentProps {
     id: string;
@@ -133,8 +133,8 @@ export interface TabsHeaderTechProps extends HornetComponentProps {
     tab: JSX.Element;
     id?: string;
     prefixWithId: Function;
-    handleKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
-    handleFocus: FocusEventHandler<HTMLElement>;
+    handleKeyDown: (event: React.KeyboardEvent<HTMLElement>) => void;
+    handleFocus: React.FocusEventHandler<HTMLElement>;
     castBooleanInNumber: Function;
     selected: boolean;
     isVisible?: boolean;
@@ -178,6 +178,7 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
             tab: true,
             "tab-focused": true,
             fl: true,
+            "li-selected": this.state.selected,
             "badge-selected-items-before-tab": this.state.errors && this.state.errors > 0,
         });
 
@@ -186,7 +187,7 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
         logger.debug("TabsHeaderTech render : ", key);
 
         const liProperties = {
-            style: { ...this.props.style, display: this.state.isVisible ? "block" : "none" },
+            style: { ...this.props.style, display: this.state.isVisible ? "flex" : "none" },
             id: key,
             className: classNameLi,
             role: "presentation",
@@ -329,7 +330,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * @inheritDoc
      */
     componentDidMount() {
-        const domElement = ReactDOM.findDOMNode(this);
+        const domElement:any = ReactDOM.findDOMNode(this) as ParentNode;
 
         if (domElement) {
             const tabViewContentList = domElement.firstElementChild.firstElementChild.children[ 1 ];
@@ -349,10 +350,10 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
 
     componentDidUpdate(prevProps: any, prevState: any, prevContext: any) {
         super.componentDidUpdate(prevProps, prevState, prevContext);
-        const domElement = ReactDOM.findDOMNode(this);
+        const domElement:any = ReactDOM.findDOMNode(this) as ParentNode;
 
         if (domElement) {
-            const tabViewContentList = domElement.firstElementChild.firstElementChild.children[ 1 ];
+            const tabViewContentList = domElement.firstElementChild.firstElementChild.children[ 1 ] as any;
             const tabViewList = tabViewContentList.firstElementChild;
             if (this.state.tabsScroll !== tabViewContentList.clientWidth <= tabViewList.clientWidth) {
                 this.setState({ tabsScroll: tabViewContentList.clientWidth <= tabViewList.clientWidth });
@@ -774,7 +775,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
     }
 
     protected detectScrollRequired() {
-        const domElement = ReactDOM.findDOMNode(this);
+        const domElement:any = ReactDOM.findDOMNode(this) as ParentNode;
         if (domElement) {
             const tabViewContentList = domElement.firstElementChild.firstElementChild.children[ 1 ];
             const tabViewList = tabViewContentList.firstElementChild;
@@ -825,7 +826,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
     showPanel(index, force = false, cb?) {
         if (this.state.beforeSelected !== index || force === true) {
             if (this.state.beforeSelected !== -1) {
-                const tab = _.find(this.elementsTab, { props: { index: this.state.beforeSelected } });
+                const tab:Tab = _.find(this.elementsTab, { props: { index: this.state.beforeSelected } }) as Tab;
                 if (tab && this.props.beforeHideTab) {
                     if (this.props.beforeHideTab(tab, this.state.beforeSelected) === false) {
                         (this.state as any).selectedTabIndex = this.state.beforeSelected;
@@ -841,9 +842,9 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
             this.elementsHeaderTech.map((item) => {
                 item.setState({ selected: false });
             });
-            const tab = _.find(this.elementsTab, { props: { index } });
+            const tab = _.find(this.elementsTab, { props: { index } }) as Tab;
 
-            const header = _.find(this.elementsHeaderTech, { props: { index } });
+            const header = _.find(this.elementsHeaderTech, { props: { index } }) as TabsHeaderTech;
             if (tab) {
                 if (tab.props.onClick) {
                     tab.props.onClick(tab, header, index);
@@ -903,7 +904,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * Gère les évèvenements clavier déclenchés
      * @param e évènement
      */
-    protected handleKeyDown(e: KeyboardEvent<HTMLElement>): void {
+    protected handleKeyDown(e: React.KeyboardEvent<HTMLElement>): void {
         if (!(e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
             const keyCode: number = e.keyCode;
 
@@ -963,7 +964,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * A surcharger éventuellement
      * @param e
      */
-    protected rightArrowKeyDownHandler(e: KeyboardEvent<HTMLElement>): void {
+    protected rightArrowKeyDownHandler(e: React.KeyboardEvent<HTMLElement>): void {
         this.setSelectedTabIndexAndFocus(TabsKeyboardNavigation.NEXT);
 
     }
@@ -972,7 +973,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * A surcharger éventuellement
      * @param e
      */
-    protected leftArrowKeyDownHandler(e: KeyboardEvent<HTMLElement>): void {
+    protected leftArrowKeyDownHandler(e: React.KeyboardEvent<HTMLElement>): void {
         this.setSelectedTabIndexAndFocus(TabsKeyboardNavigation.PREVIOUS);
     }
 
@@ -980,26 +981,26 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * A surcharger éventuellement
      * @param e
      */
-    protected downArrowKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected downArrowKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**
      * A surcharger éventuellement
      * @param e
      */
-    protected upArrowKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected upArrowKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**
      * A surcharger éventuellement
      * @param e
      */
-    protected homeKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected homeKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
         this.setSelectedTabIndexAndFocus(TabsKeyboardNavigation.HOME);
     }
 
     protected setSelectedTabIndexAndFocus(mode: TabsKeyboardNavigation) {
-        if (mode) {
+        if (mode !== null && mode !== undefined) {
             const source = _.findIndex(this.elementsHeaderReact, { props: { index: this.state.selectedTabIndex } });
             const next = this.setSelectedIndexByKeyboard(source, mode);
             (this.state as any).selectedTabIndex = this.elementsHeaderReact[ next ].props.index;
@@ -1012,7 +1013,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * A surcharger éventuellement
      * @param e
      */
-    protected endKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected endKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
         this.setSelectedTabIndexAndFocus(TabsKeyboardNavigation.END);
     }
 
@@ -1020,38 +1021,38 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * A surcharger éventuellement
      * @param e
      */
-    protected pageUpKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected pageUpKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**
      * A surcharger éventuellement
      * @param e
      */
-    protected pageDownKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected pageDownKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**
      * A surcharger éventuellement
      * @param e
      */
-    protected enterKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected enterKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**
      * A surcharger éventuellement
      * @param e
      */
-    protected f2KeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected f2KeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**
      * A surcharger éventuellement
      * @param e
      */
-    protected escapeKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected escapeKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
-    protected tabKeyDownHandler(e: KeyboardEvent<HTMLElement>) {
+    protected tabKeyDownHandler(e: React.KeyboardEvent<HTMLElement>) {
     }
 
     /**

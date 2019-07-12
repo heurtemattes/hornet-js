@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,10 +83,12 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Utils } from "hornet-js-utils";
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
-import { Logger } from "hornet-js-utils/src/logger";
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.language.change-language");
+import { Logger } from "hornet-js-logger/src/logger";
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.language.change-language");
+import KeyboardEvent = React.KeyboardEvent;
 
-import KeyboardEvent = __React.KeyboardEvent;
+import "src/widget/language/sass/_language.scss";
+
 /**
  *
  * Propriétés ChangeLanguage
@@ -167,7 +169,7 @@ export class ChangeLanguage extends HornetComponent<ChangeLanguageProps, any> {
                 id={id}
                 title={this.state.switchTitle}
                 items={dropdownItems}
-                icon="language-arrow-down"
+                icon="carretDown"
                 position={this.props.position}
                 valueCurrent={this.state.currentLanguage.toUpperCase()}
             />

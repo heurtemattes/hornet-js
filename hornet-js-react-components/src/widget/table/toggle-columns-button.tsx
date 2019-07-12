@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,11 +84,13 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
 import { CheckBox } from "src/widget/form/checkbox";
 import { fireHornetEvent, HornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { ColumnState } from "hornet-js-react-components/src/widget/table/column";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { ColumnState } from "src/widget/table/column";
+import { Logger } from "hornet-js-logger/src/logger";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.toggle-columns-button");
+import "src/widget/dropdown/sass/_dropdown.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.toggle-columns-button");
 
 const SELECTALL_KEYCOLUMN: string = "selectAll";
 
@@ -162,7 +164,7 @@ export class ToggleColumnsButton extends HornetComponent<ToggleColumnsButtonProp
         return (
             <Dropdown
                 id="table-settings"
-                icon="ico-table-settings-white"
+                icon="cog"
                 items={this.configureDropDownItems()}
                 position={Position.BOTTOMRIGHT}
                 closeClick={false}

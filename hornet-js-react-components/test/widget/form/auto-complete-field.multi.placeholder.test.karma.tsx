@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,7 @@ import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 import { Form } from "src/widget/form/form";
 import { AutoCompleteMultiField } from "src/widget/form/auto-complete-multi-field";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import * as React from "react";
 
 @Decorators.describe("Test Karma AutoCompleteMultiField placeholder")

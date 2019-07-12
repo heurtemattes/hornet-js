@@ -73,22 +73,22 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Utils } from "hornet-js-utils";
-import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
-import KeyboardEvent = __React.KeyboardEvent;
 import { UserInformations } from "hornet-js-utils/src/authentication-utils";
-import { Logger } from "hornet-js-utils/src/logger";
 
-const logger: Logger = Utils.getLogger("hornet-js-component.widget.user.user");
+import "src/widget/user/sass/_user.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-component.widget.user.user");
 /**
  * Propriétés User
  */
@@ -171,7 +171,7 @@ export class User<UserProps, S> extends HornetComponent<any, any> {
                 <Dropdown
                     items={[ { label: this.state.text, url: this.state.url, className: "link" } ]}
                     title={this.state.title}
-                    icon="picto-user"
+                    icon="account"
                     className="profil-content"
                     id={this.props.id || "dropdown-user" + "-drop"}
                     label={this.state.login.toUpperCase()}

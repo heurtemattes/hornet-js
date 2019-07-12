@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,20 +81,22 @@ import * as React from "react";
 import * as assert from "assert";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { Form } from "hornet-js-react-components/src/widget/form/form";
-import { Row } from "hornet-js-react-components/src/widget/form/row";
-import { InputField } from "hornet-js-react-components/src/widget/form/input-field";
-import { Accordions } from "hornet-js-react-components/src/widget/accordion/accordions";
-import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
-import { ButtonsArea } from "hornet-js-react-components/src/widget/form/buttons-area";
-import { Button } from "hornet-js-react-components/src/widget/button/button";
-import { Notification } from "hornet-js-react-components/src/widget/notification/notification";
+import { Form } from "src/widget/form/form";
+import { Row } from "src/widget/form/row";
+import { InputField } from "src/widget/form/input-field";
+import { Accordions } from "src/widget/accordion/accordions";
+import { Accordion } from "src/widget/accordion/accordion";
+import { ButtonsArea } from "src/widget/form/buttons-area";
+import { Button } from "src/widget/button/button";
+import { Notification } from "src/widget/notification/notification";
 
-import * as schema from "test/widget/notification/validation1.json";
-import * as schema2 from "test/widget/notification/validation2.json";
+const schema = require("test/widget/notification/validation1.json");
+const schema2 = require("test/widget/notification/validation2.json");
 
 let formElement: JSX.Element;
 let renderedElement;
@@ -105,10 +107,11 @@ let renderedElement;
  */
 @Decorators.describe("Test Karma Notification form")
 class NotificationFormDispatchingTest extends HornetReactTest {
-
+    protected id;
 
     @Decorators.before
     before() {
+        this.id = this.generateMainId();
         formElement = (
             <div>
                 <Notification id="myNotificationSpot1" />
@@ -116,7 +119,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
                 {this.generateAccordionsIntoForm2()}
             </div>
         );
-        renderedElement = this.renderIntoDocument(formElement, "main1");
+        renderedElement = this.renderIntoDocument(formElement, this.id);
     };
 
     /**
@@ -236,7 +239,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
      */
     @Decorators.it("Valider formulaire 1")
     validerForm1() {
-        this.triggerMouseEvent(document.querySelector("#main1 #envoi-form1"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} #envoi-form1`), "click");
         setTimeout(() => {
             let element = this.getNotificationMessageListForm("myNotificationSpot1", "error-message-list");
             HornetTestAssert.assertEquals(5, element.length, "La zone de notification doit contenir 5 messages d'erreur");
@@ -253,7 +256,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
      */
     @Decorators.it("Valider formulaire 2")
     validerForm2() {
-        this.triggerMouseEvent(document.querySelector("#main1 #envoi-form2"), "click");
+        this.triggerMouseEvent(document.querySelector(`#${this.id} #envoi-form2`), "click");
         setTimeout(() => {
             let element = this.getNotificationMessageListForm("myNotificationSpot1", "error-message-list");
             HornetTestAssert.assertEquals(1, element.length, "La zone de notification doit contenir 1 messages d'erreur");

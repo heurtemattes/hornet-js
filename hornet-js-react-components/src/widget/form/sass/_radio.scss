@@ -1,0 +1,81 @@
+@import '../../sass/core';
+
+$formCheckboxChecked: theme-color($variant: 'primary');
+$formSwitchLabel: theme-color($variant: 'states');
+$radioLabelDisabled: rgba(147, 147, 147, 1); //#939393
+$radioLabelCheckDisabled: rgba(122, 122, 122, 1); //#7a7a7a
+$selectedFieldBorder: rgba(174, 174, 174, 1); //#aeaeae
+$radioBaseColor: theme-color('global', 'white');
+
+.radio {
+    list-style: none;
+    padding-left: 0;
+}
+
+.radio-inline {
+    padding-left: 1em;
+
+    label {
+        margin-top: 0.3em;
+    }
+}
+
+.radio-label {
+    display: inline-block;
+    line-height: 1.250em;
+    cursor: pointer;
+
+    .outer {
+        @include smoothTransition(all, 0.3s);
+    }
+    
+    input {
+        height: 0.063em;
+        width: 0.063em;
+        opacity: 0;
+
+        &:checked~.outer {
+            transform: scale(1);
+            opacity: 1;
+            border: 0.35em solid $formCheckboxChecked;
+        }
+
+        &:focus~.outer {
+            outline: 1px solid $formSwitchLabel;
+        }
+
+        &:disabled~.outer {
+            border: 0.160em solid $radioLabelDisabled;
+        }
+
+        &:disabled:checked~.outer {
+            border: 0.4em solid $radioLabelCheckDisabled;
+        }
+    }
+
+    .outer {
+        float: left;
+        display: block;
+        height: 1.250em;
+        width: 1.250em;
+        margin: 0 0.563em 0.625em 0.625em;
+        border: 0.160em solid $selectedFieldBorder;
+        border-radius: 50%;        
+        background: $radioBaseColor;
+    }
+
+    .has-error {
+        border-color: $globalErrorColor;
+        background-color: $globalErrorBg;
+    }
+}
+
+.abstractfield-container {
+    .readonly {
+        label {
+            .radio-label {
+                cursor: default;
+            }
+        }
+    }
+}

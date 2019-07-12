@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import * as events from "events";
 import { CellCoordinates } from "src/widget/table/column/cell/cell-coordinates";
 import * as _ from "lodash";
-import { ColumnState } from "hornet-js-react-components/src/widget/table/column";
+import { ColumnState } from "src/widget/table/column";
 
 export class TableState extends events.EventEmitter {
 

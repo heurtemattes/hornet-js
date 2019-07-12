@@ -73,14 +73,15 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
+import { Logger } from "hornet-js-logger/src/logger";
+
 import * as _ from "lodash";
 import * as superagent from "superagent";
 import { Response } from "superagent";
@@ -88,29 +89,28 @@ import {
     HornetRequest, HornetSuperAgentRequest, SpinnerType, ResultDispositionType, ErrorManagementType, ResponseManagementType,
 } from "src/services/hornet-superagent-request";
 import { ClientSessionTimeout } from "src/session/client-session-configuration";
-import { ServiceEvent } from "hornet-js-core/src/event/hornet-event";
-import * as superAgentPlugins from "hornet-js-core/src/services/superagent-hornet-plugins";
-import { IHornetComponentAsync } from "hornet-js-components/src/component/ihornet-component";
+import { ServiceEvent } from "src/event/hornet-event";
+import * as superAgentPlugins from "src/services/superagent-hornet-plugins";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import { MediaTypes } from "hornet-js-core/src/protocol/media-type";
-import { BackendApiResult, NodeApiResult, BackendApiError, NodeApiError } from "hornet-js-core/src/services/service-api-results";
-import { manageError } from "hornet-js-core/src/component/error-manager";
+import { MediaTypes } from "src/protocol/media-type";
+import { BackendApiResult, NodeApiResult, BackendApiError, NodeApiError } from "src/services/service-api-results";
+import { manageError } from "src/component/error-manager";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { BusinessError } from "hornet-js-utils/src/exception/business-error";
-import { HornetCache } from "hornet-js-core/src/cache/hornet-cache";
-import { HornetPlugin } from "hornet-js-core/src/services/superagent-hornet-plugins";
+import { HornetCache } from "src/cache/hornet-cache";
+import { HornetPlugin } from "src/services/superagent-hornet-plugins";
 import { HornetEvent } from "src/event/hornet-event";
 import { fireHornetEvent } from "src/event/hornet-event";
 import { ClientConfiguration } from "src/client-conf";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 import { HttpError } from "hornet-js-utils/src/exception/http-error";
-const logger: Logger = Utils.getLogger("hornet-js-core.services.hornet-agent");
 
 import { Promise } from "hornet-js-utils/src/promise-api";
-import { AppSharedProps } from "hornet-js-utils/src/app-shared-props";
 
 import { Timer } from "src/timers/timer";
 import { DispositionType } from "src/result/disposition-type";
+
+const logger: Logger = Logger.getLogger("hornet-js-core.services.hornet-agent");
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // wrap http & https afin de sécuriser l'utilisation de "continuation-local-storage" (perte ou mix de contexte) //

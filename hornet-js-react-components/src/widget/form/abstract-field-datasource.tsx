@@ -73,28 +73,26 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
 import * as React from "react";
-
 
 import { AbstractField, AbstractFieldProps } from "src/widget/form/abstract-field";
 import {
     IHornetComponentDatasource,
     IHornetComponentAsync,
 } from "hornet-js-components/src/component/ihornet-component";
-import { HornetComponent, HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
+import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { SpinnerComponentInput } from "src/widget/spinner/spinner-component-input";
 import { SpinnerProps } from "src/widget/spinner/spinner-component";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.abstract-field-datasource");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.abstract-field-datasource");
 
 /**
  * Représente un champ de formulaire qui possède un datasource

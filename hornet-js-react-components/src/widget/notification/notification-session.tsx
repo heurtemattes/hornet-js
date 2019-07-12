@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Utils } from "hornet-js-utils";
-import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
+import { HornetComponent } from "src/widget/component/hornet-component";
 import { SESSION_REFRESHED_NOTIFICATION_EVENT, SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT, SESSION_WILL_EXPIRE_NOTIFICATION_EVENT, SessionEvent } from "hornet-js-core/src/services/hornet-superagent";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-session");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.notification.notification-session");
 const notifyDesktop = (message: string) => {
     logger.debug("notifyBesktop");
     // le navigateur supporte les notifications

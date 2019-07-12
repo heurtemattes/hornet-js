@@ -311,6 +311,7 @@
       "ERR_TECH_10013": "Sequelize - Erreur de validation - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10014": "Sequelize - Unique Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10015": "Sequelize - Erreur de base de données - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10020": "Sequelize - Erreur de base de données - Une erreur de version est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10301": "Datasource - Fetch Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10302": "Datasource - Erreur de tri - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10303": "Datasource - Erreur de filtre - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
@@ -334,3 +335,4 @@
     }
   }
 }
+

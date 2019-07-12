@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,9 +94,7 @@ if (typeof Promise === "undefined") {
 // cette surcharge est destinée à disparaitre lorsque les hornet-js-bean-converteurs seront créés
 Date.prototype.toJSON = function () { return this.getTime(); };
 
-
 import { Register } from "src/common-register";
-import { Logger } from "src/logger";
 import { DateUtils } from "src/date-utils";
 import { ConfigLib } from "src/config-lib";
 import { AppSharedProps } from "src/app-shared-props";
@@ -105,7 +103,6 @@ import * as _ from "lodash";
 
 export class Utils {
     static isServer: boolean = Register.isServer;
-    static getLogger: (category: any, buildLoggerFn?: (category: string) => void) => Logger = Register.getLogger;
 
     static dateUtils = DateUtils;
 
@@ -113,7 +110,6 @@ export class Utils {
     protected static _config: ConfigLib;
     protected static _contextPath: string;
 
-    static log4js: any;
     static notify: (nid, errors, infos?) => void;
 
     static registerGlobal<T>(paramName: string, value: T): T {
@@ -233,6 +229,15 @@ export class Utils {
     }
 
     /**
+     * Fonction retournant l'indicateur d'existance du continuationlocalstorage hornet ou un storage applicatif
+     * @param localStorageName Nom du localStorage, par défaut HornetContinuationLocalStorage
+     * @return {boolean}
+     */
+    static hasCls(localStorageName?: string): any {
+        return ContinuationLocalStorage.hasContinuationStorage(localStorageName);
+    }
+
+    /**
      * Fonction retournant la valeur associée à la key du CLS.
      * @param key: clé de la valeur à retourner
      * @param localStorageName: Nom du localStorage, par défaut HornetContinuationLocalStorage
@@ -298,8 +303,4 @@ if (Utils.isServer) {
     const config: ConfigLib = new ConfigLib();
     config.loadServerConfigs();
     Utils.config = Utils.registerGlobal("config", config);
-}
-
-if (!Utils.isServer) {
-    Utils.log4js = Utils.registerGlobal("log4js", require("src/extended/log4js"));
 }

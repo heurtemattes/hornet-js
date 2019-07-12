@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,8 +85,8 @@ import { DatasourceSortOption } from "src/component/datasource/options/datasourc
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import { Utils } from "hornet-js-utils";
 import { StringUtils } from "hornet-js-utils/src/string-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-const logger: Logger = Utils.getLogger("hornet-js-core.component.datasource.options.datasource-option");
+import { Logger } from "hornet-js-logger/src/logger";
+const logger: Logger = Logger.getLogger("hornet-js-core.component.datasource.options.datasource-option");
 
 export interface DataSourceOption {
     sendToFetch(): boolean;
@@ -148,8 +148,8 @@ export class DefaultSort implements DatasourceSortOption {
             let result: number;
             sortDatas.every((sortData) => {
 
-                let aValue = a[ sortData[ "key" ] ];
-                let bValue = b[ sortData[ "key" ] ];
+                let aValue = (a[ sortData[ "key" ] ] == null) ? "" : a[ sortData[ "key" ] ];
+                let bValue = (b[ sortData[ "key" ] ] == null) ? "" : b[ sortData[ "key" ] ];
 
                 if (aValue < bValue) {
                     result = (sortData.dir == SortDirection.ASC) ? -1 : 1;

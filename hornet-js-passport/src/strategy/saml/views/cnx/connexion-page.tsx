@@ -73,22 +73,20 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { ButtonsArea } from "hornet-js-react-components/src/widget/form/buttons-area";
-import * as _ from "lodash";
-
+import assign = require("lodash.assign");
 import { styleCSS } from "src/strategy/saml/views/cnx/thumbnail-css";
 
-const logger: Logger = Utils.getLogger("hornet-js-passport.strategy.saml.views.connexion-page");
+const logger: Logger = Logger.getLogger("hornet-js-passport.strategy.saml.views.connexion-page");
 
 export interface ConnexionSAMLPageProps extends HornetComponentProps {
     errorMessage?: any;
@@ -96,7 +94,6 @@ export interface ConnexionSAMLPageProps extends HornetComponentProps {
     staticUrl?: string;
     idps?: any;
     appTheme?: string;
-    fwkTheme?: string;
 }
 
 /**
@@ -104,18 +101,16 @@ export interface ConnexionSAMLPageProps extends HornetComponentProps {
  */
 export class ConnexionPage extends HornetComponent<ConnexionSAMLPageProps, any> {
 
-    static defaultProps = {
-        appTheme: "/css/theme.css",
-        fwkTheme: process.env.NODE_ENV === "production" ? "/css/theme-min.css" : "/css/theme.css",
-    };
+    public readonly props: Readonly<ConnexionSAMLPageProps>;
+    public readonly state: any;
 
     _renderErrorDiv() {
-        const urlImgError = this.genUrlStatic("/img/error.gif");
+        const urlImgError = this.genUrlStatic("/theme/img/error.gif");
 
-        if (_.isArray(this.state.errorMessage) && this.state.errorMessage.length >= 1) {
+        if (Array.isArray(this.state.errorMessage) && this.state.errorMessage.length >= 1) {
             return (
                 <div className="errors" id="status">
-                    <img src={this.props.staticUrl + "/img/error.gif"} alt="Erreur : " />
+                    <img src={this.props.staticUrl + "/theme/img/error.gif"} alt="Erreur : " />
                     <span>{this.state.errorMessage}</span>
                 </div>
             );
@@ -130,19 +125,18 @@ export class ConnexionPage extends HornetComponent<ConnexionSAMLPageProps, any> 
     render(): JSX.Element {
         logger.trace("VIEW ConnexionPage SAML render ");
 
-        const h1Style = _.assign(styleCSS.tac, styleCSS.bgColorMain);
+        const h1Style = assign(styleCSS.tac, styleCSS.bgColorMain);
 
         const headerStyle = styleCSS.header;
 
         return (
             <html lang="fr">
                 <head>
-                    <title>{"Authentification SAML"}</title>
+                    <title>{"Authentification SAML"}</title> 
                     <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
                     <link rel="icon" type="image/png" href={this.genUrlStatic("/img/logoHornet.png")} />
-                    <link rel="stylesheet" type="text/css" href={this.genUrlStatic("/css/auth.css")} />
-                    <link rel="stylesheet" type="text/css" href={ConnexionPage.genUrlTheme(this.props.fwkTheme)} />
-                    <link rel="stylesheet" type="text/css" href={this.genUrlStatic(this.props.appTheme)} />
+                    <link rel="stylesheet" type="text/css" href={this.genUrlStatic("/theme/css/auth.css")} />
+                    <link rel="stylesheet" type="text/css" href={this.genUrlStatic("/theme/css/main.css")} />
                 </head>
                 <body id="auth">
                     <div id="app">

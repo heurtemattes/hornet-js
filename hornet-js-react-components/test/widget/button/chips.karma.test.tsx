@@ -73,24 +73,24 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+
 Utils.setConfigObj({});
 
 import { Chips } from "src/widget/button/chips";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
-const logger: Logger = Utils.getLogger("user.test.karma");
 
 @Decorators.describe("Test Karma Chips")
 class ChipsTest extends HornetReactTest {

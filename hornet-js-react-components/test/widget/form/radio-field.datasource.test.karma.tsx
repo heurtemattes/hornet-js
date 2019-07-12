@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,8 +82,12 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-var chai = require('chai');
-const expect = chai.expect;
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import * as assert from "assert";
 
@@ -143,8 +147,9 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 1 avec datasource sans valeur par défaut")
     testRadioField1() {
+        const id = this.generateMainId();
         element = (
-            <div id="main1">
+            <div id={id}>
                 <Form id="testForm-1">
                     <RadiosField
                         name="exampleRadio-1"
@@ -159,7 +164,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main1");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-1-client");
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Client n'a pas bien été généré");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-1-client ne doit pas être sélectionné");
@@ -171,8 +176,9 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 2 avec datasource avec valeur par défaut premier item")
     testRadioField2() {
+        const id = this.generateMainId();
         element = (
-            <div id="main2">
+            <div id={id}>
                 <Form id="testForm-2">
                     <RadiosField
                         name="exampleRadio-2"
@@ -186,7 +192,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main2");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-2-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-2-client doit être sélectionné");
@@ -198,8 +204,9 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 3 avec datasource avec valeur par défaut premier item")
     testRadioField3() {
+        const id = this.generateMainId();
         element = (
-            <div id="main3">
+            <div id={id}>
                 <Form id="testForm-3">
                     <RadiosField
                         name="exampleRadio-3"
@@ -215,7 +222,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main3");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-3-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-3-client doit être sélectionné");
@@ -227,8 +234,9 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 4 avec datasource avec valeur par défaut deuxième item")
     testRadioField4() {
+        const id = this.generateMainId();
         element = (
-            <div id="main4">
+            <div id={id}>
                 <Form id="testForm-4">
                     <RadiosField
                         name="exampleRadio-4"
@@ -244,7 +252,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main4");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-4-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-4-client ne doit pas être sélectionné");
@@ -257,8 +265,9 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 5 avec datasource avec valeur par défaut deuxième item et gestion click")
     testRadioField5() {
+        const id = this.generateMainId();
         element = (
-            <div id="main5">
+            <div id={id}>
                 <Form id={"testForm-5"}>
                     <RadiosField
                         name="exampleRadio-5"
@@ -274,7 +283,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main5");
+        $element = this.renderIntoDocument(element, id);
 
         let htmlElement = document.getElementById("exampleRadio-5-fournisseur");
         this.triggerMouseEvent(document.getElementById("exampleRadio-5-client"), "click");
@@ -292,9 +301,10 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 6 avec datasource avec valeur par défaut premier item")
     testRadioField6() {
+        const id = this.generateMainId();
         this.dataSource6.select(this.dataSet[ 0 ]);
         element = (
-            <div id="main6">
+            <div id={id}>
                 <Form id="testForm-6">
                     <RadiosField
                         name="exampleRadio-6"
@@ -309,7 +319,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main6");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-6-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-6-client doit être sélectionné");
@@ -321,9 +331,10 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 7 avec datasource avec valeur par défaut deuxième item")
     testRadioField7() {
+        const id = this.generateMainId();
         this.dataSource7.select(this.dataSet[ 1 ]);
         element = (
-            <div id="main7">
+            <div id={id}>
                 <Form id="testForm-7">
                     <RadiosField
                         name="exampleRadio-7"
@@ -338,7 +349,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main7");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-7-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-7-fournisseur doit être sélectionné");
@@ -357,9 +368,10 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 8 avec datasource avec valeur par défaut deuxième item")
     testRadioField8() {
+        const id = this.generateMainId();
         this.dataSource8.select(this.dataSet[ 1 ]);
         element = (
-            <div id="main8">
+            <div id={id}>
                 <Form id="testForm-8">
                     <RadiosField
                         name="exampleRadio-8"
@@ -372,7 +384,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main8");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-8-fournisseur");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Fournisseur non trouvé");
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-8-fournisseur doit être sélectionné");
@@ -391,9 +403,10 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 9 avec datasource ayant 2 éléments avec récupération de valeur depuis getCurrentValue")
     testRadioField9() {
+        const id = this.generateMainId();
         this.dataSource9.select(this.dataSet[ 1 ]);
         element = (
-            <div id="main9">
+            <div id={id}>
                 <Form id="testForm-9">
                     <RadiosField
                         name="exampleRadio-9"
@@ -408,7 +421,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main9");
+        $element = this.renderIntoDocument(element, id);
         const htmlElement = document.getElementById("exampleRadio-9-client");
         this.triggerMouseEvent(document.getElementById("exampleRadio-9-client"), "click");
         setTimeout(() => {
@@ -420,9 +433,10 @@ class RadioFieldDataSourceTest extends BaseTest {
 
     @Decorators.it("Test radiofields 10 avec datasource ayant 3 éléments avec récupération de valeur depuis getCurrentValue")
     testRadioField10() {
+        const id = this.generateMainId();
         this.dataSource10.select(this.dataSet2[ 2 ]);
         element = (
-            <div id="main9">
+            <div id={id}>
                 <Form id="testForm-10">
                     <RadiosField
                         name="exampleRadio-10"
@@ -437,7 +451,7 @@ class RadioFieldDataSourceTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main10");
+        $element = this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-10-autre");
         this.triggerMouseEvent(document.getElementById("exampleRadio-10-autre"), "click");
         setTimeout(() => {

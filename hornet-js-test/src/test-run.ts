@@ -73,17 +73,17 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Annotations as annotes } from "hornet-js-test/src/decorators";
+import { Annotations as annotes } from "src/decorators";
 
-var Logger = require("hornet-js-utils/src/logger");
-import { TestLogger } from "hornet-js-test/src/test-logger";
+var Logger = require("hornet-js-logger/src/logger");
+import { TestLogger } from "src/test-logger";
 
 Logger.Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "disableClustering": true,
@@ -100,10 +100,6 @@ Logger.Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
         "default": { "appenders": [ "console" ], "level": "INFO" }
     }
 });
-
-import { Utils } from "hornet-js-utils";
-
-Utils.getLogger = Logger.Logger.getLogger;
 
 if (typeof window !== "undefined") {
     window.addEventListener("unhandledrejection", function (e) {
@@ -162,6 +158,7 @@ export function runTest(suite, filename?: string) {
     let { beforeFunc, beforeEachFunc, afterFunc, testName, testAsyncName, testThrowAsyncName, testXit } = annotations;
 
     describe((filename && filename + " : " + suiteName) || suiteName, () => {
+       
         before(function () {
             if (typeof document !== "undefined") {
                 let lista = document.body.childNodes;
@@ -190,11 +187,11 @@ export function runTest(suite, filename?: string) {
                 suite.catchAsyncThrow(_done);
                 if (typeof window !== "undefined") {
                     document.body.setAttribute("style", "padding:10px");
-                    let fntError: ErrorEventHandler = window.onerror;
+                    let fntError: OnErrorEventHandler = window.onerror;
                     window.onerror = (errMsg, url, line, lline, err) => {
                         console.log(errMsg, url, line, lline);
                         window.onerror = fntError;
-                        gestureErr(test, _done, err)
+                        gestureErr(test, _done, err);
                     };
                     count++;
                     let h2 = document.createElement("h2");
@@ -214,7 +211,7 @@ export function runTest(suite, filename?: string) {
                     gestureErr(test, _done, err)
                 }
             }
-            it(test.testName[ 0 ], fnt.bind(suite))
+            it(test.testName[0], fnt.bind(suite));
         });
     });
 }

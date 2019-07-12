@@ -73,12 +73,15 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
+import { TestLogger } from "hornet-js-test/src/test-logger";
+import { Logger } from "hornet-js-logger/src/logger";
+Logger.prototype.buildLogger = TestLogger.getLoggerBuilder();
 import { ServiceRequest } from "src/services/service-request";
 import { ConfigLib } from "hornet-js-utils/src/config-lib";
 import * as express from "express";
@@ -88,6 +91,7 @@ import { NodeApiResultBuilder } from "src/services/service-api-results";
 import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 import { HornetRequest, ErrorManagementType, ResponseManagementType } from "src/services/hornet-superagent-request";
 import { Request, Response, SuperAgentRequest } from "superagent";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 const expect = TestUtils.chai.expect;
 const assert = TestUtils.chai.assert;
@@ -140,7 +144,6 @@ describe("service-api-spec", () => {
         _app.use(bodyParser.json()); // to support JSON-encoded bodies
 
         _app.post("/service-api-spec-service/ok", function (req, res) {
-            console.debug("/ok");
             res.json({
                 message: "Reçu : " + req.body.data,
                 date: new Date()
@@ -148,21 +151,18 @@ describe("service-api-spec", () => {
         });
 
         _app.get("/service-api-spec-service/cache-test", function (req, res) {
-            console.debug("/ok");
             res.json({
                 date: new Date()
             });
         });
 
         _app.post("/service-api-spec-service/cache-test", function (req, res) {
-            console.debug("reset cache for cache-test");
             res.json({
                 date: new Date()
             });
         });
 
         _app.post("/service-api-spec-service/ko", function (req, res) {
-            console.debug("/ko");
             res.status(500).json({
                 message: "Retour d'une erreur : " + req.body.data,
             });
@@ -185,7 +185,6 @@ describe("service-api-spec", () => {
             res.end();
         });
         _app.get("/service-api-spec-service/query", function (req, res) {
-            console.debug(req);
             _app.callCount += 1;
             res.json({
                 query: req.query || 10,
@@ -233,10 +232,8 @@ describe("service-api-spec", () => {
 
 
         service.sending({ data: "ok" }).then((result: any) => {
-            console.debug("result (should resolve):", result);
             expect(result).to.exist;
             expect(result.message).to.be.equal("Reçu : ok");
-            console.debug("FIN");
             dateCache = result.date;
             done();
         });
@@ -271,7 +268,6 @@ describe("service-api-spec", () => {
             done(new Error("Expected error, result got instead"));
         })
         .catch((error) => {
-            console.debug("error:", error);
             expect(error.args.message).to.be.equal("Retour d\'une erreur : ko");
             done();
         });
@@ -293,7 +289,6 @@ describe("service-api-spec", () => {
         const service = new MyService();
         service.sendingUrlQuery("get", "/query", { testquery: "query" })
         .then((result: any) => {
-            console.debug(result);
             expect(result).to.exist;
             expect(result.query).to.exist;
             expect(result.query.testquery).to.be.equal("query");
@@ -308,7 +303,6 @@ describe("service-api-spec", () => {
         const service = new MyService();
         service.sendingUrlQuery("get", "/query", { testquery: "query" })
         .then((result: any) => {
-            console.debug(result);
             expect(result).to.exist;
             expect(result.headers).to.exist;
             expect(result.headers.custom).to.be.equal("customValue");
@@ -325,7 +319,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, hooks: {beforeRequest: (su: SuperAgentRequest, hr: HornetRequest) => {su.query({ testquery: "queryhook" })}}})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.query).to.exist;
                 expect(result.query.testquery).to.be.equal("queryhook");
@@ -340,7 +333,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, hooks: {afterInit: (su: SuperAgentRequest, hr: HornetRequest) => {su.query({ testquery: "queryhook" })}}})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.query).to.exist;
                 expect(result.query.testquery).to.be.equal("queryhook");
@@ -355,7 +347,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, hooks: {afterRequestSuccess: (res: Response, hr: HornetRequest) => {return {hook: "afterRequestSuccess"}}}})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.hook).to.exist;
                 expect(result.hook).to.be.equal("afterRequestSuccess");
@@ -373,7 +364,6 @@ describe("service-api-spec", () => {
                 done(new Error("Expected error, result got instead"));
             })
             .catch((error) => {
-                console.debug(error);
                 expect(error.message).to.be.equal("test afterRequestError");
                 done();
             });
@@ -386,7 +376,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.None})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.query).to.exist;
                 expect(result.query.testquery).to.be.equal("query");
@@ -401,7 +390,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.All})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.body).to.exist;
                 expect(result.body.query.testquery).to.be.equal("query");
@@ -416,7 +404,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.Error})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.query).to.exist;
                 expect(result.query.testquery).to.be.equal("query");
@@ -432,7 +419,6 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.OK})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.body).to.exist;
                 expect(result.body.query.testquery).to.be.equal("query");
@@ -450,7 +436,6 @@ describe("service-api-spec", () => {
                 done(new Error("Expected error, result got instead"));
             })
             .catch((error) => {
-                console.debug(error);
                 expect(error.code).to.be.equal("ERR_HORNET_HTTP");
                 done();
             });
@@ -463,7 +448,6 @@ describe("service-api-spec", () => {
                 done(new Error("Expected error, result got instead"));
             })
             .catch((error) => {
-                console.debug(error);
                 expect(error.body.message).to.be.equal("Retour d\'une erreur : ko");
                 done();
             });
@@ -476,14 +460,12 @@ describe("service-api-spec", () => {
             const service = new MyService();
             service.sendingQuery("/query", { url: "/query", timeToLiveInCache: 60})
             .then((result: any) => {
-                console.debug(result);
                 expect(result).to.exist;
                 expect(result.callCount).to.exist;
                 expect(result.callCount).to.be.equal(10);
                 //done();
                 return service.sendingQuery("/query", { url: "/query", timeToLiveInCache: 60})
                 .then((result: any) => {
-                    console.debug(result);
                     expect(result).to.exist;
                     expect(result.callCount).to.exist;
                     expect(result.callCount).to.be.equal(10);

@@ -1,0 +1,121 @@
+@import '../../sass/core';
+
+$modalBaseColor: theme-color('global', 'white');
+$modalheaderBg: theme-color($variant: 'secondary');
+$modalContentTitle: theme-color('global', 'blueTitles');
+$modalCloseFocus: rgba(4, 76, 160, 1); //#044ca0
+
+.widget-alert-body {
+    padding: 0.5em 0.5em 1em 0.5em;
+}
+
+.dialogue-border-reset {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.widget-dialogue-header {
+    padding: 0 0.625em;
+    color: $modalBaseColor;
+    background: $modalheaderBg;
+    font-size: 120%;
+    line-height: 2;
+    box-shadow: 0 0.3125em 0.625em $buttonBoxShadow;
+    border: 0.0625em solid $buttonBoxShadow;
+    border-radius: 0.3125em;
+
+    .widget-dialogue-title {
+        h1 {
+            font-size: 0.9em;
+        }
+    }
+}
+
+.widget-dialogue-body {
+    position: relative;
+    box-sizing: border-box;
+    padding: 0.5em;
+    max-height: 30em;
+    box-shadow: 0 0.3125em 0.625em $buttonBoxShadow;
+    background: $modalBaseColor;
+    border: 0.0625em solid $buttonBoxShadow;
+    border-radius: 0 0 0.3125em 0.3125em;
+    outline: none;
+    line-height: 1.428571429;
+}
+
+#dialogue-body-content {
+    h1 {
+        color: $modalContentTitle;
+    }
+    .tooltip{
+        position: relative;
+    }
+}
+
+.content-modal-body {
+    overflow: auto;
+    max-height: 28em;
+}
+
+.widget-dialogue-close {
+    position: absolute;
+    top: .125em;
+    right: 0.0625em;
+}
+
+.modal-overflow-y {
+    overflow-y: auto;
+}
+
+.widget-dialogue-footer {
+    padding: 0.1875em;
+    text-align: right;
+}
+
+.widget-dialogue-close {
+    .hornet-dialogue-croix {
+        box-shadow: none;
+    }
+}
+
+.hornet-button.hornet-dialogue-croix {
+    margin-right: 0;
+    
+    &:focus {
+        color: $modalCloseFocus !important;
+        background: none repeat scroll 0 0 $modalBaseColor;
+        font-weight: 400;
+    }
+}
+
+.widget-spinner-body {
+    padding: 5em;
+    text-align: center;
+}
+
+.widget-spinner-content {
+    padding-bottom: 1.25em;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 200%;
+}
+
+.react-draggable {
+    transform: translate(-50%, -50%);
+}
+
+.react-draggable-cursor {
+    cursor: move;
+}
+
+.widget-shortcuts-content {
+    padding-right: 1em;
+}
+
+div[role=alertdialog] {
+    z-index: 5;
+}
+
+.dialog-content-alert {
+    position: absolute !important;
+}

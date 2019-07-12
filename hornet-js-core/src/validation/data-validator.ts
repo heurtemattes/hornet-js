@@ -73,12 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-var Ajv = require("ajv");
+import * as ajv from "ajv";
+import * as _ from "lodash";
 
 /**
  *  Propriétés d'une classe de validation customisée d'un formulaire
@@ -115,8 +116,6 @@ export class DataValidator {
      * chaînes de caractères au format ISO 8601)
      */
     static DEFAULT_VALIDATION_OPTIONS: ajv.Options = {
-        /* Activation des mots clé json-schema v5 (https://github.com/json-schema/json-schema/wiki/v5-Proposals) */
-        v5: true,
         /* Valide tous les champs : ne s'arrête pas à la première erreur */
         allErrors: true,
         /* Convertit les chaînes de caractères vers le type indiqué dans le schéma de validation */
@@ -157,9 +156,9 @@ export class DataValidator {
             errors: []
         };
         if (this.schema) {
-            let ajvInstance: ajv.Ajv = Ajv(this.options);
+            let ajvInstance: ajv.Ajv = ajv(this.options);
             require('ajv-keywords')(ajvInstance);
-            result.valid = ajvInstance.validate(this.schema, data);
+            result.valid = ajvInstance.validate(this.schema, data) as boolean;
             result.errors = ajvInstance.errors || [];
         }
 

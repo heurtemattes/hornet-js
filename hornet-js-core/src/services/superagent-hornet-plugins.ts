@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,14 +81,13 @@
 import { Utils } from "hornet-js-utils";
 import { HornetSuperAgentRequest } from "src/services/hornet-superagent-request";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
+import { Logger } from "hornet-js-logger/src/logger";
 
-
-const logger = Utils.getLogger("hornet-js-core.services.superagent-hornet-plugins");
+const logger = Logger.getLogger("hornet-js-core.services.superagent-hornet-plugins");
 const browser = require("detect-browser");
 
 const HEADER_CSRF_NAME: string = "x-csrf-token";
 const HEADER_LOGIN_PAGE: string = "x-is-login-page";
-
 
 export abstract class HornetPlugin {
     static getPlugin(...args): (request: HornetSuperAgentRequest) => void {

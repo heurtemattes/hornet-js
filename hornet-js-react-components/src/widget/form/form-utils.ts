@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,6 +83,7 @@ import { NotificationType, Notifications } from "hornet-js-core/src/notification
 import { UploadedFile } from "hornet-js-core/src/data/file";
 
 import * as _ from "lodash";
+import * as ajv from "ajv";
 import ErrorObject = ajv.ErrorObject;
 import DependenciesParams = ajv.DependenciesParams;
 

@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -83,12 +83,12 @@ import { AbstractHornetMiddleware } from "hornet-js-core/src/middleware/middlewa
 const flash = require("connect-flash");
 import { Request, Response } from "express";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AuthenticationtConfiguration } from "src/authentication-configuration";
 import { AuthenticationStrategy } from "src/strategy/authentication-strategy";
 import { AuthenticationUtils } from "src/authentication-utils";
 
-const logger: Logger = Utils.getLogger("authentication.passport-authentication");
+const logger: Logger = Logger.getLogger("authentication.passport-authentication");
 
 
 export class PassportAuthentication {
@@ -162,7 +162,9 @@ export class PassportAuthentication {
                 }
             }
 
-            if (!req.isAuthenticated() || !validateEndSession) {
+            var routesAuthorization = Utils.hasCls() && Utils.getCls("hornet.routeAuthorization");
+
+            if ((!req.isAuthenticated() || !validateEndSession) && (!routesAuthorization || routesAuthorization.length > 0)) {
                 if (Object.keys(_self.strategies).length == 1) {
                     _self.strategies[ Object.keys(_self.strategies)[ 0 ] ].connect(_self.passport, req, res, next);
                 } else if (Object.keys(_self.strategies).length >= 1 && req.query.strategy) {

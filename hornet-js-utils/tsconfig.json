@@ -1,26 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES5",
-    "module": "commonjs",
-    "moduleResolution": "classic",
-    "experimentalDecorators": true,
-    "jsx": "react",
-    "sourceMap": true,
-    "noResolve": true,
-    "importHelpers": true,
     "baseUrl": "./",
-    "paths": {
-      "tslib": [
-        "definition-ts/hornet-js-ts-typings/tslib/tslib.d.ts"
-      ]
-    }
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "lib": ["es2015", "DOM"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./target",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES5"
   },
+
   "include": [
-    "./**/*.ts*",
-    "./definition-ts/**/*.d.ts"
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "./node_modules/hornet-js-logger/index.d.ts",
+    "./node_modules/hornet-js-test/index.d.ts"
   ],
   "exclude": [
-    "istanbul",
-    "node_modules"
+    "istanbul"
   ]
 }

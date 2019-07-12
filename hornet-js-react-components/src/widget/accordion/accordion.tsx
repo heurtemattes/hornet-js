@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
+import { HornetComponent } from "src/widget/component/hornet-component";
 import { fireHornetEvent, HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { ADD_NOTIFICATION_EVENT,
         CLEAN_NOTIFICATION_EVENT,
         CLEAN_ALL_NOTIFICATION_EVENT } from "hornet-js-core/src/notification/notification-events";
 import { AccordionHeader } from "src/widget/accordion/accordion-header";
-import { AccordionInfo } from "hornet-js-react-components/src/widget/accordion/accordion-info";
-import KeyboardEvent = __React.KeyboardEvent;
-const logger = Utils.getLogger("hornet-js-react-components.widget.accordion.accordion");
+import { AccordionInfo } from "src/widget/accordion/accordion-info";
+import KeyboardEvent = React.KeyboardEvent;
+import { Logger } from "hornet-js-logger/src/logger";
+const logger = Logger.getLogger("hornet-js-react-components.widget.accordion.accordion");
 
 export const TAB_ID_NAME = "tab";
 export const FOCUS_ON_ACCORDION = new HornetEvent<string>("FOCUS_ON_ACCORDION");

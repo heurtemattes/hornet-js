@@ -73,14 +73,11 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as React from "react";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { NavigateDirection } from "src/widget/table/navigation-direction";
@@ -116,7 +113,7 @@ export interface AbstractCellProps extends HornetComponentProps {
 
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-cell");
 
 /**
  * Classe abstraite d'une cellule de tableau

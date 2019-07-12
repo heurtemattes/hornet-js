@@ -73,30 +73,30 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
 import * as _ from "lodash";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { CheckBox } from "src/widget/form/checkbox";
 import { AutoCompleteState } from "src/widget/form/auto-complete-state";
-import MouseEventHandler = __React.MouseEventHandler;
-import CSSProperties = __React.CSSProperties;
 import * as React from "react";
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-complete-selector");
+import "src/widget/form/sass/_autocomplete.scss";
+
+const logger = Logger.getLogger("hornet-js-react-components.widget.form.auto-complete-selector");
 
 /**
  * Propriétés de la liste de choix pour le composant d'auto-complétion
  */
 export interface AutoCompleteSelectorProps extends HornetComponentProps {
     choices?: Array<any>;
-    onOptionSelected: (event: __React.MouseEvent<HTMLElement>, choice: any) => void;
+    onOptionSelected: (event: React.MouseEvent<HTMLElement>, choice: any) => void;
     currentTypedText?: string;
 
     // todo: A supprimer suite à l'usage de AutompleteState ?!?
@@ -117,7 +117,7 @@ export interface AutoCompleteSelectorProps extends HornetComponentProps {
  */
 export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorProps, any> {
     static defaultProps = {
-        onOptionSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
+        onOptionSelected(event: React.MouseEvent<HTMLElement>, choice: any): void {
             event.preventDefault();
         },
         currentTypedText: "",
@@ -155,7 +155,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         return this;
     }
 
-    public setOnOptionSelected(value: MouseEventHandler<HTMLElement>, callback?: () => any): this {
+    public setOnOptionSelected(value: React.MouseEventHandler<HTMLElement>, callback?: () => any): this {
         this.setState({ onOptionSelected: value }, callback);
         return this;
     }
@@ -182,7 +182,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
     /**
      * Fonction appelée lors du click sur un élément de la liste
      **/
-    protected onListClick(event: __React.MouseEvent<HTMLElement>, choice: any) {
+    protected onListClick(event: React.MouseEvent<HTMLElement>, choice: any) {
         event.preventDefault();
         (this.state as any).onListClick = true;
         return this.state.onOptionSelected(event, choice);
@@ -366,7 +366,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
                 if (!currentTextFormatted) {
                     index = -1;
                 }
-                const classes: ClassDictionary = {
+                const classes: classNames.ClassDictionary = {
                     "autocomplete-item": true,
                 };
 
@@ -421,7 +421,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
                     const index = choiceTextFormatted.indexOf(currentTextFormatted);
                     if (index === -1) return null; // Valeur saisie non présente
 
-                    const classes: ClassDictionary = {
+                    const classes: classNames.ClassDictionary = {
                         "autocomplete-item": true,
                         "autocomplete-item-active": this.props.autoCompleteState.choiceFocused === indexTab,
                     };
@@ -474,21 +474,20 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
         this.liReact = (this.props.isMultiple) ? this.renderOptionMultipleList() : this.renderOptionList();
 
         // On construit le ul englobant
-        const classes: ClassDictionary = {
+        const classes: classNames.ClassDictionary = {
             "autocomplete-selector": true,
             "widget-positioned": true,
             "autocomplete-selector-hidden": this.state.showComponent === false,
         };
         const classList: string = classNames(classes);
 
-        const styleUl: CSSProperties = {
+        const styleUl: React.CSSProperties = {
             minWidth: "100%",
             maxHeight: this.props.maxHeight ? this.props.maxHeight + "px" : "none"
         };
         
-        const styleWrap: CSSProperties = {
+        const styleWrap: React.CSSProperties = {
             width: '100%',
-            left: '0',
             bottom: '0'
         };        
 
@@ -496,7 +495,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
             styleUl.overflow = "auto";
         }
 
-        const classesContent: ClassDictionary = {
+        const classesContent: classNames.ClassDictionary = {
             "autocomplete-content-selector": true,
         };
 

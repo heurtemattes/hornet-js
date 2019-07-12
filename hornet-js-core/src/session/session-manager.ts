@@ -73,14 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-const logger: Logger = Utils.getLogger("hornet-js-core.session.session-manager");
+import { Logger } from "hornet-js-logger/src/logger";
+const logger: Logger = Logger.getLogger("hornet-js-core.session.session-manager");
 
 import * as cookie from "cookie";
 var crc = require("crc").crc32;
@@ -94,11 +94,14 @@ import { MemoryStore } from "src/session/memory-store";
 import { Store } from "src/session/store";
 import { CookieManager } from "src/session/cookie-manager"
 
-declare module "express" {
-    export interface Request {
+declare global {
+    namespace Express {
+      interface Request {
         getSession?: () => Session;
+      }
     }
 }
+
 
 /**
  * Node.js 0.8+ async implementation.

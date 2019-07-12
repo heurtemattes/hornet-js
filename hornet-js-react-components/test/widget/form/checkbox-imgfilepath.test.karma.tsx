@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,9 +85,11 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Decorators } from "hornet-js-test/src/decorators";
 import { CheckBoxField } from "src/widget/form/checkbox-field";
 import { Form } from "src/widget/form/form";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
 
 @Decorators.describe("Test Karma checkbox-field")
 class TestCheckboxFieldImgFilePath extends HornetReactTest {
@@ -102,6 +104,7 @@ class TestCheckboxFieldImgFilePath extends HornetReactTest {
             <Form id="test">
                 <CheckBoxField name={"checkbox"}
                     imgFilePath="test/test"
+                    icoToolTip="test/test"
                     toolTip="test"
                     label="Test" ref={(elt) => { this.checkboxElement = elt; }} />
             </Form>

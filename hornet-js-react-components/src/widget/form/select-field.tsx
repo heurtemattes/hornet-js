@@ -73,14 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import {
     HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps, AbstractFieldProps } from "src/widget/form/abstract-field";
 
@@ -90,7 +89,9 @@ import { HornetComponentDatasourceProps } from "src/widget/component/hornet-comp
 import * as _ from "lodash";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.select-field");
+import "src/widget/form/sass/_selected.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.select-field");
 
 /**
  * Propriétés d'un champ de formulaire de type groupe de boutons radios

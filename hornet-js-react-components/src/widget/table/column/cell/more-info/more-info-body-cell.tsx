@@ -73,19 +73,17 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { ActionBodyCell, ActionBodyCellProps } from "src/widget/table/column/cell/action/action-body-cell";
-import { Picto } from "src/img/picto";
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
 
 const LINE_BEFORE = "before";
 const LINE_AFTER = "after";
@@ -100,7 +98,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
     link: HTMLLinkElement;
 
     static defaultProps = {
-        srcImg: Picto.blue.user,
+        srcImg: <SvgSprites icon="user" color="#0579BE" ariaLabel="Plus d'information" />,
         keyShouldComponentUpdate: "id",
     };
 
@@ -135,7 +133,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
 
         this.title = this.getCellTitleWithProps(this.props);
 
-        const classes: ClassDictionary = {
+        const classes = {
             "button-action": true,
         };
         if (this.state.className) {
@@ -159,9 +157,10 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
             this.state.visible ?
 
                 <a {...aProps}>
-                    <img src={(this.props as any).srcImg} className={this.state.classNameImg}
-                        alt={this.title} />
-                    <span className="label-button-action">{this.state.label}</span>
+                    <SvgSprites icon="user" color="#0579BE" ariaLabel={aProps.title} />
+                    <span className="label-button-action">
+                        {this.state.label}
+                    </span>
                 </a>
                 : null
         );

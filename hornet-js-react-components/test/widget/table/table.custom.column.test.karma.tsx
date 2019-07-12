@@ -73,38 +73,36 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
 import * as assert from "assert";
 
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-/*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
+import { Content } from "src/widget/table/content";
 
-import { YesNoColumn } from "hornet-js-react-components/src/widget/table/column/yesno-column";
-import { DateColumn } from "hornet-js-react-components/src/widget/table/column/date-column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { CheckColumn } from "src/widget/table/column/check-column";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
-import { Utils } from "hornet-js-utils";
+import { YesNoColumn } from "src/widget/table/column/yesno-column";
+import { DateColumn } from "src/widget/table/column/date-column";
+import { Columns } from "src/widget/table/columns";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
-Utils.setConfigObj({});
+
 
 /** Tableau de liste de secteurs */
 let dataSourceSortTitle: DataSource<any>;
@@ -203,7 +201,7 @@ class tableTest extends HornetReactTest {
         table = this.renderIntoDocument(tableElement3, id);
         dataSourceSortTitle.on("fetch", (value) => {
             const year = new Date().getFullYear().toString();
-            const imgCell = document.querySelector(`#${id} #lite-0-colBody-0-0 a img`);
+            const imgCell = document.querySelector(`#${id} #lite-0-colBody-0-0 a svg`);
             expect(imgCell).to.exist;
             this.end();
         });

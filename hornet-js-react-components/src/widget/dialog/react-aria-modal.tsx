@@ -73,24 +73,26 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { Logger } from "hornet-js-logger/src/logger";
+
+import "src/widget/dialog/sass/_modal.scss";
 
 const Draggable = require("react-draggable");
 const tabbable = require("tabbable");
 const noScroll = require("no-scroll");
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.dialog.react-aria-modal");
+const logger = Logger.getLogger("hornet-js-react-components.widget.dialog.react-aria-modal");
 
 class ModalManager {
     static modals: Array<any> = [];
@@ -217,7 +219,7 @@ class ModalManager {
 
 class ReactAriaModalUnderlay extends HornetComponent<any, any> {
     render() {
-        let style: __React.CSSProperties = {
+        let style: React.CSSProperties = {
             position: "fixed",
             top: 0,
             left: 0,
@@ -262,7 +264,7 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
 
         const transformValue = (this.state.verticallyCenter) ? "translate(-50%, -50%)" : "translateX(-50%)";
         const topValue = (this.state.verticallyCenter) ? "50%" : "0";
-        const style: __React.CSSProperties = {
+        const style: React.CSSProperties = {
             position: "absolute",
             left: this.state.isDraggable ? "40%" : "50%",
             top: this.state.isDraggable ? "35%" : topValue,

@@ -73,13 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import * as _ from "lodash";
 import {
@@ -90,9 +89,10 @@ import {
 } from "src/widget/form/abstract-field";
 import { UploadedFile } from "hornet-js-core/src/data/file";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import FormEvent = __React.FormEvent;
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.upload-file-field");
+import "src/widget/form/sass/_upload-files.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.upload-file-field");
 
 /**
  * Propriétés d'un champ de formulaire de type groupe de boutons radios
@@ -152,7 +152,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
      * Gestion du changement de fichier sélectionné
      * @param e évènement
      */
-    protected handleChange(e: __React.SyntheticEvent<HTMLElement>): void {
+    protected handleChange(e: React.SyntheticEvent<HTMLElement>): void {
         const input: HTMLInputElement = e.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {
             this.setState({
@@ -303,7 +303,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
                 currentTarget: this.htmlElement,
                 preventDefault: () => { },
                 stopPropagation: () => { },
-            } as FormEvent<HTMLElement>);
+            } as React.FormEvent<HTMLElement>);
         }
     }
 

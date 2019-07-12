@@ -73,7 +73,7 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,8 @@ import { Adress } from "./model/adress";
 import { UserDTO } from "./model/userDTO";
 
 const expect: any = TestUtils.chai.expect;
-import * as _ from "lodash";
+import map = require("lodash.map");
+import cloneDeep = require("lodash.clonedeep");
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { AdressDTO } from "test/model/adressDTO";
 import { OtherUser } from "test/model/OtherUser";
@@ -124,7 +125,7 @@ describe("Test of BeanUtils.serialize* : ", () => {
         const result = BeanUtils.serializeObject(User, array);
         expect(result).not.empty;
         expect(result.length).to.be.eq(array.length);
-        _.map(result, function (item) {
+        map(result, function (item) {
             expect(item.constructor).to.be.eq(undefined);
         });
         for (let i = 0; i < result.length; i++) {
@@ -306,7 +307,7 @@ describe("Test of BeanUtils.map* : ", () => {
             const result = BeanUtils.mapObject(User, array);
             expect(result).not.empty;
             expect(result.length).to.be.eq(array.length);
-            _.map(result, function (item) {
+            map(result, function (item) {
                 expect(item).to.be.an.instanceOf(User);
             });
             for (let i = 0; i < result.length; i++) {
@@ -562,7 +563,7 @@ describe("Test of BeanUtils.map* : ", () => {
 describe("Test of BeanUtils.clone* : ", () => {
     it("should do a dummy deep equal test", (done) => {
         const array = [user, user2];
-        const array2 = _.cloneDeep(array);
+        const array2 = cloneDeep(array);
         expect(array).to.deep.eql(array2);
         done();
     });

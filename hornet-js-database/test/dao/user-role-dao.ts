@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,7 @@ import { injectable } from "hornet-js-core/src/inject/injectable";
 import { RoleAttributes } from "../models/model-role";
 import { HornetGenericDAO } from "src/sequelize/hornet-generic-dao";
 import { RoleMetier } from "test/models/user-mod";
-
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 @injectable()
 export class UserRoleDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeInstanceModel<RoleAttributes>> {

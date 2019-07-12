@@ -1,0 +1,110 @@
+@import '../../sass/core';
+
+$tableDataColumns: rgba(244, 244, 244, 1); //#f4f4f4
+$tableLoader: rgba(221, 221, 221, 1); //#ddd
+$tableOverlay: rgba(0, 0, 0, 0.6);
+$tableSpinnerBg: rgba(246, 247, 248, 1); //#f6f7f8
+$tableSpinnerGradient: linear-gradient(to right, #f7f7f7 8%, #ededed 18%, #f7f7f7 33%);
+
+/// Composant table qui se compose de :
+/// _table.scss
+/// _pagination.scss
+/// datatable-sortable.scss
+/// _datatable-loader.scss
+.datatable-line-loader {
+    margin-bottom: 0;
+    line-height: 0;
+
+    th {
+        padding: 0;
+        background-color: $tableDataColumns;
+        height: auto !important;
+        padding: 0px !important;
+
+        div {
+            height: 0.25em;
+            padding: 0;
+        }
+    }
+}
+
+.datatable-loader {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    background: $tableLoader;
+
+    &:before {
+        position: absolute;
+        display: block;
+        content: "";
+        width: 12.5em;
+        height: 0.25em;
+        left: -12.5em;
+        background: $tableHeaderColor;
+        animation: loading 2s linear infinite;
+    }
+}
+
+.datatable-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: $tableOverlay;
+    opacity: 0.5;
+    bottom: 0;
+    right: 0;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.table-spinner-background {
+    position: relative;
+    min-height: 310px;
+    background: $tableSpinnerBg;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background-size: 800px 104px;
+}
+
+.table-spinner-cell {
+    height: 100%;
+    width: 100%;
+    color: transparent;
+    border: 0.625em solid $tableBaseColor;
+    line-height: 1.2;
+}
+
+@keyframes loading {
+    from {
+        left: -12.5em;
+        width: 30%;
+    }
+    50% {
+        width: 30%;
+    }
+    70% {
+        width: 70%;
+    }
+    80% {
+        left: 50%;
+    }
+    95% {
+        left: 120%;
+    }
+    to {
+        left: 100%;
+    }
+}
+
+@keyframes placeHolderShimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}

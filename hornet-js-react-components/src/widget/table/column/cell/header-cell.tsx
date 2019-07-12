@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { AbstractHeaderCell, AbstractHeaderCellProps, SortTitleInformations } from "src/widget/table/column/cell/abstract-header-cell";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
 
-import * as classNames from "classnames";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
+
+import "src/widget/table/sass/_datatable-sortable.scss";
 
 export interface HeaderCellProps extends AbstractHeaderCellProps {
 
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.header-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.header-cell");
 
 /**
  * Classe Permettant de générer le rendu html d'un cellule d'entête de tableau
@@ -120,15 +120,15 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
         logger.debug("render HeaderCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         // Gestion du titre de l'entête
         const isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
-        let urlImgArrow: string = "/img/tableau/ic_arrow_upward_black.svg";
-        const imgClassName: ClassDictionary = { "arrow-sort": true };
+        let urlImgArrow: any = <SvgSprites icon="arrowUpward" color="#000" />;
+        const imgClassName = { "arrow-sort": true };
         if (this.state.sortData && this.state.sortData.dir === SortDirection.DESC) {
-            urlImgArrow = "/img/tableau/ic_arrow_downward_black.svg";
+            urlImgArrow = <SvgSprites icon="arrowDownward" color="#000" />;
         }
         const title: string = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none").title;
         let titleDesc: any = isTriActifSurColonne && this.state.edition ?
             <div>{this.props.title}
-                <img src={HeaderCell.genUrlTheme(urlImgArrow)} className={classNames(imgClassName)} alt={title} />
+                {urlImgArrow}
             </div> : <div>{this.props.title}</div>;
 
         if (this.props.sortable && !this.props.contentState.itemInEdition) {
@@ -184,10 +184,10 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
             logger.warn("Column ", this.props.keyColumn, " Must have lang with abbr configuration");
         }
 
-        let urlImgArrow: string = "/img/tableau/ic_arrow_upward_black.svg";
-        const imgClassName: ClassDictionary = { "arrow-sort": true };
+        let urlImgArrow: any = <SvgSprites icon="arrowUpward" color="#000" />;
+        const imgClassName = { "arrow-sort": true };
         if (this.state.sortData && this.state.sortData.dir === SortDirection.DESC) {
-            urlImgArrow = "/img/tableau/ic_arrow_downward_black.svg";
+            urlImgArrow = <SvgSprites icon="arrowDownward" color="#000" />;
         }
 
         const titles = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none");
@@ -213,8 +213,7 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
                             <abbr lang={this.state.lang} title={this.state.abbr}>
                                 {this.state.title}
                             </abbr> : this.state.title}
-                        <img src={HeaderCell.genUrlTheme(urlImgArrow)} className={classNames(imgClassName)} alt={titles.title}
-                            tabIndex={-1} />
+                            {urlImgArrow}
                     </div>
                     :
                     <div>

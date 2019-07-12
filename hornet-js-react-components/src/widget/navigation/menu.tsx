@@ -73,28 +73,30 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { MenuNavigation } from "src/widget/navigation/menu-navigation";
 import * as _ from "lodash";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import * as ReactDOM from "react-dom";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { MenuInfoAccessibilite } from "src/widget/navigation/menu-info-accessibilite";
 import { Utils } from "hornet-js-utils";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { UPDATE_PAGE_EXPAND_MENU } from "src/widget/screen/layout-switcher";
-import { MENU_LINK_ACTIVATED } from "hornet-js-react-components/src/widget/navigation/menu-link";
-import HTMLAttributes = __React.HTMLAttributes;
+import { MENU_LINK_ACTIVATED } from "src/widget/navigation/menu-link";
+import HTMLAttributes = React.HTMLAttributes;
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu");
+import "src/widget/navigation/sass/_menu.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.navigation.menu");
 
 const showIconSize = 720;
 
@@ -165,7 +167,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         this.state = {
             ...this.state,
             ...this.handleLayoutExpand(),
-            items: this.props.configMenu ? NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(this.props.configMenu), this.user) : NavigationUtils.getFilteredConfigNavigation(NavigationUtils.getConfigMenu(), this.user),
+            items: this.props.configMenu ? NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(this.props.configMenu), this.user) : NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(NavigationUtils.getConfigMenu()), this.user),
             isMenuActive: false,
         };
 
@@ -347,7 +349,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         }
 
         if (this.state.onToggleClick) {
-            this.state.onToggleClick();
+            this.state.onToggleClick(active);
         }
         this.setState({ isMenuActive: active }, () => {
             if (this.burgerIcon) {

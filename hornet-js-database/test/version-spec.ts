@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 
@@ -110,7 +110,7 @@ if (!conf.database) {
           "password": "test",
           "options": {
               "dialect": "sqlite",
-              "storage": "/database/database1.sqlite",
+              "storage": "/database/database.sqlite",
               "pool": {
                   "max": 15,
                   "min": 0,
@@ -131,7 +131,7 @@ if (!conf.database) {
           "password": "test",
           "options": {
             "dialect": "sqlite",
-            "storage": "/database/database2.sqlite",
+            "storage": "/database/database.1.sqlite",
             "pool": {
               "max": 15,
               "min": 0,
@@ -148,12 +148,13 @@ if (!conf.database) {
     
         }
       }
+      conf.database.configTestBis.options.storage = path.join(__dirname, "..", "..", "test", conf.database.configTestBis.options.storage);
 }
-conf.database.configTestBis.options.storage = path.join(__dirname, "..", "..", "test", conf.database.configTestBis.options.storage);
+console.log(conf.database.configTestBis.options.storage);
 Utils.config.setConfigObj(conf);
 let expect = TestUtils.chai.expect;
 
-import { Database } from "hornet-js-database/src/sequelize/database";
+import { Database } from "src/sequelize/database";
 import { UtilisateursDAO } from "test/dao/utilisateurs-dao";
 import { Injector } from "hornet-js-core/src/inject/injector";
 import { Scope } from "hornet-js-core/src/inject/injectable";
@@ -163,7 +164,7 @@ const dbConfig2 = "configTestBis";
 describe("Test LockOptimistic Sequelize", () => {
 
     before((done) => {
-        let files = [ __dirname + "/../../test/database/01_createTablesSqlite.sql", __dirname + "/../../test/database/02_initDataSqlite.sql"];
+        const files = [__dirname + "/../../test/database/01_createTablesSqlite.sql", __dirname + "/../../test/database/02_initDataSqlite.sql"];
         if (!Injector.getRegistered("databaseConfigName")) {
             Injector.register("databaseConfigName", dbConfig2);
         } else if (Injector.getRegistered("databaseConfigName") !== dbConfig2) {

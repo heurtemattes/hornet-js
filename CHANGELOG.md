@@ -1,3 +1,50 @@
+# hornet-js 5.4.0
+
+- 340143d8 PROJ[] : Update package.json
+- 6aef26e3 PROJ[] :Update hbw.sh
+- b440d11b FIX[] : on conserve les states issus des props dans le constructeur de NotificationContent afin de conserver les exceptions et erros envoyées depuis Notification
+- febeac94 FIX[]: Correction navigation clavier sur les tabs
+- 22798a55 FIX[] : compare de DefaultSort gère l'abscence de valeur et la remplace par une chaine vide
+- d803e85c PROJ[] : ajout heigth et width sur le bouton d'accessibilité
+- 39643b16 FIX[] : deplacement middleware expandedLayout
+- 56f412bd PROJ[]: Fix animation checkbox
+- da9fb7da PROJ[] : correction pour retailler l'image dans les colonnes
+- 45a66282 FIX[]: correction TU sur les actions-body-cell
+- 1e431b2e FIX[m73805]: Fix warning react sur le composant switch
+- 14ba28bd FIX[]: Prise en compte des changements des props defaultValue, datas et disabled lors du rendu
+- 7ae2d319 FIX[SUPPORT_ALLOR]: ajout props autofilter
+- 77f5bfd4 FIX[] : problème d'enchainement de middleware avec director
+- ebbf1700 FIX[]: bugs sur les tooltips
+- 71419866 FIX[] : probleme isolation config serveur
+- 376e473d PROJ[] : verification route public sur post
+- 4bae706e FIX[]: Correction regression sur le logger côté client
+- 83159fd0 FIX[task1301]: Correction du problème de lenteur sur les tableau
+- a04723c7 PROJ[] : passage node 10
+- 8f03499c EVOL[] : ajout d'un header fixe dans le composant table
+- e0bd777e PROJ[] : typage typescript / react
+- f6147252 PROJ[] : update sequelise / sqlite3
+- e16b598c FIX[task1293]: Correction de l'accès à une propriété d'un objet potentiellement null
+- 617f1aa1 FIX[SUPPORT_ALLOR]: autocomplete charge les choix avec "no data found" lorsqu'il est prérempli avec updateField
+- 8b9ef9ee EVOL[PREVOIR]: exposition de la props shouldRadioBeChecked du SwitchField
+- 2ada2d5e PROJ[] : update varsion typescript
+- 3a450c27 EVOL[] : ajout des boutons flottant sur longs formulaires
+- 1321fe60 PROJ[] : Update version et déplacement de log4js dans les dépendancies
+- 1fb4dbdd PROJ[] : changement des couleurs vers rgba
+- 076adc67 FIX[S413] : précision pour ignorer ERROR React dans CheckHeaderCell et CheckBodyCell sur l'assignation via this.state
+- 958079fc FIX[S413] : correction utils.config et <tr> hors <table>
+- b4ffb60f PROJ[] : integration des chips et autocomplete multiple
+- 4f4c3551 PROJ[] : déplacement devDep -> dep
+- 0de65c76 PROJ[] : passage des tabs en flex
+- 21452080 EVOL[S407]: gestion id des tests karma par generateMainId()
+- ec1b6e80 FIX[] : problème d'isolation du CLS
+- d08428d1 PROJ[] : typage du type sur les boutons
+- 4765d29d EVOL[] : refonte de la structuration des fichiers sass + preparation au theming avancé
+- 1c9c0dfe PROJ[] : Utilisation du nouveau builder
+- 31b20f39 PROJ[] : passage en 5.4.0
+- 61e342da PROJ[] : exclusion outils
+- b9588c9d EVOL[] : clean des svg et ajout de sprites
+- 37cfb6b9 EVOL[S447] : refacto du css en sass
+
 # hornet-js 5.3.0
 
 - f8169029 EVOL[s362] : AutoCompleteMultiField avec chips

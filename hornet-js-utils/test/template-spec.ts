@@ -72,7 +72,7 @@
 * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
 *
 * @author MEAE - Ministère de l'Europe et des Affaires étrangères
-* @version v5.3.0
+* @version v5.4.0
 * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
 * @license CECILL-2.1
 */
@@ -109,7 +109,7 @@ class MyUnitTest extends BaseMochaTest {
     @Decorators.it("Template: Chaine trouvée avec 1 niveaux de profondeur")
     testCas0() {
         const value = new Template("${niveau1}").process(this.obj, "?");
-        assert(value.niveau2);
+        assert.ok((value as any).niveau2);
         this.end();
     }
 

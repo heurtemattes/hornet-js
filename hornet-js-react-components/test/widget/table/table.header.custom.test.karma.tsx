@@ -73,31 +73,33 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l"Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
-import { Utils } from "hornet-js-utils";
-import { Dropdown } from "hornet-js-react-components/src/widget/dropdown/dropdown";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
+import { Dropdown } from "src/widget/dropdown/dropdown";
 import { I18nUtils } from "hornet-js-utils/src/i18n-utils";
-import { Picto } from "hornet-js-react-components/src/img/picto";
-import { MenuActions } from "hornet-js-react-components/src/widget/table/menu-actions";
-import { ActionButton } from "hornet-js-react-components/src/widget/table/action-button";
+import { MenuActions } from "src/widget/table/menu-actions";
+import { ActionButton } from "src/widget/table/action-button";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { Content } from "src/widget/table/content";
+import { Columns } from "src/widget/table/columns";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
 Utils.setConfigObj({});
 
 /** Tableau de liste de secteurs */
@@ -137,13 +139,13 @@ class TableWithCustomHeaderTest extends HornetReactTest {
                     <ExportFileButton service="" dropDownId="test-export-cmp-with-menu-action"></ExportFileButton>
                     <MenuActions>
                         <ActionButton title="Export CSV" label="Export CSV"
-                            srcImg={Picto.export.csv}
+                            srcImg={<SvgSprites icon="csv" height="1.5em" width="1.5em" color="#08743b" />}
                             action={() => { }} />
                         <ActionButton title="Export PDF" label="Export PDF"
-                            srcImg={Picto.export.pdf}
+                            srcImg={<SvgSprites icon="pdf" height="1.5em" width="1.5em" color="#EA4C3A" />}
                             action={() => { }} />
                         <ActionButton title="Export ODT" label="Export ODT"
-                            srcImg={Picto.export.odt}
+                            srcImg={<SvgSprites icon="odt" height="1.5em" width="1.5em" color="#000" />}
                             action={() => { }} />
                     </MenuActions>
                 </Header>
@@ -206,7 +208,6 @@ class ExportFileButton<P extends ExportFileButtonProps> extends React.Component<
                         console.log("Action en cours d'exécution");
                     },
                     className: "link",
-                    srcImg: Picto.export[picto],
                 }))}
                 icon="more-actions"
             />

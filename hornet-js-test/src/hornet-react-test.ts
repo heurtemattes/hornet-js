@@ -73,12 +73,12 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { BaseTest } from "hornet-js-test/src/base-test";
+import { BaseTest } from "src/base-test";
 const Intl = require("intl");
 import 'intl/locale-data/jsonp/fr';
 

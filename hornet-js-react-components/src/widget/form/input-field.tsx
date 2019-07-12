@@ -73,29 +73,29 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import {
     AbstractField, HornetWrittableProps,
     HornetClickableProps, HornetBasicFormFieldProps, ReactFocusDOMAttributes, AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import { Picto } from "src/img/picto";
 import * as _ from "lodash";
 import * as classNames from "classnames";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { CharsCounter, HornetCharsCounterAttributes } from "src/widget/form/chars-counter";
-import FormEvent = __React.FormEvent;
 import { ToolTip } from "src/widget/tool-tip/tool-tip";
+import { SvgSprites } from '../icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.input-field");
+import "src/widget/form/sass/_input.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.input-field");
 
 /**
  * Composant champ de formulaire : input html de type texte par défaut
@@ -139,7 +139,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
             _.assign(htmlProps, { defaultValue: this.props.currentValue });
         }
 
-        const inputClasses: ClassDictionary = {
+        const inputClasses: classNames.ClassDictionary = {
             "has-error": this.hasErrors(),
             input: true,
         };
@@ -204,7 +204,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         const hidden = htmlProps["type"] === "hidden";
 
-        const classList: ClassDictionary = {
+        const classList: classNames.ClassDictionary = {
             "input-reset": true,
             "input-reset-hidden": (!this.isValued() || hidden),
         };
@@ -226,7 +226,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
                 onKeyDown={this.handleResetKeyDown}
             >
                 <a {...aProps}>
-                    <img src={Picto.grey.close} alt={aProps.title} />
+                    <SvgSprites icon="close" height="1.5em" width="1.5em" color="#757575" />
                 </a>
             </span>
         );
@@ -258,7 +258,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
                     currentTarget: this.htmlElement,
                     preventDefault: () => { },
                     stopPropagation: () => { },
-                } as FormEvent<HTMLElement>);
+                } as React.FormEvent<HTMLElement>);
             }
         });
     }
@@ -301,7 +301,9 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
         }
 
         const urlTheme = this.state.imgFilePath || AbstractField.genUrlTheme();
-        const urlIcoTooltip = urlTheme + this.state.icoToolTip;
+        let urlIcoTooltip = "";
+
+        this.state.icoToolTip ? urlIcoTooltip = urlTheme + this.state.icoToolTip : "";
 
         if ((this.state as any).abbr && !this.state.lang) {
             logger.warn("Field ", fieldName, " Must have lang with abbr configuration");
@@ -337,7 +339,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
                         <span className="label-required"><abbr title={this.getRequiredLabel()}>*</abbr></span> : null}
 
                     {this.state.toolTip ?
-                        <ToolTip alt={this.state.toolTip} src={urlIcoTooltip} idSpan={fieldName + "Tooltip"} /> : null}
+                        <ToolTip alt={this.state.toolTip} src={urlIcoTooltip != "" ? urlIcoTooltip : ""} idSpan={fieldName + "Tooltip"} /> : null}
                 </label>
             </div>
         );

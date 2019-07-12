@@ -73,19 +73,15 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as path from "path";
-import * as Log4jsNode from "log4js";
 import * as _ from "lodash";
-import * as cheerio from "cheerio";
 import * as chai from "chai";
 import * as sinon from "sinon";
 import * as sinonChai from "sinon-chai";
-import * as fs from "fs";
 
 chai.use(sinonChai);
 

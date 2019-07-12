@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,21 +82,17 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-var chai = require('chai');
-const expect = chai.expect;
-import * as React from "react";
-import * as assert from "assert";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-import { RadiosField } from "src/widget/form/radios-field";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
+import * as React from "react";
+
 import { Form } from "src/widget/form/form";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { SelectField } from "src/widget/form/select-field";
-import { Table } from "src/widget/table/table";
-import { Header } from "src/widget/table/header";
-import { Content } from "src/widget/table/content";
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
 
 let element: JSX.Element;
 let $element;
@@ -133,8 +129,9 @@ class SelectFieldDataTest extends BaseTest {
 
     @Decorators.it("Test selectfield avec data sans valeur par défaut")
     testSelectField1() {
+        const id = this.generateMainId();
         element = (
-            <div id="main1">
+            <div id={id}>
                 <Form id={"testForm-1"}>
                     <SelectField name={"selectTypePartenaire1"}
                         label={"Type de partenaire"}
@@ -146,7 +143,7 @@ class SelectFieldDataTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main1");
+        $element = this.renderIntoDocument(element, id);
         const htmlElement = document.getElementById("selectTypePartenaire1");
         HornetTestAssert.assertEquals(this.dataSet[0].id, (htmlElement as any).value, "SelectField doit être valorisé par le premier élément");
         this.end();
@@ -154,8 +151,9 @@ class SelectFieldDataTest extends BaseTest {
 
     @Decorators.it("Test selectfield avec datasource, set currentValue")
     testSelectField2() {
+        const id = this.generateMainId();
         element = (
-            <div id="main2">
+            <div id={id}>
                 <Form id={"testForm-2"}>
                     <SelectField name={"selectTypePartenaire2"}
                                  label={"Type de partenaire"}
@@ -167,7 +165,7 @@ class SelectFieldDataTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main2");
+        $element = this.renderIntoDocument(element, id);
         this.referencedElement.setCurrentValue("4");
 
         let htmlElement = document.getElementById("selectTypePartenaire2");
@@ -177,8 +175,9 @@ class SelectFieldDataTest extends BaseTest {
 
     @Decorators.it("Test selectfield avec datasource, currentValue en valeur par défaut")
     testSelectField3() {
+        const id = this.generateMainId();
         element = (
-            <div id="main3">
+            <div id={id}>
                 <Form id={"testForm-3"}>
                     <SelectField name={"selectTypePartenaire3"}
                                  label={"Type de partenaire"}
@@ -191,7 +190,7 @@ class SelectFieldDataTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main3");
+        $element = this.renderIntoDocument(element, id);
 
         const htmlElement = document.getElementById("selectTypePartenaire3");
         HornetTestAssert.assertEquals(this.dataSet[4].id, (htmlElement as any).value, "SelectField doit être valorisé avec l'élement ayant l'id 5");

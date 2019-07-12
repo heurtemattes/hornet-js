@@ -73,19 +73,19 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as cookie from "cookie";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { IncomingMessage, ServerResponse } from "http";
 
 var signature = require("cookie-signature");
 
-const logger: Logger = Utils.getLogger("hornet-js-core.session.cookie-manager");
+const logger: Logger = Logger.getLogger("hornet-js-core.session.cookie-manager");
 
 export interface CookieManagerOption {
     secret?: string;

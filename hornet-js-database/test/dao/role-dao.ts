@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,8 +85,8 @@ import { inject } from "hornet-js-core/src/inject/inject";
 import { injectable } from "hornet-js-core/src/inject/injectable";
 import { HornetGenericDAO } from "src/sequelize/hornet-generic-dao";
 import { RoleMetier } from "test/models/user-mod";
-import { RoleAttributes } from 'test/models/model-role';
-
+import { RoleAttributes } from "test/models/model-role";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 @injectable()
 export class RoleDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeInstanceModel<RoleAttributes>> {
@@ -97,11 +97,11 @@ export class RoleDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeInstanceM
 
     @Map(RoleMetier)
     findOne(data): Promise<RoleMetier> {
-        return this.entity.findOne(data);
+        return this.classEntity.findOne(data);
     }
 
     insert(data) {
-        return this.entity.create(data);
+        return this.classEntity.create(data);
     }
 
 }

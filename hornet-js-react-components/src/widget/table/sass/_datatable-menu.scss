@@ -1,0 +1,57 @@
+@import '../../sass/core';
+
+$tableDataColumns: rgba(244, 244, 244, 1); //#f4f4f4
+$tableSelected: rgba(226, 239, 247, 1); //#e2eff7
+
+/// Composant table qui se compose de :
+/// _table.scss
+/// _pagination.scss
+/// datatable-sortable.scss
+/// _datatable-loader.scss
+.menu-priority-container {
+    float: left;
+    margin-right: 0.1em;
+}
+
+.menu-contextuel-container {
+    float: right;
+}
+
+.menu-contextuel {
+    .dropdown-content {
+        background-color: $tableDataColumns;
+
+        .dropdown-list {
+            padding-left: 0;
+
+            li {
+                background-color: $tableDataColumns;
+
+                &:hover,
+                &:focus {
+                    background-color: $tableSelected;
+                }
+            }
+        }
+    }
+}
+
+.menu-priority-content > ul {
+    display: flex;
+    padding-left: 0;
+    list-style: outside none none;
+
+    .button-info-accessibilite-button {
+        position: relative;
+        padding: 0.4em;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        right: auto;
+    }
+}
+
+.menu-priority-content-action > a {
+    display: block;
+    padding: 0.4em;
+}

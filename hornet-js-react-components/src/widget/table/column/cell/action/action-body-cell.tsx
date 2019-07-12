@@ -73,25 +73,24 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
 import * as React from "react";
 import { Template } from "hornet-js-utils/src/template";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import * as _ from "lodash";
+import classNames from "classnames";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
-import * as classNames from "classnames";
-
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.action.action-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.action.action-body-cell");
 
 export interface ActionBodyCellProps extends AbstractBodyCellProps {
     /** src de l'image */
-    srcImg?: JSX.Element | string;
+    srcImg?: JSX.Element | string | SvgSprites;
     /** className de l'image */
     classNameImg?: string;
     /** Url de l'action à déclencher */
@@ -120,6 +119,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
     protected title: string;
     private inferedAlertMessage: string;
     private inferedAlertTitle: string;
+    protected disabled: boolean = false;
 
     static defaultProps = {
         keyShouldComponentUpdate: "id",
@@ -168,7 +168,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         logger.debug("render ActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         this.title = this.getCellTitleWithProps(this.props);
 
-        const classes: ClassDictionary = {
+        const classes = {
             "button-action": true,
             "picto-svg": true,
         };
@@ -177,15 +177,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
             classes[this.state.className] = true;
         }
 
-        let img = null;
-        if (typeof this.props.srcImg === "string") {
-            img = <img src={this.state.srcImg} className={this.state.classNameImg} alt={this.title} />;
-        } else {
-
-            img = this.props.srcImg;
-        }
-
-        const disabled: boolean = (typeof this.state.disabled === "function") ? this.state.disabled() : this.state.disabled;
+        this.disabled = (typeof this.state.disabled === "function") ? this.state.disabled(this.props.value) : this.state.disabled;
 
         const aProps: any = {
             href: this.props.url && this.genUrlWithParams(this.props.url, this.props.value) || "#",
@@ -193,11 +185,18 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
             title: this.state.titleCell instanceof Function ? this.state.titleCell(this.props.value) :
                 this.state.titleCell ? this.state.titleCell : this.title,
             onMouseDown: this.onClick,
-            disabled: (this.props.contentState.itemInEdition && this.state.isEditing === false) || disabled,
+            disabled: (this.props.contentState.itemInEdition && this.state.isEditing === false) || this.disabled,
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
             role: "button",
         };
+
+        let img = null;
+        if (typeof this.props.srcImg === "string") {
+            img = <SvgSprites icon={this.state.srcImg} ariaLabel={aProps.title} />
+        } else if (this.props.srcImg) {
+            img = React.createElement((this.props.srcImg as JSX.Element).type, { ...(this.props.srcImg as JSX.Element).props, ariaLabel: aProps.title })
+        }
 
         if (this.props.messageAlert) {
             this.inferedAlertMessage = this.props.messageAlert
@@ -227,7 +226,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         if (e.keyCode === KeyCodes.ENTER || e.keyCode === KeyCodes.SPACEBAR) {
             e.preventDefault();
             e.stopPropagation();
-            this.onClick(e);
+            !this.disabled && this.onClick(e);
         }
     }
 
@@ -242,7 +241,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
      * Click sur le lien
      */
     onClick(e): void {
-        if (!e.button || (e.button && e.button !== 2)) {
+        if ((!e.button || (e.button && e.button !== 2)) && !this.disabled) {
             if (this.props.messageAlert) {
                 e.persist();
                 e.stopPropagation();

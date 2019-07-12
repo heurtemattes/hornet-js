@@ -73,25 +73,26 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as classNames from "classnames";
+import { Logger } from "hornet-js-logger/src/logger";
+import classNames from "classnames";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.button.button");
+import "src/widget/button/sass/_buttons.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.button.button");
 
 /**
  * Propriétés Button
  */
 export interface ButtonProps extends HornetComponentProps {
-    type?: string;
+    type?: "button" | "submit" | "reset" | "link" ;
     id?: string;
     name?: string;
     value?: string;
@@ -101,11 +102,11 @@ export interface ButtonProps extends HornetComponentProps {
     title?: string;
     disabled?: boolean;
     url?: string;
-    target?: LinkTarget
+    target?: LinkTarget;
 }
 
 export interface ButtonState extends ButtonProps, HornetComponentState {
-    type?: string;
+    type?: "button" | "submit" | "reset" | "link";
     effect?: boolean;
     css?: any;
     unmount?: boolean;
@@ -164,7 +165,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
      */
     protected renderButton(): JSX.Element {
 
-        const classes: ClassDictionary = {};
+        const classes = {};
         if (this.state.className) {
             classes[ this.state.className ] = true;
         }
@@ -192,7 +193,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
      */
     protected renderLink(): JSX.Element {
 
-        const classes: ClassDictionary = {};
+        const classes = {};
         if (this.state.className) {
             classes[ this.state.className ] = true;
         }
@@ -210,8 +211,7 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
         }
 
         return (
-            <a {...aProps}
-            >
+            <a {...aProps}>
                 {this.state.label}
                 {this.state.effect ? <div className="ripple-effect" style={this.state.css} /> : null}
             </a>
@@ -251,6 +251,6 @@ export class Button<P extends ButtonProps, S extends ButtonState> extends Hornet
             if (this.mounted) {
                 this.setState({ effect: false });
             }
-        },         1500);
+        }, 1500);
     }
 }

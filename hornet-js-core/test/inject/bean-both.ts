@@ -73,12 +73,12 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Bean } from "test/inject/bean"
+import { Bean } from "test/inject/bean";
 
 export class BeanBoth extends Bean {
     howIAm(): string {

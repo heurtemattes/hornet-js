@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -98,11 +98,12 @@ import { HornetComponentProps, IHornetComponent, HornetComponentState } from "ho
 import { HornetPage } from "src/widget/component/hornet-page";
 import { I18nUtils } from "hornet-js-utils/src/i18n-utils";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { AbstractFieldProps } from "src/widget/form/abstract-field";
+import { Logger } from "hornet-js-logger/src/logger";
 
 const pathToRegexp = require('path-to-regexp');
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.component.hornet-component");
+const logger = Logger.getLogger("hornet-js-react-components.widget.component.hornet-component");
+
 
 export interface HornetComponentDatasourceProps {
 
@@ -362,7 +363,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     protected getChildrenOf(ComponentType): any[] {
         let children = [];
 
-        React.Children.map(this.props.children, (child: React.ReactChild) => {
+        React.Children.map(this.props.children, (child: React.ReactElement<any>) => {
             if ((child as React.ReactElement<any>).type === ComponentType) {
 
                 if ((child as React.ReactElement<any>).props.children) {

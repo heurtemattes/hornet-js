@@ -73,32 +73,32 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
-import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
+import { Tabs } from "src/widget/tab/tabs";
+import { Tab } from "src/widget/tab/tab";
 
 import { Form } from 'src/widget/form/form';
 import { InputField } from 'src/widget/form/input-field';
-import * as schemaTabsInForm from "./validation-tabs-in-form.json";
-import * as schemaFormInTabs from "./validation-form-in-tabs.json";
+const schemaTabsInForm = require("./validation-tabs-in-form.json");
+const schemaFormInTabs = require ("./validation-form-in-tabs.json");
 import { ButtonsArea } from 'src/widget/form/buttons-area';
 import { Button } from 'src/widget/button/button';
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
-import { Utils } from "hornet-js-utils";
-Utils.setConfigObj({});
-
-
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 
 @Decorators.describe("Test Karma tabs gestion des erreurs")
 class NotificationTabsErrorsTest extends BaseTest {

@@ -73,25 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 
 import { AbstractCell, AbstractCellProps } from "src/widget/table/column/cell/abstract-cell";
 import { Template } from "hornet-js-utils/src/template";
-import * as classNames from "classnames";
+import classNames from "classnames";
+
+import "src/widget/table/sass/_datatable-sortable.scss";
 
 export interface AbstractBodyCellProps extends AbstractCellProps {
     /** chaine de remplacement des valeurs undefined dans le templating */
     replaceUndef?: string;
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-body-cell");
 
 /**
  * Classe permettant de générer le rendu html d'un cellule du corps d'un tableau
@@ -206,7 +206,7 @@ export class AbstractBodyCell<P extends AbstractBodyCellProps, S> extends Abstra
      * @returns {{ref: ((instance:HTMLTableCellElement)=>undefined), className: string, onKeyDown: any, tabIndex: number, aria-selected: (((props:any)=>boolean)|any), onFocus: any, style: any}}
      */
     getDefaultTdProps() {
-        const classes: ClassDictionary = { "datatable-cell": true };
+        const classes: { [id: string]: any;} = { "datatable-cell": true };
         classes[ "datatable-cell-custom-" + this.props.keyColumn ] = true;
         classes[ "datatable-cell-in-edition" ] = this.props.contentState.itemInEdition && this.state.abstractisEditing;
         const key = this.props.id + "-colBody-" + this.props.coordinates.row + "-" + this.props.coordinates.column;

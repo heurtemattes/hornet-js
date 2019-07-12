@@ -1,0 +1,104 @@
+@import '../../sass/core';
+
+$ddBaseLanguageColor: theme-color('global', 'white');
+$ddBaseColor: theme-color('global', 'white');
+$ddLanguageBoxShadow: rgba(0, 0, 0, 0.45);
+$ddLanguageColor: theme-color($variant: 'texts');
+$ddPrimaryColor: theme-color($variant: 'primary');
+
+.language {
+    cursor: pointer;
+    position: relative;
+    color: $ddBaseLanguageColor;
+    font-family: $notoRegular;
+    font-size: 1em;
+    text-decoration: none;
+
+    a {
+        @include flexCentered();
+
+        padding: 0 0.3em !important;
+        color: $ddBaseLanguageColor;
+    }
+}
+
+.current-language {
+    overflow: hidden;
+    padding: 0 0.2em;
+
+    &:focus {
+        outline: 1px solid $ddBaseLanguageColor;
+    }
+}
+
+.language-arrow-down {
+    display: inline-block;
+    vertical-align: middle;
+    height: 1.5em;
+    width: 1.5em;
+    
+    @include svgAsBackground($ddBaseColor, "../img/arrow-down.svg");
+}
+
+.dropdown-language {
+    position: absolute;
+    display: none;
+    z-index: 2;
+    width: 10em;
+    height: auto;
+    padding: 1em;
+    top: 2.188em;
+    right: -5px;
+    background: $ddBaseLanguageColor;
+    box-shadow: 0 0.1em 0.3em $ddLanguageBoxShadow;
+    color: $ddLanguageColor;
+
+    a {
+        display: inline-block;
+        width: 100%;
+        cursor: pointer;
+        padding: 11px 25px;
+        color: $ddLanguageColor;
+    }
+
+    &:before {
+        content: '';
+        z-index: 2;
+        position: absolute;
+        width: 1em;
+        height: 1em;
+        top: -0.43em;
+        right: 0.5em;
+        background: $ddBaseLanguageColor;
+        transform: rotate(45deg);
+    }
+
+    .ulLang {
+        -webkit-padding-start: 0;
+        -moz-padding-start: 0;
+    }
+}
+
+.isOpen {
+    position: absolute;
+    display: block;
+    right: 0;
+
+    .itemLang {
+        list-style-type: none;
+        text-align: center;
+
+        &:focus {
+            outline: 1px solid $ddPrimaryColor;
+        }
+
+        &:hover {
+            color: $ddBaseLanguageColor;
+            background: $ddPrimaryColor;
+
+            a {
+                color: $ddBaseLanguageColor;
+            }
+        }
+    }
+}

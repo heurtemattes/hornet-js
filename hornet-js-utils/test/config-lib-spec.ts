@@ -73,15 +73,15 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
-import chai = require("chai");
-const expect = chai.expect;
-import { Logger } from "src/logger";
+const expect = TestUtils.chai.expect;
+
+import { Logger } from "hornet-js-logger/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {

@@ -1,5 +1,5 @@
 import { InputField, InputFieldProps } from "src/widget/form/input-field";
-import logger, { LogLevels } from "hornet-js-utils/src/logger/dec-logger";
+import logger, { LogLevels } from "hornet-js-logger/src/decorators/logger";
 
 export class TestableInputField<P extends InputFieldProps, S> extends InputField<P, S> {
     @logger({

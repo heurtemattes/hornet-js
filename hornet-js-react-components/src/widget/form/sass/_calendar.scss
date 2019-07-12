@@ -1,0 +1,95 @@
+
+@import '../../sass/core';
+
+$inputGlobalBorder: rgba(174, 174, 174, 1); //#aeaeae
+$iconStatesOutline: theme-color($variant: 'states');
+
+/// Composant calendar qui se compose de :
+/// _rc-calendar.scss
+/// _rc-calendar-utils.scss
+.calendar-input {
+    height: 2.563em;
+    min-width: 12.469em;
+    padding: 0.5em 3em 0.5em 1em;
+    appearance: none;
+    border: 1px solid $inputGlobalBorder;
+    text-align: center;
+
+    @media screen and (max-width: #{$mediaM-675}) {
+        min-width: 9.469em;
+    }
+}
+
+#calendar {
+    .calendarPath {
+        fill: $calendarPrimaryColor;
+    }
+}
+
+.calendar-input {
+    &.has-error {
+        background: $globalErrorBg;
+        border: 1px solid $globalErrorColor;
+        min-width: 12.469em;
+    
+        @media screen and (max-width: #{$mediaM-675}) {
+            min-width: 9.469em;
+        }
+    }
+}
+
+.agenda {
+    height: 2.563em;
+    padding: 0.4em 0.5em 0.5em 1em;
+    border: none;
+    background: transparent;
+    outline: medium none !important;
+}
+
+button {
+    &.hornet-button{
+        &.hornet-dialogue-croix {
+            min-width: 2em;
+        }
+    }
+}
+
+table {
+    thead {
+        tr {
+            th {
+                height: auto !important;            
+            }
+        }   
+    }
+    tbody {
+        tr {
+            td {
+                height: auto !important;            
+            }
+        }   
+    }
+}
+
+.agenda {
+    &.icon {
+        &:hover {
+            cursor: pointer;
+        }
+    
+        &:focus {
+            .icon {
+                outline: 1px solid $iconStatesOutline;
+            }
+        }
+    }
+}
+
+.agenda {
+    .icon {
+        height: 2.563em;
+        width: 2.563em;
+        margin-bottom: 0.25em;
+        vertical-align: middle;
+    }
+}

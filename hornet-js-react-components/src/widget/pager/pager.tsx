@@ -73,14 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as _ from "lodash";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -90,7 +89,9 @@ import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import * as classNames from "classnames";
 import KeyboardEvent = React.KeyboardEvent;
 
-const logger: Logger = Utils.getLogger("hornet-js-components.widget.pager.pager");
+import "src/widget/table/sass/_pagination.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-components.widget.pager.pager");
 
 /**
  * Propriétés de pagination de tableau Hornet
@@ -256,7 +257,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
     render(): JSX.Element {
         logger.debug("Pager render : ", this.props.id);
         logger.trace("render");
-        const className: ClassDictionary = {
+        const className: classNames.ClassDictionary = {
             "datatable-pagination": true,
         };
         if (this.state.className) {
@@ -322,7 +323,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
                 <div className="datatable-pagination-content" key={"pagerTableDropDownSubContainer-" + this.props.id}>
                     <Dropdown
                         items={dropdownItems}
-                        icon="caret-down"
+                        icon="carretDown"
                         id={this.props.id + "-drop"}
                         valueCurrent={this.state.pagination.itemsPerPage}
                         label={selectedItem.textKey}

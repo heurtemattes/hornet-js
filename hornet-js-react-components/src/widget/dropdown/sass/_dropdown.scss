@@ -1,0 +1,266 @@
+@import '../../sass/core';
+
+$ddBaseColor: theme-color('global', 'white');
+$ddPrimaryColor: theme-color($variant: 'primary');
+$ddSecondaryColor: rgba(226, 239, 247, 1); //#e2eff7
+$ddLanguageBoxShadow: rgba(0, 0, 0, 0.45);
+$ddLinkfocusOutline: theme-color($variant: 'states');
+$ddBaseColorDark: theme-color('global', 'texts');
+
+/// Contient le mixin svgAsBackground() pour générer des appels svg en tant que bg
+/// Contient le mixin arrowDropDown() pour générer les arrows et leur sens
+.dropdown-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    background: transparent;
+
+    button {
+        position: relative;
+        right: auto;
+        cursor: pointer;
+        padding: 0.2em;
+        min-width: 2.313em;
+        min-height: 2.313em;
+        border: none;
+        background: no-repeat center $ddPrimaryColor;
+    }
+
+    .dropdown-button {
+        padding: 0.4em;
+    }
+
+    .dropdown-content {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        z-index: 4;
+        visibility: visible;
+        cursor: pointer;
+        transition: max-height 500ms ease;        
+    }
+
+    .position-bottom-left {
+        top: 2.8em;
+        left: 0;
+        z-index: 1;
+        @include arrowDropdown("bottom-left", $top: -0.43em, $left: 1.5em);
+    }
+
+    .position-bottom-right {
+        top: 2.8em;
+        right: -0.5em;
+        z-index: 1;
+        @include arrowDropdown("bottom-right", -0.43em, $zIndex: 0);
+    }
+
+    .dropdown-content {
+        &.position-top-right {
+            bottom: 2.4em;
+            right: -0.5em;
+
+            @include arrowDropdown("top-right", $bottom: -0.43em, $zIndex: 0);
+        }
+
+        &.position-top-left {
+            bottom: 2.4em;
+            left: 0;
+            
+            @include arrowDropdown("top-left", $left: 1.5em, $bottom: -0.43em, $zIndex: 0);
+        }
+
+        &.dropdown-content-hidden {
+            display: none !important;
+        }
+    }
+}
+
+.dropdown-list {
+    margin-top: 0;
+    list-style: none;
+    opacity: 1;
+    min-width: 8.5em;
+    padding: 0;
+    box-shadow: 0 0 0.3em $ddLanguageBoxShadow;
+    background: $ddBaseColor;
+
+    li {
+        a {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            padding: 0 0.5em;
+            width: 100%;
+            height: 3em;
+            cursor: pointer;
+            line-height: inherit;
+            background: $ddBaseColor;
+            color: $ddBaseColorDark;
+            white-space: nowrap;
+
+            @include smoothTransition(border-left, 0.3s);        
+
+            &:hover {
+                background: $ddSecondaryColor;
+                border-left: 0.25em solid $ddPrimaryColor;
+            }
+
+            &:focus {
+                outline: 0.0625em solid $ddLinkfocusOutline;
+            }
+
+            svg {
+                height: 1.2em;
+                width: 1.2em;
+                min-width: 1.2em;
+                margin-right: 5%;
+            }
+        }
+
+        .checked {
+            color: $ddPrimaryColor;
+            background: $ddSecondaryColor;
+            border-left: 0.25em solid $ddPrimaryColor;
+            padding: 0 2.9em 0 0.75em !important;
+
+            @include smoothTransition(color, 0.3s);
+
+            &:hover {
+                color: $ddPrimaryColor;
+            }
+        }
+
+        .toggle-column-item-content {
+            position: relative;
+            @include smoothTransition(all, 0.3s);
+
+            &:hover {
+                color: $ddBaseColorDark;
+                background: $ddSecondaryColor;
+                border-left: 0.25em solid $ddPrimaryColor;
+                padding: 0 2.9em 0 0.75em;
+            }
+        }
+    }
+}
+
+.datatable-pagination-content {
+
+    .dropdown-container {
+        a {
+            svg {
+                fill: theme-color('global', 'dark');
+            }
+        }
+    }
+    
+    .dropdown-list {
+        li {
+            a {
+                &:focus {
+                    margin: 0.1em auto;
+                }
+            }
+        }
+    }
+}
+
+.more-actions {
+    display: inline-block;
+    height: 1.5em;
+    width: 1.5em;
+    vertical-align: middle;
+
+    @include svgAsBackground($ddBaseColor, "../img/more.svg", "left top");
+}
+
+.caret-down {
+    @extend .more-actions;
+
+    @include svgAsBackground($ddBaseColorDark, "../img/arrow-down.svg");
+}
+
+.ico-table-settings-white {
+    cursor: pointer;
+    display: block;
+    height: 1.5em;
+    width: 1.5em;
+
+    @include svgAsBackground($ddBaseColor, "../img/settings.svg");
+}
+
+.imgItem {
+    padding-right: 0.625em;
+    height: 1.625em;
+}
+
+.toggle-column-item-content {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0.5em;
+    padding: 0 2.9em 0 1em;
+    height: 3em;
+    width: 100%;
+    font-size: 1em;
+    line-height: inherit;
+    background: $ddBaseColor;
+    color: $ddBaseColorDark;
+    white-space: nowrap;
+}
+
+.toggle-column-item-checkbox {
+    width: 25%;
+
+    .checkbox-content {
+        .checkbox-material {
+            &:before {
+                height: 0.1875em;
+            }
+        }
+    }
+}
+
+.toggle-column-item-label {
+    width: 75%;
+    font-size: 0.8em;
+    line-height: 2em;
+
+    &:hover {
+        border: none !important;
+        padding: 0 !important;
+    }
+}
+
+#table-settingscontent {
+    .dropdown-list {
+        li {
+            a {
+                width: 100%;
+                margin-right: 0.5em;
+            }
+        }
+    }
+}
+
+.toggle-column-item-label {
+    &.fl label {
+        display: inline-block;
+        cursor: pointer;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+.datatable-header-title {
+    &:focus {
+        outline: none;
+    }
+}
+
+.dropdown-hidden-label {
+    display: none;
+}

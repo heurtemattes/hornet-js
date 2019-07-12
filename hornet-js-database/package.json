@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-database",
-  "version": "5.3.0",
+  "version": "5.4.0",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants de gestion de base hornet-js",
   "bugs": {
@@ -10,27 +10,20 @@
     "type": "git",
     "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
   },
-  "tsDefinitionDependencies": {
-    "hornet-js-bean-dts": "5.3.0",
-    "hornet-js-ts-typings": "5.3.0",
-    "hornet-js-utils-dts": "5.3.0",
-    "hornet-js-core-dts": "5.3.0",
-    "hornet-js-components-dts": "5.3.0",
-    "hornet-js-test-dts": "5.3.0"
+  "types": "./index.d.ts",
+  "dependencies": {
+    "continuation-local-storage": "3.2.1",
+    "hornet-js-bean": "5.4.0",
+    "hornet-js-core": "5.4.0",
+    "hornet-js-logger": "5.4.0",
+    "hornet-js-utils": "5.4.0",
+    "sequelize": "5.8.9",
+    "tslib": "1.9.3"
   },
-  "appDependencies": {
-    "hornet-js-bean": "5.3.0",
-    "hornet-js-utils": "5.3.0",
-    "hornet-js-core": "5.3.0",
-    "hornet-js-components": "5.3.0",
-    "sequelize": "4.33.0",
-    "terraformer": "1.0.8",
-    "terraformer-wkt-parser": "1.1.2"
-  },
-  "buildDependencies": {},
-  "testDependencies": {
-    "hornet-js-test": "5.3.0",
-    "sqlite3": "3.1.13"
+  "devDependencies": {
+    "@types/mocha": "5.2.6",
+    "hornet-js-test": "5.4.0",
+    "sqlite3": "4.0.8"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

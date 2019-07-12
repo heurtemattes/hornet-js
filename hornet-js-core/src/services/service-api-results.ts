@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -188,14 +188,14 @@ export class NodeApiError {
     static parseError(apiErrors: BaseError[] | BaseError, httpStatus: number): NodeApiError {
         if (!_.isArray(apiErrors) && (apiErrors as BaseError).name === "BusinessErrorList") {
             apiErrors = apiErrors[ "errors" ];
-        } else if (_.isArray(apiErrors) && apiErrors.length === 1 && apiErrors[ 0 ].name === "BusinessErrorList") {
+        } else if (_.isArray(apiErrors) && (apiErrors as BaseError[]).length === 1 && apiErrors[ 0 ].name === "BusinessErrorList") {
             apiErrors = apiErrors[ 0 ][ "errors" ];
         }
 
-        if (_.isArray(apiErrors) && apiErrors.length > 1) {
+        if (_.isArray(apiErrors) && (apiErrors as BaseError[]).length > 1) {
             // cas d'une liste d'erreurs
             const global: NodeApiError = new NodeApiError();
-            for (let i: number = 0; i < apiErrors.length; i++) {
+            for (let i: number = 0; i < (apiErrors as BaseError[]).length; i++) {
                 const details: string = NodeApiError.parseDetails(apiErrors[ i ]);
                 global.nodeApiErrorList.push(
                     new NodeApiError(apiErrors[ i ].date, apiErrors[ i ].code, apiErrors[ i ].name,
@@ -329,7 +329,7 @@ export class BackendApiError {
      * @returns {BackendApiError}
      */
     static parseError(apiErrors: BackendApiError | Array<BackendApiError>, httpStatus: number): BackendApiError {
-        if (_.isArray(apiErrors) && apiErrors.length > 1) {
+        if (_.isArray(apiErrors) && (apiErrors as BackendApiError[]).length > 1) {
             // cas d'une liste d'erreurs
             const global: BackendApiError = new BackendApiError();
             for (let i = 0; i < (apiErrors as Array<BackendApiError>).length; i++) {
@@ -344,7 +344,7 @@ export class BackendApiError {
             if (_.isArray(apiErrors)) {
                 singleError = apiErrors[ 0 ];
             } else {
-                singleError = apiErrors;
+                singleError = apiErrors as BackendApiError;
             }
             return new BackendApiError(singleError.date, singleError.code, singleError.name, singleError.type,
                                        singleError.details, singleError.args, singleError.reportId, httpStatus || 200, singleError);

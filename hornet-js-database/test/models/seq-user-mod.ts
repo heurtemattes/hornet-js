@@ -73,14 +73,14 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as Sequelize from "sequelize";
 import { RoleAttributes } from "test/models/model-role";
-import { HornetSequelizeAttributes } from "hornet-js-database/src/sequelize/hornet-sequelize-attributes";
+import { HornetSequelizeAttributes } from "src/sequelize/hornet-sequelize-attributes";
 
 export interface UtilisateurAttributes extends HornetSequelizeAttributes {
     id: number;
@@ -92,11 +92,7 @@ export interface UtilisateurAttributes extends HornetSequelizeAttributes {
 
 }
 
-export interface UtilisateurInstance extends Sequelize.Instance<UtilisateurAttributes>, UtilisateurAttributes {
-
-}
-
-export let UtilisateurModel: Sequelize.DefineAttributes = {
+export const utilisateurSequelizeAttibutes: Sequelize.ModelAttributes = {
     id: {
         type: Sequelize.INTEGER,
         field: "id_utilisateur",

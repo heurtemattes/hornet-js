@@ -73,37 +73,33 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
 import * as React from "react";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
-import { Pager } from "hornet-js-react-components/src/widget/pager/pager";
+import { Pager } from "src/widget/pager/pager";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
-import { DefaultSort } from "hornet-js-core/src/component/datasource/options/datasource-option";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
+import { Content } from "src/widget/table/content";
 /*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
 import * as assert from "assert";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 
-var chai = require('chai');
-
-
-const logger = Utils.getLogger("hornet-js-react-components.test.pager.pager");
 let element: JSX.Element;
 let $element;
-
 
 @Decorators.describe("Test Karma Pager")
 class PagerTest extends HornetReactTest {

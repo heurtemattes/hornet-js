@@ -73,24 +73,26 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.icon.icon");
+import "src/widget/icon/sass/_icons.scss";
+
+const logger = Logger.getLogger("hornet-js-react-components.widget.icon.icon");
 
 /**
  * Propriétés d'une icône
  */
 export interface IconProps extends HornetComponentProps {
     /** Url de l'image */
-    src: string;
+    src: any;
     /** Texte alternatif */
     alt: string;
     /** Identifiant HTML de l'image rendue */
@@ -155,9 +157,9 @@ export class Icon extends HornetComponent<IconProps, any> {
             result = <button type="button" title={this.state.title} id={this.state.idLink}
                 className={this.props.classLink}
                 onClick={this.iconOnClick}
-                tabIndex={this.props.tabIndex}>
-                <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
-                    className={this.state.classImg} />
+                tabIndex={this.props.tabIndex}
+                >
+                { this.state.src }
             </button>;
         } else {
             /* L'URL est valorisée : le comportement est celui d'un lien (raccourci clavier : Entrée uniquement )*/
@@ -165,8 +167,7 @@ export class Icon extends HornetComponent<IconProps, any> {
                 className={this.props.classLink}
                 onClick={this.iconOnClick} target={this.state.target}
                 tabIndex={this.props.tabIndex}>
-                <img src={this.state.src} alt={this.state.alt} id={this.state.idImg}
-                    className={this.state.classImg} />
+                { this.state.src }
             </a>;
         }
         return result;

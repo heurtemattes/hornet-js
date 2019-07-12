@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,14 +97,14 @@ import { INotificationType } from "hornet-js-core/src/notification/notification-
 import { AutoCompleteState } from "src/widget/form/auto-complete-state";
 import { DataSourceMaster } from "hornet-js-core/src/component/datasource/datasource-master";
 import { AbstractFieldDatasource } from "src/widget/form/abstract-field-datasource";
-import FormEvent = __React.FormEvent;
-import HTMLAttributes = __React.HTMLAttributes;
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Logger } from "hornet-js-utils/src/logger";
-import { Picto } from "src/img/picto";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
+import { SvgSprites } from '../icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-complete-field");
+import "src/widget/form/sass/_autocomplete.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.auto-complete-field");
 
 export enum FilterTextType {
     beginWith = 1,
@@ -141,12 +141,15 @@ export interface AutoCompleteFieldProps extends AbstractFieldProps, HornetWritta
     name: string;
 
     // surcharge du label lors qu'on a pas de resultat
-    noResultLabel?: String;
+    noResultLabel?: string;
 
     // définit si le champs peut être réinitialiser
     resettable?: boolean;
     // définit le title du bouton si le champs peut être réinitialiser
     resetTitle?: string;
+
+    // force le filtre de la liste de choix par rapport à l'élément sélectionné
+    autoFilter?: boolean;
 }
 
 /**
@@ -169,6 +172,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         resettable: true,
         resetTitle: "form.autoCompleteField.resetTitle",
         init: true,
+        autoFilter: false
     },
         AbstractField.defaultProps);
 
@@ -185,6 +189,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     /** Indicateur si la valeur dans l'autocomplete a changé depuis le dernier focus */
     protected isUpdated: boolean;
     protected typedValueOnFocus: string;
+    protected isTyping: boolean;
 
     constructor(props: P, context?: any) {
         super(props, context);
@@ -222,7 +227,13 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @returns {AutoComplete}
      */
     setChoices(value: any[], callback?: () => any): this {
-        this.setState({ choices: value }, callback);
+        let choices: any[] = [];
+        if (value && !Array.isArray(value)) {
+            choices.push(value);
+        } else {
+            choices = value;
+        }
+        this.setState({ choices }, callback);
         return this;
     }
 
@@ -265,7 +276,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         this.props.dataSource.removeListener("delete", this.setDeleteResultCallback);
         this.props.dataSource.removeListener("sort", this.setResultCallback);
         this.props.dataSource.removeListener("loadingData", this.displaySpinner);
-
     }
 
     /**
@@ -322,7 +332,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             className += " " + this.state.className;
         }
 
-        let htmlProps: HTMLAttributes<HTMLElement> = this.getHtmlProps();
+        let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
         htmlProps = _.assign(htmlProps, {
             onKeyDown: this.handleKeyDown,
             onFocus: this.handleFocus,
@@ -339,7 +349,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             type: "text",
             name: this.getFreeTypingFieldName(),
             className,
-        } as HTMLAttributes<HTMLElement>);
+        } as React.HTMLAttributes<HTMLElement>);
+
+        // Dans le cas où l'autocomplete est mis à jour avec une donnée sélectionnée depuis le datasource
+        // la liste des choix du selector est uniquement alimentée par le choix sélectionné comme si il avait été saisi à la main
+        // const choices = (this.state.dataSource.selected) ? this.state.dataSource.selected : this.state.choices;
 
         /* Le champ caché contient l'identifiant de l'élément sélectionné. C'est cet identifiant qui est ensuite
          utilisé par les actions. */
@@ -407,7 +421,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
 
         const hidden = htmlProps["type"] === "hidden";
 
-        const classList: ClassDictionary = {
+        const classList: classNames.ClassDictionary = {
             "input-reset autocomplete-reset": true,
             "input-reset-hidden": (!this.isValued() || hidden),
         };
@@ -420,18 +434,18 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             aProps["role"] = "button";
         }
 
-        let spanProps: HTMLAttributes<HTMLElement> = {};
+        let spanProps: React.HTMLAttributes<HTMLElement> = {};
         spanProps = _.assign(spanProps, {
             id: this.inferResetButtonId(),
             "aria-hidden": !this.isValued(),
             className: classNames(classList),
             onKeyDown: this.handleResetKeyDown,
-        } as HTMLAttributes<HTMLElement>);
+        } as React.HTMLAttributes<HTMLElement>);
         logger.trace("render resetButton", spanProps, aProps);
         return (
             <span {...spanProps}>
                 <a {...aProps}>
-                    <img src={Picto.grey.close} alt={aProps.title} />
+                    <SvgSprites icon="close" color="#757575" />
                 </a>
             </span>
         );
@@ -447,7 +461,9 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     }
 
     clear(event) {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
         this.resetField();
         this.emitDataSourceSelectEvent(null);
         if (this.state.onChange) {
@@ -670,11 +686,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
 
     /**
      * gère la tabulation
-     * @param {__React.KeyboardEvent<HTMLElement>} e
+     * @param {React.KeyboardEvent<HTMLElement>} e
      * @param {boolean} shouldShow
      * @param {boolean} preventDefault
      */
-    protected tabHandlerForValueChange(e: __React.KeyboardEvent<HTMLElement>, shouldShow: boolean) {
+    protected tabHandlerForValueChange(e: React.KeyboardEvent<HTMLElement>, shouldShow: boolean) {
         if (this.isUpdated) {
             this.validateSelectedValue(shouldShow);
             this.isUpdated = false;
@@ -747,6 +763,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param {any} event évènement propagé
      */
     protected handleClickAndDoubleClick(event?: any): void {
+        this.prepareChoices();
         this.typedValueOnFocus = this.getCurrentText();
 
         if (!this.isValidText(this.typedValueOnFocus) && this.state.allChoices) {
@@ -782,7 +799,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             (this.state as any).selectedIndex = -1;
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, "", null);
         } else {
-            (this.state as any).selectedIndex = _.findIndex(this.state.allChoices, { text: this.typedValueOnFocus });
+            (this.state as any).selectedIndex = _.findIndex(this.state.choices, { text: this.typedValueOnFocus });
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, null);
         }
     }
@@ -832,7 +849,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     clearFilterData() {
         if (this.props.dataSource instanceof DataSourceMaster) {
-            (this.props.dataSource as DataSourceMaster<any>).getSlaves().forEach((item: DataSource<any>) => {
+            this.props.dataSource.getSlaves().forEach((item: DataSource<any>) => {
                 item.emit("filter", []);
             });
         }
@@ -848,14 +865,17 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Fonction déclenchée sur une modification du champ de saisie libre
      * @param event
      */
-    protected handleChangeTextInput(event: FormEvent<HTMLElement>): void {
+    protected handleChangeTextInput(event?: React.FormEvent<HTMLElement>): void {
+        this.isTyping = true;
         logger.trace("auto-complete handleChangeTextInput");
         // Le texte a changé donc on réinitialise la valeur
         this.resetSelectedValue();
         (this.state as any).selectedIndex = null;
 
         // L'attribut DOM onChange est éventuellement aussi renseigné sur le composant auto-complete
-        this.onChangeForceEmit(event);
+        if (event) {
+            this.onChangeForceEmit(event);
+        }
 
         const newText = this.getCurrentText();
 
@@ -936,10 +956,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     /**
      * Charge la liste de choix dans le composant
      */
-    protected prepareChoices() {
+    protected prepareChoices(): void {
         const newText = this.getCurrentText();
         if (this.isValidText(newText) || (!newText && this.state.init) || !this.state.writable) {
-            const newChoices = this.inferNewChoices(this.state.choices, newText);
+            const choicesListToUse = (this.state.choices && this.state.choices.length > 0) ? this.state.choices : this.state.allChoices;
+            const newChoices = this.inferNewChoices(choicesListToUse, newText);
 
             // mets a jour la liste des choix
             this.setChoices(newChoices, () => {
@@ -967,10 +988,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             newChoices = actualChoices;
             const maxElements = this.state.maxElements ? this.state.maxElements : actualChoices.length;
             // Dans le cas d'un datasource array, le filter est pour l'instant porté par l'autocomplete
-            if (this.props.dataSource && this.props.dataSource.isDatasourceArray()) {
+            if (this.props.dataSource && (this.props.autoFilter || this.isTyping)) {
                 newChoices = actualChoices.filter((choice: any) => {
                     return this.findText(choice, inputValue.toLowerCase());
                 });
+                this.isTyping = false;
             }
 
             newChoices = newChoices.filter((item, index) => {
@@ -1068,7 +1090,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Fonction appelée lorsque l'utilisateur clique sur un item de la liste des valeurs possibles
      * @param event
      */
-    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
+    protected onListWidgetSelected(event: React.MouseEvent<HTMLElement>, choice: any): void {
         if (choice) {
             logger.trace("Selection click [", choice.value, "]:", choice.text);
             const index = _.findIndex(this.state.choices, choice);
@@ -1195,7 +1217,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Surcharge le rendu des erreurs de validation : le nom du champ à mettre en évidence est le champ de saisie libre
      * @override
      */
-    renderErrors(): __React.ReactElement<FieldErrorProps> {
+    renderErrors(): React.ReactElement<FieldErrorProps> {
         const fieldErrorProps: FieldErrorProps = {
             errors: this.state.errors,
             fieldName: this.getFreeTypingFieldName(),

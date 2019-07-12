@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,9 +81,7 @@
 import * as Log4jsNode from "log4js";
 import * as _ from "lodash";
 import { ContinuationLocalStorage } from "hornet-js-utils/src/continuation-local-storage";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as path from "path";
-import * as fs from "fs";
+import { Logger } from "hornet-js-logger/src/logger";
 
 export class ServerLog {
 

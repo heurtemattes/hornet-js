@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,6 +88,8 @@ import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { Utils } from "hornet-js-utils";
 import { ClientInputChannel } from "src/security/client-input-channel";
+import { Promise } from "hornet-js-utils/src/promise-api";
+
 // fixme changer l'import var net...
 const net = require("net");
 

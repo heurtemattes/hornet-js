@@ -73,14 +73,13 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Register } from "src/common-register";
-
-const logger = Register.getLogger("hornet-js-utils.template");
+import { Logger } from "hornet-js-logger/src/logger";
+const logger = Logger.getLogger("hornet-js-utils.template");
 
 
 export interface Key {

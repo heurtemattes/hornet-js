@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,20 +82,19 @@
 import { runTest } from "hornet-js-test/src/test-run";
 import "hornet-js-test/src/test-run";
 
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Decorators } from "hornet-js-test/src/decorators";
-import * as assert from "assert";
-import { Utils } from "hornet-js-utils";
 
 import * as moment from "moment";
 import { CalendarField } from "src/widget/form/calendar-field";
-import { Form } from "src/widget/form/form";
-import { Button } from "src/widget/button/button";
 
 let simpleCalendar: JSX.Element;
 let multipleFormatsCalendar: JSX.Element;

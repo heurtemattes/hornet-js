@@ -73,13 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
@@ -87,7 +90,6 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import { ActionButton } from "src/widget/table/action-button";
-import { Utils } from "hornet-js-utils";
 import { Column } from "src/widget/table/column";
 import { Columns } from "src/widget/table/columns";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
@@ -95,9 +97,9 @@ import { Table } from "src/widget/table/table";
 import { Header } from "src/widget/table/header";
 /* Composant Content */
 import { Content } from "src/widget/table/content";
-Utils.setConfigObj({});
 import { MenuActions } from "src/widget/table/menu-actions";
 import { KeyCodes } from 'hornet-js-components/src/event/key-codes';
+
 
 let actionButtonElement: JSX.Element;
 let dataSourceTableEditable: DataSource<any>;

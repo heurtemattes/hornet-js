@@ -73,19 +73,19 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
 import { AbstractCell, AbstractCellProps } from "src/widget/table/column/cell/abstract-cell";
-import { ColumnState } from "hornet-js-react-components/src/widget/table/column";
-import * as classNames from "classnames";
-import { ContentState } from "hornet-js-react-components/src/widget/table/table-state";
+import { ColumnState } from "src/widget/table/column";
+import classNames from "classnames";
+import { ContentState } from "src/widget/table/table-state";
+
+import "src/widget/table/sass/_datatable-sortable.scss";
 
 export interface SortTitleInformations {
     ariasort: "none" | "ascending" | "descending" | "other";
@@ -117,7 +117,7 @@ export interface AbstractHeaderCellProps extends AbstractCellProps {
     orderByLabelDown?: string;
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-header-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-header-cell");
 
 /**
  * Classe permettant de générer le rendu html d'un cellule du header d'un tableau
@@ -173,7 +173,7 @@ export class AbstractHeaderCell<P extends AbstractHeaderCellProps, S> extends Ab
 
         logger.trace("Rendu Header column Tableau");
 
-        const classes: ClassDictionary = { "datatable-header": true, fixed: (this.props.headerFixed) };
+        const classes:{ [id: string]: any;} = { "datatable-header": true, fixed: (this.props.headerFixed) };
 
         if (this.props.className) {
             classes[ this.props.className ] = true;

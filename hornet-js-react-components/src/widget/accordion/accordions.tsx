@@ -73,19 +73,21 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { Accordion, TAB_ID_NAME } from "src/widget/accordion/accordion";
 import { GroupComponent, GroupComponentProps } from "src/widget/group/abstract-group-component";
 import * as _ from "lodash";
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.accordion.accordions");
+import "src/widget/accordion/sass/_accordions.scss";
+
+const logger = Logger.getLogger("hornet-js-react-components.widget.accordion.accordions");
 
 export interface AccordionsProps extends GroupComponentProps {
     multiSelectable?: boolean;

@@ -73,14 +73,12 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-
 import { Request, Response, SuperAgentRequest } from "superagent";
-import { IncomingMessage, ServerResponse } from "http";
 import { MediaType } from "src/protocol/media-type";
 import { CacheKey } from "src/services/hornet-superagent";
 import { ClientSessionTimeout } from "src/session/client-session-configuration";
@@ -88,7 +86,7 @@ import { ClientSessionTimeout } from "src/session/client-session-configuration";
 /**
  * Surcharge pour la compilation des plugins
  */
-export interface HornetSuperAgentRequest extends Request<HornetSuperAgentRequest> {
+export interface HornetSuperAgentRequest extends Request {
     callback(err: any, res: any): void;
 }
 
@@ -108,7 +106,7 @@ export interface HornetRequest {
     ca?: string;
     cert?: string;
     key?: string;
-    progress?: Function;
+    progress?: (event: any) => void;
     timeout?: HornetRequestTimeOut;
     resultDisposition?: HornetRequestResultDisposition;
     clientTimeout?: ClientSessionTimeout;

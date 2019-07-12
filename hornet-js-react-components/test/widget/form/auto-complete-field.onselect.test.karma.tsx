@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,7 @@ import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 import { Form } from "src/widget/form/form";
 import { AutoCompleteField } from "src/widget/form/auto-complete-field";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import * as React from "react";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -164,14 +164,19 @@ class AutoCompleteOnSelectTest extends HornetReactTest {
                             HornetTestAssert.assertLesserThan(2, this.dataSourceOnSelectCompteur, "Le datasource a déclenché trop d'event select");
                             HornetTestAssert.assertGreaterThan(0, this.dataSourceOnSelectCompteur, "Le datasource n'a pas déclenché d'event select");
                             (document.querySelector(`#${id} #testAutocomplete`) as any).click();
-                            const elts = document.querySelectorAll(`#${id} #testAutocomplete_select`);
-                            this.triggerMouseEvent(elts[0].children[1], "mousedown");
+                            const resetButton = document.querySelector(`#testAutocompleteResetButton > a`);
+                            (resetButton as any).click();
+                            this.triggerMouseEvent(resetButton, "mousedown");
                             setTimeout(() => {
-                                const data = { value: 2, text: "tata" };
-                                HornetTestAssert.assertEquals(data, this.dataSource.selected, "Le clic de sélection n'a pas sélectionné le bon élément 2");
-                                HornetTestAssert.assertLesserThan(3, this.dataSourceOnSelectCompteur, "Le datasource a déclenché trop d'event select");
-                                HornetTestAssert.assertGreaterThan(1, this.dataSourceOnSelectCompteur, "Le datasource n'a pas déclenché d'event select");
-                                this.end();
+                                const elts = document.querySelectorAll(`#${id} #testAutocomplete_select`);
+                                this.triggerMouseEvent(elts[0].children[1], "mousedown");
+                                setTimeout(() => {
+                                    const data = { value: 2, text: "tata" };
+                                    HornetTestAssert.assertEquals(data, this.dataSource.selected, "Le clic de sélection n'a pas sélectionné le bon élément 2");
+                                    HornetTestAssert.assertLesserOrEqualThan(4, this.dataSourceOnSelectCompteur, `Le datasource a déclenché trop d'event select | ${this.dataSourceOnSelectCompteur}`);
+                                    HornetTestAssert.assertGreaterThan(1, this.dataSourceOnSelectCompteur, `Le datasource n'a pas déclenché d'event select | ${this.dataSourceOnSelectCompteur}`);
+                                    this.end();
+                                }, 500);
                             }, 500);
                         }, 500);
                     }, 500);

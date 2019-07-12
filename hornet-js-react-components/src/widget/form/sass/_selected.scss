@@ -1,0 +1,62 @@
+@import '../../sass/core';
+
+$selectedFieldBorder: rgba(174, 174, 174, 1); //#aeaeae
+$selectedBgWhite: theme-color('global', 'white');
+$selectedShadow: theme-color('global', 'dark');
+$selectedFieldFocus: theme-color($variant: 'states');
+$selectedFieldReadonly: rgba(235, 235, 228, 1); //#ebebe4
+
+.selectfield {
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 15.469em;
+    width: 100%;
+    height: 2.563em;
+    padding: 0.5em 0.5em 0.5em 1em;
+    margin: 0;
+    background: url("../img/expand-close.svg") $selectedBgWhite no-repeat calc(100% - 6px) 50%;
+    background-size: 43px;
+    font: inherit;
+    line-height: 1.5em;
+    appearance: none;
+    border: 1px solid $selectedFieldBorder;
+
+    &:-moz-focusring {
+        color: transparent;
+        text-shadow: 0 0 0 $selectedShadow;
+    }
+
+    &:focus {
+        outline: 1px solid $selectedFieldFocus;
+    }
+
+    &[readonly] {
+        background-color: $selectedFieldReadonly;
+    }
+
+    &:not([readonly]),
+    &[readonly="false"] {
+        background-color: $baseColorLight;
+    }
+
+    &[multiple] {
+        height: 7.5em;
+        background-image: none;
+    }
+
+    &::-ms-expand {
+        display: none;
+    }
+
+    option {
+        padding-left: 1em !important;
+    }
+}
+
+.selectfield {
+    &.has-error {
+        background: $globalErrorBg;
+        appearance: none;
+        border: 1px solid $globalErrorColor;
+    }
+}

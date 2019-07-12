@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "emitDecoratorMetadata": true,    
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./target",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES5"
+  },
+  "include": [
+    "src/**/*.ts*",
+    "index.ts",
+    "test/**/*.ts*"
+  ],
+  "exclude": [
+    "istanbul",
+    "./index.d.ts"
+  ]
+}

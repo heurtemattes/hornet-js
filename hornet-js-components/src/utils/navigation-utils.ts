@@ -73,18 +73,18 @@
  * hornet-js-components - Interfaces des composants web de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as MenuConstants from "src/utils/menu-constantes";
 import { AuthUtils, UserInformations } from "hornet-js-utils/src/authentication-utils";
 import { IMenuItem } from "src/component/imenu-item";
-import * as _ from "lodash";
 
-const logger = Utils.getLogger("hornet-js-component.navigation.utils.navigation-utils");
+const logger = Logger.getLogger("hornet-js-component.navigation.utils.navigation-utils");
 
 export interface NavigationItem {
     submenu: Array<NavigationItem>;
@@ -104,7 +104,7 @@ export class NavigationUtils {
      * @returns {any}
      */
     public static getConfigMenu() {
-        return _.cloneDeep(Utils.getCls("hornet.menuConfig") || []);
+        return [...Utils.getCls("hornet.menuConfig")] || [];
     }
 
     /**
@@ -131,7 +131,7 @@ export class NavigationUtils {
             const item: IMenuItem = items[ i ];
             if (!item.rolesAutorises 
                 || (item.rolesAutorises 
-                    && AuthUtils.isAllowed(user, _.isArray(item.rolesAutorises) ? item.rolesAutorises as any : [ item.rolesAutorises ]))) {
+                    && AuthUtils.isAllowed(user, Array.isArray(item.rolesAutorises) ? item.rolesAutorises as any : [ item.rolesAutorises ]))) {
                 const typeNavigation = (isForPlan) ? "visibleDansPlan" : "visibleDansMenu";
                 if (item[ typeNavigation ]) {
                     logger.debug("L'utilisateur a accès au menu:", item.text);
@@ -301,7 +301,7 @@ export class NavigationUtils {
         if (myElement) {
             for (let i = 0; i < depth; i++) {
                 if (myElement.classList && myElement.classList.contains(MenuConstants.HAVING_SUBMENU_CLASSNAME)) {
-                    if (myElement.nextSibling && myElement.nextSibling.localName === "li") {
+                    if (myElement.nextSibling && myElement.nextSibling.nodeName === "li") {
                         if (hideElement) {
                             // TODO à corriger : il faut aussi cacher les sous éléments (cf. mantis 58700)
                             NavigationUtils.hideElement(myElement.nextSibling);

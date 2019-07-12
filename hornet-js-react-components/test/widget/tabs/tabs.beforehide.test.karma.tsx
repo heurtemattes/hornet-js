@@ -73,13 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
@@ -87,8 +88,8 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
-import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
-import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
+import { Tabs } from "src/widget/tab/tabs";
+import { Tab } from "src/widget/tab/tab";
 import * as _ from "lodash";
 
 let tabsElement: JSX.Element;

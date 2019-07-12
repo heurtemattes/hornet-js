@@ -73,17 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
+import * as _ from "lodash";
 
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -94,7 +93,11 @@ import { Confirm } from "src/widget/dialog/confirm";
 import { PaginateDataSource, Pagination } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 
-const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.header");
+import "src/widget/table/sass/_table.scss";
+import "src/widget/table/sass/_datatable-sortable.scss";
+import "src/widget/dropdown/sass/_dropdown.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-components.widget.table.header");
 
 /**
  * Propriétés du composant Header de tableau Hornet

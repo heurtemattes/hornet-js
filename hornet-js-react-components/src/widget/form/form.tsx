@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { Notification } from "src/widget/notification/notification";
 import { AbstractField } from "src/widget/form/abstract-field";
@@ -95,15 +95,19 @@ import {
 } from "hornet-js-core/src/notification/notification-manager";
 import { CheckBoxField } from "src/widget/form/checkbox-field";
 import { IValidationResult, ICustomValidation, DataValidator } from "hornet-js-core/src/validation/data-validator";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import * as _ from "lodash";
+import * as ajv from "ajv";
 import ErrorObject = ajv.ErrorObject;
 import { SelectField } from "src/widget/form/select-field";
 import { ButtonsArea } from "src/widget/form/buttons-area";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { HTML_ATTRIBUTES } from "src/widget/form/html-attributes";
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.form");
+
+import "src/widget/form/sass/_form-entities.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.form");
 
 /**
  * Propriétés du formulaire hornet.
@@ -118,7 +122,7 @@ export interface FormProps extends AbstractFormProps {
     /** Fonction déclenchée lors de la soumission du formulaire, lorsque celui-ci est valide */
     onSubmit?: (data: any) => void;
     /** Fonction déclenchée lors de la modification d'un champ du formulaire */
-    onFormChange?: __React.FormEventHandler<HTMLElement>;
+    onFormChange?: React.FormEventHandler<HTMLElement>;
     /** Lorsque mis à true, le message d'information concernant les champs obligatoires est masqué.
      * Ignoré lorsque markRequired est à false car le message n'a pas lieu d'être affiché. */
     isMandatoryFieldsHidden?: boolean;
@@ -154,6 +158,12 @@ export interface FormProps extends AbstractFormProps {
     hideButtons?: boolean;
     // Ignorer ou non les informations non valorisées du formulaire
     omitNull?: boolean;
+    /* Ajoute ou non la classe sticky au formulaire */
+    isSticky?: boolean;
+    /* d de la zone de bouton sticky au formulaire */
+    buttonAreaIdSticky?: string;
+    /* id du footer pour gérer la visibilité de la zone de bouton sticky au formulaire */
+    footerId?: string;
 }
 
 /**
@@ -174,6 +184,9 @@ export class Form extends AbstractForm<FormProps, any> {
         customValidators: [],
         validationOptions: DataValidator.DEFAULT_VALIDATION_OPTIONS,
         omitNull: true,
+        isSticky: false,
+        buttonAreaIdSticky: "button-container",
+        footerId: "footer-container",
     });
 
     constructor(props?: FormProps, context?: any) {
@@ -213,7 +226,7 @@ export class Form extends AbstractForm<FormProps, any> {
         return this;
     }
 
-    setOnFormChange(handler: __React.FormEventHandler<HTMLElement>, callback?: () => any): this {
+    setOnFormChange(handler: React.FormEventHandler<HTMLElement>, callback?: () => any): this {
         this.setState({ onFormChange: handler }, callback);
         return this;
     }
@@ -283,6 +296,7 @@ export class Form extends AbstractForm<FormProps, any> {
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        window.removeEventListener("scroll", this.handleScroll);
         NotificationManager.clean(this.state.notifId, this.state.id);
         if (this.formElement) {
             this.formElement["__component"] = null;
@@ -291,6 +305,7 @@ export class Form extends AbstractForm<FormProps, any> {
 
     componentDidMount(): void {
         super.componentDidMount();
+        window.addEventListener("scroll", this.handleScroll);
         /* On évite la soumission intempestive du formulaire en cas de clics répétés ou de touche entrée maintenue
          sur le bouton de soumission*/
         this.debouncedValidateAndSubmit = _.debounce(this.validateAndSubmit, 500);
@@ -702,7 +717,7 @@ export class Form extends AbstractForm<FormProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        const classes: ClassDictionary = {
+        const classes = {
             form: true,
             clear: true,
             /* Application du style CSS readonly à tout le bloc lorsque tous les champs sont en lecture seule */
@@ -730,8 +745,14 @@ export class Form extends AbstractForm<FormProps, any> {
             ref: this.registerForm,
         };
 
+        let formClass = 'form-content';
+
         if (this.isMultiPartForm(this.state.children)) {
             formProps["encType"] = "multipart/form-data";
+        }
+
+        if(this.state.isSticky) {
+            formClass += ' form-content-sticky'
         }
 
         const textHtmlProps = {
@@ -740,7 +761,7 @@ export class Form extends AbstractForm<FormProps, any> {
 
         const htmlProps = _.cloneDeep(this.getHtmlProps);
         return (
-            <section className="form-container">
+            <section id="form-content" className={formClass}>
                 {customNotif}
                 <div className={classNames(classes)}>
                     <form  {...htmlProps}{...formProps}>
@@ -780,6 +801,70 @@ export class Form extends AbstractForm<FormProps, any> {
             }
         });
         return tableauButtonsArea;
+    }
+
+    /**
+     * Métohde de gestion du scroll à l'écran
+     */
+    protected handleScroll() {
+
+        if(this.state.isSticky) {
+            let footer = document.getElementById(this.props.footerId);
+
+            let rect = footer.getBoundingClientRect();
+            let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            
+            //gestions des boutons & du formulaire
+            let form = document.getElementById("form-content");
+            let buttonsArea = document.getElementById(this.props.buttonAreaIdSticky);
+            
+            if(buttonsArea) {
+                let buttonsRect = buttonsArea.getBoundingClientRect();
+                let buttonHeight = buttonsRect.height;
+        
+                //sauvegarde la taille visible du footer
+                let height = -(rect.top - viewHeight);
+                this.setState({ size: height });
+        
+                /*si le footer est visible, le composant s'affichera au dessus de celui-ci*/
+                let visible: boolean = false;
+                if (footer) {
+                    visible = this.checkvisible(footer);
+        
+                    // Si un formulaire sticky est présent
+                    if(form && form.classList.contains('form-content-sticky')) {
+                        // gestion des boutons si footer visible
+                        if(visible) {
+                            // change la classe de la div contenant les boutons
+                            buttonsArea.classList.replace('button-area-isFixed', 'button-area-isSticky');
+                        } else {
+                            buttonsArea.classList.replace('button-area-isSticky', 'button-area-isFixed');
+                        }
+            
+                        // ajoute le positionnement bottom sur les boutons sticky
+                        buttonsArea.classList.contains('button-area-isSticky') 
+                            ? buttonsArea.style.bottom = `-${buttonHeight}px`
+                            : buttonsArea.style.bottom = `0`;
+                    }
+                }        
+            }
+        }
+    }
+
+        /**
+     * Calcule si un élément est présent ou non a l'écran
+     * @param {Element} elm - l'élément a rechercher
+     * @return {boolean} true si l'élément est présent
+     */
+    protected checkvisible(elm) {
+        let rect = elm.getBoundingClientRect();
+        let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+
+        //sauvegarde la la taille visible de l'élément
+        let height = -(rect.top - viewHeight) + 40;
+        this.setState({ size: height });
+
+        return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
     }
 
 }

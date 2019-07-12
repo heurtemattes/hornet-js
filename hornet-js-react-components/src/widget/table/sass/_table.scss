@@ -1,0 +1,260 @@
+@import '../../sass/core';
+
+$tableDataColumns: rgba(244, 244, 244, 1); //#f4f4f4
+$tableBoxShadows: rgba(0, 0, 0, 0.12);
+$tableBoxShadowsDarker: rgba(0, 0, 0, 0.40);
+$tableContentColor: rgba(0, 0, 0, 0.87);
+$tableBorders: rgba(224, 224, 224, 1); //#e0e0e0
+$tableSelected: rgba(226, 239, 247, 1); //#e2eff7
+$tableEditionBoxShadow: theme-color('global', 'boxShadows');
+$tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
+
+/// Composant table qui se compose de :
+/// _table.scss
+/// _pagination.scss
+/// datatable-sortable.scss
+/// _datatable-loader.scss
+%titleStyle {
+    overflow: hidden;
+    color: $tableBaseColor;
+    word-break: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+%tdStyle {
+    margin-top: 0;
+    vertical-align: middle;
+    height: 3.5em;
+    font-size: 0.8125em;
+    text-overflow: ellipsis;
+    font-family: $roboto;
+}
+
+.is-disabled,
+[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.datatable-caption {
+    display: none;
+}
+
+.datatable-container {
+    svg {
+        vertical-align: middle;
+        &:not([width]) {
+            width: 1.7em;
+            height: 1.7em;
+        }
+    }
+    /// exception pour l'icone account du tableau partenaire
+    .one-fifth {
+        svg {
+            width: 10em;
+            height: 10em;
+        }
+    }
+
+    .icon-arrowUpward,
+    .icon-arrowDownward {
+        width: 1em;
+        height: 1em;
+    }
+}
+
+.datatable-header-title {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    background: $tableHeaderColor;
+    padding: 0 0.625em 0 1.5em;
+    border-radius: 0.375em 0.375em 0 0;
+    box-shadow: 0 0.0625em 0.375em $tableBoxShadows;
+
+    .datatable-title {
+        flex: 1;
+        width: 70%;
+
+        @extend %titleStyle;
+
+        &-span {
+            position: relative;
+            padding-right: 1em;
+            font-size: 1.25em;
+            line-height: 2.3em;
+
+            @extend %titleStyle;
+        }
+    }
+
+    .datatable-header-menu {
+        flex-direction: row;
+        padding-top: 0.3em;
+    }
+}
+
+.datatable-content {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: auto;
+    background: $tableBaseColor;
+    border-radius: 0 0 0.375em 0.375em;
+    box-shadow: 0 0.0625em 0.375em $tableBoxShadows;
+    color: $tableContentColor;
+    transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+
+    .isSticky {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        z-index: 99;
+        display: inherit;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+
+        th {
+            font-size: 0.8125em;
+        }
+    }
+
+    .datatable-data {
+        .autocomplete-selector {
+            position: absolute;
+        }
+    }
+
+    table {
+        background-color: $tableBaseColor;
+        border-spacing: 0;
+        table-layout: fixed !important;
+
+        caption {
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .datatable-columns {
+            background-color: $tableDataColumns;
+
+            .datatable-header {
+                background-color: $tableDataColumns;
+            }
+        }
+        
+        .datatable-columns-fixed {
+            display: inline;
+        }
+        .datatale-columns-hidden {
+            display: none;
+        }
+    }
+}
+
+td,
+th {
+    border: none !important;
+    padding: 0;
+}
+
+.datatable-data-fixed {
+    display: inline;
+    overflow-y: auto;
+}
+
+.table-header {
+    position: relative;
+    width: 1.5em;
+    padding-right: 1.5em;
+    vertical-align: middle;
+    color: $tableHeaderColor;
+    font-size: 0.75em;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    tr {
+        border-bottom: 0.0625em solid $tableBorders;
+    }
+}
+
+tr:hover td,
+tr.datatable-line-selected td {
+    background: $tableSelected;
+}
+
+table > thead > tr > th {
+    line-height: 2.2;
+
+    @extend %tdStyle;
+}
+
+table > tbody > tr > td {
+    overflow: hidden;
+    line-height: 2.2;
+    white-space: nowrap;
+
+    @extend %tdStyle;
+    
+}
+
+table > thead.datatable-columns-disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+table > thead.datatable-columns > tr > th,
+table > tbody.datatable-data > tr > td {
+    display: table-cell;
+}
+
+table > tbody > tr > td.datatable-cell-in-edition {
+    background: $tableSelected;
+    box-shadow: 0 0.125em 0 $tableEditionBoxShadow;
+    opacity: 1;
+    filter: none;
+}
+
+table > thead.datatable-columns-fixed > tr > th,
+table > tbody.datatable-data-pxfixed > tr > td {
+    display: inline-block;
+}
+
+table > tbody > tr {
+    border-bottom: 0.0625em solid $tableBorders;
+    color: $tableGlobalColor;
+}
+
+.table-footer {
+    height: 3em;
+}
+
+th {
+    padding: 0;
+}
+
+th {
+    div {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        padding-right: 0.1em;
+        padding-left: 0.5em;
+    }
+}
+
+tr {
+    th {
+        padding: .3em 0em !important;
+    }
+}
+tr {
+    td {
+        padding: 0.3em 0.1em 0.3em 0.8em;
+    }
+}

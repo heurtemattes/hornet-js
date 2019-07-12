@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,21 +86,24 @@ import {
     AbstractFieldProps,
 } from "src/widget/form/abstract-field";
 import * as _ from "lodash";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
-import KeyboardEventHandler = __React.KeyboardEventHandler;
+import KeyboardEventHandler = React.KeyboardEventHandler;
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.checkbox-field");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.checkbox-field");
 
-export interface SwitchFieldProps extends AbstractFieldProps, HornetClickableProps{
-    datas? : any;
+export interface SwitchFieldProps extends AbstractFieldProps, HornetClickableProps {
+    datas?: any;
     valueKey?: string;
     labelKey?: string;
     defaultValue?: any;
     inputClassName?: string;
     labelClassName?: string;
     onKeyDown?: KeyboardEventHandler<HTMLElement>;
+    /** Function retournant un booléen permettant de savoir si le choix courrant est à sélectionner lors de render
+     * accèpte un argument dit choice en entrée
+     */
+    shouldRadioBeChecked?: Function;
 }
 
 /**
@@ -115,7 +118,8 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
         labelKey: "label",
         valueKey: "value",
         readOnly: false,
-        disabled: false});
+        disabled: false
+    });
 
     constructor(props?: SwitchFieldProps, context?: any) {
         super(props, context);
@@ -141,20 +145,33 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
 
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.datas !== this.state.items) {
+            this.setItems(nextProps.datas);
+        }
+
+        if (nextProps.defaultValue !== this.state.selected) {
+            this.setState({ selected: nextProps.defaultValue });
+        }
+
+        if (nextProps.disabled !== this.state.disabled) {
+            this.setState({ disabled: nextProps.disabled });
+        }
+    }
+
     /**
      * Génère le rendu spécifique du champ
      * @returns {JSX.Element} rendu
      * @override
      */
     renderWidget(): JSX.Element {
-
-        const className: ClassDictionary = {
+        const className: classNames.ClassDictionary = {
             "has-error": this.hasErrors(),
-            "switch-container": true,
+            "switch": true,
         };
 
         if (this.props.className) {
-            className[ this.props.className ] = true;
+            className[this.props.className] = true;
         }
 
 
@@ -163,22 +180,23 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
             readOnly: this.state.readOnly,
             className: classNames(className),
             id: this.state.id,
-            name: this.state.name};
+            name: this.state.name
+        };
 
         const hasItems = this.state.items && this.state.items.length && this.state.items.length > 0;
 
-        return(
+        return (
             <div {...toggleProps} >
                 <fieldset className="switch-fieldset">
                     <div className="switch-toggle">
                         {hasItems ?
-                         this.state.items.map((data) => {
-                            return this.renderOptionInput(data);
-                        }) : null}
-                        { hasItems ?
-                         this.state.items.map((data, index) => {
-                            return this.renderOptionLabel(data, index);
-                        }) : null}
+                            this.state.items.map((data) => {
+                                return this.renderOptionInput(data);
+                            }) : null}
+                        {hasItems ?
+                            this.state.items.map((data, index) => {
+                                return this.renderOptionLabel(data, index);
+                            }) : null}
                     </div>
                 </fieldset>
             </div>
@@ -193,18 +211,18 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
     renderOptionInput(option: any): JSX.Element {
         const inputClassName = this.props.inputClassName ?
             this.props.inputClassName + " switch-option-input" : "switch-option-input";
+        const key = this.state.id + "-" + option[this.state.valueKey];
 
-        return(
-            <React.Fragment>
-                <input
-                    id={this.state.id + "-" + option[this.state.valueKey]}
+        return (
+            <React.Fragment key={key}>
+                <input key={key + "-input"}
+                    id={key}
                     type="radio"
                     name={this.state.name}
                     onClick={() => this.handleClick(option)}
                     onKeyDown={() => this.handleKeyDown(option)}
                     onChange={this.handleChange}
                     checked={this.shouldRadioBeChecked(option)}
-                    defaultChecked = {false}
                     readOnly={this.state.readOnly}
                     disabled={this.state.disabled}
                     className={inputClassName}
@@ -225,15 +243,17 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
             this.props.labelClassName + " switch-option-label" : "switch-option-label";
 
         const style = this.getLabelStyle(option, index);
+        const key = this.state.id + "-" + option[this.state.valueKey];
 
-        return(
-            <React.Fragment>
-                <label htmlFor={this.state.id + "-" + option[this.state.valueKey]}
-                className={labelClassName}
-                title={option[this.state.labelKey]}
-                style={style.style}>
-                    {index === 0 && this.state.selected !== null ? <div className="switch-label-before" style={style.before}/> : null}
-                        {option[this.state.labelKey]}
+        return (
+            <React.Fragment key={key}>
+                <label htmlFor={key}
+                    key={ key + "-label" }
+                    className={labelClassName}
+                    title={option[this.state.labelKey]}
+                    style={style.style}>
+                    {index === 0 && this.state.selected !== null ? <div className="switch-label-before" style={style.before} /> : null}
+                    {option[this.state.labelKey]}
                     <div className="switch-label-after" style={style.after}> {option[this.state.labelKey]} </div>
                 </label>
             </React.Fragment>
@@ -248,32 +268,32 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * @param index index de l'option parmis les choix
      * @returns {JSX.Element} style de l'option
      */
-    public getLabelStyle(option: any, index: number) : any {
+    public getLabelStyle(option: any, index: number): any {
         const selected = this.shouldRadioBeChecked(option);
 
         const width = 100 / (this.state.items.length);
         const styleWidth = width + "%";
 
-        const left = width * this.getSelectedIndex() ;
-        const styleLeft = left + "%" ;
+        const left = width * this.getSelectedIndex();
+        const styleLeft = left + "%";
 
-        const beforeStyle = { width: styleWidth, left: styleLeft};
+        const beforeStyle = { width: styleWidth, left: styleLeft };
 
         const opacity = selected ? 1 : 0;
         const afterstyle = { width: styleWidth, left: styleLeft, opacity };
 
-        const style = {width: styleWidth};
+        const style = { width: styleWidth };
 
-        return {after: afterstyle, before: beforeStyle, style};
+        return { after: afterstyle, before: beforeStyle, style };
     }
 
     /**
      * retourne l'index du choix sélectionné dans les items
      * @returns {JSX.Element} index du choix sélectionné, -1 si non présent dans la liste
      */
-    private getSelectedIndex() : number {
+    protected getSelectedIndex(): number {
         if (this.state.items && this.state.items.length && this.state.items.length > 1 && this.state.selected) {
-            for ( let i = 0 ; i < this.state.items.length ; i++ ) {
+            for (let i = 0; i < this.state.items.length; i++) {
                 if (this.state.selected && this.state.items[i][this.props.valueKey] === this.state.selected[this.props.valueKey]) {
                     return i;
                 }
@@ -285,10 +305,27 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
 
     /**
      * indique si le choix doit etre sélectionné ou non
+     * Les projets peuvent surcharger les critères en passant une fonction
+     * dans la props shouldRadioBeChecked;
      * @param {any} choice choix a tester
      * @returns {Boolean} choix sélectionné ou non
      */
-    private shouldRadioBeChecked(choice: any) : boolean {
+    protected shouldRadioBeChecked(choice: any): boolean {
+        if (this.props.shouldRadioBeChecked) {
+            return this.props.shouldRadioBeChecked(choice, this);
+        } else {
+            return this.defaultShouldRadioBeChecked(choice);
+        }
+    }
+
+    /**
+     * indique si le choix doit etre sélectionné ou non
+     * Les projets peuvent surcharger les critères en passant une fonction
+     * dans la props shouldRadioBeChecked;
+     * @param {any} choice choix a tester
+     * @returns {Boolean} choix sélectionné ou non
+     */
+    protected defaultShouldRadioBeChecked(choice: any): boolean {
         if (this.state.selected !== undefined && this.state.selected != null) {
             return this.state.selected && choice[this.props.valueKey] === this.state.selected[this.props.valueKey];
         } else {
@@ -300,7 +337,7 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * Appelée au changement de valeur
      * @param {React.ChangeEvent<HTMLElement>} event evennement
      */
-    private handleChange(event: React.ChangeEvent<HTMLElement>) : void {
+    protected handleChange(event: React.ChangeEvent<HTMLElement>): void {
         if (this.props.onChange) this.props.onChange(event);
     }
 
@@ -308,20 +345,20 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * Appelée lors d'un click ou d'un key down sur l'item
      * @param {any} item choix sur lequel l'evennement à été éffectué
      */
-    private handleClick(item: any): void {
-        if (item && this.state.selected && item[this.props.valueKey] === this.state.selected[this.props.valueKey]){
+    protected handleClick(item: any): void {
+        if (item && this.state.selected && item[this.props.valueKey] === this.state.selected[this.props.valueKey]) {
             this.setState({ selected: null, currentValue: null });
-        }else {
+        } else {
             this.setState({ selected: item, currentValue: item });
         }
-        if (this.props.onClick) this.props.onClick(item);
+        if (this.props.onClick) this.props.onClick.bind(this)(item);
     }
 
     /**
      * Appelée lors d'un key down sur l'item
      * @param {any} item choix sur lequel l'evennement à été éffectué
      */
-    private handleKeyDown(item: any): void {
+    protected handleKeyDown(item: any): void {
         if (this.props.onKeyDown) this.props.onKeyDown(item);
     }
 
@@ -329,28 +366,29 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * modifier les choix
      * @param {any[]} items choix à modifier
      */
-    setItems(items: any[]) : void {
-        this.setState({ items: _.cloneDeep(items),
-        selected: null,
-        currentValue: null,
-     });
+    setItems(items: any[]): void {
+        this.setState({
+            items: _.cloneDeep(items),
+            selected: null,
+            currentValue: null,
+        });
     }
 
     /**
      * ajoute des choix
      * @param {any[] | any} items choix à ajouter
      */
-    addItems(items : any[] | any) : void {
+    addItems(items: any[] | any): void {
         let newItems = _.cloneDeep(this.state.items);
         const selected = this.state.selected;
         if (!newItems || newItems.length && newItems.length === 0) {
             newItems = [];
         }
         if (Array.isArray(items)) {
-            for ( let i = 0 ; i < items.length ; i ++) {
+            for (let i = 0; i < items.length; i++) {
                 newItems.push(items[i]);
             }
-        }else {
+        } else {
             newItems.push(items);
         }
         this.setState({ items: newItems, selected });
@@ -360,17 +398,18 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * Supprime des choix
      * @param {any[] | any} items valeurs à supprimer
      */
-    deleteItems(items: any[] | any) : void {
+    deleteItems(items: any[] | any): void {
         const newItems = _.cloneDeep(this.state.items);
-        for ( let i = 0 ; i < items.length ; i ++) {
-            for ( let j = 0 ; j < newItems.length ; j ++) {
-                if (items[i][this.props.valueKey] === newItems[j][this.props.valueKey]){
+        for (let i = 0; i < items.length; i++) {
+            for (let j = 0; j < newItems.length; j++) {
+                if (items[i][this.props.valueKey] === newItems[j][this.props.valueKey]) {
                     newItems.splice(j, 1);
                 }
             }
         }
         const selected = null;
-        this.setState({items: newItems,
+        this.setState({
+            items: newItems,
             selected,
             currentValue: selected,
         });
@@ -380,8 +419,8 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * Modifie la valeur courrante
      * @param {any} item valeur
      */
-    setCurrentValue(item: any) : this {
-        this.setState({ selected: item, currentValue: item});
+    setCurrentValue(item: any): this {
+        this.setState({ selected: item, currentValue: item });
         return this;
     }
 

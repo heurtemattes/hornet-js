@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import {
     AbstractField,
@@ -90,9 +90,13 @@ import * as moment from "moment";
 import { DateUtils } from "hornet-js-utils/src/date-utils";
 import { InputField, InputFieldProps } from "src/widget/form/input-field";
 import { KEYNAMES } from "hornet-js-components/src/event/key-codes";
-import FormEvent = __React.FormEvent;
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.calendar-fied");
+import "src/widget/form/sass/_calendar.scss";
+import "src/widget/form/sass/_rc-calendar.scss";
+import "src/widget/form/sass/_rc-calendar-utils.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.calendar-fied");
 
 let RcCalendar = null;
 const defaultLocale = DateUtils.default_locale;
@@ -234,8 +238,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                     title={this.state.title || this.state.calendarLocale.agendaTitle}
                     disabled={this.state.readOnly || this.state.disabled} value="calendar"
                 >
-                    <img src={CalendarField.genUrlTheme("/img/calendar/icon_calendar.svg")}
-                        alt={this.state.alt || this.state.title || this.state.calendarLocale.agendaTitle} />
+                    <SvgSprites icon="calendar" color="#007BA7" />
                 </button>;
 
             /*RcCalendar prend un Moment en paramètre*/
@@ -280,7 +283,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                 </Modal>;
         }
 
-        let htmlProps: __React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
+        let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
 
         const formatedValue = this.state.currentValue.length >= 1
             ? this.state.currentValue
@@ -293,7 +296,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             onChange: this.handleInputChange,
             onKeyPress: this.handleInputKeyPress,
             onBlur: this.handleInputLeave,
-        } as __React.HTMLAttributes<HTMLElement>);
+        } as React.HTMLAttributes<HTMLElement>);
 
         if ((htmlProps as any).label === htmlProps.title) {
             htmlProps.title = undefined;
@@ -308,7 +311,6 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         }
 
         (htmlProps as any).label = undefined;
-        (htmlProps as any).alt = undefined;
 
         const hasError = this.hasErrors() ? " has-error" : "";
 
@@ -366,7 +368,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                     currentTarget: this.htmlElement,
                     preventDefault: () => { },
                     stopPropagation: () => { },
-                } as FormEvent<HTMLElement>);
+                } as React.FormEvent<HTMLElement>);
             }
             if (this.state.onValueChange) {
                 this.state.onValueChange(this.state.currentValue);

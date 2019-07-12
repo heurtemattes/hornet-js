@@ -73,21 +73,22 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
-import { Picto } from "hornet-js-react-components/src/img/picto";
 import { ActionButton, ActionButtonProps, TypeAction } from "src/widget/table/action-button";
 import { TableButtonInfoAccessibilite } from "src/widget/table/table-button-info-accessibilite";
-import * as _ from "lodash";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
+
+import "src/widget/table/sass/_datatable-menu.scss";
+import "src/widget/button/sass/_buttons.scss";
+
 
 /**
  * Propriétés du MenuActions
@@ -104,7 +105,7 @@ export interface MenuActionsProps extends HornetComponentProps {
     toggleColumnsButton?: typeof HornetComponent;
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.menu-actions");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.menu-actions");
 
 /**
  * Classe permettant de générer le rendu html du Menu d'actions d'un tableau
@@ -143,12 +144,11 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
     getMenuActions() {
         const priorityActions = [];
         const dropdownItems = [];
-        const item = this.props.selectedItems ? this.props.selectedItems[ 0 ] : {};
+        const item = this.props.selectedItems ? this.props.selectedItems[0] : {};
         const self = this;
 
         if (this.props.showIconInfo) {
-            priorityActions.push(<TableButtonInfoAccessibilite srcImg={Picto.white.info}
-                key={this.props.id + "-icon-info"} />);
+            priorityActions.push(<TableButtonInfoAccessibilite color={"#ffffff"} key={this.props.id + "-icon-info"}/>);
         }
 
         if (this.props.toggleColumnsButton) {
@@ -162,13 +162,13 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                     || (action.props.typeAction === TypeAction.ACTION_UNITAIRE
                         && self.props.selectedItems && self.props.selectedItems.length === 1)
                     || !action.props.typeAction) {
-                    const propsButtons: ActionButtonProps = {...action.props};
+                    const propsButtons: ActionButtonProps = { ...action.props };
 
                     propsButtons.showAlert = this.props.showAlert;
                     propsButtons.selectedItems = this.props.selectedItems;
                     propsButtons.items = this.props.items;
-                    propsButtons[ "key" ] = self.props.id + "-menuAction-" + index;
-                    propsButtons[ "value" ] = item;
+                    propsButtons["key"] = self.props.id + "-menuAction-" + index;
+                    propsButtons["value"] = item;
 
                     const isVisible: boolean = propsButtons.items.length > 0 || propsButtons.displayedWithoutResult;
 
@@ -180,7 +180,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                                 label: propsButtons.label,
                                 action: propsButtons.action,
                                 url: propsButtons.url ? this.genUrlWithParams(propsButtons.url, item || {}) : null,
-                                srcImg: propsButtons.srcImg,
+                                icon: propsButtons.srcImg,
                                 className: propsButtons.className ? "material-dropdown-menu__link " + propsButtons.className :
                                     "material-dropdown-menu__link",
                                 key: propsButtons.id || index + "-menuAction-" + index,
@@ -188,7 +188,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
                                 title: propsButtons.title,
                             });
                         } else {
-                            const newProps = _.cloneDeep(propsButtons);
+                            const newProps = { ...propsButtons };
                             newProps.label = null;
                             const actionButton = <ActionButton {...newProps} />;
                             priorityActions.push(actionButton);
@@ -211,7 +211,12 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
     renderDropDownActions(actions): JSX.Element {
         return (
             <div className="fr menu-contextuel-container">
-                <Dropdown id={this.props.id} icon="more-actions" className="menu-contextuel" type="button" items={actions}
+                <Dropdown
+                    id={this.props.id}
+                    icon="list"
+                    className="menu-contextuel"
+                    type="button"
+                    items={actions}
                     title={this.state.title}
                     position={Position.BOTTOMRIGHT} />
             </div>

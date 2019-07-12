@@ -73,13 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { http, DirectorRouter } from "director";
 import {
     AbstractRoutes,
@@ -98,7 +98,7 @@ import * as Http from "http";
 import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 
 
-const logger: Logger = Utils.getLogger("hornet-js-core.routes.router-server");
+const logger: Logger = Logger.getLogger("hornet-js-core.routes.router-server");
 
 export type DirectorRoutesDesc = { [ key: string ]: { [ key: string ]: (...arg) => void } };
 

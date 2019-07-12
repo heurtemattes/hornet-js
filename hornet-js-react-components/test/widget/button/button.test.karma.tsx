@@ -79,23 +79,10 @@
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import { Logger } from "hornet-js-utils/src/logger";
-const chai = require("chai");
-const expect = chai.expect;
-Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
-    "appenders": {
-        "console": {
-            "type": "console",
-            "layout": {
-                "type": "pattern",
-                "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-            }
-        }
-    },
-    "categories": {
-        "default": { "appenders": ["console"], "level": "INFO" }
-    }
-});
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
+
 
 import * as React from "react";
 import { HornetReactTest } from 'hornet-js-test/src/hornet-react-test';

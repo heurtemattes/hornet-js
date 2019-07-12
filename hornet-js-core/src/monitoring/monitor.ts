@@ -73,14 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-const logger: Logger = Utils.getLogger("hornet-js-core.monitoring.monitor");
+import { Logger } from "hornet-js-logger/src/logger";
+const logger: Logger = Logger.getLogger("hornet-js-core.monitoring.monitor");
 var onHeaders = require("on-headers");
 var eventLoopMonitor = require("event-loop-monitor");
 var v8 = require("v8");
@@ -92,7 +92,7 @@ var Module = require("module").Module;
 function requireGlobal(moduleName) {
     var globalDir = process.env[ "HORNET_GLOBAL_MODULE_DIR" ];
     if (!globalDir) {
-        //Utils.getLogger("hornet-js-utils").error("La variable d'environnement 'HORNET_GLOBAL_MODULE_DIR' n'est pas définie. Impossible de charger un module global !!");
+        //Logger.getLogger("hornet-js-utils").error("La variable d'environnement 'HORNET_GLOBAL_MODULE_DIR' n'est pas définie. Impossible de charger un module global !!");
         throw new Error("La variable d'environnement 'HORNET_GLOBAL_MODULE_DIR' n'est pas définie. Impossible de charger un module global !!");
     }
     // On rétabli temporairement le fonctionnement normal de résolution des modules

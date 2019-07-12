@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -81,13 +81,22 @@
 import * as url from "url";
 import * as request from "request";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { CasConfiguration } from "src/strategy/cas/cas-configuration";
 import { AuthenticationStrategy } from "src/strategy/authentication-strategy"
 import { Request, Response } from "express";
 import { AuthenticationUtils } from "src/authentication-utils";
 
-const logger: Logger = Utils.getLogger("authentication.cas.cas-strategy");
+const logger: Logger = Logger.getLogger("authentication.cas.cas-strategy");
+
+declare global {
+    namespace Express {
+        interface Request {
+            getSession(): any;
+        }
+    }
+}
+
 
 var parseString = require("xml2js").parseString,
     stripPrefix = require("xml2js/lib/processors").stripPrefix;
@@ -136,7 +145,7 @@ export class CasStrategy implements AuthenticationStrategy {
             return;
         }
 
-        let urlObject = url.parse(this.configuration.casValidateUrl);
+        let urlObject = url.parse(this.configuration.casValidateUrl, true);
         urlObject.query = {
             service: CasStrategy.origin(req, Utils.buildContextPath(this.configuration.hostUrlReturnTo)),
             ticket: ticket
@@ -324,7 +333,7 @@ export class CasStrategy implements AuthenticationStrategy {
         logger.debug("Reconnexion - mise en session de returnUrl (attribut returnTo) : ", returnUrl);
 
         // préparer la requête vers le CAS :
-        let urlObject = url.parse(this.configuration.casLoginUrl);
+        let urlObject = url.parse(this.configuration.casLoginUrl, true);
         urlObject.query = {
             service: originUrl
         };

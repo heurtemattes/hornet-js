@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
@@ -100,12 +100,17 @@ Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
 });
 
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
-
-let expect = TestUtils.chai.expect;
+const expect = TestUtils.chai.expect;
 
 const dbConfig1 = "configTest";
 const dbConfig2 = "configTestBis";
+
 describe("Test DBConnect Sequelize", () => {
+
+    before(function() {
+        // dossiers de configuration
+        process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
+    });
 
     const namespace = "namespace_unit_test";
     it("Test chargement configuration configTest, doit passer", (done) => {
@@ -124,10 +129,7 @@ describe("Test DBConnect Sequelize", () => {
         DbConnect.init(dbConfig2);
         const configuration = DbConnect.getConfiguration(dbConfig2);
 
-        expect(configuration.basename).to.be.equals(
-            "sequelizeTwo"
-        );
+        expect(configuration.basename).to.be.equals("sequelizeTwo");
         done();
     });
-
 });

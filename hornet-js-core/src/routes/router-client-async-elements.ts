@@ -73,13 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { AsyncElement } from "src/executor/async-element";
 import { HornetEvent, fireHornetEvent, UNAUTHORIZE_ERROR_EVENT } from "src/event/hornet-event";
@@ -138,7 +138,7 @@ export class UrlChangeElement extends AsyncElement {
 export class UserAccessSecurityElement extends AsyncElement {
 
     
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UserAccessSecurityElement");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.routes.router-client.UserAccessSecurityElement");
 
     execute(next) {
         const user = Utils.getCls("hornet.user");
@@ -183,7 +183,7 @@ export class UserAccessSecurityElement extends AsyncElement {
 export interface ComponentChangeEventDetail { newComponent: Class<IHornetPage<any, any>>; data: any; }
 export var COMPONENT_CHANGE_EVENT = new HornetEvent<ComponentChangeEventDetail>("COMPONENT_CHANGE_EVENT");
 export class ViewRenderingElement extends AsyncElement {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.ViewRenderingElement");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.routes.router-client.ViewRenderingElement");
 
     protected appComponent;
     constructor(appComponent) {
@@ -203,7 +203,7 @@ export class ViewRenderingElement extends AsyncElement {
 //                                      UnmanagedViewErrorElement
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UnmanagedViewErrorElement extends AsyncElement {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client.UnmanagedViewErrorElement");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.routes.router-client.UnmanagedViewErrorElement");
 
     protected errorComponent;
     constructor(errorComponent) {

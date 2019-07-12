@@ -73,22 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { DropdownItem } from "src/widget/dropdown/dropdown-item";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetEvent, fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.dropdown");
+import "src/widget/dropdown/sass/_dropdown.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.dialog.dropdown");
 
 interface DropdownActivationEventDetail { id: string; }
 const DROPDOWN_ACTIVATION_EVENT = new HornetEvent<DropdownActivationEventDetail>("DROPDOWN_ACTIVATION_EVENT");
@@ -113,6 +116,7 @@ export interface DropdownProps extends HornetComponentProps {
     /** className facultatif à appliquer au label */
     labelClassName?: string;
     disabled?: boolean;
+    /** Icone svg du composant */
     icon?: string;
     srcImg?: string;
     items?: any;
@@ -205,7 +209,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
     render(): JSX.Element {
         logger.debug("Dropdown render :", this.state.id);
 
-        const dropdownClasses: ClassDictionary = {
+        const dropdownClasses = {
             "dropdown-container": true,
         };
 
@@ -225,16 +229,24 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
      * retourne l'image du dropdown
      */
     getImage() {
+
         let img = null;
         if (this.props.icon) {
-            img = this.props.icon;
-            if (typeof this.props.icon === "string") {
-                img = <span className={"icon " + this.props.icon} />;
+            logger.deprecated("Ne plus utiliser la props icon mais srcImg avec <SvgSprites icon='monicin'>");
+            img = <SvgSprites icon={this.props.icon} width="1.5em" tabIndex={ -1 } height="1.5em" ariaLabel={this.props.title} />
+        } else {
+            if (this.props.srcImg) {
+                if (typeof this.props.srcImg === "string") {
+                    img = <img
+                        src={this.props.srcImg}
+                        className={this.props.className+"-img icon"}
+                        alt={this.props.title} />;
+                } else {
+                    img = this.props.srcImg;
+                }
+            } else {
+                this.props.srcImg ? img = this.props.srcImg : img = null;
             }
-        } else if (this.props.srcImg) {
-            img = <img
-                src={this.props.srcImg}
-                className={"icon"} />;
         }
 
         return img;
@@ -276,12 +288,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
 
     renderButton() {
 
-        let img = null;
-        if (typeof this.props.icon === "string") {
-            img = <span className={"icon " + this.props.icon} ></span>;
-        } else {
-            img = this.props.icon;
-        }
+        const img = this.getImage();
 
         const buttonProps: any = {
             onClick: this.handleClick,
@@ -324,6 +331,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                 url: item.url,
                 className: item.className,
                 srcImg: item.srcImg,
+                icon: item.icon,
                 key: `dropdown-${this.props.id}-${index}`,
                 handleKeyDown: this.handleKeyDownDropDownItem,
                 getRef: item => this.items.push(item),
@@ -355,7 +363,7 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
             });
         }
 
-        const dropDownClasses: ClassDictionary = {
+        const dropDownClasses = {
             "dropdown-content": true,
             "dropdown-content-hidden": !this.state.isActive,
         };
@@ -379,8 +387,10 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
         let valRightArrow = 0;
         let valLeftBox = 0;
         let valLeftArrow = 0;
-        const widthIcon = this.button.getElementsByClassName("icon")[0].getBoundingClientRect().width;
-        const widthLabel = this.button.getElementsByClassName("label")[0].getBoundingClientRect().width;
+        const icon = this.button.getElementsByClassName("icon");
+        const label = this.button.getElementsByClassName("label");
+        const widthIcon = icon && icon[0] && icon[0].getBoundingClientRect ? icon[0].getBoundingClientRect().width : 1;
+        const widthLabel = label && label[0] && label[0].getBoundingClientRect() ? label[0].getBoundingClientRect().width : 1;
         switch (this.props.position) {
 
             case Position.BOTTOMRIGHT:

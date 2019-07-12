@@ -73,29 +73,31 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
-import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import { Utils } from "hornet-js-utils";
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { CheckColumn } from "src/widget/table/column/check-column";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
-
 Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
+import * as _ from "lodash";
+import * as React from "react";
+
+import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
+import { Table } from "src/widget/table/table";
+import { Content } from "src/widget/table/content";
+import { Columns } from "src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { CheckColumn } from "src/widget/table/column/check-column";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
+
 
 @Decorators.describe("Table alert div test")
 class TableAlertDivTest extends HornetReactTest {

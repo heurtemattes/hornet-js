@@ -73,7 +73,7 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,11 +83,6 @@ module.exports = {
 
 
     gulpTasks: function (gulp, project, conf, helper) {
-        var path = require("path");
-
-        // chemin vers le fichier "definition.d.ts" généré
-        conf.generatedTypings.dir = path.join("..", project.name + "-dts");
-        conf.generatedTypings.file = project.name + ".d.ts";
     },
     externalModules: {
         enabled: false,
@@ -95,6 +90,26 @@ module.exports = {
         ]
     },
     config: {
-        autoGenerateIndex: true
+        autoGenerateIndex: true,
+        karma: {
+            //browsers: ["Firefox"],
+            clientContext: [
+                [/moment[\/\\]locale$/, /fr|en/],
+                [/intl[\/\\]locale-data[\/\\]jsonp$/, /fr|en/],
+                [/.appender/, /console/],
+                [/^\.$/, (context) => {
+                    if ( !/\/log4js\/lib$/.test(context.context) ) return;
+                    context.regExp = /^\.\/appenders\/console.*$/;
+                    context.request = ".";
+                }]
+            ],
+            clientExclude: {
+                modules: ["cluster", "continuation-local-storage", "config", "cluster", "./dateFile", "./file"]
+            }
+        },
+        typescript: {
+            // bin: __dirname + "/node_modules/build/typescript"
+        }
     }
+
 };

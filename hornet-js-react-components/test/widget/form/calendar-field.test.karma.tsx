@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,8 +82,9 @@
 import { runTest } from "hornet-js-test/src/test-run";
 import "hornet-js-test/src/test-run";
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
@@ -91,7 +92,7 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 import { Utils } from "hornet-js-utils";
-
+Utils.setConfigObj({});
 import * as moment from "moment";
 import { CalendarField } from "src/widget/form/calendar-field";
 
@@ -246,7 +247,6 @@ class CalendarFieldTest extends HornetReactTest {
             <CalendarField
                 valideOnForm={false}
                 label={"Test date alt props"}
-                alt={"test alt props"}
                 name="dateTestAltProps"
                 onSelect={(value) => { }}
                 onChange={(value) => { }}
@@ -255,8 +255,7 @@ class CalendarFieldTest extends HornetReactTest {
             , id);
 
         setTimeout(() => {
-            expect(document.querySelector(`#${id} img`)).to.exist;
-            expect((document.querySelector(`#${id} img`) as any).alt).to.equal("test alt props");
+            expect(document.querySelector(`#${id} svg`)).to.exist;
             expect(document.querySelector(`#${id} input`)).to.exist;
             expect((document.querySelector(`#${id} input`) as HTMLInputElement).hasAttribute("alt")).to.be.false;
 

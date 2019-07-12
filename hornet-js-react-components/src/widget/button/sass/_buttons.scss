@@ -1,0 +1,120 @@
+@import
+    '../../sass/core',
+    'colors';
+
+
+/// 1 - Boutons globaux
+/// 2 - Top button
+/// 3 - Aria buttons
+%buttons-template {
+    overflow: hidden;
+    position: relative;
+    min-width: 4vw;
+    margin: 0 0 0.5em 0;
+    color: $buttonBaseColor;
+    background: $buttonBg;
+    font-family: $notoBold;
+    text-align: center;
+    cursor: pointer;
+    border: medium none;
+    text-transform: uppercase;
+    box-shadow: 0 0 0 0 $buttonBoxShadow;
+
+    @include smoothTransition(all, 0.2s);
+
+    &:active {
+        box-shadow: 0 10px 15px 0 $buttonBoxShadow;
+        outline: none !important;
+    }
+
+    &:hover,
+    &:focus {
+        background: $buttonBgStates;
+        outline: 2px solid $buttonBorderStates;
+    }
+    
+    @media (max-width: #{$mediaS-543}) {
+        width: 100%;
+    }
+}
+
+button {
+    &.hornet-button {
+        @extend %buttons-template;
+        padding: 0.3em;
+    }
+
+    &.toggler {
+        &:hover,
+        &:focus {
+            background: $buttonBgStates;
+            outline: 2px solid $buttonBorderStates;
+        }
+    }
+
+    &.button-info-accessibilite-button {
+        display: inline-block;
+        position: absolute;
+        appearance: none;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        right: 0.1875em;
+    
+        img {
+            width: 1em;
+        }
+    }
+}
+
+a.hornet-button {
+    @extend %buttons-template;
+    padding: 0.3em 1em !important;
+}
+
+.hornet-button-right {
+    position: absolute;
+    min-width: 2.653em !important;
+    height: 2.653em;
+    margin-bottom: 0 !important;
+    bottom: 0;
+    right: 0;
+}
+
+.button-area {
+    margin: 0 auto;
+}
+
+.ripple-effect {
+    position: absolute;
+    overflow: hidden;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: $buttonBaseColor;
+    outline: none;
+    animation: ripple-animation 1.5s;
+}
+
+@keyframes ripple-animation {
+    from {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+    to {
+        transform: scale(100);
+        opacity: 0;
+    }
+}
+
+.button-info-accessibilite {
+    position: relative;
+}
+
+.datatable-header-menu {
+    button.button-info-accessibilite-button {
+        img {
+            width: 1.5em;
+        }
+    }
+}

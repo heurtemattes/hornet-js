@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Utils } from "hornet-js-utils";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
 import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent, HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import {
@@ -105,11 +105,17 @@ import { NavigateDirection } from "src/widget/table/navigation-direction";
 import { Form } from "src/widget/form/form";
 import { LineBefore } from "src/widget/table/line/line-before";
 import { LineAfter } from "src/widget/table/line/line-after";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import * as _ from "lodash";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { ICustomValidation } from "hornet-js-core/src/validation/data-validator";
 import { AlertDiv } from "src/widget/table/alert-div";
+import { Promise } from "hornet-js-utils/src/promise-api";
+
+import "src/widget/table/sass/_table.scss";
+import "src/widget/table/sass/_datatable-sortable.scss";
+import "src/widget/form/sass/_form-entities.scss";
+import { element } from 'prop-types';
 
 export const UNIT_SIZE = "em";
 export const UPDATE_COLUMN_VISIBILITY = new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY");
@@ -125,7 +131,7 @@ export enum KeyboardInteractionMode {
     ACTIONABLE = 1,
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.content");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.content");
 
 export interface ContentProps extends HornetComponentProps, HornetComponentDatasourceProps {
     id?: string;
@@ -171,6 +177,8 @@ export interface ContentProps extends HornetComponentProps, HornetComponentDatas
     customValidators?: ICustomValidation[];
 
     onRerender?: Function | any;
+
+    isSticky?: boolean;
 }
 
 /**
@@ -198,6 +206,10 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     protected spinnerOverlay: any;
 
     protected alertDiv: AlertDiv;
+    
+    /** ref des éléments du DOM à recevoir pour gérer le scroll */
+    protected wrapScroll: any;
+    protected scrollElem: any;
 
     /** Collection de colonne avec coordonnées et état */
     protected columnsWithVisibilityMap: Array<ColumnState> = new Array<ColumnState>();
@@ -220,6 +232,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             isContentVisible: true,
             spinner: false,
             actionMassEnabled: this.hasChildrenOfComponentTypeOf(Columns, CheckColumn),
+            topHead: 0
         };
 
         const columnKeyActionMass = null;
@@ -274,6 +287,9 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         this.props.dataSource.on("select", this.handleChangeSelectedItems.bind(this));
 
         this.listen(UPDATE_COLUMN_VISIBILITY, this.updateColumnVisibility);
+
+        this.wrapScroll.addEventListener("scroll", this.scrollTable);
+        
     }
 
     /**
@@ -291,6 +307,12 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         this.props.dataSource.removeListener("loadingData", this.displaySpinner);
         this.props.dataSource.removeListener("select", this.handleChangeSelectedItems.bind(this));
         this.remove(UPDATE_COLUMN_VISIBILITY, this.updateColumnVisibility);
+        
+        this.wrapScroll.removeEventListener("scroll", this.scrollTable);
+    }
+
+    scrollTable() {
+        this.setState({ topHead: this.wrapScroll.scrollTop + "px" });
     }
 
     /**
@@ -490,13 +512,20 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         const headerTable = this.state.isContentVisible ? this.renderTHeader(columns) : null;
 
         return (
-            <div className="datatable-content" tabIndex={this.state.tabIndex}>
-                <SpinnerOverlay ref={(elt) => this.spinnerOverlay = elt} isVisible={this.state.spinner}
+            <div
+                className="datatable-content"
+                tabIndex={this.state.tabIndex}
+                ref={(scroll) => { this.wrapScroll = scroll; }}>
+                <SpinnerOverlay
+                    ref={(elt) => this.spinnerOverlay = elt} isVisible={this.state.spinner}
                     onHideSpinner={this.onHideSpinner}
                     nbColumns={this.getTotalColumnsVisibleFromState()}
                     width={this.props.width} />
                 {this.renderDivAlert()}
-                <table {...tableProps} summary={this.props.summary}>
+                <table
+                    {...tableProps}
+                    summary={this.props.summary}
+                    ref={(elmt) => { this.scrollElem = elmt; }}>
                     {this.renderCaption(columns)}
                     {headerTable}
                     {this.renderTBody(columns)}
@@ -540,7 +569,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                     const sortColumn = _.find(this.sortData, { key: column.props.keyColumn });
                     if (sortColumn) {
                         title += ":" + this.i18n("table.sortedByTitle", { columnTitle: column.props.title }) + " ";
-                        title += sortColumn.dir === SortDirection.ASC ? this.i18n("table.ascending") : this.i18n("table.descending");
+                        title += (sortColumn as SortData).dir === SortDirection.ASC ? this.i18n("table.ascending") : this.i18n("table.descending");
                     }
                 }
             });
@@ -593,18 +622,28 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             id: this.props.id + "-thead",
         };
 
-        return (
-            <thead {...tHeadProps}>
-                <tr id={this.props.id + "-tr-header"}>
-                    {this.renderRowHeader(columns)}
-                </tr>
-                <SpinnerLoader ref={(elt) => this.spinnerLoader = elt}
-                    isVisible={this.state.spinner}
-                    className={this.props.id}
-                    nbColumns={this.getTotalColumnsVisibleFromState()}
-                />
-            </thead>
-        );
+        const contentTHead = <thead {...tHeadProps}>
+                                <tr id={this.props.id + "-tr-header"}>
+                                    {this.renderRowHeader(columns)}
+                                </tr>
+                                <SpinnerLoader ref={(elt) => this.spinnerLoader = elt}
+                                    isVisible={this.state.spinner}
+                                    className={this.props.id}
+                                    nbColumns={this.getTotalColumnsVisibleFromState()}
+                                />
+                            </thead>;
+
+        if (this.props.isSticky && this.wrapScroll && this.wrapScroll.scrollTop > 0) {
+            return (
+                <div className="isSticky" style={{ top: this.state.topHead }}>
+                    { contentTHead }
+                </div>
+            );
+        } else {
+            return (
+                contentTHead
+            );
+        }
     }
 
     /**
@@ -626,7 +665,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 (props as ColumnProps).sortData = sortColumn;
             }
             // si la colonne ne contient que le checkBox, on applique pas (text-overflow: ellipsis;)
-            if ((column as React.ReactElement<any>).type === CheckColumn) {
+            if (column.type === CheckColumn) {
                 props.className = classNames({ "datatable-header-no-text-overflow": true });
             }
 
@@ -773,7 +812,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
 
                     const key: string = this.props.id + "-expandable-line-" + rowType + "-" + lineIndex;
 
-                    const trClassName: ClassDictionary = {
+                    const trClassName = {
                         "datatable-expandable-line": true,
                         "datatable-expandable-line-hidden": !LineComponent.props.displayed,
                         "datatable-expandable-line-displayed": LineComponent.props.displayed,
@@ -815,7 +854,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
 
         const tds = [];
 
-        let classNamesRow: ClassDictionary = {};
+        let classNamesRow = {};
 
         const isSelected = ArrayUtils.getIndexById(this.props.dataSource.selected, item) !== -1;
 
@@ -837,8 +876,8 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             props.isEditing = this.props.contentState.itemInEdition === item;
 
             // TODO: voi si on peut accéder aux propriétés d'un ActionColumn et s'assurer qu'elles matchent avec l'interface
-            if ((column as React.ReactElement<any>).type === ActionColumn
-                || (column as React.ReactElement<any>).type === EditionActionColumn) {
+            if (column.type === ActionColumn
+                || column.type === EditionActionColumn) {
                 props.showAlert = this.showAlert;
             }
 

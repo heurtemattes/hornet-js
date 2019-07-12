@@ -1,0 +1,68 @@
+@import '../../sass/core';
+
+$toolTipFocus: theme-color($variant: 'states');
+$tooltipLabelBg: rgba(51, 51, 51, 0.9);
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 1.125em;
+
+    a {
+        &:focus {
+            outline: 1px solid $toolTipFocus;
+        }
+    }
+
+    .tooltip-image {
+        width: 1.25em;
+        height: 1.25em;
+        padding-bottom: 0.3em;
+
+        &:focus {
+            .tooltip-image {
+                outline: 1px solid $toolTipFocus;
+            }
+        }
+
+        &:focus,
+        &:hover {
+            outline: 1px solid $toolTipFocus;
+        }
+    }
+
+    .tooltip-label {
+        position: absolute;
+        cursor: pointer;
+        z-index: 3;
+        bottom: 150%;
+        left: 174%;
+        width: 160px;
+        margin-bottom: 5px;
+        margin-left: -92px;
+        padding: 7px;
+        border-radius: 3px;
+        color: $baseColorLight;
+        background: $tooltipLabelBg;
+        text-align: center;
+        line-height: 1.2;
+
+        &:after {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 0;
+            margin-left: -12px;
+            border-top: 5px solid $tooltipLabelBg;
+            border-right: 5px solid transparent;
+            border-left: 5px solid transparent;
+            content: " ";
+            font-size: 0;
+            line-height: 0;
+            visibility: visible;
+            opacity: 1;
+            pointer-events: none;
+        }
+    }
+}

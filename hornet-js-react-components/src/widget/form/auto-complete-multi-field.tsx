@@ -73,12 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps, AbstractFieldProps } from "src/widget/form/abstract-field";
 
@@ -89,13 +89,9 @@ import * as _ from "lodash";
 import { HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-
 import { AutoCompleteState } from "src/widget/form/auto-complete-state";
-import * as classNames from "classnames";
-import FormEvent = __React.FormEvent;
-import HTMLAttributes = __React.HTMLAttributes;
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-complete-multi-field");
+const logger = Logger.getLogger("hornet-js-react-components.widget.form.auto-complete-multi-field");
 
 /**
  * Propriétés du composant d'auto-complétion
@@ -225,7 +221,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             className += " " + this.state.className;
         }
 
-        let htmlProps: HTMLAttributes<HTMLElement> = this.getHtmlProps();
+        let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
         htmlProps = _.assign(htmlProps, {
             onKeyDown: this.handleKeyDown,
             onFocus: this.handleFocus,
@@ -243,7 +239,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             type: "text",
             name: this.getFreeTypingFieldName(),
             className
-        } as HTMLAttributes<HTMLElement>);
+        } as React.HTMLAttributes<HTMLElement>);
 
         let classNameContainer = "autocomplete-container";
 
@@ -532,7 +528,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      * Fonction déclenchée sur une modification du champ de saisie libre
      * @param event
      */
-    protected handleChangeTextInput(event: FormEvent<HTMLElement>): void {
+    protected handleChangeTextInput(event: React.FormEvent<HTMLElement>): void {
         logger.trace("auto-complete multiple handleChangeTextInput");
         /* L'attribut DOM onChange est éventuellement aussi renseigné sur le composant auto-complete */
         if (this.state.onChange) {
@@ -818,7 +814,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
      * Fonction appelée lorsque l'utilisateur clique sur un item de la liste des valeurs possibles
      * @param event
      */
-    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
+    protected onListWidgetSelected(event: React.MouseEvent<HTMLElement>, choice: any): void {
         logger.trace("Selection Multiple click");
         const selectedValue = choice.value;
         if (event.target !== event.currentTarget) {

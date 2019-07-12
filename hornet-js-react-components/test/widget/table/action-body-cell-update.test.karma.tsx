@@ -73,30 +73,30 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { Utils } from "hornet-js-utils";
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
+import { Table } from "src/widget/table/table";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-Utils.setConfigObj({});
+import { Content } from "src/widget/table/content";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { ActionColumn } from "hornet-js-react-components/src/widget/table/column/action-column";
-import { Picto } from "hornet-js-react-components/src/img/picto";
-import { YesNoColumn } from "hornet-js-react-components/src/widget/table/column/yesno-column";
+import { ActionColumn } from "src/widget/table/column/action-column";
+import { YesNoColumn } from "src/widget/table/column/yesno-column";
 
 @Decorators.describe("Action coulmn update")
 class ActionColumnUpdateTest extends HornetReactTest {
@@ -119,7 +119,7 @@ class ActionColumnUpdateTest extends HornetReactTest {
                         <ActionColumn keyColumn="test"
                         visible={(data) => { return data.afficherAction; }}
                         action={this.test}
-                        srcImg={Picto.blue.editer}
+                        // srcImg={Picto.blue.editer}
                         />
                     </Columns>
                 </Content>

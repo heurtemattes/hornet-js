@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,10 +84,9 @@ import { ConfigLib } from "hornet-js-utils/src/config-lib";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Utils } from "hornet-js-utils";
-import { NodeApiResultBuilder } from "src/services/service-api-results";
-import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 import { CacheKey, HornetSuperAgent, HornetPluginConfig } from 'src/services/hornet-superagent';
-import * as superAgentPlugins from "hornet-js-core/src/services/superagent-hornet-plugins";
+import * as superAgentPlugins from "src/services/superagent-hornet-plugins";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 const expect = TestUtils.chai.expect;
 const assert = TestUtils.chai.assert;
@@ -149,7 +148,6 @@ describe("hornet superagent plugins", () => {
         _app.use(bodyParser.json()); // to support JSON-encoded bodies
 
         _app.get("/service-api-spec-service/plugins-test", function (req, res) {
-            console.debug("/ok");
             res.json(req.query);
         });
 

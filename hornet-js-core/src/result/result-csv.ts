@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import * as _ from "lodash";
 import { MediaTypes } from "src/protocol/media-type";
 import { ResultFile } from "src/result/result-file";
 import { OptionsCSV } from "src/result/hornet-result-interface";
-
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      ResultCSV

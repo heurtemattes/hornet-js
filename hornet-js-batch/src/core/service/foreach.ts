@@ -73,20 +73,19 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { BatchService } from "src/core/service/batch-service";
 import { BatchProcess } from "src/core/batch-process";
 import { STATUS } from "src/core/batch-status";
 
 
-const logger: Logger = Utils.getLogger("hornet-js-batch.service.batch-foreach");
+const logger: Logger = Logger.getLogger("hornet-js-batch.service.batch-foreach");
 
 /**
 * @classdesc Classe de type BatchService qui appelle en serie un service de type {@see IService}

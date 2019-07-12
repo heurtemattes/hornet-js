@@ -73,15 +73,15 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
 process.env.HORNET_CONFIG_DIR_INFRA = __dirname + "/config_infra";
 import { TestUtils } from "hornet-js-test/src/test-utils";
-const chai = TestUtils.chai;
-const expect: any = chai.expect;
+const expect = TestUtils.chai.expect;
+
 
 import AuthenticationUtils = require("src/authentication-utils");
 const AuthUtils = AuthenticationUtils.AuthUtils;

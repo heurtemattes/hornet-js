@@ -73,13 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
@@ -90,8 +91,8 @@ import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data"
 import * as assert from "assert";
 
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { HeaderPage } from "hornet-js-react-components/src/widget/header/header-page";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+import { HeaderPage } from "src/widget/header/header-page";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 

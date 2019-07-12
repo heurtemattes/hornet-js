@@ -73,19 +73,19 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import { IdentityProviderProps } from "hornet-js-passport/src/strategy/saml/saml-configuration";
+import { Logger } from "hornet-js-logger/src/logger";
+import { IdentityProviderProps } from "src/strategy/saml/saml-configuration";
 
 
 export type Callback<T> = (res: T) => void;
 
-const logger: Logger = Utils.getLogger("horneg-js-passport.strategy.saml.saml");
+const logger: Logger = Logger.getLogger("horneg-js-passport.strategy.saml.saml");
 
 import * as zlib from "zlib";
 import * as querystring from "querystring";

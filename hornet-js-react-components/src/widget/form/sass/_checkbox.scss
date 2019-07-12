@@ -1,0 +1,282 @@
+@import '../../sass/core';
+
+$formBaseCheckboxColor: theme-color('global', '$formBaseCheckboxColor');
+$formBaseCheckboxError: theme-color('global', 'redError');
+$formBaseCheckboxWarn: theme-color('global', 'redErrorlight');
+$formCheckboxOutline: theme-color($variant: 'states');
+$formCheckboxChecked: theme-color($variant: 'primary');
+$formCheckboxDisabled: rgba(122, 122, 122, 1); //#7a7a7a
+$formCheckboxMaterial: rgba(0, 0, 0, 0.84);
+$formCheckboxMaterialBg: rgba(235, 235, 228, 1); //#ebebe4
+
+/// Se compose du style du composant et de ses animations
+.checkbox-container {
+    &.readonly {
+        span.checkbox-material {
+            cursor: auto;
+        }
+    }
+}
+
+.checkbox-container {
+    transform: translateZ(0);
+}
+
+.label-margin-right {
+    margin-right: 2.125em;
+}
+
+label {
+    &.checkbox-content {
+        cursor: pointer;
+        margin-top: 0.7em;
+
+        input {
+            &:focus+.checkbox-material {
+                .check {
+                    outline: $formCheckboxOutline solid 1px;
+                }
+            }
+        }
+    }
+}
+
+.checkbox-material {
+    .check {
+        &.readonly,
+        &.disabled {
+            background-color: $formCheckboxMaterialBg;
+            color: $formCheckboxDisabled;
+            cursor: default;
+        }
+    }  
+} 
+
+.checkbox-content {
+    input[type=checkbox] {
+        opacity: 0;
+        z-index: -1;
+        position: absolute;
+        overflow: hidden;
+        margin: 0;
+        width: 0;
+        height: 0;
+        left: 0;
+        pointer-events: none;
+
+        &:checked+.checkbox-material {
+
+            .check {
+                color: $formCheckboxChecked;
+
+                &:before {
+                    box-shadow: 0 0 0 0.625em,
+                                0.625em -0.625em 0 0.625em,
+                                2em 0em 0 1.25em,
+                                0em 2em 0 1.25em,
+                                -0.3125em 0.3125em 0 0.625em,
+                                1.25em -10.125em 0 0.6875em;
+                }
+            }
+        }
+
+        &:not(:checked)+.checkbox-material {
+            .check {
+                border: 1px solid;
+
+                &.has-error {
+                    border-color: $formBaseCheckboxError;
+                    background-color: $formBaseCheckboxWarn;
+                }
+            }
+            
+        }
+
+        &:disabled:checked+.checkbox-material {
+            .check {
+                color: $formCheckboxDisabled;
+            }
+        }
+
+        &:focus+.checkbox-material {
+            .check {
+                &:after {
+                    opacity: 0.2;
+                }
+            }
+        }
+
+        &[disabled]:not(:checked)~.checkbox-material .check:before,
+        &[disabled]+.circle {
+            opacity: 0.5;
+        }
+
+        &[disabled]+.checkbox-material {
+            .check {
+                &:after {
+                    background-color: $formCheckboxMaterial;
+                    transform: rotate(-45deg);
+                }
+            }
+        }
+    }
+
+    .checkbox-material {
+        position: relative;
+        top: 0.1875em;
+        vertical-align: middle;
+
+        .check {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            z-index: 1;
+            padding: 0.125em 0 0 0.125em;
+            width: 1.25em;
+            height: 1.25em;
+            border-radius: 0.125em;
+            background-color: $formBaseCheckboxColor;
+
+            &:before {
+                position: absolute;
+                content: "";
+                display: block;
+                margin-top: -0.25em;
+                margin-left: 0.375em;
+                width: 0;
+                height: 0;
+                box-shadow: 0 0 0 0,
+                            0 0 0 0,
+                            0 0 0 0,
+                            0 0 0 0,
+                            0 0 0 0,
+                            0 0 0 0,
+                            0 0 0 0 inset;
+                color:$formCheckboxChecked;
+                transform: rotate(45deg);
+            }
+        }
+
+        &:before {
+            opacity: 0;
+            position: absolute;
+            z-index: 1;
+            content: "";
+            margin: 0;
+            left: 0.5em;
+            top: 0.125em;
+            width: 0.25em;
+            border-radius: 100%;
+        }
+    }
+}
+
+@keyframes checkbox-on {
+    0% {
+        box-shadow: 0 0 0 0.625em,
+                    0.625em -0.625em 0 0.625em,
+                    2em 0 0 1.25em,
+                    0 2em 0 1.25em,
+                    -0.3125em 0.3125em 0 0.625em,
+                    0.9375em 0.125em 0 0.6875em;
+    }
+    50% {
+        box-shadow: 0 0 0 0.625em,
+                    0.625em -0.625em 0 0.625em,
+                    2em 0 0 1.25em,
+                    0 2em 0 1.25em,
+                    -0.3125em 0.3125em 0 0.625em,
+                    1.25em 0.125em 0 0.6875em;
+    }
+    100% {
+        box-shadow: 0 0 0 0.625em,
+                    0.625em -0.625em 0 0.625em,
+                    2em 0 0 1.25em,
+                    0 2em 0 1.25em,
+                    -0.3125em 0.3125em 0 0.625em,
+                    1.25em -10.125em 0 0.6875em;
+    }
+}
+
+@keyframes checkbox-off {
+    0% {
+        box-shadow: 0 0 0 0.625em,
+                    0.625em -0.625em 0 0.625em,
+                    2em 0 0 1.25em,
+                    0 2em 0 1.25em,
+                    -0.3125em 0.3125em 0 0.625em,
+                    1.25em -10.125em 0 0.6875em,
+                    0 0 0 0 inset;
+    }
+    25% {
+        box-shadow: 0 0 0 0.625em,
+                    0.625em -0.625em 0 0.625em,
+                    2em 0 0 1.25em,
+                    0 2em 0 1.25em,
+                    -0.3125em 0.3125em 0 0.625em,
+                    1.25em -10.125em 0 0.6875em,
+                    0 0 0 0 inset;
+    }
+    50% {
+        transform: rotate(45deg);
+        margin-top: -0.25em;
+        margin-left: 0.375em;
+        width: 0;
+        height: 0;
+        box-shadow: 0 0 0 0.625em,
+                    0.625em -0.625em 0 0.625em,
+                    2em 0 0 1.25em,
+                    0 2em 0 1.25em,
+                    -0.3125em 0.3125em 0 0.625em,
+                    0.9375em 0.125em 0 0.6875em,
+                    0 0 0 0 inset;
+    }
+    51% {
+        transform: rotate(0deg);
+        margin-top: -0.125em;
+        margin-left: -0.125em;
+        width: 1.25em;
+        height: 1.25em;
+        box-shadow: 0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0.625em inset;
+    }
+    100% {
+        transform: rotate(0deg);
+        margin-top: -0.125em;
+        margin-left: -0.125em;
+        width: 1.25em;
+        height: 1.25em;
+        box-shadow: 0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0,
+                    0 0 0 0 inset;
+    }
+}
+
+@keyframes rippleOn {
+    0% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(13, 13);
+    }
+}
+
+@keyframes rippleOff {
+    0% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(13, 13);
+    }
+}

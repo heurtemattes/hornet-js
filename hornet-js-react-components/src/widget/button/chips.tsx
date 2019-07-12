@@ -73,21 +73,22 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as kebabCase from "lodash/kebabCase";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import kebabCase = require("lodash.kebabcase");
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 
-const logger: Logger = Utils.getLogger("hornet-js-components.widget.button.chips");
+import "src/widget/button/sass/_chips.scss";
+const logger: Logger = Logger.getLogger("hornet-js-components.widget.button.chips");
 
 /**
  * Propriétés du composant Chips
@@ -104,7 +105,7 @@ export interface ChipsProps extends HornetComponentProps {
     /** disabled ? */
     disabled?: boolean;
     /** Liste de class CSS */
-    classNames?: ClassDictionary;
+    classNames?: classNames.ClassDictionary;
     /** Méthode appelée lors du click sur le bouton reset */
     handleClickReset?: Function;
     /** Méthode appelée lors du click sur le composant chips */
@@ -127,7 +128,7 @@ export class Chips extends HornetComponent<ChipsProps, any> {
         logger.debug("Rendu chips :", this.props.id);
 
         // Génération des class CSS associées
-        const classes: ClassDictionary = {
+        const classes: classNames.ClassDictionary = {
             "chips-content": true,
             readonly: this.props.readOnly,
             disabled: this.props.disabled,
@@ -142,19 +143,19 @@ export class Chips extends HornetComponent<ChipsProps, any> {
 
         props = this.setPropIfExists(props, "title");
         props = this.setPropIfExists(props, "handleClick", "onClick");
-        props[ "onKeyDown" ] = this.handleDeleteKeyDown;
-        props[ "onKeyUp" ] = this.handleDeleteKeyUp;
+        props["onKeyDown"] = this.handleDeleteKeyDown;
+        props["onKeyUp"] = this.handleDeleteKeyUp;
 
         if (this.state.readOnly || this.state.disabled) {
-            props[ "onKeyDown" ] = null;
-            props[ "onKeyUp" ] = null;
-            props[ "onClick" ] = null;
-        } 
+            props["onKeyDown"] = null;
+            props["onKeyUp"] = null;
+            props["onClick"] = null;
+        }
 
-        props[ "type" ] = "button";
-        const classNamesText = {"chips-text": true};
+        props["type"] = "button";
+        const classNamesText = { "chips-text": true };
         classNamesText[kebabCase("chips-text-" + this.props.text)] = true;
-        props["data-real-value"] = (this.props as any).item.value;
+        props["data-real-value"] = (this.props as any).item && (this.props as any).item.value;
 
         return (
             <button {...props}>
@@ -198,7 +199,7 @@ export class Chips extends HornetComponent<ChipsProps, any> {
      * Méthode permettant de générer les initiales du mot à afficher
      */
     renderInitial() {
-        const classNamesIcon = {"chips-icon": true};
+        const classNamesIcon = { "chips-icon": true };
         classNamesIcon[kebabCase("chips-icon-" + this.props.text)] = true;
         return (
             <div className={classNames(classNamesIcon)}>{this.props.text.charAt(0)}</div>
@@ -213,23 +214,19 @@ export class Chips extends HornetComponent<ChipsProps, any> {
 
         logger.debug("Rendu bouton reset chips :", this.props.id);
 
-        const classes: ClassDictionary = {
+        const classes: classNames.ClassDictionary = {
             "chips-reset": true,
         };
         const props = {
-            className: classNames(classes),
-            viewBox: "0 0 24 24",
-            "aria-hidden": "true",
+            className: classNames(classes)
         };
 
         if (!this.props.disabled) {
-            props[ "onClick" ] = this.props.handleClickReset;
+            props["onClick"] = this.props.handleClickReset;
         }
 
         return (
-            <svg {...props}>
-                <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
-            </svg>
+            <SvgSprites icon="close" classAdded={props.className} />
         );
     }
 
@@ -240,8 +237,8 @@ export class Chips extends HornetComponent<ChipsProps, any> {
      * @param prop: clé de props à intégrer
      */
     setPropIfExists(props, propKey, newPropKey?): any {
-        if (this.props[ propKey ]) {
-            props[ newPropKey || propKey ] = this.props[ propKey ];
+        if (this.props[propKey]) {
+            props[newPropKey || propKey] = this.props[propKey];
         }
         return props;
     }

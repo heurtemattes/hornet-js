@@ -73,28 +73,30 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { ReactAriaModal } from "src/widget/dialog/react-aria-modal";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 
-import * as classNames from "classnames";
+import classNames from "classnames";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.modal");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.dialog.modal");
 
-import ReactNode = __React.ReactNode;
-import MouseEvent = __React.MouseEvent;
+import ReactNode = React.ReactNode;
+import MouseEvent = React.MouseEvent;
+
+import "src/widget/dialog/sass/_modal.scss";
 
 export interface ModalProps extends HornetComponentProps {
-    onClickClose?: __React.MouseEventHandler<HTMLInputElement>;
+    onClickClose?: React.MouseEventHandler<HTMLInputElement>;
     isVisible?: boolean;
     title?: string;
     hideTitleBar?: boolean;
@@ -217,7 +219,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
         let titleBarRender = null;
         let closeBarRender = null;
 
-        const titleClasses: ClassDictionary = {};
+        const titleClasses = {};
         titleClasses[ "widget-dialogue-title" ] = true;
         titleClasses[ "react-draggable-cursor" ] = this.state.isDraggable;
 
@@ -242,7 +244,7 @@ export class Modal extends HornetComponent<ModalProps, any> {
                 </div>);
         }
 
-        const bodyClasses: ClassDictionary = {
+        const bodyClasses = {
             "widget-dialogue-body": true,
             "modal-overflow-y": !this.state.withoutOverflow,
         };

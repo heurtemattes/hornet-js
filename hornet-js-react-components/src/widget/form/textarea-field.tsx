@@ -73,30 +73,29 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import {
     AbstractField, HornetWrittableProps,
     HornetClickableProps, HornetBasicFormFieldProps, AbstractFieldProps,
 } from "src/widget/form/abstract-field";
 import * as _ from "lodash";
-import { Picto } from "src/img/picto";
 import * as classNames from "classnames";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { Alert } from "src/widget/dialog/alert";
 import { CharsCounter, HornetCharsCounterAttributes } from "src/widget/form/chars-counter";
 import { ToolTip } from "src/widget/tool-tip/tool-tip";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import FormEvent = __React.FormEvent;
+import { SvgSprites } from '../icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.textarea-field");
+import "src/widget/form/sass/_texte-area.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.textarea-field");
 
 /**
  * Champ de formulaire Hornet de type zone de texte (textarea)
@@ -204,7 +203,9 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
             customLabel = customLabel.concat(" ").concat(this.i18n("charsCounter.limitLabel", { maxChar: this.props.maxChar }));
         }
         const urlTheme = this.state.imgFilePath || AbstractField.genUrlTheme();
-        const urlIcoTooltip = urlTheme + this.state.icoToolTip;
+        let urlIcoTooltip = "";
+
+        this.state.icoToolTip ? urlIcoTooltip = urlTheme + this.state.icoToolTip : "";
 
         if ((this.state as any).abbr && !this.state.lang) {
             logger.warn("Field ", fieldName, " Must have lang with abbr configuration");
@@ -243,7 +244,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                         <span className="label-required"><abbr title={this.getRequiredLabel()}>*</abbr></span> : null}
 
                     {this.state.toolTip ?
-                        <ToolTip alt={this.state.toolTip} src={urlIcoTooltip} idSpan={fieldName + "Tooltip"} /> : null}
+                        <ToolTip alt={this.state.toolTip} src={urlIcoTooltip != "" ? urlIcoTooltip : ""} idSpan={fieldName + "Tooltip"} /> : null}
                 </label>
             </div>
         );
@@ -259,7 +260,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
 
         const hidden = htmlProps["type"] === "hidden";
 
-        const classList: ClassDictionary = {
+        const classList: classNames.ClassDictionary = {
             "input-reset textarea-reset": true,
             "input-reset-hidden": (!this.isValued() || hidden),
         };
@@ -280,7 +281,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                 onKeyDown={this.handleResetKeyDown}
                 id={ identifiant }>
                 <a {...aProps}>
-                <img src={Picto.grey.close} alt={aProps.title} />
+                    <SvgSprites icon="close" color="#757575" />
                 </a>
             </span>
         );
@@ -374,7 +375,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                 currentTarget: this.element,
                 preventDefault: () => {},
                 stopPropagation: () => {},
-            } as FormEvent<HTMLElement>);
+            } as React.FormEvent<HTMLElement>);
         };
 
         if (value) {
@@ -424,13 +425,13 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                 currentTarget: this.element,
                 preventDefault: () => {},
                 stopPropagation: () => {},
-            } as FormEvent<HTMLElement>);
+            } as React.FormEvent<HTMLElement>);
         });
     }
 
     /**
      * Propage l'évènement onChange si la props onChange est passée
-     * @param {FormEvent<HTMLElement>} - e l'évènement à propager
+     * @param {React.FormEvent<HTMLElement>} - e l'évènement à propager
      */
     fireOnChangeEvent(e): void {
         if (this.props.onChange) {

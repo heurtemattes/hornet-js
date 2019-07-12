@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,6 +85,7 @@ import * as _ from "lodash";
 import Sequelize = require("sequelize");
 import { Utils } from "hornet-js-utils";
 import { Injector } from "hornet-js-core/src/inject/injector";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 export class Database {
     protected _config: Configuration;

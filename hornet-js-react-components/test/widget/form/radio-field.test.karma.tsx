@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,8 +82,12 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-const chai = require("chai");
-const expect = chai.expect;
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import * as assert from "assert";
 
@@ -113,8 +117,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields sans datasource sans valeur par défaut")
     testRadioField1() {
+        const id = this.generateMainId();
         element = (
-            <div id="main1">
+            <div id={id}>
                 <Form id={"testForm-1"}>
                     <RadiosField
                         name="exampleRadio-1"
@@ -129,7 +134,6 @@ class RadioFieldTest extends BaseTest {
             </div>
         );
 
-        const id = this.generateMainId();
         this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-1-client");
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Client n'a pas bien été généré");
@@ -142,8 +146,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields 2 sans datasource avec valeur par défaut premier item")
     testRadioField2() {
+        const id = this.generateMainId();
         element = (
-            <div id="main2">
+            <div id={id}>
                 <Form id={"testForm-2"}>
                     <RadiosField
                         name="exampleRadio-2"
@@ -158,7 +163,6 @@ class RadioFieldTest extends BaseTest {
                 </Form>
             </div>
         );
-        const id = this.generateMainId();
         this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-2-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
@@ -171,8 +175,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields 3 sans datasource avec valeur par défaut deuxième item")
     testRadioField3() {
+        const id = this.generateMainId();
         element = (
-            <div id="main3">
+            <div id={id}>
                 <Form id={"testForm-3"}>
                     <RadiosField
                         name="exampleRadio-3"
@@ -187,7 +192,6 @@ class RadioFieldTest extends BaseTest {
                 </Form>
             </div>
         );
-        const id = this.generateMainId();
         this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-3-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
@@ -201,8 +205,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields 4 sans datasource avec valeur par défaut deuxième item et gestion click")
     testRadioField4() {
+        const id = this.generateMainId();
         element = (
-            <div id="main4">
+            <div id={id}>
                 <Form id={"testForm-4"}>
                     <RadiosField
                         name="exampleRadio-4"
@@ -217,7 +222,6 @@ class RadioFieldTest extends BaseTest {
                 </Form>
             </div>
         );
-        const id = this.generateMainId();
         this.renderIntoDocument(element, id);
 
         let htmlElement = document.getElementById("exampleRadio-4-fournisseur");

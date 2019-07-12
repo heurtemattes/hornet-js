@@ -73,13 +73,13 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as _ from "lodash";
-import { Template } from "hornet-js-utils/src/template";
+import { Template } from "src/template";
 
 /**
  * Classe utilitaire sur les arrays.

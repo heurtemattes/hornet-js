@@ -73,20 +73,17 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
 import { CheckBox } from "src/widget/form/checkbox";
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.check.check-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.check.check-body-cell");
 
 export interface CheckBodyCellProps extends AbstractBodyCellProps {
     toggleSelectLine?: (lineIndex?: number) => void;
@@ -126,6 +123,7 @@ export class CheckBodyCell<P extends CheckBodyCellProps, S> extends AbstractBody
      */
     componentWillReceiveProps(nextProps: CheckBodyCellProps) {
         // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
+        // Ignorer l'erreur React issu de cette assignation
         this.state = {...this.state, ...nextProps};
     }
 

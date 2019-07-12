@@ -2,6 +2,8 @@ import { HornetComponent } from "src/widget/component/hornet-component";
 import * as React from "react";
 import * as classNames from "classnames";
 
+import "src/widget/sass/base/_global.scss";
+
 /**
  * Composant proposant une div cachée contenant un message d'alerte
  */
@@ -10,7 +12,7 @@ export class AlertDiv extends HornetComponent<any, any>{
     protected container;
 
     render(): JSX.Element {
-        const classes: ClassDictionary = {};
+        const classes: classNames.ClassDictionary = {};
         if (this.state.className) {
             classes[ this.state.className ] = true;
         }

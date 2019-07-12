@@ -73,18 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
-import * as React from "react";
+import * as _ from "lodash";
 import * as moment from "moment";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.date.date-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.date.date-body-cell");
 
 export interface DateBodyCellProps extends AbstractBodyCellProps {
     /** format d'affichage de la valeur */

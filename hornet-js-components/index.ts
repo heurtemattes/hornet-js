@@ -5,3 +5,4 @@ export * from "./src/component/imenu-item";
 export * from "./src/event/key-codes";
 export * from "./src/utils/menu-constantes";
 export * from "./src/utils/navigation-utils";
+export * from "./src/utils/scrolling-utils";

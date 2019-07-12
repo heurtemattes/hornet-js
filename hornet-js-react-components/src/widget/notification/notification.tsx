@@ -73,13 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 
 import * as ReactDom from "react-dom";
@@ -92,11 +91,14 @@ import {
     CLEAN_NOTIFICATION_EVENT,
 } from "hornet-js-core/src/notification/notification-events";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
-import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
-import { NotificationType } from "hornet-js-core/src/notification/notification-manager";
+import { Accordion } from "src/widget/accordion/accordion";
 import { ScrollingUtils } from "hornet-js-components/src/utils/scrolling-utils";
+import { SvgSprites } from '../icon/svg-sprites';
+import { AlertItem } from './notification-alerts';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification");
+import "src/widget/notification/sass/_notification.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.notification.notification");
 
 /**
  * Propriétés du composant Notification
@@ -173,6 +175,7 @@ export class Notification extends HornetComponent<NotificationProps, any> {
 
     constructor(props?: NotificationProps, context?: any) {
         super(props, context);
+
         if (!Notification.started) {
             this.listen(ADD_NOTIFICATION_EVENT, (ev) => {
                 const state: NotificationContentState = {};
@@ -237,9 +240,11 @@ export class Notification extends HornetComponent<NotificationProps, any> {
      */
     render(): JSX.Element {
         logger.debug("Notification render : ", this.state.id);
+
         return (
             <div id={this.state.id}>
-                <NotificationContent errorsTitle={this.state.errorsTitle}
+                <NotificationContent
+                    errorsTitle={this.state.errorsTitle}
                     errors={this.state.errors}
                     warningsTitle={this.state.warningsTitle}
                     warnings={this.state.warnings}
@@ -314,9 +319,14 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
     listError: any = {};
     btnError: HTMLButtonElement;
     btnInfo: HTMLButtonElement;
+    alertInfo: any;
 
     constructor(props?: NotificationProps, context?: any) {
         super(props, context);
+        this.state = {
+            ...this.state,
+            isShowed: true
+        }
     }
 
 
@@ -355,7 +365,7 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
      * Fait défiler la page courante de façon à afficher le bloc de notifications
      */
     scrollToNotifications() {
-        if (this.state.infos || this.state.errors || this.state.exceptions) {
+        if (this.state.errors || this.state.exceptions) {
             const element = ReactDom.findDOMNode(this) as any;
             if (element) {
                 ScrollingUtils.smoothScrollToElementWithStickyHeader(element);
@@ -403,8 +413,7 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
     * Rendu d'un message
     * @returns {any}
     */
-    renderMessage(errors, notifType) {
-
+    renderMessage(errors: [], notifType) {
         const idMessages = [];
 
         const generateMessage = (exception: BaseError, index) => {
@@ -422,8 +431,7 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
             return <MessageItem key={messageItemKey} text={text} className="error-message-text">{stack}</MessageItem>;
         };
 
-        const messages = errors.map((message) => {
-
+        const messages = errors.map((message: any) => {
             if (notifType === notificationType.EXCEPTION) {
                 if (Array.isArray(message.message)) {
                     return message.message.map(generateMessage);
@@ -431,7 +439,6 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
                     return generateMessage(message, 0);
                 }
             } else {
-
                 idMessages.push(message.id);
                 return <MessageItem key={message.id} anchor={message.anchor} {...message}
                     className={notifType + "-message-text"} />;
@@ -455,40 +462,59 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
             backgroundImage: "url('" + this.state.logo + "')",
         } : {};
         const ulStyle = (notifType === notificationType.PERSONNALS) ? { color: this.state.color } : {};
-
-        // on utilise la meme class css pour les errors et les exeptions
+        let icoColor = 'red';
+        
         notifType = (notifType === notificationType.EXCEPTION) ? "error" : notifType;
-        return (
-            <section>
-                <div className={"messageBox " + notifType + "Box " + notifType + "-message"} style={customContainertStyle}>
-                    <div ref={(elt) => {
-                        this.notif = elt;
-                    }}>
-                        {button}
-                        <h1 className={"title" + notifType + " " + notifType + "-message-title"}
-                            style={customContentStyle}>
-                            {this._getTitle()}
-                        </h1>
-                        <ul style={ulStyle} className={notifType + "-message-list"} role="alert"
-                            id={ariaControls} ref={(listError) => {
-                                if (listError && !this.listError[this.props.idComponent + notifType]) {
-                                    this.listError[this.props.idComponent + notifType] = listError;
-                                    this.width = listError.clientWidth;
-                                }
-                            }} >
-                            {messages}
-                        </ul>
-                    </div>
-                </div >
-            </section >
-        );
+
+        const displayAlert = errors.map((display: any) => display ? display.isAlert : null);
+
+        if(notifType === 'info' && displayAlert && displayAlert.indexOf(true) != -1) {
+            return <AlertItem
+                        action={() => this.handleClickRemove(messages.map(message => message.key))}
+                        message={messages}
+                        showed={this.state.isShowed}
+                        button={button}
+                        ref={(alertInfo) => (this.alertInfo = alertInfo)} />;
+        } else {
+            return (
+                <section>
+                    <div className={"messageBox " + notifType + "Box " + notifType + "-message"} style={customContainertStyle}>
+                        <div ref={(elt) => {
+                            this.notif = elt;
+                        }}>
+                            {button}
+                            <h1 className={"title" + notifType + " " + notifType + "-message-title"}
+                                style={customContentStyle}>
+                                <span>
+                                    <SvgSprites
+                                        icon={notifType}
+                                        color={notifType === 'warning' ? icoColor = 'orange' : notifType === 'info' ? icoColor = 'green' : icoColor }
+                                        height="1.5em"
+                                        width="1.5em" />
+                                </span>
+                                {this._getTitle()}
+                            </h1>
+                            <ul style={ulStyle} className={notifType + "-message-list"} role="alert"
+                                id={ariaControls} ref={(listError) => {
+                                    if (listError && !this.listError[this.props.idComponent + notifType]) {
+                                        this.listError[this.props.idComponent + notifType] = listError;
+                                        this.width = listError.clientWidth;
+                                    }
+                                }} >
+                                {messages}
+                            </ul>
+                        </div>
+                    </div >
+                </section >
+            )
+        }
+        
     }
 
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
-
         const { exceptions, errors, warnings, infos, personnals } = this.state;
         return (
             <span>
@@ -551,9 +577,13 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
      * @param items
      */
     handleClickRemove(items) {
-        items.map((id) => {
-            this.fire(CLEAN_NOTIFICATION_EVENT.withData({ id, idComponent: this.props.idComponent }));
-        });
+        this.setState({ isShowed: false });
+        setTimeout(() => {
+            items.map((id) => {
+                this.fire(CLEAN_NOTIFICATION_EVENT.withData({ id, idComponent: this.props.idComponent }));
+            })
+            this.setState({ isShowed: true });
+        }, 200)
     }
 
     /**

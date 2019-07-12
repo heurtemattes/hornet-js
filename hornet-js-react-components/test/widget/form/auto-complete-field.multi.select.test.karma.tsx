@@ -73,18 +73,19 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+
+import { runTest } from "hornet-js-test/src/test-run";
+import { Decorators } from "hornet-js-test/src/decorators";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
-import { runTest } from "hornet-js-test/src/test-run";
-import { Decorators } from "hornet-js-test/src/decorators";
 
-const chai = require("chai");
-const expect = chai.expect;
+import * as _ from "lodash";
+const expect = require('chai').expect;
 import * as React from "react";
 import * as assert from "assert";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
@@ -92,7 +93,7 @@ import { IService } from "hornet-js-core/src/services/service-api";
 import { AutoCompleteMultiField } from "src/widget/form/auto-complete-multi-field";
 import { DataSourceConfig } from 'hornet-js-core/src/component/datasource/config/service/datasource-config';
 import { Promise } from "hornet-js-utils/src/promise-api";
-let ReactTestUtils = require("react-dom/test-utils");
+const ReactTestUtils = require("react-dom/test-utils");
 
 let reactElement: JSX.Element;
 let reactElement2: JSX.Element;
@@ -386,18 +387,18 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
         selectedItem.push({ value: 2, text: "libelle2" });
         setTimeout(() => {
             // sélectionner item libelle2
-            this.triggerMouseEvent(document.querySelector(`#${id} #autocomplete-selector-checkbox-0`), "mousedown");
+            this.triggerMouseEvent(document.querySelector(`#${id} #autocomplete-selector-checkbox-1`), "mousedown");
             // sélectionner item libelle22
             selectedItem.push({ value: 22, text: "libelle22" });
             setTimeout(() => {
-                this.triggerMouseEvent(document.querySelector(`#${id} #autocomplete-selector-checkbox-3`), "mousedown");
+                this.triggerMouseEvent(document.querySelector(`#${id} #autocomplete-selector-checkbox-21`), "mousedown");
                 // rechercher les items commençants par libelle44
                 (element as any).value = "libelle44";
                 ReactTestUtils.Simulate.change(element);
                 setTimeout(() => {
                     selectedItem.push({ value: 44, text: "libelle44" });
                     // sélectionner item libelle44
-                    this.triggerMouseEvent(document.querySelector(`#${id} #autocomplete-selector-checkbox-0`), "mousedown");
+                    this.triggerMouseEvent(document.querySelector(`#${id} #autocomplete-selector-checkbox-43`), "mousedown");
                     setTimeout(() => {
 
                         selectedItem = selectedItem.filter(i => {
@@ -407,10 +408,10 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                         finish = true;
                         // désélectionner l'item libelle2
                         this.triggerMouseEvent(document.querySelector(`#${id} #libelle-2-2-2`), "click");
-                    }, 2000);
-                }, 2000);
-            }, 2000);
-        }, 2000);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }, 500);
     }
     
     @Decorators.it("Conservation des éléments précédemment sélectionnnés après nouvelle recherche avec un dataSource de type service")
@@ -474,10 +475,10 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                         })
                         finish1 = true;
                         this.triggerMouseEvent(document.querySelector(`#${id} #libelle-2-2-2`), "click");
-                    }, 2000);
-                }, 2000);
-            }, 2000);
-        }, 2000);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }, 500);
     }
 
     @Decorators.after

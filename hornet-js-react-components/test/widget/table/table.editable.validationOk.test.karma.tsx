@@ -73,14 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 'use strict';
-var chai = require('chai');
-const expect = chai.expect;
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
@@ -91,16 +95,15 @@ import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data"
 import * as assert from "assert";
 
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
+import { Content } from "src/widget/table/content";
 /*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { CheckColumn } from "src/widget/table/column/check-column";
-import { EditionActionColumn } from "hornet-js-react-components/src/widget/table/column/edition-action-column";
-import { Notification } from "hornet-js-react-components/src/widget/notification/notification";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
+import { EditionActionColumn } from "src/widget/table/column/edition-action-column";
+import { Notification } from "src/widget/notification/notification";
 import { NotificationManager, Notifications } from "hornet-js-core/src/notification/notification-manager";
 
 
@@ -179,23 +182,23 @@ class tableTest extends BaseTest {
             </div>
         );
 
-
-        table = this.renderIntoDocument(tableElement, "main3");
+        const id = this.generateMainId();
+        table = this.renderIntoDocument(tableElement, id);
         dataSourceTableEditable.on("fetch", () => {
 
-            this.triggerMouseEvent(document.querySelector('#main3 #lite-0-colBody-0-2 .edition-button-action-before'), "click");
+            this.triggerMouseEvent(document.querySelector(`#${id} #lite-0-colBody-0-2 .edition-button-action-before`), "click");
 
-            expect(document.querySelector("#main3 #lite-0-colBody-0-0 .table-cell-input")).to.exist;
+            expect(document.querySelector(`#${id} #lite-0-colBody-0-0 .table-cell-input`)).to.exist;
 
-            document.querySelector('#main3 #lite-0-colBody-0-0 input#label')[ "value" ] = "new libelle";
+            document.querySelector(`#${id} #lite-0-colBody-0-0 input#label`)[ "value" ] = "new libelle";
 
-            document.querySelector("#main3 .form-table")[ "novalidate" ] = "true";
+            document.querySelector(`#${id} .form-table`)[ "novalidate" ] = "true";
 
 
             /* TODO : faire un mock sur l'action de submit sinon le test tourne en boucle */
-            //this.triggerMouseEvent(document.querySelector("#main3 #lite-0-colBody-0-2 button[title='Enregistrer'"), "click");
+            //this.triggerMouseEvent(document.querySelector(`#${id} #lite-0-colBody-0-2 button[title='Enregistrer'`), "click");
 
-            expect(document.querySelector("#main3 #lite-0-colBody-0-0 ").innerHTML).to.exist;
+            expect(document.querySelector(`#${id} #lite-0-colBody-0-0`).innerHTML).to.exist;
 
             this.end();
         });

@@ -73,18 +73,21 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
 import { Accordions } from "src/widget/accordion/accordions";
 import { Accordion } from "src/widget/accordion/accordion";
@@ -92,10 +95,11 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Form } from "src/widget/form/form";
 import { InputField } from "src/widget/form/input-field";
 import { RadiosField } from "src/widget/form/radios-field";
-import * as schema from "hornet-js-react-components/test/widget/form/form-validate-required-fields.json";
+const schema = require("hornet-js-react-components/test/widget/form/form-validate-required-fields.json");
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { ButtonsArea } from "src/widget/form/buttons-area";
 import { Button } from "src/widget/button/button";
+
 
 let cpt = [];
 let rdrCpt = [];

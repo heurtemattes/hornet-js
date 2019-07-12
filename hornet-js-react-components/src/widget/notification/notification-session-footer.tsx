@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Utils } from "hornet-js-utils";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import {
@@ -11,10 +11,11 @@ import {
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { WakeUpNode } from "hornet-js-core/src/services/default/wakeup-node";
-
-import { Picto } from "src/img/picto";
-import * as classNames from "classnames";
+import classNames from "classnames";
 import * as moment from "moment-timezone";
+import { SvgSprites } from '../icon/svg-sprites';
+
+import "src/widget/notification/sass/_notification.scss";
 
 (moment.duration as any).fn.format = function () {
     let str = "";
@@ -25,7 +26,7 @@ import * as moment from "moment-timezone";
     return str
 };
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-session-footer");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.notification.notification-session-footer");
 
 /**
  * Déclaration des prpriétés du CountDown
@@ -102,16 +103,16 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
             id: "notification-session"
         };
 
-        let labelClasses: ClassDictionary = {
+        let labelClasses = {
             "fl": true,
             "notification-session-message": true,
             "notification-expanded": !this.state.reduced,
             "notification-reduced": this.state.reduced
         };
 
-        let imgSrc: string = Picto.darkBlue.next;
+        let imgSrc: any = <SvgSprites icon="next" color="#2E586E" height="3em" width="2em" />;
         if (this.state.reduced) {
-            imgSrc = Picto.darkBlue.previous;
+            imgSrc = <SvgSprites icon="previous" color="#0579BE" height="3em" width="2em" />;
         }
 
         let tabIndex: number = this.state.reduced ? -1 : 0;
@@ -120,11 +121,15 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
             <div {...divProps}>
                 <div className={classNames(labelClasses)}>
                     <div>{this.formateMessage()}</div>
-                    <div><a onClick={this.handlClickWakeUp} tabIndex={tabIndex}>{this.i18n(this.props.messages).reconnexion}</a></div>
+                    <div>
+                        <a onClick={this.handlClickWakeUp} tabIndex={tabIndex}>
+                            {this.i18n(this.props.messages).reconnexion}
+                        </a>
+                    </div>
                 </div>
-                <div className={"fl"} onClick={this.handleToggleNotification}>
-                    <a href={""} onClick={this.handleToggleNotification} tabIndex={0}>
-                        <img src={imgSrc} style={{ height: "3em" }} onClick={this.handleToggleNotification} />
+                <div className={"fl"}>
+                    <a href={""} onClick={this.handleToggleNotification} tabIndex={0} className="notifWrap">
+                        {imgSrc}
                     </a>
                 </div>
             </div>
@@ -202,12 +207,10 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
      * @param {HornetEvent<SessionEvent>} ev
      */
     handleWillExpire(ev: HornetEvent<SessionEvent>) {
-        // console.log(ev.detail.value);
         this.setState({ expireIn: ev.detail.value }, () => {
             setTimeout(this.handleToggleNotification, this.props.displayDuration);
         });
     }
-
 
     /**
      * Métohde de gestion du scroll à l'écran
@@ -234,6 +237,7 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
             visible: visible
         });
     }
+
 
     /**
      * Calcule si un élément est présent ou non a l'écran

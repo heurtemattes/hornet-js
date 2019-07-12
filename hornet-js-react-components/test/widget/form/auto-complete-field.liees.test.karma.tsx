@@ -73,12 +73,15 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
+import * as _ from "lodash";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as React from "react";
@@ -86,8 +89,7 @@ import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { AutoCompleteField, AutoCompleteFieldProps } from "src/widget/form/auto-complete-field";
 import { DataSourceMaster } from "hornet-js-core/src/component/datasource/datasource-master";
 
-var chai = require("chai");
-const expect = chai.expect;
+const expect = require("chai").expect;
 
 let elements: JSX.Element;
 

@@ -73,13 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { BusinessError } from "hornet-js-utils/src/exception/business-error";
 import { BusinessErrorList } from "hornet-js-utils/src/exception/business-error-list";
@@ -88,7 +88,7 @@ import { NotificationManager } from "src/notification/notification-manager";
 import { fireHornetEvent } from "src/event/hornet-event";
 import { COMPONENT_CHANGE_EVENT } from "src/routes/router-client-async-elements";
 
-const logger: Logger = Utils.getLogger("hornet-js-core.exception.error-manager");
+const logger: Logger = Logger.getLogger("hornet-js-core.exception.error-manager");
 
 /**
  * Applique le traitement appropriété à l'erreur indiquée suivant sa nature :

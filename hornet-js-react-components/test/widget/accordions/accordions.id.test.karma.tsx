@@ -73,13 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-var chai = require('chai');
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as _ from "lodash";
 import * as React from "react";
 
@@ -115,16 +116,18 @@ class AccordionTest extends BaseTest {
 
     @Decorators.it("Test 1 - Vérifier l'id de l'élément Accordions")
     testIdAccordions() {
-        data = this.renderIntoDocument(element, "main1");
-        expect(document.querySelector("#main1 .accordion").id, "Problème élément Label non trouvé").to.equal("accordions-test-karma")
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        expect(document.querySelector(`#${id} .accordion`).id, "Problème élément Label non trouvé").to.equal("accordions-test-karma")
         this.end();
     };
 
 
     @Decorators.it("Test 2 - Vérifier les id des éléments Accordion Header")
     testIdAccordionHeader() {
-        data = this.renderIntoDocument(element, "main2");
-        let elements = document.querySelectorAll("#main2 .accordion-header");
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        let elements = document.querySelectorAll(`#${id} .accordion-header`);
         [].forEach.call(elements, function (elem, index) {
             assert.equal(elem.id, "accordions-test-karma-" + index + "-li");
         });
@@ -133,8 +136,9 @@ class AccordionTest extends BaseTest {
 
     @Decorators.it("Test 3 - Vérifier les id des éléments titre des Accordion Header")
     testIdAccordionHeaderTitre() {
-        data = this.renderIntoDocument(element, "main3");
-        let elements = document.querySelectorAll("#main3 .accordion-label");
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        let elements = document.querySelectorAll(`#${id} .accordion-label`);
         [].forEach.call(elements, function (elem, index) {
             assert.equal(elem.id, "accordions-test-karma-" + index + "-tab");
         });
@@ -143,8 +147,9 @@ class AccordionTest extends BaseTest {
 
     @Decorators.it("Test 4 - Vérifier les id des éléments Accordion Content")
     testIdAccordionContent() {
-        data = this.renderIntoDocument(element, "main4");
-        let elements = document.querySelectorAll("#main4 .accordion-content");
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        let elements = document.querySelectorAll(`#${id} .accordion-content`);
         [].forEach.call(elements, function (elem, index) {
             assert.equal(elem.id, "accordions-test-karma-" + index + "-panel");
         });

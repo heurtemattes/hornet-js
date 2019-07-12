@@ -73,14 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.3.0
+ * @version v5.4.0
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-
+import { Logger } from "hornet-js-logger/src/logger";
+import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { HornetComponent } from "src/widget/component/hornet-component";
@@ -91,7 +91,7 @@ import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
 import { HornetPage } from "src/widget/component/hornet-page";
 import { IClientInitializer } from "hornet-js-components/src/component/iclient-initializer";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.react.react-client");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.react.react-client");
 
 /**
  * Gère les étapes d'initialisation du client spécifiques à React

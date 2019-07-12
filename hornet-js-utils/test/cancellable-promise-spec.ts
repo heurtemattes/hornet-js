@@ -1,4 +1,4 @@
-import { Logger } from "src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
@@ -16,8 +16,8 @@ Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
 });
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
-const chai = TestUtils.chai;
-const expect: any = chai.expect;
+const expect = TestUtils.chai.expect;
+
 import { CancellablePromise } from "src/cancellable-promise";
 
 let cpt =0;

@@ -1,0 +1,98 @@
+@import '../../sass/core';
+
+$userBaseColor: theme-color('global', 'white');
+$userPanelBoxShadow: rgba(0, 0, 0, .45);
+$userProfilLink: theme-color($variant: 'secondary');
+$userProfilLinkHover: theme-color($variant: 'buttons');
+
+.profil-content {
+    a {
+        @include flexCentered();
+
+        padding: 0 0.3em !important;
+        cursor: pointer;
+        color: $userBaseColor;
+        font-family: $notoRegular;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    .dropdown-button {
+        font-size: 0.9em;
+
+        &:hover {
+            color: $userBaseColor;
+        }
+
+        .label {
+            margin-right: 0.3125em;
+        }
+    }    
+
+    &:focus {
+        outline: 1px solid $userBaseColor;
+    }
+
+    .picto-user {
+        display: inline-block;
+        height: 1.5em;
+        width: 1.5em;
+        vertical-align: middle;
+        background-color: $userBaseColor;
+        mask: url("../img/account.svg") no-repeat left top;
+    }
+
+    .user-panel {
+        display: none;
+        position: absolute;
+        top: 2.9em;
+        right: 0;
+        z-index: 2;
+        width: 12.688em;
+        height: auto;
+        background: $userBaseColor;
+        box-shadow: 0 0.1em 0.3em $userPanelBoxShadow;
+        padding: 1em;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: -0.43em;
+            right: 0.5em;
+            z-index: 2;
+            width: 1em;
+            height: 1em;
+            background: $userBaseColor;
+            transform: rotate(45deg);
+        }
+    }
+
+    .expand {
+        display: block;
+    }
+    
+    .link {
+        width: auto;
+        margin: 1em;
+        padding: 0 1em !important;
+        color: $userBaseColor;
+        background: $userProfilLink;
+        text-align: center;
+        font-weight: bold;
+        font-size: 0.8em;
+        transition: 0.2s;
+        line-height: 3em;
+
+        &:hover {
+            padding: 0 1em;
+            background: $userProfilLinkHover;
+            border-width: 0;
+            color: $userBaseColor;
+        }
+    }
+
+    @media (max-width: #{$mediaXS-405}) {
+        margin-right: 0.4em;
+        padding-left: 2.45vh;
+    }
+}
