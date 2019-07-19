@@ -2,6 +2,8 @@
 
 $tableDataColumns: rgba(244, 244, 244, 1); //#f4f4f4
 $tableSelected: rgba(226, 239, 247, 1); //#e2eff7
+$tableMenuHoverBackGround: rgba(0, 99, 156, 1); //#00639c
+$tableMenuFocusBackGround: rgba(65, 160, 214, 1); //#e2eff7
 
 /// Composant table qui se compose de :
 /// _table.scss
@@ -17,7 +19,28 @@ $tableSelected: rgba(226, 239, 247, 1); //#e2eff7
     float: right;
 }
 
+%menuStyleFocusAndHover {
+    outline: none;
+    border-radius: 50%;
+}
+
 .menu-contextuel {
+    button {
+        min-width: 2.5em;
+        min-height: 2.5em;
+        outline: none;
+        &:focus {
+            @include smoothTransition(all, 0.3s);
+            @extend %menuStyleFocusAndHover;
+            background-color: $tableMenuFocusBackGround;
+        }
+        &:hover {
+            @include smoothTransition(all, 0.3s);
+            @extend %menuStyleFocusAndHover;
+            background-color: $tableMenuHoverBackGround;
+        }
+    }
+    
     .dropdown-content {
         background-color: $tableDataColumns;
 
@@ -48,10 +71,48 @@ $tableSelected: rgba(226, 239, 247, 1); //#e2eff7
         border: none;
         cursor: pointer;
         right: auto;
+        outline: none;
+        &:focus {
+            @include smoothTransition(all, 0.3s);
+            @extend %menuStyleFocusAndHover;
+            background-color: $tableMenuFocusBackGround;
+        }
+        &:hover {
+            @include smoothTransition(all, 0.3s);
+            @extend %menuStyleFocusAndHover;
+            background-color: $tableMenuHoverBackGround;
+        }
     }
 }
 
-.menu-priority-content-action > a {
+.menu-priority-content-action a.button-action {
     display: block;
     padding: 0.4em;
+
+    outline: none;
+    &:focus {
+        @include smoothTransition(all, 0.3s);
+        @extend %menuStyleFocusAndHover;
+        background-color: $tableMenuFocusBackGround;
+    }
+    &:hover {
+        @include smoothTransition(all, 0.3s);
+        @extend %menuStyleFocusAndHover;
+        background-color: $tableMenuHoverBackGround;
+    }
+}
+
+.menu-priority-content-action > button {
+    display: block;
+    padding: 0.4em;
+
+    outline: none !important;
+    &:focus {
+        @extend %menuStyleFocusAndHover;
+        background-color: $tableMenuFocusBackGround;
+    }
+    &:hover {
+        @extend %menuStyleFocusAndHover;
+        background-color: $tableMenuHoverBackGround;
+    }
 }

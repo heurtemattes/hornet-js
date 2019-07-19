@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-database",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants de gestion de base hornet-js",
   "bugs": {
@@ -13,16 +13,21 @@
   "types": "./index.d.ts",
   "dependencies": {
     "continuation-local-storage": "3.2.1",
-    "hornet-js-bean": "5.4.0",
-    "hornet-js-core": "5.4.0",
-    "hornet-js-logger": "5.4.0",
-    "hornet-js-utils": "5.4.0",
+    "hornet-js-bean": "5.4.1",
+    "hornet-js-core": "5.4.1",
+    "hornet-js-logger": "5.4.1",
+    "hornet-js-utils": "5.4.1",
+    "lodash.assignin": "4.2.0",
+    "lodash.foreach": "4.5.0",
     "sequelize": "5.8.9",
     "tslib": "1.9.3"
   },
   "devDependencies": {
+    "@types/node": "10.14.9",
+    "@types/lodash.assignin": "4.2.6",
+    "@types/lodash.foreach": "4.5.6",
     "@types/mocha": "5.2.6",
-    "hornet-js-test": "5.4.0",
+    "hornet-js-test": "5.4.1",
     "sqlite3": "4.0.8"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"

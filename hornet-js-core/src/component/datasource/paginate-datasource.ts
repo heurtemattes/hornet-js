@@ -73,12 +73,11 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { DataSource } from "src/component/datasource/datasource";
 import { DataSourceMap } from "src/component/datasource/config/datasource-map";
@@ -93,6 +92,12 @@ import { Logger } from "hornet-js-logger/src/logger";
 import { DataSourceOption } from "src/component/datasource/options/datasource-option";
 import { DatasourceSortOption } from "src/component/datasource/options/datasource-sort-option";
 
+import filter = require("lodash.filter");
+
+import round = require("lodash.round");
+import map = require("lodash.map");
+import forEach = require("lodash.foreach");
+import assignIn = require("lodash.assignin");
 const logger: Logger = Logger.getLogger("hornet-js-core.component.datasource.paginate-datasource");
 
 export const ITEMS_PER_PAGE_ALL: number = 2147483647;
@@ -164,7 +169,7 @@ export class Paginator<T> {
 
     protected calculateNbPages(itemsTot?: number): number {
         let nbTot = itemsTot || this._pagination.totalItems;
-        return _.round(nbTot / this._pagination.itemsPerPage) + ((nbTot % this._pagination.itemsPerPage) > 0 ? 1 : 0);
+        return round(nbTot / this._pagination.itemsPerPage) + ((nbTot % this._pagination.itemsPerPage) > 0 ? 1 : 0);
     }
 
 
@@ -299,7 +304,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
         this._paginator = new Paginator<T>(pagination);
         this.initPaginateDataSource();
         this.initSort();
-        _.map([ "sort", "pagination", "select", "add", "filter", "delete", "unselect" ], (event) => {
+        map([ "sort", "pagination", "select", "add", "filter", "delete", "unselect" ], (event) => {
             this.on(event, this.saveSelected);
         });
     }
@@ -387,7 +392,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
      * @inheritdoc
      */
     protected fetchData(triggerFetch: Boolean, args?: any): Promise<Array<T>> {
-        return super.fetchData(triggerFetch, this._paginator.sort ? _.extend(this.getFetchArgs("sort", this._paginator.sort), args) : args)
+        return super.fetchData(triggerFetch, this._paginator.sort ? assignIn(this.getFetchArgs("sort", this._paginator.sort), args) : args)
             .then((results: Array<T>) => {
                 this.pagination.pageIndex = this.pagination.pageIndex || 1;
                 this.updatePaginator(this.datasourceResults, this._paginator.pagination.totalItems);
@@ -485,7 +490,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
         Promise.resolve().then(() => {
             try {
                 if (this.isDataSourceArray) {
-                    this.datasourceResults = _.filter(this.results, config);
+                    this.datasourceResults = filter(this.results, config);
                     this.updatePaginator(this.datasourceResults);
                     this.goToPage(Direction.FIRST);
                 } else {
@@ -662,7 +667,7 @@ export class PaginateDataSource<T> extends DataSource<T>{
      */
     public select(items: any[]) {
         let temp = [];
-        if (items) _.forEach(items, (item) => {
+        if (items) forEach(items, (item) => {
             if (item.id) {
                 temp.push(item);
             }

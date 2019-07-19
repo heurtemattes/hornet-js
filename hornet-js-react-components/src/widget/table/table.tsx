@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { Header } from "src/widget/table/header";
-import { Content, UNIT_SIZE } from "src/widget/table/content";
+import { Content } from "src/widget/table/content";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { Columns } from "src/widget/table/columns";
 import { Footer } from "src/widget/table/footer";
@@ -229,7 +229,7 @@ export class Table extends HornetComponent<TableProps, any> {
                             keyColumns.push({
                                 keyColumn: column.props.keyColumn,
                                 title: column.props.title,
-                                width: (column.props.defaultWidth || column.props.width) + UNIT_SIZE,
+                                width: (column.props.defaultWidth || column.props.width) + Table.UNIT_SIZE,
                             });
                         }
                     });

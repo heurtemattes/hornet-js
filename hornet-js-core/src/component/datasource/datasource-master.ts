@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,8 @@ import { DataSource } from "src/component/datasource/datasource";
 import { DataSourceMap } from "src/component/datasource/config/datasource-map";
 import { DataSourceConfig } from "src/component/datasource/config/service/datasource-config";
 import { DataSourceConfigPage } from "src/component/datasource/config/service/datasource-config-page";
-import * as _ from "lodash";
+import remove = require("lodash.remove");
+import map = require("lodash.assign");
 
 /*
 * @classdesc Classe représentant les datasources de type MASTER-SLAVE
@@ -92,7 +93,7 @@ export class DataSourceMaster<T> extends DataSource<T>{
     protected _datasources: DataSource<any>[] = [];
 
     constructor(config: DataSourceConfig | DataSourceConfigPage | Array<T>, public keysMap: DataSourceMap, public options?: any[]) {
-        super(config, keysMap, options)
+        super(config, keysMap, options);
     }
 
     /***
@@ -110,7 +111,7 @@ export class DataSourceMaster<T> extends DataSource<T>{
      * @param datasource esclave du master
      */
     public removeDatasource(datasource: DataSource<any>): void {
-        _.remove(this._datasources, datasource);
+        remove(this._datasources, datasource);
     }
 
     /***
@@ -131,7 +132,7 @@ export class DataSourceMaster<T> extends DataSource<T>{
         super.select(args);
         if (this._datasources.length > 0) {
             let isArrayDS = this.isDataSourceArray;
-            _.map(this._datasources, (item) => {
+            map(this._datasources, (item) => {
                 item.fetch(isArrayDS ? false : true, args);
             })
         }

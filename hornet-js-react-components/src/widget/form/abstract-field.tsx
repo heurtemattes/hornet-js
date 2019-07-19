@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 
 import classNames from "classnames";
-import * as _ from "lodash";
+import camelCase = require("lodash.camelcase");
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { DomAdapter } from "src/widget/form/dom-adapter";
 import { FieldError, FieldErrorProps } from "src/widget/form/field-error";
@@ -604,7 +604,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
                     this.setAttribute(key, nextProps[key]);
                 } else {
                     /* Propriété spécifique hornet : un 'setter' est certainement présent */
-                    const setterName: string = _.camelCase("set " + (key));
+                    const setterName: string = camelCase("set " + (key));
                     if (this[setterName]) {
                         this[setterName](nextProps[key]);
                     } else {

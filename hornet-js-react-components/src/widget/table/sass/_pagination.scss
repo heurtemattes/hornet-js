@@ -3,6 +3,7 @@
 $tableBaseColorDark: theme-color('global', 'dark');
 $tableGlobalStates: theme-color($variant: 'states');
 $paginationButtonBg: rgba(0, 0, 0, 0);
+$paginationButtonFill: rgba(0, 0, 0, 1);
 $paginationInputHover: rgba(238, 238, 238, 1); //#eee
 
 /// Composant table qui se compose de :
@@ -59,11 +60,15 @@ $paginationInputHover: rgba(238, 238, 238, 1); //#eee
     text-decoration: none;
     text-transform: uppercase;
     transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s,
-                background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s;
+    background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s;
     white-space: nowrap;
-
+   
+    &:hover,
     &:focus {
-        outline: 0.0625em solid $tableGlobalStates;
+        border-radius: 50%;
+        outline: none;
+        box-shadow: 0 0 0.3em 0em $tableGlobalStates;
+        transition: all 0.3s;
     }
 }
 
@@ -73,15 +78,17 @@ $paginationInputHover: rgba(238, 238, 238, 1); //#eee
 .datatable-pagination-button-nextpage,
 .datatable-pagination-button-firstpage,
 .datatable-pagination-button-lastpage {
-    height: 2.5em;
-    margin: 0 0.375em;
-    padding: 0 1em;
+    margin: 0;
+    padding: 0 0.3em;
     border-radius: 50%;
     line-height: 1.5em;
     min-width: 0;
+    use {
+        fill: $paginationButtonFill;
+    }
 }
 
-.datatable-pagination-button-prev,
+/*.datatable-pagination-button-prev,
 .datatable-pagination-button-prevpage {
     background-position: 0.125em;
 
@@ -105,7 +112,7 @@ $paginationInputHover: rgba(238, 238, 238, 1); //#eee
     background-position: 0.125em;
 
     @include svgAsBackground($tableBaseColorDark, "../img/last-page.svg");
-}
+}*/
 
 .datatable-pagination-input {
     width: 3em;

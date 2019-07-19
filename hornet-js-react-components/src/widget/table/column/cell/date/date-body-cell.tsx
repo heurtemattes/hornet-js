@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
 import * as moment from "moment";
 
 const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.date.date-body-cell");
@@ -110,7 +110,7 @@ export class DateBodyCell<P extends DateBodyCellProps, S> extends AbstractBodyCe
 
     componentWillReceiveProps(nextProps: P, nextContext: any): void {
         const value = DateBodyCell.getTemplatedValue(nextProps);
-        const props = _.assign({}, {...(nextProps as any), value});
+        const props = assign({}, { ...(nextProps as any), value });
 
         if (value !== this.state.value) {
             this.setState({

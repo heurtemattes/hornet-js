@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,12 @@ import { HornetBasicFormFieldProps, HornetClickableProps, HornetWrittableProps, 
 import { AutoCompleteField, AutoCompleteFieldProps } from "src/widget/form/auto-complete-field";
 import { AutoCompleteSelector } from "src/widget/form/auto-complete-selector";
 import { Chips } from "src/widget/button/chips";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import deburr = require("lodash.deburr");
+import find = require("lodash.find");
+import kebabCase = require("lodash.kebabcase");
+import throttle = require("lodash.throttle");
 import { HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -140,7 +145,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
     protected autocompleteContainer: HTMLDivElement;
     protected selectedChoices: any[];
 
-    static defaultProps: any = _.assign({ withChips: true }, AutoCompleteField.defaultProps);
+    static defaultProps: any = assign({ withChips: true }, AutoCompleteField.defaultProps);
 
     constructor(props: P, context?: any) {
         super(props, context);
@@ -161,8 +166,8 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
     componentWillUpdate(nextProps: AutoCompleteFieldProps, nextState: any, nextContext: any): void {
         super.componentWillUpdate(nextProps, nextState, nextContext);
         if (this.state.delay !== nextState.delay) {
-            // Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec _.throttle
-            this._throttledTriggerAction = _.throttle(this.triggerAction, nextState.delay);
+            // Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec throttle
+            this._throttledTriggerAction = throttle(this.triggerAction, nextState.delay);
         }
     }
 
@@ -222,7 +227,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
         }
 
         let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
-        htmlProps = _.assign(htmlProps, {
+        htmlProps = assign(htmlProps, {
             onKeyDown: this.handleKeyDown,
             onFocus: this.handleFocus,
             onBlur: this.handleBlur,
@@ -302,9 +307,9 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 });
 
                 if (item) {
-                    const key: string = _.kebabCase(item.text + "-" + item.value + "-" + index);
+                    const key: string = kebabCase(item.text + "-" + item.value + "-" + index);
                     const classObject = {};
-                    classObject[_.kebabCase("chips-" + this.props.name + "-" + item.text)] = true;
+                    classObject[kebabCase("chips-" + this.props.name + "-" + item.text)] = true;
                     if (indice === this.state.currentValue.length - 1) {
                         classObject["last-chips"] = true;
                     }
@@ -418,7 +423,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
 
             if (shouldShow && !this.state.readOnly && !this.state.disabled) {
                 const indexSelected: number = this.autoCompleteState.choiceFocused;
-                const listDefaultValue: number[] = (this.state.listDefaultValue) ? _.cloneDeep(this.state.listDefaultValue) : [];
+                const listDefaultValue: number[] = (this.state.listDefaultValue) ? cloneDeep(this.state.listDefaultValue) : [];
                 let itemSelected;
 
                 this.state.choices.map((item, index) => {
@@ -435,7 +440,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
         } else if (e.keyCode === KeyCodes.ENTER && this.state.writable) {
             if (shouldShow && !this.state.readOnly && !this.state.disabled) {
                 const indexSelected: number = this.autoCompleteState.choiceFocused;
-                const listDefaultValue: number[] = (this.state.listDefaultValue) ? _.cloneDeep(this.state.listDefaultValue) : [];
+                const listDefaultValue: number[] = (this.state.listDefaultValue) ? cloneDeep(this.state.listDefaultValue) : [];
                 let itemSelected;
 
                 this.state.choices.map((item, index) => {
@@ -483,7 +488,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 logger.trace(" Autocomplete multiple ctrl+A ");
 
                 let listDefaultValue: string[] = (this.state.listDefaultValue && this.state.listDefaultValue instanceof Array)
-                    ? _.cloneDeep(this.state.listDefaultValue)
+                    ? cloneDeep(this.state.listDefaultValue)
                     : [];
 
                 if (listDefaultValue.length === (this.refs.selector as AutoCompleteSelector).props.choices.length) {
@@ -554,7 +559,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
 
         if (this.state.choices[0]
             && this.state.choices.length === 1
-            && _.deburr(newText).toLowerCase() === _.deburr(this.state.choices[0].text).toLowerCase()) {
+            && deburr(newText).toLowerCase() === deburr(this.state.choices[0].text).toLowerCase()) {
             this.changeSelectedChoice();
         }
     }
@@ -587,7 +592,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
                 document.getElementById(this.state.id).focus();
             } else {
                 // Sinon focus sur le chips
-                key = _.kebabCase(`${focusChoix[0].text}-${liste[focusIndex]}-${liste[focusIndex]}`);
+                key = kebabCase(`${focusChoix[0].text}-${liste[focusIndex]}-${liste[focusIndex]}`);
                 document.getElementById(key).focus();
             }
         } else {
@@ -607,7 +612,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
             res = value;
         } else {
             let listDefaultValue: string[] = (this.state.listDefaultValue && this.state.listDefaultValue instanceof Array)
-                ? _.cloneDeep(this.state.listDefaultValue)
+                ? cloneDeep(this.state.listDefaultValue)
                 : [];
             if (this.isValueDefined(value)) {
                 const index = listDefaultValue.indexOf(value);
@@ -687,7 +692,7 @@ export class AutoCompleteMultiField<P extends AutoCompleteMultiFieldProps, S> ex
 
         if (this.isValueDefined(value) && (!Array.isArray(value) || value.length > 0)) {
             const res = value.map((item) => {
-                return _.find(this.props.dataSource.results, { value: item });
+                return find(this.props.dataSource.results, { value: item });
             });
             if (res || (!Array.isArray(res) || res.length > 0)) {
                 this.props.dataSource.select(res);

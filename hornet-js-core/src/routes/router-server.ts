@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -93,7 +93,7 @@ import {
     RouteType,
 } from "src/routes/abstract-routes";
 import { LazyClassLoader } from "hornet-js-utils/src/lazy-class-loader";
-import * as _ from "lodash";
+import merge =  require("lodash.merge");
 import * as Http from "http";
 import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 
@@ -223,7 +223,7 @@ export class RouterServer {
             objData[ this.dataContext + prefix + key ] = dataRoutes[ key ];
         }
 
-        (<any>global).routesInfos = _.merge((<any>global).routesInfos, objPage, objData);
+        (<any>global).routesInfos = merge((<any>global).routesInfos, objPage, objData);
     }
 
     private parseRoutes<T extends RouteInfos>(declaredRoutes: Routes<T>, internalObj: DirectorRoutesDesc, prefix: string) {

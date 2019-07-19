@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,8 @@ import * as React from "react";
 import classNames from "classnames";
 import { Accordion, TAB_ID_NAME } from "src/widget/accordion/accordion";
 import { GroupComponent, GroupComponentProps } from "src/widget/group/abstract-group-component";
-import * as _ from "lodash";
+import cloneDeep = require("lodash.clonedeep");
+import find = require("lodash.find");
 
 import "src/widget/accordion/sass/_accordions.scss";
 
@@ -172,8 +173,7 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
      * @param callback function
      */
     handleClickAccordion(index: number, strDomId = "", callback: any) {
-        let accordion;
-        const visibleAccordion = _.cloneDeep(this.visibleAccordion);
+        const visibleAccordion = cloneDeep(this.visibleAccordion);
         if (this.state.multiSelectable) {
             visibleAccordion[ index ] = !visibleAccordion[ index ];
             if (!visibleAccordion[ index ]) {
@@ -206,7 +206,7 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
     protected updateIsOpen(index: number, strDomId = "", callback: any) {
         if (this.visibleAccordion[ index ] && this.accordionList[index].state && this.accordionList[index].state.isOpen === false ) {
             this.accordionList[index].setState({isOpen: true}, () => {
-                const accordion = _.find(this.accordionList, { props: { panelIndex: index } });
+                const accordion = find(this.accordionList, { props: { panelIndex: index } });
                 if (accordion && accordion.state.isOpen && this.props.afterShowAccordion) {
                     this.props.afterShowAccordion(accordion, index);
                 }
@@ -221,7 +221,7 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
 
 
     protected handleBeforeHideAccordion(index: number) {
-        const accordion = _.find(this.accordionList, { props: { panelIndex: index } });
+        const accordion = find(this.accordionList, { props: { panelIndex: index } });
         if (accordion && this.props.beforeHideAccordion) {
             this.props.beforeHideAccordion(accordion, index);
         }
@@ -254,7 +254,7 @@ export class Accordions<P extends AccordionsProps> extends GroupComponent<Accord
                 this.handleClickAccordion(index, strDomId, this.scrollToFocus);
             }
         } else {
-            const tabIndex = _.cloneDeep(this.tabIndex);
+            const tabIndex = cloneDeep(this.tabIndex);
             if (this.state.children) {
                 if (this.state.children.length > 1 ) {
                     this.state.children.map((child, i) => {

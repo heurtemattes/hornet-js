@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,7 @@ import { Logger } from "hornet-js-logger/src/logger";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { Utils } from "hornet-js-utils";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
-import * as _ from "lodash";
+import assignIn = require("lodash.assignin");
 import { I18nUtils } from "hornet-js-utils/src/i18n-utils";
 
 const nodemailer = require("nodemailer");
@@ -148,7 +148,7 @@ export class Mailer {
         if (!this.transport) {
             const conf = Mailer.defaultOptions;
             if (options) {
-                _.assignIn(conf, options);
+                assignIn(conf, options);
                 logger.trace("NodeMailerTransport :", JSON.stringify(conf));
             }
             this.transport = nodemailer.createTransport(conf);

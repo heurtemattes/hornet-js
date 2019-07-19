@@ -19,10 +19,11 @@ $modalCloseFocus: rgba(4, 76, 160, 1); //#044ca0
     color: $modalBaseColor;
     background: $modalheaderBg;
     font-size: 120%;
-    line-height: 2;
+    line-height: 2.5;
     box-shadow: 0 0.3125em 0.625em $buttonBoxShadow;
     border: 0.0625em solid $buttonBoxShadow;
-    border-radius: 0.3125em;
+    border-top-right-radius: 0.3125em;
+    border-top-left-radius: 0.3125em;
 
     .widget-dialogue-title {
         h1 {
@@ -76,13 +77,14 @@ $modalCloseFocus: rgba(4, 76, 160, 1); //#044ca0
 .widget-dialogue-close {
     .hornet-dialogue-croix {
         box-shadow: none;
+        min-width: 2em;
+        margin-top: .3em;
+        margin-right: 0.3em;
     }
 }
 
 .hornet-button.hornet-dialogue-croix {
-    margin-right: 0;
-    
-    &:focus {
+    &:hover, &:focus {
         color: $modalCloseFocus !important;
         background: none repeat scroll 0 0 $modalBaseColor;
         font-weight: 400;

@@ -112,7 +112,7 @@ export class SvgSprites extends HornetComponent<SvgSpritesProps, any> {
 
     render() {
         const urlSprite = this.genUrlStatic(this.props.url);
-        const aria = this.props.ariaLabel ? this.props.ariaLabel : this.props.icon;
+        const aria = this.props.ariaLabel ? this.props.ariaLabel : "";
 
         return (
             <svg
@@ -124,7 +124,6 @@ export class SvgSprites extends HornetComponent<SvgSpritesProps, any> {
                 tabIndex={this.props.tabIndex}
                 aria-hidden="true"
                 aria-label={ aria }>
-                    <title>{ aria }</title>
                     <use xlinkHref={`${urlSprite}#ico-${this.props.icon}`} />
             </svg>
         );

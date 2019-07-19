@@ -73,17 +73,19 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import isNaN = require("lodash.isnan");
+import isNumber = require("lodash.isnumber");
 import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import * as classNames from "classnames";
@@ -323,7 +325,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
                 <div className="datatable-pagination-content" key={"pagerTableDropDownSubContainer-" + this.props.id}>
                     <Dropdown
                         items={dropdownItems}
-                        icon="carretDown"
+                        srcImg={<SvgSprites icon="carretDown" />}
                         id={this.props.id + "-drop"}
                         valueCurrent={this.state.pagination.itemsPerPage}
                         label={selectedItem.textKey}
@@ -392,11 +394,11 @@ export class Pager extends HornetComponent<PagerProps, any> {
         const i18nValues = {firstPage, totalPages, nextPage, prevPage, summary: this.state.summary};
 
         return [
-            this.renderButton(this.i18n(this.state.firstPageTitle, i18nValues), firstPage, startOnClickActif, "firstPage"),
-            this.renderButton(this.i18n(this.state.previousPageTitle, i18nValues), prevPage, startOnClickActif, "prevPage"),
+            this.renderButton(this.i18n(this.state.firstPageTitle, i18nValues), firstPage, startOnClickActif, "firstPage", "first"),
+            this.renderButton(this.i18n(this.state.previousPageTitle, i18nValues), prevPage, startOnClickActif, "prevPage", "previous"),
             this.renderPageInput(firstPage, lastPage, this.i18n(this.state.inputLabelTitle, {summary: this.state.summary})),
-            this.renderButton(this.i18n(this.state.nextPageTitle, i18nValues), nextPage, endOnClickActif, "nextPage"),
-            this.renderButton(this.i18n(this.state.lastPageTitle, i18nValues), lastPage, endOnClickActif, "lastPage"),
+            this.renderButton(this.i18n(this.state.nextPageTitle, i18nValues), nextPage, endOnClickActif, "nextPage", "next"),
+            this.renderButton(this.i18n(this.state.lastPageTitle, i18nValues), lastPage, endOnClickActif, "lastPage", "last"),
         ];
     }
 
@@ -408,7 +410,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * @param key clé de l'élément React
      * @returns l'élément React correspondant
      */
-    protected renderButton(infoTitle: string, page: number, enabled: boolean, key: string): JSX.Element {
+    protected renderButton(infoTitle: string, page: number, enabled: boolean, key: string, ico: string): JSX.Element {
         logger.trace("renderButton");
         let className: string = "datatable-pagination-button datatable-pagination-button-" + key.toLowerCase();
         if (enabled) {
@@ -430,6 +432,7 @@ export class Pager extends HornetComponent<PagerProps, any> {
                 title={infoTitle}
             >
                 {/*{texte}*/}
+                <SvgSprites icon={ico} tabIndex={ -1 }/>
             </button>
         );
     }
@@ -505,12 +508,12 @@ export class Pager extends HornetComponent<PagerProps, any> {
      * @param e
      */
     protected handleChangeValue(e) {
-        const pagination = {...this.state.pagination};
+        const pagination = { ...this.state.pagination };
         const maxPages: number = Pager.getTotalPages(this.state.pagination.totalItems, this.state.pagination.itemsPerPage);
 
         // Si NaN, on rend une chaine vide
-        pagination.pageIndex = !_.isNaN(e.target.valueAsNumber) ? e.target.valueAsNumber : "";
-        if (_.isNumber(pagination.pageIndex) && pagination.pageIndex < 1) {
+        pagination.pageIndex = !isNaN(e.target.valueAsNumber) ? e.target.valueAsNumber : "";
+        if (isNumber(pagination.pageIndex) && pagination.pageIndex < 1) {
             pagination.pageIndex = 1;
             this.tableInputPager.value = 1;
         }

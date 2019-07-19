@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import * as _ from "lodash";
+import isEqual = require("lodash.isequal");
 import { TestUtils } from "hornet-js-test/src/test-utils";
 const expect = TestUtils.chai.expect;
 
@@ -145,7 +145,7 @@ class AutoCompleteFieldTest extends BaseTest {
         let index = 0;
         dataSource.on("select", (choice) => {
             index++;
-            expect(_.isEqual(choice.value, index),
+            expect(isEqual(choice.value, index),
                 ("L'élément sélectionné dans le datasource " + choice.value + " doit être identique à l'element suivant : " + index)).to.be.true;
             if (index === dataSource.results.length - 1) {
                 this.end();

@@ -73,13 +73,12 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import events = require("events");
-import * as _ from "lodash";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
@@ -90,6 +89,14 @@ import { DataSourceConfig } from "src/component/datasource/config/service/dataso
 import { DataSourceConfigPage } from "src/component/datasource/config/service/datasource-config-page";
 import { DatasourceSortOption } from "src/component/datasource/options/datasource-sort-option";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
+import remove = require("lodash.remove");
+import map = require("lodash.map");
+import get = require("lodash.get");
+import orderBy = require("lodash.orderby");
+import find = require("lodash.find");
+import forEach = require("lodash.foreach");
+import filter = require("lodash.filter");
+
 
 export enum DataSourceStatus {
     Dummy,
@@ -212,10 +219,10 @@ export class DataSource<T> extends events.EventEmitter {
             this.isDataSourceArray = true;
             this.init();
         }
-        const init = _.find(options, (option: DataSourceOption) => {
+        const init = find(options, (option: DataSourceOption) => {
             return option instanceof InitAsync;
         });
-        const sort = _.find(options, (option: DataSourceOption) => {
+        const sort = find(options, (option: DataSourceOption) => {
             return option instanceof DefaultSort;
         });
 
@@ -305,7 +312,7 @@ export class DataSource<T> extends events.EventEmitter {
      * @return renvoie les éléments trouvés
      */
     public findAll(criteria: any): any {
-        return _.filter(this.results, criteria);
+        return filter(this.results, criteria);
     }
 
     /**
@@ -317,15 +324,15 @@ export class DataSource<T> extends events.EventEmitter {
         if (this._selected instanceof Array) {
             const itemsToRemove = (item instanceof Array) ? item : [item];
             if (item["id"]) {
-                _.remove(this._selected, (mappedItem) => {
+                remove(this._selected, (mappedItem) => {
                     const indexOf = ArrayUtils.getIndexById(itemsToRemove, mappedItem);
                     if (indexOf > -1) {
                         return true;
                     }
                 });
             } else {
-                _.forEach(itemsToRemove, (item) => {
-                    _.remove(this._selected, item);
+                forEach(itemsToRemove, (item) => {
+                    remove(this._selected, item);
                 });
             }
         } else {
@@ -417,7 +424,7 @@ export class DataSource<T> extends events.EventEmitter {
      */
     protected fetchData(triggerFetch: Boolean, args?: any): Promise<Array<T>> {
         this.emit("loadingData", true);
-        const fetchOptions = _.filter(this.options, (option: DataSourceOption) => {
+        const fetchOptions = filter(this.options, (option: DataSourceOption) => {
             return option.sendToFetch();
         });
         const fetchArgs = (typeof args !== "undefined") ? [ args ].concat(fetchOptions) : fetchOptions;
@@ -570,8 +577,8 @@ export class DataSource<T> extends events.EventEmitter {
         this.emit("loadingData", true);
         return Promise.resolve().then(() => {
             return this.transformData(items).then((result: Array<T>) => {
-                _.map(result, (item) => {
-                    _.remove(this.datasourceResults, item);
+                map(result, (item) => {
+                    remove(this.datasourceResults, item);
                 });
                 if (triggerFetch) this.emit("fetch", this.results);
                 return this.results;
@@ -670,7 +677,7 @@ export class DataSource<T> extends events.EventEmitter {
                     keys.push(options.sortDatas[ i ].key);
                     directions.push(options.sortDatas[ i ].dir ? "desc" : "asc");
                 }
-                this.results = _.orderBy(this.results, keys, directions);
+                this.results = orderBy(this.results, keys, directions);
             }
         }
     }
@@ -744,7 +751,7 @@ export class DataSource<T> extends events.EventEmitter {
         Promise.resolve().then(() => {
             try {
                 if (this.isDataSourceArray) {
-                    this.datasourceResults = _.filter(this.results, config);
+                    this.datasourceResults = filter(this.results, config);
                     this.emitEvent("filter", this.results);
                 } else {
                     this.fetchData(false, this.getFetchArgs("filter", config)).then(() => {

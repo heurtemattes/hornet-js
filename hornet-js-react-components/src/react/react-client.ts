@@ -73,14 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import { Logger } from "hornet-js-logger/src/logger";
-import * as _ from "lodash";
+import isFunction = require("lodash.isfunction");
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { HornetComponent } from "src/widget/component/hornet-component";
@@ -137,7 +136,7 @@ export class ReactClientInitializer implements IClientInitializer<HornetEvent<Co
             // logger.error("Erreur lors du premier rendu react côté client", exc);
             // throw exc;
         } finally {
-            if (_.isFunction(this.readyCallback)) {
+            if (isFunction(this.readyCallback)) {
                 logger.trace("readyCallback");
                 this.readyCallback();
             }

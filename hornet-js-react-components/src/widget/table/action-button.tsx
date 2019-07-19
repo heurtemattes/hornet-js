@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { Button, ButtonProps, ButtonState } from "src/widget/button/button";
 import classNames from "classnames";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
@@ -118,7 +118,7 @@ export interface ActionButtonState extends ButtonState {
 
 export class ActionButton<P extends ActionButtonProps, S extends ActionButtonState> extends Button<ActionButtonProps, ActionButtonState> {
 
-    static defaultProps = _.assign(Button.defaultProps, {
+    static defaultProps = assign(Button.defaultProps, {
         displayedWithoutResult: false,
     });
 
@@ -157,7 +157,8 @@ export class ActionButton<P extends ActionButtonProps, S extends ActionButtonSta
                 img = <img
                     src={this.props.srcImg}
                     className={this.props.classNameImg}
-                    alt={this.props.title} />;
+                    alt={this.props.title}
+                    tabIndex={-1} />;
             } else {
                 img = this.props.srcImg;
             }

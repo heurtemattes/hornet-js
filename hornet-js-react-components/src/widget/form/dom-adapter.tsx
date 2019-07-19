@@ -73,12 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import find = require("lodash.find");
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { FormUtils } from "src/widget/form/form-utils";
 import { Logger } from "hornet-js-logger/src/logger";
@@ -155,7 +155,7 @@ export class DomAdapter<P, S> extends HornetComponent<P, S> {
             }
         }
         elt[ "__component" ] = this;
-        if (!_.find(this.multipleElement, (element) => element.id === elt.id)) {
+        if (!find(this.multipleElement, (element) => element.id === elt.id)) {
             this.multipleElement.push(elt);
         }
     }

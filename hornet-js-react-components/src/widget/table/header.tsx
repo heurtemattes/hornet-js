@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { Logger } from "hornet-js-logger/src/logger";
 
 import * as React from "react";
 import classNames from "classnames";
-import * as _ from "lodash";
+import cloneDeep = require("lodash.clonedeep");
 
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -452,6 +452,6 @@ export class Header extends HornetComponent<HeaderProps, any> {
     }
 
     handlePaginationChange(result): void {
-        this.setState({ pagination: _.cloneDeep(result.pagination) });
+        this.setState({ pagination: cloneDeep(result.pagination) });
     }
 }

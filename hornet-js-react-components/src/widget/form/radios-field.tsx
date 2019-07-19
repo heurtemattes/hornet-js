@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,11 @@ import {
     InlineStyle,
     AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import find = require("lodash.find");
+import kebabCase = require("lodash.kebabcase");
+import omit = require("lodash.omit");
 import { HornetComponentChoicesProps, IHornetComponentDatasource } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import * as classNames from "classnames";
@@ -125,7 +129,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
 
     public readonly props: Readonly<RadiosFieldProps>;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         labelClass: "blocLabelUp",
         valueKey: "value",
         labelKey: "label",
@@ -229,7 +233,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         }
 
         /* On n'inclut pas les propriétés spécifiques ou celles dont on surcharge la valeur */
-        const htmlProps: HtmlPropsInterface = _.omit(
+        const htmlProps: HtmlPropsInterface = omit(
             this.getHtmlProps(),
             [
                 "dataSource",
@@ -253,7 +257,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
             choice[this.state.labelKey] :
             choice[this.state.valueKey];
 
-        const idInput = `${this.state.id}-${_.kebabCase(label)}`;
+        const idInput = `${this.state.id}-${kebabCase(label)}`;
         const key = `${idInput}-${choice.value}`;
 
         const classNamesSpan: classNames.ClassDictionary = {
@@ -362,7 +366,7 @@ export class RadiosField extends AbstractFieldDatasource<RadiosFieldProps, any> 
         // L'adaptateur DOM met à jour l'élément dans le DOM : on met ici à jour l'état interne du composant
         this.setState({ currentValue: value });
         if (this.state.items && this.state.items.length > 0) {
-            const itemToSelected = _.find(this.state.items, (element) => {
+            const itemToSelected = find(this.state.items, (element) => {
                 const elementValue = element[this.state.valueKey] !== null && element[this.state.valueKey] !== undefined ?
                     element[this.state.valueKey].toString() : element[this.state.valueKey];
 

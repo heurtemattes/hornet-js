@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,7 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 
-import * as _ from "lodash";
+import isEqual = require("lodash.isequal");
 const expect = require('chai').expect;
 import * as React from "react";
 import * as assert from "assert";
@@ -191,7 +191,7 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                 index++;
                 items.push(index);
                 items.forEach((item, ind) => {
-                    expect(_.isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} n'est pas le même que celui du tableau this.dataSource.selected`).to.be.true;
+                    expect(isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} n'est pas le même que celui du tableau this.dataSource.selected`).to.be.true;
                 });
 
                 if (index === this.dataSource.results.length - 1) {
@@ -224,7 +224,7 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                 index++;
                 items.push(index);
                 items.forEach((item, ind) => {
-                    expect(_.isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} n'est pas le même que celui du tableau this.dataSource.selected`).to.be.true;
+                    expect(isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} n'est pas le même que celui du tableau this.dataSource.selected`).to.be.true;
                 })
 
                 if (index == this.dataSource.results.length - 1) {
@@ -258,7 +258,7 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                 index++;
                 items.push(index);
                 items.forEach((item, ind) => {
-                    expect(_.isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} ne correspond pas à celui du même index dans this.dataSource.selected`).to.be.true;
+                    expect(isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} ne correspond pas à celui du même index dans this.dataSource.selected`).to.be.true;
                 })
 
                 if (index === this.dataSource.results.length - 1) {
@@ -292,7 +292,7 @@ class AutoCompleteMultiFieldTest extends HornetReactTest {
                 index++;
                 items.push(index);
                 items.forEach((item, ind) => {
-                    expect(_.isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} ne correspond pas à celui du même index dans this.dataSource.selected`).to.be.true;
+                    expect(isEqual(this.dataSource.selected[ind].value, item), `L'item situé à l'index ${ind} ne correspond pas à celui du même index dans this.dataSource.selected`).to.be.true;
                 })
 
                 if (index === this.dataSource.results.length - 1) {

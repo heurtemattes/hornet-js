@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -151,9 +151,11 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
 
         const classes = {
             "edition-button-action": true,
+            "button-action": true,
         };
 
         const classesBefore = {
+            "button-action": true,
             "edition-button-action-before": true,
         };
 
@@ -176,6 +178,19 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      */
     getCellTitle() {
         return "";
+    }
+
+
+    /**
+     * Gestion de la touche espace et entre
+     * @param e
+     */
+    handleKeyDownButton(e: React.KeyboardEvent<HTMLElement>): void {
+        if (e.keyCode === KeyCodes.ENTER || e.keyCode === KeyCodes.SPACEBAR) {
+            e.preventDefault();
+            e.stopPropagation();
+            !this.state.isEditing && this.onClick(e);
+        }
     }
 
     /**
@@ -220,8 +235,10 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
             aria-label={this.i18n(this.state.titleEdit, this.props.value)}
             onClick={this.onClick}
             tabIndex={-1}
+            onKeyDown={this.handleKeyDownButton}
+            role="button"
         >
-            <SvgSprites icon="quickEdit" color="#0579be" width="2em" height="2em" />
+            <SvgSprites icon="quickEdit" color="#0579be" width="2em" height="2em" tabIndex={-1}/>
         </a>
         );
     }
@@ -242,7 +259,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                     aria-label={this.state.titleSave}
                     type="submit"
                     tabIndex={0}>
-                    <SvgSprites icon="registerEdit" color="#006400" width="2em" height="2em" />
+                    <SvgSprites icon="registerEdit" color="#006400" width="2em" height="2em" tabIndex={-1}/>
                 </button>
 
                 <button ref={(elt) => {
@@ -254,7 +271,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                     onClick={this.onClick}
                     type="button"
                     tabIndex={0}>
-                    <SvgSprites icon="cancelEdit" color="#D60000" width="2em" height="2em" />
+                    <SvgSprites icon="cancelEdit" color="#D60000" width="2em" height="2em" tabIndex={-1}/>
                 </button>
             </div>
         );

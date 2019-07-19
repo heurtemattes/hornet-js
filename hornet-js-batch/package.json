@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-batch",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants de gestion de base hornet-js",
   "bugs": {
@@ -13,15 +13,17 @@
   },
   "dependencies": {
     "csv-parse": "4.1.0",
-    "hornet-js-components": "5.4.0",
-    "hornet-js-core": "5.4.0",
-    "hornet-js-logger": "5.4.0",
-    "hornet-js-utils": "5.4.0",
+    "express": "4.16.4",
+    "hornet-js-components": "5.4.1",
+    "hornet-js-core": "5.4.1",
+    "hornet-js-logger": "5.4.1",
+    "hornet-js-utils": "5.4.1",
     "lodash.clonedeep": "4.5.0",
     "lodash.filter": "4.6.0",
     "lodash.find": "4.6.0",
     "lodash.remove": "4.7.0",
-    "tslib": "1.9.3"
+    "tslib": "1.9.3",
+    "uuid": "3.2.1"
   },
   "devDependencies": {
     "@types/express": "4.16.1",

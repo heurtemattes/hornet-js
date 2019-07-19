@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -91,7 +91,8 @@ import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { HornetPage, HornetPageProps } from "src/widget/component/hornet-page";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import * as _ from "lodash";
+import merge = require("lodash.merge");
+import clone = require("lodash.clone");
 
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      PageRenderingMiddleware
@@ -107,9 +108,9 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
                 const filterUserKeys = ["SessionNotOnOrAfter", "Profil", "Nom", "Prenom", "name", "Mail", "Login", "roles"];
                 const userKeys = [...userKeysToInclude, ...filterUserKeys];
 
-                const includeCls:{[key: string]: string[]} = _.merge(configuration && configuration.includeClsKey || {}, {"hornet.user": userKeys});
+                const includeCls:{[key: string]: string[]} = merge(configuration && configuration.includeClsKey || {}, {"hornet.user": userKeys});
 
-                const includeSession:{[key: string]: string[]} = _.merge(configuration && configuration.includeSessionKey || {}, {passport: [], strategy: []});
+                const includeSession:{[key: string]: string[]} = merge(configuration && configuration.includeSessionKey || {}, {passport: [], strategy: []});
                 const routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
 
                 // route de type 'PAGE' uniquement
@@ -142,7 +143,7 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
                     res.expose(process.env.NODE_ENV, "Mode");
 
                     // On expose le CLS sans ce qui est spécifique serveur
-                    const cls = _.clone(Utils.getContinuationStorage().active);
+                    const cls = clone(Utils.getContinuationStorage().active);
                     delete cls[ "hornet.request" ];
                     delete cls[ "hornet.response" ];
                     delete cls[ "hornet.routeInfos" ];

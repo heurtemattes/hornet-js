@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,7 +86,8 @@ import {
 import { AbstractFieldDatasource } from "src/widget/form/abstract-field-datasource";
 import { IHornetComponentDatasource, HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 
 import "src/widget/form/sass/_selected.scss";
@@ -128,7 +129,7 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
 
     readonly props: Readonly<SelectFieldProps>;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractFieldDatasource.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractFieldDatasource.defaultProps), {
         labelClass: "blocLabelUp",
         valueKey: "value",
         labelKey: "label",
@@ -150,7 +151,7 @@ export class SelectField<P extends SelectFieldProps> extends AbstractFieldDataso
         logger.debug("renderWidget selectField :", this.state.id ? this.state.id : this.state.name);
         const hasError = this.hasErrors() ? " has-error" : "";
         const htmlProps = this.getHtmlProps();
-        _.assign(htmlProps, {
+        assign(htmlProps, {
             className: htmlProps["className"] ? htmlProps["className"] + " selectfield" + hasError : " selectfield" + hasError,
             value: this.state.currentValue,
             onChange: (e) => {

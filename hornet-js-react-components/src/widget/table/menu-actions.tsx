@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -213,7 +213,7 @@ export class MenuActions<P extends MenuActionsProps> extends HornetComponent<P, 
             <div className="fr menu-contextuel-container">
                 <Dropdown
                     id={this.props.id}
-                    icon="list"
+                    srcImg={<SvgSprites icon="list" />}
                     className="menu-contextuel"
                     type="button"
                     items={actions}

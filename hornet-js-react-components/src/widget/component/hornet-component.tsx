@@ -73,14 +73,17 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import * as _ from "lodash";
+import camelCase = require("lodash.camelcase");
+import isEqual = require("lodash.isequal");
+import isFunction = require("lodash.isfunction");
+import isUndefined = require("lodash.isundefined");
 import { UserInformations } from "hornet-js-utils/src/authentication-utils";
 import {
     fireHornetEvent,
@@ -157,10 +160,12 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     /* Chargement des données USer */
     protected user: UserInformations = Utils.getCls("hornet.user");
 
+    static UNIT_SIZE = "em";
+
     componentWillMount(): void {
         // gestion de l'injection automatique des instances de composants avec props "var=()=>{}"
         if (!Utils.isServer) {
-            if (!_.isUndefined(this.props[ "var" ]) && _.isFunction(this.props[ "var" ])) {
+            if (!isUndefined(this.props[ "var" ]) && isFunction(this.props[ "var" ])) {
                 this.props[ "var" ](this);
             }
         }
@@ -179,7 +184,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     }
 
     componentWillUnmount(): void {
-        if (!_.isUndefined(this.props[ "var" ]) && _.isFunction(this.props[ "var" ])) {
+        if (!isUndefined(this.props[ "var" ]) && isFunction(this.props[ "var" ])) {
             this.props[ "var" ](null);
         }
         this.mounted = false;
@@ -199,9 +204,9 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
              *
              * On ne veut pas dans ce cas écraser l'état avec l'ancienne propriété. En effet l'état peut avaoir été modifié
              * via un setter alors que la propriété utilisée initialement pour le constructeur n'a pas changé.*/
-            if (!_.isEqual((this as any).props[ key ], nextProps[ key ])) {
+            if (!isEqual((this as any).props[ key ], nextProps[ key ])) {
                 /* On se base sur le 'setter' portant le même nom que la propriété */
-                let setterName: string = _.camelCase("set " + (key));
+                let setterName: string = camelCase("set " + (key));
                 if (this[ setterName ]) {
                     this[ setterName ](nextProps[ key ]);
                 } else {
@@ -247,7 +252,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
     protected autobinding() {
         const blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
         for (const fn in this) {
-            if (_.isFunction(this[ fn ]) && !(fn in blacklist)) {
+            if (isFunction(this[ fn ]) && !(fn in blacklist)) {
                 this[ fn ] = this[ fn ][ "bind" ](this);
             }
         }
@@ -262,7 +267,7 @@ export class HornetComponent<P extends HornetComponentProps, S extends HornetCom
         const blacklist = { constructor: 1, errorManagement: 1, wrapMethod: 1 };
         if (this.isErrorManaged()) {
             for (const fn in this) {
-                if (_.isFunction(this[ fn ]) && !(fn in blacklist)) {
+                if (isFunction(this[ fn ]) && !(fn in blacklist)) {
                     // this.wrapMethod(fn);
                 }
             }

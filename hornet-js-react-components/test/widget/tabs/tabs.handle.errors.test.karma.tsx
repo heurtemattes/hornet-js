@@ -91,10 +91,8 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
-
 import { Tabs } from "src/widget/tab/tabs";
 import { Tab } from "src/widget/tab/tab";
-import * as _ from "lodash";
 
 import { Form } from 'src/widget/form/form';
 import { InputField } from 'src/widget/form/input-field';
@@ -167,14 +165,14 @@ class TabsErrorsTest extends BaseTest {
                 this.triggerMouseEvent(document.querySelector(`#${id} #ACTION_ERREUR_1`), "click");
                 setTimeout(() => {
                     expect(document.querySelector(`#${id} #tabs-0`).getAttribute("tabIndex")).to.equal("-1");
-                    expect(document.querySelector(`#${id} #tabs-1`).getAttribute("tabIndex")).to.equal(null);
+                    expect(document.querySelector(`#${id} #tabs-1`).getAttribute("tabIndex")).to.equal("0");
                     expect(document.querySelector(`#${id} #adresse`) === document.activeElement).to.equal(true);
                     
 
                     this.triggerMouseEvent(document.querySelector(`#${id} #ACTION_ERREUR_0`), "click");
 
                     setTimeout(() => {
-                        expect(document.querySelector(`#${id} #tabs-0`).getAttribute("tabIndex")).to.equal(null);
+                        expect(document.querySelector(`#${id} #tabs-0`).getAttribute("tabIndex")).to.equal("0");
                         expect(document.querySelector(`#${id} #tabs-1`).getAttribute("tabIndex")).to.equal("-1");
                         expect(document.querySelector(`#${id} #nom`) === document.activeElement).to.equal(true);
                         this.end();

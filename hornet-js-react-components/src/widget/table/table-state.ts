@@ -73,14 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as events from "events";
 import { CellCoordinates } from "src/widget/table/column/cell/cell-coordinates";
-import * as _ from "lodash";
+import remove = require("lodash.remove");
 import { ColumnState } from "src/widget/table/column";
 
 export class TableState extends events.EventEmitter {
@@ -99,7 +99,7 @@ export class TableState extends events.EventEmitter {
 
     removeContent(contentState: ContentState) {
         contentState.removeListener(ContentState.ITEMS_CHANGE_EVENT, this.setIndexAfterItemsChangeEvent.bind(this));
-        _.remove(this.contentsState, contentState);
+        remove(this.contentsState, contentState);
     }
 
     removeContents() {

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,8 +85,7 @@ Utils.setConfigObj({});
 import { TestUtils } from "hornet-js-test/src/test-utils";
 const expect = TestUtils.chai.expect;
 
-
-import * as _ from "lodash";
+import isEqual = require("lodash.isequal");
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
@@ -186,7 +185,7 @@ class tableTest extends BaseTest {
             this.triggerMouseEvent(document.querySelector(`#${this.id} #lite-0-colBody-1-0 input`), "click");
         });
         this.dataSourceTriTableSelect.on("select", () => {
-            expect(_.isEqual(this.dataSourceTriTableSelect.selected[0], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
+            expect(isEqual(this.dataSourceTriTableSelect.selected[0], { id: 2, label: "libelle2", desc: "desc2" })).to.be.true;
             this.end();
 
         });

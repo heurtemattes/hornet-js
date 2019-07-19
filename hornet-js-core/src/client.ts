@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -100,7 +100,6 @@ import { NodeApiError } from "src/services/service-api-results";
 import { manageError } from "src/component/error-manager";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
-import * as _ from "lodash";
 import * as path from "path";
 
 

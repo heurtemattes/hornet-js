@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,6 @@ import { Utils } from "hornet-js-utils";
 import { Class, AbstractClass } from "hornet-js-utils/src/typescript-utils";
 import { UserInformations } from "hornet-js-utils/src/authentication-utils";
 import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
-import * as _ from "lodash";
 import { DataValidator } from "src/validation/data-validator";
 import { Request, Response } from "express";
 import { IService } from "src/services/service-api";
@@ -92,7 +91,10 @@ import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import { MediaTypes, MediaType } from "src/protocol/media-type";
 import { Promise } from "hornet-js-utils/src/promise-api";
-
+import assign = require("lodash.assign");
+import isString = require("lodash.isstring");
+import isUndefined = require("lodash.isundefined");
+import findIndex = require("lodash.findindex");
 const logger: Logger = Logger.getLogger("hornet-js-core.routes.abstract-routes");
 
 /** DirectorClientConfiguration */
@@ -198,7 +200,7 @@ export abstract class RouteInfos {
 
     constructor(type: string, attributes: RouteAttributes = {}, service?: Class<IService> | AbstractClass<IService> | IService) {
         this.type = type;
-        _.assign(this.attributes, attributes);
+        assign(this.attributes, attributes);
         if (service) {
             this.service = service;
         }
@@ -258,16 +260,16 @@ export abstract class AbstractRoutes {
     protected resolveAuthorizationAndMethod(authorizationOrMethod: RouteMethod | RouteAuthorization, method: RouteMethod) {
         let auth;
         let meth;
-        if (_.isString(authorizationOrMethod)) {
+        if (isString(authorizationOrMethod)) {
             auth = DEFAULT_AUTHORIZATION;
             meth = authorizationOrMethod;
         } else {
-            if (_.isUndefined(authorizationOrMethod)) {
+            if (isUndefined(authorizationOrMethod)) {
                 auth = DEFAULT_AUTHORIZATION;
             } else {
                 auth = authorizationOrMethod;
             }
-            if (_.isString(method)) {
+            if (isString(method)) {
                 meth = method;
             } else {
                 meth = DEFAULT_METHOD;
@@ -325,7 +327,7 @@ export abstract class AbstractRoutes {
     getDefaultRouteLoader(paths: Array<string>) {
         return (name: string) => {
             logger.trace("defaultRouteLoader(" + name + ")");
-            const index = _.findIndex(paths, function (path) {
+            const index = findIndex(paths, function (path) {
                 try {
                     return require.main.require(path + name);
                 } catch (e) {

@@ -73,12 +73,11 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
 import forEach = require("lodash.foreach");
 import cloneDeep  = require("lodash.clonedeep");
 import clone = require("lodash.clone");

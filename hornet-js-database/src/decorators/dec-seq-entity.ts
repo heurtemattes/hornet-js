@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,7 @@ import { DbConnect } from "src/sequelize/dbconnect-sequelize";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import * as _ from "lodash";
+import assignIn = require("lodash.assignin");
 
 export type HornetEntity<T> = Class<Sequelize.Model<T>> & { entityName?: string; };
 
@@ -119,7 +119,7 @@ export function Entity(tableName: string, Model: Sequelize.ModelAttributes, opti
                             && Object.keys(myEntity)[i].toString() !== "Model") {
                             const tmpObject = {};
                             tmpObject[Object.keys(myEntity)[i].toString()] = myEntity[Object.keys(myEntity)[i]];
-                            innerOptions = _.assignIn(innerOptions, tmpObject);
+                            innerOptions = assignIn(innerOptions, tmpObject);
                         }
                     }
                     target["__inner__" + propertyKey.toString()] = DbConnect.getGlobal(this["configDatabase"])
@@ -136,7 +136,7 @@ export function Entity(tableName: string, Model: Sequelize.ModelAttributes, opti
         if (!target["config"]) {
             target["config"] = {};
         }
-        const myObject = _.assignIn({ table: tableName, Model: Model }, confOptions);
+        const myObject = assignIn({ table: tableName, Model: Model }, confOptions);
 
 
         if(confOptions.version && (!myObject.hooks || !myObject.hooks.beforeUpdate)) {

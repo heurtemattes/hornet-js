@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,8 @@ import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { DomAdapter } from "src/widget/form/dom-adapter";
-import * as _ from "lodash";
+import get = require("lodash.get");
+import set = require("lodash.set");
 
 const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.form");
 
@@ -242,15 +243,15 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
         for (const name in fields) {
             const value: any = fields[name].getCurrentValue(removeEmptyStrings);
             if ((value !== "" && value !== null && !(fields[name].getType() === "number" && isNaN(value))) || !removeEmptyStrings) {
-                _.set(data, name, value);
+                set(data, name, value);
             } else {
                 /* Le champ est vide : si son nom correspond à une arborescence d'objets, on s'assure tout de même
                 que l'objet parent existe */
                 const lastDotIndex = name.lastIndexOf(".");
                 if (lastDotIndex > 0) {
                     const parentPath: string = name.substring(0, lastDotIndex);
-                    if (_.get(data, parentPath) == null) {
-                        _.set(data, parentPath, {});
+                    if (get(data, parentPath) == null) {
+                        set(data, parentPath, {});
                     }
                 }
             }

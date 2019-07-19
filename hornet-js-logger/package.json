@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-logger",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "license": "CECILL-2.1",
   "description": "Ensemble des composants de gestion de base hornet-js",
   "bugs": {
@@ -12,17 +12,16 @@
     "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
   },
   "dependencies": {
-    "lodash": "4.17.11",
     "lodash.findlastindex": "4.6.0",
     "lodash.iserror": "3.1.1",
     "lodash.isfunction": "3.0.9",
     "lodash.isstring": "4.0.1",
     "lodash.last": "3.0.0",
     "log4js": "4.3.0",
+    "reflect-metadata": "0.1.13",
     "tslib": "1.9.3"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.132",
     "@types/lodash.findlastindex": "4.6.6",
     "@types/lodash.iserror": "3.1.6",
     "@types/lodash.isfunction": "3.0.6",

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -120,10 +120,10 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
         logger.debug("render HeaderCell -> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
         // Gestion du titre de l'entête
         const isTriActifSurColonne = this.isSortedColumn(this.props.sortData);
-        let urlImgArrow: any = <SvgSprites icon="arrowUpward" color="#000" />;
+        let urlImgArrow: any = <SvgSprites icon="arrowUpward" color="#000" tabIndex={-1}/>;
         const imgClassName = { "arrow-sort": true };
         if (this.state.sortData && this.state.sortData.dir === SortDirection.DESC) {
-            urlImgArrow = <SvgSprites icon="arrowDownward" color="#000" />;
+            urlImgArrow = <SvgSprites icon="arrowDownward" color="#000" tabIndex={-1}/>;
         }
         const title: string = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none").title;
         let titleDesc: any = isTriActifSurColonne && this.state.edition ?
@@ -184,10 +184,10 @@ export class HeaderCell<P extends HeaderCellProps, S> extends AbstractHeaderCell
             logger.warn("Column ", this.props.keyColumn, " Must have lang with abbr configuration");
         }
 
-        let urlImgArrow: any = <SvgSprites icon="arrowUpward" color="#000" />;
+        let urlImgArrow: any = <SvgSprites icon="arrowUpward" color="#000" tabIndex={-1}/>;
         const imgClassName = { "arrow-sort": true };
         if (this.state.sortData && this.state.sortData.dir === SortDirection.DESC) {
-            urlImgArrow = <SvgSprites icon="arrowDownward" color="#000" />;
+            urlImgArrow = <SvgSprites icon="arrowDownward" color="#000" tabIndex={-1}/>;
         }
 
         const titles = this.handleSortTitle(this.isSortedColumn(this.props.sortData), "none");

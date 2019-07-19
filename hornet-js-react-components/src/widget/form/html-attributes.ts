@@ -73,21 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { HornetProps } from "src/widget/form/abstract-field";
 import { HtmlAttributes } from "src/widget/form/html-const-attributes";
-import * as _ from "lodash";
-
+import assign = require("lodash.assign");
 
 /**
  * Object contenant toutes les propriétés standards HTML définies dans HornetHTMLAttributes.
  * Sert à vérifier si une propriété est une propriété standard HTML.
  */
-export const HTML_ATTRIBUTES: HornetProps = _.assign(
+export const HTML_ATTRIBUTES: HornetProps = assign(
     HtmlAttributes.HTML_NON_STANDARD_ATTRIBUTES,
     HtmlAttributes.HTML_RDFA_ATTRIBUTES, HtmlAttributes.HTML_STANDARD_CONFIG_ATTRIBUTES,
     HtmlAttributes.HTML_STANDARD_PRESENTATION_ATTRIBUTES, HtmlAttributes.HTML_STANDARD_FORM_ATTRIBUTES,

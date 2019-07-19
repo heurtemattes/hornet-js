@@ -73,12 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l"Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import assignIn = require("lodash.assignin");
+import map = require("lodash.map");
+import fill = require("lodash.fill");
 import { OptionsPDF } from "src/result/hornet-result-interface";
 import { MediaTypes } from "src/protocol/media-type";
 import { Utils } from "hornet-js-utils";
@@ -109,7 +111,7 @@ export class ResultPDF extends ResultFile {
             try {
                 const projectRoot = process.cwd() + "/static/" + Utils.config.get("themeName");
                 if (this.options.data && this.options.data instanceof Array) {
-                    const listValue: Array<any> = _.map(this.options.data, (item) => {
+                    const listValue: Array<any> = map(this.options.data, (item) => {
                         if (item) {
                             const arr = [];
                             for (const field of this.options.fields) {
@@ -118,15 +120,15 @@ export class ResultPDF extends ResultFile {
                             return arr;
                         }
                     });
-                    const header = _.map(this.options.fieldNames, (item) => {
+                    const header = map(this.options.fieldNames, (item) => {
                         return { text: item, style: "tableHeader" };
                     });
                     this.options.definition.content.forEach(element => {
                         if (element.table) {
-                            element.table = _.extend(
+                            element.table = assignIn(
                                 element.table, {
                                     body: [ header ].concat(listValue),
-                                    width: _.fill(new Array(this.options.fields.length), "*"),
+                                    width: fill(new Array(this.options.fields.length), "*"),
                                 });
                         }
                     });

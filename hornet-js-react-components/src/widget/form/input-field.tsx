@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,9 @@ import {
     AbstractField, HornetWrittableProps,
     HornetClickableProps, HornetBasicFormFieldProps, ReactFocusDOMAttributes, AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import isFunction = require("lodash.isfunction");
 import * as classNames from "classnames";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
@@ -114,7 +116,7 @@ export interface InputFieldProps extends AbstractFieldProps, HornetWrittableProp
 
 export class InputField<P extends InputFieldProps, S> extends AbstractField<InputFieldProps, S> {
 
-    static defaultProps = _.assign({ type: "text", resettable: true, resetTitle: "inputField.resetTitle" }, AbstractField.defaultProps);
+    static defaultProps = assign({ type: "text", resettable: true, resetTitle: "inputField.resetTitle" }, AbstractField.defaultProps);
 
     public readonly props: Readonly<InputFieldProps>;
     protected charsCounter: CharsCounter;
@@ -133,10 +135,10 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      */
     renderWidget(): JSX.Element {
         logger.debug("InputField renderWidget : ", this.props.id ? this.props.id : this.state.name);
-        const htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = cloneDeep(this.getHtmlProps());
 
         if (this.state.currentValue != null) {
-            _.assign(htmlProps, { defaultValue: this.props.currentValue });
+            assign(htmlProps, { defaultValue: this.props.currentValue });
         }
 
         const inputClasses: classNames.ClassDictionary = {
@@ -200,7 +202,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
      */
     renderResetButton(): JSX.Element {
 
-        const htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = cloneDeep(this.getHtmlProps());
 
         const hidden = htmlProps["type"] === "hidden";
 
@@ -226,7 +228,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
                 onKeyDown={this.handleResetKeyDown}
             >
                 <a {...aProps}>
-                    <SvgSprites icon="close" height="1.5em" width="1.5em" color="#757575" />
+                    <SvgSprites icon="close" height="1.5em" width="1.5em" color="#757575" tabIndex={ -1 }/>
                 </a>
             </span>
         );
@@ -278,7 +280,7 @@ export class InputField<P extends InputFieldProps, S> extends AbstractField<Inpu
 
         const htmlProps = this.getHtmlProps();
 
-        if (_.isFunction(htmlProps["onChange"])) {
+        if (isFunction(htmlProps["onChange"])) {
             htmlProps["onChange"](e);
         }
         if (this.charsCounter) {

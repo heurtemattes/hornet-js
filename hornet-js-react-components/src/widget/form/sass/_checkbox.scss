@@ -32,9 +32,11 @@ label {
         margin-top: 0.7em;
 
         input {
-            &:focus+.checkbox-material {
+            &:focus+.checkbox-material,
+            &:hover+.checkbox-material {
                 .check {
-                    outline: $formCheckboxOutline solid 1px;
+                    outline: none;
+                    box-shadow: 0 0 0.3em 0 $formCheckboxOutline;
                 }
             }
         }

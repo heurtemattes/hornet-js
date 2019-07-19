@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,6 +84,7 @@ import { HornetComponentProps } from "hornet-js-components/src/component/ihornet
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Utils } from "hornet-js-utils";
 import { Dropdown, Position } from "src/widget/dropdown/dropdown";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 import { UserInformations } from "hornet-js-utils/src/authentication-utils";
 
 import "src/widget/user/sass/_user.scss";
@@ -171,7 +172,7 @@ export class User<UserProps, S> extends HornetComponent<any, any> {
                 <Dropdown
                     items={[ { label: this.state.text, url: this.state.url, className: "link" } ]}
                     title={this.state.title}
-                    icon="account"
+                    srcImg={<SvgSprites icon="account" />}
                     className="profil-content"
                     id={this.props.id || "dropdown-user" + "-drop"}
                     label={this.state.login.toUpperCase()}

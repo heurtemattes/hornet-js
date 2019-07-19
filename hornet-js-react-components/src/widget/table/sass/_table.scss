@@ -25,7 +25,7 @@ $tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
 %tdStyle {
     margin-top: 0;
     vertical-align: middle;
-    height: 3.5em;
+    height: auto !important;
     font-size: 0.8125em;
     text-overflow: ellipsis;
     font-family: $roboto;
@@ -47,8 +47,15 @@ $tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
     svg {
         vertical-align: middle;
         &:not([width]) {
-            width: 1.7em;
-            height: 1.7em;
+            width: 2em;
+            height: 2em;
+        }
+    }
+
+    .datatable-data {
+        svg {
+            width: 2em;
+            height: 2em;
         }
     }
     /// exception pour l'icone account du tableau partenaire
@@ -64,6 +71,14 @@ $tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
         width: 1em;
         height: 1em;
     }
+
+    section.form-content {
+        margin: 0.875em ;
+        padding: 0 !important;
+    }
+    div.form-content {
+        padding: 0 !important;
+    }
 }
 
 .datatable-header-title {
@@ -78,6 +93,7 @@ $tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
     .datatable-title {
         flex: 1;
         width: 70%;
+        padding: 0 0 0 0.1em;
 
         @extend %titleStyle;
 
@@ -93,7 +109,7 @@ $tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
 
     .datatable-header-menu {
         flex-direction: row;
-        padding-top: 0.3em;
+        padding-top: 0.2em;
     }
 }
 
@@ -152,6 +168,12 @@ $tableGlobalColor: rgba(28, 28, 28, 1); //#1c1c1c
         }
         .datatale-columns-hidden {
             display: none;
+        }
+
+        tbody {
+            button-action {
+                transition: none;
+            }
         }
     }
 }

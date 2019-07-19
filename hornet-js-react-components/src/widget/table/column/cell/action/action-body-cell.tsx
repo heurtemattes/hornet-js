@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column
 import * as React from "react";
 import { Template } from "hornet-js-utils/src/template";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import * as _ from "lodash";
+import isNull = require("lodash.isnull");
 import classNames from "classnames";
 import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
@@ -193,9 +193,9 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
 
         let img = null;
         if (typeof this.props.srcImg === "string") {
-            img = <SvgSprites icon={this.state.srcImg} ariaLabel={aProps.title} />
+            img = <SvgSprites icon={this.state.srcImg} ariaLabel={aProps.title}  tabIndex={-1} />
         } else if (this.props.srcImg) {
-            img = React.createElement((this.props.srcImg as JSX.Element).type, { ...(this.props.srcImg as JSX.Element).props, ariaLabel: aProps.title })
+            img = React.createElement((this.props.srcImg as JSX.Element).type, { ...(this.props.srcImg as JSX.Element).props, tabIndex:-1, ariaLabel: aProps.title });
         }
 
         if (this.props.messageAlert) {
@@ -226,7 +226,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         if (e.keyCode === KeyCodes.ENTER || e.keyCode === KeyCodes.SPACEBAR) {
             e.preventDefault();
             e.stopPropagation();
-            !this.disabled && this.onClick(e);
+            !this.disabled && !this.state.isEditing && this.onClick(e);
         }
     }
 
@@ -278,7 +278,7 @@ export class ActionBodyCell<P extends ActionBodyCellProps, S> extends AbstractBo
         const nameClass: string = "default-body-cell";
         const sortableColumnCass: string = "datatable-header-sortable-column";
 
-        if (_.isNull(lineIndex)) {
+        if (isNull(lineIndex)) {
             this.setState({ isEditing: false });
             this.tableCellRef.removeAttribute("disabled");
             this.tableCellRef.classList.remove("datatable-cell-in-edition");

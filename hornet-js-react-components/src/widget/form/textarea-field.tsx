@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,8 @@ import {
     AbstractField, HornetWrittableProps,
     HornetClickableProps, HornetBasicFormFieldProps, AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 import * as classNames from "classnames";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
@@ -120,7 +121,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
 
     public readonly props: Readonly<TextAreaFieldProps>;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         rows: 6,
         resettable: true,
         displayCharNumber: true,
@@ -161,7 +162,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
         const htmlProps = this.getHtmlProps();
         const hasError = this.hasErrors() ? " has-error" : "";
         const charsCounterId = `chars-counter-${this.state.id}`;
-        _.assign(htmlProps, {
+        assign(htmlProps, {
             className: htmlProps["className"] ? htmlProps["className"] + hasError : hasError,
             "role-aria": "textbox",
             "aria-multiline": "true",
@@ -171,7 +172,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
             "textarea-unresizable": this.props.extendable,
             "textarea-resizable": !this.props.extendable};
         const classListStr = classNames(classList);
-        _.assign(htmlProps, { className: `${htmlProps["className"]} ${classListStr}` });
+        assign(htmlProps, { className: `${htmlProps["className"]} ${classListStr}` });
         htmlProps["onChange"] =  this.valueChange;
 
         return (
@@ -256,7 +257,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
      */
     renderResetButton(): JSX.Element {
 
-        const htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = cloneDeep(this.getHtmlProps());
 
         const hidden = htmlProps["type"] === "hidden";
 
@@ -281,7 +282,7 @@ export class TextAreaField extends AbstractField<TextAreaFieldProps, any> {
                 onKeyDown={this.handleResetKeyDown}
                 id={ identifiant }>
                 <a {...aProps}>
-                    <SvgSprites icon="close" color="#757575" />
+                    <SvgSprites icon="close" color="#757575" tabIndex={ -1 } />
                 </a>
             </span>
         );

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,8 @@ import { HornetComponent } from "src/widget/component/hornet-component";
 import { ButtonProps } from "src/widget/button/button";
 import { AbstractField } from "src/widget/form/abstract-field";
 import classNames from "classnames";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 
 import "src/widget/form/sass/_form-entities.scss";
 
@@ -105,7 +106,7 @@ export interface ButtonsAreaProps extends HornetComponentProps {
  */
 export class ButtonsArea extends HornetComponent<ButtonsAreaProps, any> {
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
     });
 
     //readonly props: Readonly<ButtonsAreaProps>;

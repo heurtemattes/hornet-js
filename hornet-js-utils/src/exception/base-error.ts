@@ -73,12 +73,12 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import merge = require ("lodash.merge");
 import * as util from "util";
 
 declare global {
@@ -110,7 +110,7 @@ export class BaseError {
         this.date = new Date().getTime();
         this.code = code;
         this.message = message;
-        this.args = _.merge(args || {}, {});
+        this.args = merge(args || {}, {});
         (<any>Error).captureStackTrace(this, this.constructor);
         this.err_cause = cause;
     }

@@ -5,6 +5,7 @@ $inputGlobalBorder: rgba(174, 174, 174, 1); //#aeaeae
 $inputFocus: theme-color($variant: 'states');
 $inputHoverImgBg: rgba(158, 158, 158, 0.2);
 $inputHoverImgBoxShadow: theme-color($variant: 'states');
+$inputResetFocusImgBoxShadow: rgba(0, 97, 255, 1); //#0061ff
 
 .input {
     height: 2.653em;
@@ -77,6 +78,20 @@ $inputHoverImgBoxShadow: theme-color($variant: 'states');
     .input-reset {
         margin: 0.8125em -2.5em;
         position: absolute;
+
+        a {
+            outline: none;
+            @include smoothTransition(all, 0.3s);
+    
+            &:hover,
+            &:focus {
+                svg {
+                    border-radius: 50%;
+                    outline: none;
+                    box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
+                }
+            }
+        }
     }
 } 
 
@@ -91,14 +106,15 @@ $inputHoverImgBoxShadow: theme-color($variant: 'states');
     }
 
     a {
+        outline: none;
         @include smoothTransition(all, 0.3s);
 
-        &:hover {
-            img {
-                background: $inputHoverImgBg;
+        &:hover,
+        &:focus {
+            svg {
                 border-radius: 50%;
                 outline: none;
-                box-shadow: 0 0 1px $inputHoverImgBoxShadow;
+                box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
             }
         }
     }

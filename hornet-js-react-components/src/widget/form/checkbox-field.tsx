@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,7 +88,8 @@ import {
     InlineStyle,
     AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 
@@ -114,7 +115,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
     public readonly props: Readonly<CheckBoxFieldProps>;
     public state: any;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         switch: false,
     });
 
@@ -165,7 +166,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         const htmlProps = this.getHtmlProps();
         if (this.state.currentChecked != null) {
-            _.assign(htmlProps, { defaultChecked: this.state.currentChecked });
+            assign(htmlProps, { defaultChecked: this.state.currentChecked });
         }
 
         if (this.state.readOnly && !this.state.disabled) {

@@ -5,10 +5,11 @@ $iconStatesOutline: theme-color($variant: 'states');
 .button-action,
 .larger-screen
  {
-    @include smoothTransition(outline, 0.3s);
-
+    outline: 0px solid $iconStatesOutline; 
+    
     &:hover,
     &:focus {
+        @include smoothTransition(outline, 0.3s);
         outline: 1px solid $iconStatesOutline;    
     }
 }

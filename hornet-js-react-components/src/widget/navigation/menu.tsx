@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,7 @@ import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { MenuNavigation } from "src/widget/navigation/menu-navigation";
-import * as _ from "lodash";
+import cloneDeep = require("lodash.clonedeep");
 import classNames from "classnames";
 import * as ReactDOM from "react-dom";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -167,7 +167,7 @@ export class Menu extends HornetComponent<MenuProps, any> {
         this.state = {
             ...this.state,
             ...this.handleLayoutExpand(),
-            items: this.props.configMenu ? NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(this.props.configMenu), this.user) : NavigationUtils.getFilteredConfigNavigation(_.cloneDeep(NavigationUtils.getConfigMenu()), this.user),
+            items: this.props.configMenu ? NavigationUtils.getFilteredConfigNavigation(cloneDeep(this.props.configMenu), this.user) : NavigationUtils.getFilteredConfigNavigation(cloneDeep(NavigationUtils.getConfigMenu()), this.user),
             isMenuActive: false,
         };
 

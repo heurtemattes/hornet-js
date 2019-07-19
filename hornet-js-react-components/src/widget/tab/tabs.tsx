@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -94,7 +94,10 @@ import {
 } from "hornet-js-core/src/notification/notification-events";
 import { fireHornetEvent, HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { TabHeader } from "src/widget/tab/tab-header";
-import * as _ from "lodash";
+import find = require("lodash.find");
+import findIndex = require("lodash.findindex");
+import forEach = require("lodash.foreach");
+import remove = require("lodash.remove");
 const logger = Logger.getLogger("hornet-js-react-components.widget.tab.tabs");
 
 export const FOCUS_ON_TAB = new HornetEvent<string>("FOCUS_ON_TAB");
@@ -194,7 +197,7 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
             key: "liTab-" + key,
             onKeyDown: this.handleKeyDown,
             onFocus: this.props.handleFocus,
-            tabIndex: this.props.castBooleanInNumber(this.state.selected),
+            tabIndex: (this.props.castBooleanInNumber(this.state.selected) == null) ? 0 : this.props.castBooleanInNumber(this.state.selected),
         };
 
         if (this.state.errors && this.state.errors > 0) {
@@ -221,7 +224,7 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
                     aria-controls={this.props.prefixWithId() + "sectionTabPanel-" + lTabIndex}
                     key={"aTab-" + key}
                     ref="link"
-                    tabIndex={this.props.castBooleanInNumber(this.state.selected)}>
+                    tabIndex={-1}>
                     {header}
                 </a>
                 {this.props.isDeletable ?
@@ -230,6 +233,7 @@ export class TabsHeaderTech extends HornetComponent<TabsHeaderTechProps, any> {
                         className={deleteButtonClasses}
                         onClick={this.deleteTabFunction}
                         title={this.props.deleteButtonTitle ? this.props.deleteButtonTitle : this.i18n("tabs.delete-button")}
+                        tabIndex={-1}
                     >
                         <span className={"tabs-button-label"}>
                             {this.props.deleteButtonTitle ? this.props.deleteButtonTitle : this.i18n("tabs.delete-button")}
@@ -497,7 +501,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * @return the Tab
      */
     public getTabById(id: string) {
-        return this.elementsTab ? _.find(this.elementsTab, { props: { id } }) : null;
+        return this.elementsTab ? find(this.elementsTab, { props: { id } }) : null;
     }
 
     /**
@@ -506,7 +510,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * @return the Tab
      */
     public getTabByIndex(index: number) {
-        return this.elementsTab ? _.find(this.elementsTab, { props: { index } }) : null;
+        return this.elementsTab ? find(this.elementsTab, { props: { index } }) : null;
     }
 
     /**
@@ -550,16 +554,16 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
      * Permet de supprimer un TabsHeaderTech (instance + JSX.Element)
      */
     protected removeHeaderTech(criteria) {
-        _.remove(this.elementsHeaderReact, { props: criteria });
-        _.remove(this.elementsHeaderTech, { props: criteria });
+        remove(this.elementsHeaderReact, { props: criteria });
+        remove(this.elementsHeaderTech, { props: criteria });
     }
 
     /**
      * Permet de supprimer un Tab (instance + JSX.Element)
      */
     protected removeTab(criteria) {
-        _.remove(this.elementsTabReact, { props: criteria });
-        _.remove(this.elementsTab, { props: criteria });
+        remove(this.elementsTabReact, { props: criteria });
+        remove(this.elementsTab, { props: criteria });
     }
 
 
@@ -623,18 +627,18 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
         let tableauDesTabs;
         if (this.elementsHeaderTech.length === 0) {
             tableauDesTabs = this.getTabs(this.state.children);
-            _.forEach(tableauDesTabs, (item) => {
+            forEach(tableauDesTabs, (item) => {
                 const element = this.createTabsHeader(item);
-                if (!_.find(this.elementsHeaderReact, (tab) => tab.key === element.key)) {
+                if (!find(this.elementsHeaderReact, (tab) => tab.key === element.key)) {
                     this.elementsHeaderReact.push(element);
                 }
             });
         }
 
         if (this.elementsTab.length === 0) {
-            _.forEach(tableauDesTabs, (item) => {
+            forEach(tableauDesTabs, (item) => {
                 const element = this.createWrap(item);
-                if (!_.find(this.elementsTabReact, (tab) => tab.key === element.key)) {
+                if (!find(this.elementsTabReact, (tab) => tab.key === element.key)) {
                     this.elementsTabReact.push(element);
                 }
             });
@@ -772,6 +776,9 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
         this.tabviewPictoList.className = classTabviewPictoList;
         this.tabRightPicto.className = classTabRightPicto;
         this.tabLeftPicto.className = classTabLeftPicto;
+        this.tabRightPicto.tabIndex = isTabRightPictoDisabled ? "-1" : "";
+        this.tabLeftPicto.tabIndex = isTabLeftPictoDisabled ? "-1" : "";
+
     }
 
     protected detectScrollRequired() {
@@ -826,7 +833,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
     showPanel(index, force = false, cb?) {
         if (this.state.beforeSelected !== index || force === true) {
             if (this.state.beforeSelected !== -1) {
-                const tab:Tab = _.find(this.elementsTab, { props: { index: this.state.beforeSelected } }) as Tab;
+                const tab:Tab = find(this.elementsTab, { props: { index: this.state.beforeSelected } }) as Tab;
                 if (tab && this.props.beforeHideTab) {
                     if (this.props.beforeHideTab(tab, this.state.beforeSelected) === false) {
                         (this.state as any).selectedTabIndex = this.state.beforeSelected;
@@ -842,9 +849,9 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
             this.elementsHeaderTech.map((item) => {
                 item.setState({ selected: false });
             });
-            const tab = _.find(this.elementsTab, { props: { index } }) as Tab;
+            const tab = find(this.elementsTab, { props: { index } }) as Tab;
 
-            const header = _.find(this.elementsHeaderTech, { props: { index } }) as TabsHeaderTech;
+            const header = find(this.elementsHeaderTech, { props: { index } }) as TabsHeaderTech;
             if (tab) {
                 if (tab.props.onClick) {
                     tab.props.onClick(tab, header, index);
@@ -955,7 +962,7 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
         const target = (e.currentTarget as any);
         const id: string = target.firstElementChild.id;
         (this.state as any).selectedTabIndex = +id.replace(this.prefixWithId() + "tabList-item-", "");
-
+        
         this.manageScrollButtonStyle();
         this.showPanel(this.state.selectedTabIndex);
     }
@@ -1001,12 +1008,13 @@ export class Tabs<P extends TabsProps> extends HornetComponent<TabsProps, any> {
 
     protected setSelectedTabIndexAndFocus(mode: TabsKeyboardNavigation) {
         if (mode !== null && mode !== undefined) {
-            const source = _.findIndex(this.elementsHeaderReact, { props: { index: this.state.selectedTabIndex } });
+            const source = findIndex(this.elementsHeaderReact, { props: { index: this.state.selectedTabIndex } });
             const next = this.setSelectedIndexByKeyboard(source, mode);
             (this.state as any).selectedTabIndex = this.elementsHeaderReact[ next ].props.index;
         }
-        const target = _.find(this.elementsHeaderTech, { props: { index: this.state.selectedTabIndex } }) as any;
-        target.refs.link.focus();
+        const target = find(this.elementsHeaderTech, { props: { index: this.state.selectedTabIndex } }) as any;
+        const element: HTMLElement = document.getElementById(target.refs.link.parentElement.id);
+        element.focus();
     }
 
     /**

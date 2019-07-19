@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,8 +81,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { JSONLoader } from "hornet-js-utils/src/json-loader";
-import * as _ from "lodash";
-
+import merge = require("lodash.merge");
 import { II18n, AbstractI18nLoader } from "src/i18n/abstract-i18n-loader";
 
 /**
@@ -125,7 +124,7 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
                     this.messagesLang[ locale.locale ] = {  
                         locale: locale.locale,
                         lang: locale.lang,
-                        messages: _.merge({},
+                        messages: merge({},
                                           this.messagesLang[ "default" ].messages),
                     };
                     this.getFilesRecursive(pathLAng, "messages-" + locale.locale + ".json", this.messagesLang[ locale.locale ].messages);
@@ -155,7 +154,7 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
 
 
         const localMessage = {};
-        _.merge(localMessage, this.messagesLang[ "default" ].messages);
+        merge(localMessage, this.messagesLang[ "default" ].messages);
 
         /** verifier sur localeI18n dans defaut.json existe */
         if (locales && locales.locale) {
@@ -215,7 +214,7 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
                             locales[ match[ 1 ] ] = {};
                         }
                         
-                        _.merge(locales[ match[ 1 ] ], {
+                        merge(locales[ match[ 1 ] ], {
                             langShort: listShort[ 1 ],
                             locale: match[ 1 ],
                             langLabel: jsonMessage.labelLanguage || listShort[ 1 ],
@@ -241,7 +240,7 @@ export class I18nLoaderSubDirectory extends AbstractI18nLoader {
                     childDirs.push(path.join(folder, fileName));
                 } else {
                     if (fileName === searchFileName) {
-                        _.merge(messages, require(path.join(folder, fileName)));
+                        merge(messages, require(path.join(folder, fileName)));
                     }
                 }
 

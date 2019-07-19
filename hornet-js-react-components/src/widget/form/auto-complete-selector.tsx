@@ -73,14 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
-import * as _ from "lodash";
+import deburr = require("lodash.deburr");
+import findIndex = require("lodash.findindex");
+import forEach = require("lodash.foreach");
+import indexOf = require("lodash.indexof");
+import replace = require("lodash.replace");
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { CheckBox } from "src/widget/form/checkbox";
@@ -297,9 +301,9 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      * Fonction appelée pour déselectionner
      **/
     protected cleanActived() {
-        const lastCheckedElement = document.querySelectorAll("#" + _.replace(this.state.selectorId, ".", "\\.") + " .autocomplete-item-active");
+        const lastCheckedElement = document.querySelectorAll("#" + replace(this.state.selectorId, ".", "\\.") + " .autocomplete-item-active");
         if (lastCheckedElement) {
-            _.forEach(lastCheckedElement, (item) => {
+            forEach(lastCheckedElement, (item) => {
                 item.className = "autocomplete-item";
             });
         }
@@ -357,8 +361,8 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
         this.state.choices && this.state.choices.forEach((choice, indexTab) => {
             if (choice && choice.text) {
-                const choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
-                const currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
+                const choiceTextFormatted: string = deburr(choice.text).toLowerCase();
+                const currentTextFormatted: string = deburr(this.state.currentTypedText).toLowerCase();
                 let index = choiceTextFormatted.indexOf(currentTextFormatted);
                 if (index === -1 && currentTextFormatted !== "") {
                     return null;
@@ -415,8 +419,8 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
             this.state.choices.forEach((choice, indexTab) => {
                 if (choice) {
 
-                    const choiceTextFormatted: string = _.deburr(choice.text).toLowerCase();
-                    const currentTextFormatted: string = _.deburr(this.state.currentTypedText).toLowerCase();
+                    const choiceTextFormatted: string = deburr(choice.text).toLowerCase();
+                    const currentTextFormatted: string = deburr(this.state.currentTypedText).toLowerCase();
 
                     const index = choiceTextFormatted.indexOf(currentTextFormatted);
                     if (index === -1) return null; // Valeur saisie non présente
@@ -428,7 +432,7 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
 
                     let checkboxChecked: boolean = false;
 
-                    if (_.indexOf(this.props.choicesSelected, choice.value.toString()) > -1 || _.indexOf(this.props.choicesSelected, choice.value) > -1) {
+                    if (indexOf(this.props.choicesSelected, choice.value.toString()) > -1 || indexOf(this.props.choicesSelected, choice.value) > -1) {
                         checkboxChecked = true;
                     }
                     const classList: string = classNames(classes);
@@ -524,10 +528,10 @@ export class AutoCompleteSelector extends HornetComponent<AutoCompleteSelectorPr
      **/
     handleFocus(oldChoiceFocused, newChoiceFocused, value: string, index: number) {
         if (value && value.length > 0) {
-            const elmt = document.querySelector("#" + _.replace(this.state.selectorId, ".", "\\.") + " [data-real-value='" + value + "']");
+            const elmt = document.querySelector("#" + replace(this.state.selectorId, ".", "\\.") + " [data-real-value='" + value + "']");
             if (elmt) {
                 this.scrollToElement(elmt as HTMLElement);
-                const _index = _.findIndex(this.liElts, elmt);
+                const _index = findIndex(this.liElts, elmt);
                 this.state.autoCompleteState.choiceFocused = _index;
                 this.setFocusElement(elmt as HTMLElement);
             }

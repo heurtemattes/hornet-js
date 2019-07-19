@@ -73,14 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
 import { Utils } from "hornet-js-utils";
-import * as _ from "lodash";
+import cloneDeep  = require("lodash.clonedeep");
 
 // pas d'utilisation du mot clé import pour TestUtils pour pouvoir compiler le fichier
 let expect = TestUtils.chai.expect;
@@ -452,7 +452,7 @@ describe.skip("superagent-hornet-plugins", () => {
                     status: TestUtils.randomString(),
                     type: TestUtils.randomString()
                 };
-                var expectedRequest = _.cloneDeep(mockRequest);
+                var expectedRequest = cloneDeep(mockRequest);
                 mockRequest[ TestUtils.randomString() ] = TestUtils.randomString();
 
                 // Act

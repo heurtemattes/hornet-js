@@ -73,13 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as ajv from "ajv";
-import * as _ from "lodash";
+import cloneDeep = require ("lodash.clonedeep");
 
 /**
  *  Propriétés d'une classe de validation customisée d'un formulaire
@@ -217,7 +217,7 @@ export class DataValidator {
     static transformRequiredStrings(hornetSchema: any): any {
         var resultSchema: any;
         if (hornetSchema) {
-            resultSchema = _.cloneDeep(hornetSchema);
+            resultSchema = cloneDeep(hornetSchema);
             resultSchema.required = resultSchema.required || [];
             // TODO à appliquer récursivement, chaque champ pouvant lui même être un objet
             for (var fn in resultSchema.properties) {

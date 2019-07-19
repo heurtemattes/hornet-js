@@ -40,8 +40,10 @@ $uploadReadonlyContent: rgba(169, 169, 169, 1); //#a9a9a9
         }
 
         &:not([readonly]) {
-            &:hover {
+            &:hover,
+            &:focus {
                 background-color: $uploadHover;
+                outline: 2px solid #f99a05;
             }
         }
 

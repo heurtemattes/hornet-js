@@ -73,12 +73,12 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import forOwn = require("lodash.forown");
 
 export interface MediaType {
     /** Représentation simplifiée du type MIME */
@@ -156,7 +156,7 @@ export class MediaTypes {
 
     protected static _fromShortValue(parameter: string): MediaType {
         let mediaType: MediaType = null;
-        _.forOwn(MediaTypes, function (value: MediaType) {
+        forOwn(MediaTypes, function (value: MediaType) {
             if (value && value.SHORT && value.SHORT === parameter) {
                 mediaType = value;
                 return false;
@@ -167,7 +167,7 @@ export class MediaTypes {
 
     protected static _fromMime(mimeType: string): MediaType {
         let mediaType: MediaType = null;
-        _.forOwn(MediaTypes, function (value: MediaType) {
+        forOwn(MediaTypes, function (value: MediaType) {
             if (value && value.MIME && value.MIME === mimeType) {
                 mediaType = value;
                 return false;

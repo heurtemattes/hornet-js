@@ -1,6 +1,6 @@
 {
   "name": "hornet-js-components",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "license": "CECILL-2.1",
   "description": "Interfaces des composants web de hornet-js",
   "repository": {
@@ -13,14 +13,14 @@
   "main": "./index.js",
   "types": "./index.dts",
   "dependencies": {
-    "hornet-js-logger": "5.4.0",
-    "hornet-js-utils": "5.4.0",
-    "react": "16.6.3"
+    "hornet-js-logger": "5.4.1",
+    "hornet-js-utils": "5.4.1",
+    "react": "16.6.3",
+    "tslib": "1.9.3"
   },
   "devDependencies": {
     "@types/node": "10.14.9",
     "@types/react": "16.7.22"
   },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
-
 }

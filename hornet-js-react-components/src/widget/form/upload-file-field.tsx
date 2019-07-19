@@ -73,14 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import omit = require("lodash.omit");
 import {
     AbstractField,
     HornetBasicFormFieldProps,
@@ -126,7 +128,7 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
     protected link: HTMLLinkElement;
     public readonly props: Readonly<UploadFileFieldProps>;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         fileSelectedLabel: UploadFileField.getI18n("uploadFile.selectedFile", { count: 0 }),
         i18nLabelKey: "uploadFile.selectedFile",
         resettable: true,
@@ -224,9 +226,9 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
         }
 
         // On n'inclut pas les propriétés spécifiques ou celles dont on surcharge la valeur
-        const htmlProps = _.omit(this.getHtmlProps(), ["defaultFile", "type", "onChange"]);
-        _.assign(htmlProps, { className: htmlProps["className"] ? htmlProps["className"] + " uploadfile" : " uploadfile" });
-        _.assign(htmlProps, {
+        const htmlProps = omit(this.getHtmlProps(), ["defaultFile", "type", "onChange"]);
+        assign(htmlProps, { className: htmlProps["className"] ? htmlProps["className"] + " uploadfile" : " uploadfile" });
+        assign(htmlProps, {
             "data-multiple-caption": this.state.fileSelectedLabel,
             disabled: this.state.disabled,
             readOnly: this.state.disabled || this.state.readOnly,
@@ -265,6 +267,11 @@ export class UploadFileField<P extends UploadFileFieldProps> extends AbstractFie
                 if (this.link && this.state.focusInput) { this.link.focus(); }
             },
         };
+
+        if (htmlProps["disabled"]) {
+            aProps["tabIndex"] = -1;
+        }
+
         return (
             <div className="upload-container">
                 {inputFile}

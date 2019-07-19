@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -450,10 +450,14 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
         if (notifType !== notificationType.INFOS) {
             button = <button type="button" className="error-button-open" ref={(btnError) => (this.btnError = btnError)}
                 onClick={this.handleClickShowError.bind(this)} aria-controls={ariaControls}
-                title={this.i18n("notification.hideShowTitle")} aria-expanded={true} />;
+                title={this.i18n("notification.hideShowTitle")} aria-expanded={true} >
+                    <SvgSprites icon={"top"} tabIndex={ -1 }/>
+                    <SvgSprites icon={"bottom"} tabIndex={ -1 }/>
+                </button>;
         } else {
             button = <button type="button" className="info-button" ref={(btnInfo) => (this.btnInfo = btnInfo)}
-                onClick={this.handleClickRemove.bind(this, idMessages)} title={this.i18n("notification.deleteTitle")} />;
+                onClick={this.handleClickRemove.bind(this, idMessages)} title={this.i18n("notification.deleteTitle")} >
+                <SvgSprites icon={"close"} tabIndex={ -1 }/></button>;
         }
 
         const customContainertStyle = (notifType === notificationType.PERSONNALS) ? { border: "0.063em solid " + this.state.color } : {};
@@ -490,7 +494,7 @@ export class NotificationContent extends HornetComponent<NotificationContentProp
                                         icon={notifType}
                                         color={notifType === 'warning' ? icoColor = 'orange' : notifType === 'info' ? icoColor = 'green' : icoColor }
                                         height="1.5em"
-                                        width="1.5em" />
+                                        width="1.5em" tabIndex={-1}/>
                                 </span>
                                 {this._getTitle()}
                             </h1>

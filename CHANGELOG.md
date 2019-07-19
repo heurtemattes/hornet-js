@@ -1,3 +1,33 @@
+# hornet-js 5.4.1
+
+- 2cbc63e7 PROJ[ACC]: reprise color sur l'outline des messages
+- 26a1faaf PROJ[ACC] : gestion tabIndex sur la navigation des onglets
+- 5c7600f3 FIX[]: test si edition avant de lancer le clic
+- 3f5cdfbd PROJ[ACC]: grise svg des boutons action du tableau
+- 0ec48f83 PROJ[ACC] : ajout style hover lien dans footer
+- 0e71b8bc PROJ[]: Ajout nota bene sur les picto non focusable
+- 0ca9dd5e PROJ[ACC]: Affichage dropdown pager
+- 1d085c84 PROJ[ACC] : correction navigation et signialisation focus sur les boutons dans les notifications
+- 131c381d PROJ[ACC] : revue zindex
+- b7cd1080 PROJ[ACC] : sur disabled rend focus impossible sur le bouton upload
+- 79487b40 PROJ[ACC] : correction style badge
+- 98da8f50 FIX[] : Correction focus onglet et navigation clavier
+- d7ac38f9 ACC[]: Correction navigation clavier sur les svg
+- 08e231b4 PROJ[] : Ajout first et last dans le sprite
+- cb8cef76 PROJ[ACC] : ajout outline sur upload file
+- e99c77a7 PROJ[ACC] : correction focus reset
+- 4562a90b PROJ[ACC] : passage outline en box-shadow
+- 79ddb8c2 FIX[] : correction navigation clavier onglets
+- 844b3585 FIX[]: Correction style button croix des modales
+- 0586e3cb PROG [ACC] : ajout tabIndex -1 sur svg calendar
+- 0a2731fa PROJ[ACC] : uniformisation outline
+- c1f420a1 PROJ[ACC] : ajout tabIndex -1 sur svg dans a du reset
+- d1f80738 PROJ [] : Filtrage du hsts seulement sur les requêtes sécurisées
+- PROJ[] : passage en lodash (4.17.11) en dépendances modulaires
+- 9a5bf900 FIX[] : correction typage icon Dropdown
+- aec100c8 FIX[ACC] : force tabindex -1 pour svg dans Dropdown
+- 9cbfe053 FIX[] : correction suite minification (classe name : children.type.name) dans les MoreInfoColumn
+
 # hornet-js 5.4.0
 
 - 340143d8 PROJ[] : Update package.json

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -90,7 +90,6 @@ import * as assert from "assert";
 
 import { Tabs } from "src/widget/tab/tabs";
 import { Tab } from "src/widget/tab/tab";
-import * as _ from "lodash";
 
 let tabsElement: JSX.Element;
 let tabs;

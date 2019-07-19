@@ -1,10 +1,14 @@
-@import '../../sass/core';
+@import '../../sass/core',
+        'colors';
 
 $menuPrimaryColor: theme-color($variant: 'primary');
 $menuSecondaryColor: theme-color($variant: 'texts'); 
 $menuBoxShadow: theme-color('global', 'boxShadows');
-$menuNavItemColor: rgba(185, 226, 250, 1); //#b9e2fa
-$menuSubnavLinkColor: rgba(104, 104, 104, 1); //#686868
+
+%menuStyleFocusAndHover {
+    outline: none;
+    border-radius: 50%;
+}
 
 /// Gestions du menu
 .noscroll {
@@ -93,6 +97,17 @@ $menuSubnavLinkColor: rgba(104, 104, 104, 1); //#686868
         border: medium none;
 
         @include smoothTransition(all, 0.3s);
+
+        &:focus {
+            @extend %menuStyleFocusAndHover;
+            background: $buttonMenuBgFocus;
+            box-shadow: 0 0 0 0.2em $buttonMenuBgFocus;
+        }
+        &:hover {
+            @extend %menuStyleFocusAndHover;
+            background: $buttonMenuBgHover;
+            box-shadow: 0 0 0 0.2em $buttonMenuBgHover;
+        }
 
         span {
             position: relative;
@@ -477,7 +492,7 @@ $menuSubnavLinkColor: rgba(104, 104, 104, 1); //#686868
                 @include smoothTransition(all, 0.3s);
             
                 a {
-                    color: $baseColorLight;
+                    color: $globalLinkColor;
                 }
             }
         }

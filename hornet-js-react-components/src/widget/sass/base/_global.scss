@@ -307,3 +307,10 @@ abbr[title] {
     position: absolute;
     left: -100em;
 }
+
+ul.footer-links {
+    a:hover,
+    a:focus {
+        color: black;
+    }
+}

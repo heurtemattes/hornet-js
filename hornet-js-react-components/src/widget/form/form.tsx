@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -96,7 +96,10 @@ import {
 import { CheckBoxField } from "src/widget/form/checkbox-field";
 import { IValidationResult, ICustomValidation, DataValidator } from "hornet-js-core/src/validation/data-validator";
 import classNames from "classnames";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import debounce = require("lodash.debounce");
+import get = require("lodash.get");
 import * as ajv from "ajv";
 import ErrorObject = ajv.ErrorObject;
 import { SelectField } from "src/widget/form/select-field";
@@ -176,7 +179,7 @@ export class Form extends AbstractForm<FormProps, any> {
     protected debouncedValidateAndSubmit: any;
 
     /** Valeur de propriétés par défaut */
-    static defaultProps: FormProps = _.assign(_.cloneDeep(AbstractForm.defaultProps), {
+    static defaultProps: FormProps = assign(cloneDeep(AbstractForm.defaultProps), {
         markRequired: true,
         isMandatoryFieldsHidden: false,
         subTitle: null,
@@ -308,7 +311,7 @@ export class Form extends AbstractForm<FormProps, any> {
         window.addEventListener("scroll", this.handleScroll);
         /* On évite la soumission intempestive du formulaire en cas de clics répétés ou de touche entrée maintenue
          sur le bouton de soumission*/
-        this.debouncedValidateAndSubmit = _.debounce(this.validateAndSubmit, 500);
+        this.debouncedValidateAndSubmit = debounce(this.validateAndSubmit, 500);
         if (this.state.defaultValues) {
             this.updateFields(this.state.defaultValues);
         }
@@ -360,7 +363,7 @@ export class Form extends AbstractForm<FormProps, any> {
         const fields = this.extractFields();
         this.propagateParentState();
         Object.keys(fields).forEach((fiedName) => {
-            const fieldNewValue = _.get(data, fiedName);
+            const fieldNewValue = get(data, fiedName);
             const field = fields[fiedName];
             if (fieldNewValue != null && fiedName && field) {
                 field.setCurrentValue(fieldNewValue);
@@ -759,7 +762,7 @@ export class Form extends AbstractForm<FormProps, any> {
             lang: this.props.textLang ? this.props.textLang : null,
         };
 
-        const htmlProps = _.cloneDeep(this.getHtmlProps);
+        const htmlProps = cloneDeep(this.getHtmlProps);
         return (
             <section id="form-content" className={formClass}>
                 {customNotif}

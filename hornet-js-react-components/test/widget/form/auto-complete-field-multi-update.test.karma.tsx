@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -97,7 +97,6 @@ import forEach = require("lodash/forEach");
 import { AutoCompleteMultiField } from "src/widget/form/auto-complete-multi-field";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Form } from "src/widget/form/form";
-import * as _ from "lodash";
 
 let dataSourceInt: DataSource<any>;
 let dataSourceString: DataSource<any>;

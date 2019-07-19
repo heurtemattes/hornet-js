@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
-import * as _ from "lodash";
+import isEqual = require("lodash.isequal");
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as React from "react";
@@ -194,8 +194,8 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
     testSelectArrowDown() {
         this.renderIntoDocument(elements, this.getTestId());
         this.eventEmitter.on(this.getTestId() + "paysDataSourceOnSelect", (item: any) => {
-            expect(_.isEqual(item.value, "1"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 1)).to.be.true;
-            expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "1"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 1)).to.be.true;
+            expect(isEqual(item.value, "1"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 1)).to.be.true;
+            expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "1"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 1)).to.be.true;
             this.end();
         });
         this.triggerFocusOnElement(this.getDOMElement("pays"));
@@ -212,8 +212,8 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
     testSelectArrowUp() {
         this.renderIntoDocument(elements, this.getTestId());
         this.eventEmitter.on(this.getTestId() + "paysDataSourceOnSelect", (item: any) => {
-            expect(_.isEqual(item.value, "3"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 3)).to.be.true;
-            expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "3"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 3)).to.be.true;
+            expect(isEqual(item.value, "3"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 3)).to.be.true;
+            expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "3"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 3)).to.be.true;
             this.end();
         });
         this.triggerFocusOnElement(this.getDOMElement("pays"));
@@ -231,8 +231,8 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
     testSelectHome() {
         this.renderIntoDocument(elements, this.getTestId());
         this.eventEmitter.on(this.getTestId() + "paysDataSourceOnSelect", (item: any) => {
-            expect(_.isEqual(item.value, "1"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 1)).to.be.true;
-            expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "1"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 1)).to.be.true;
+            expect(isEqual(item.value, "1"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 1)).to.be.true;
+            expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "1"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 1)).to.be.true;
             this.end();
         });
         this.triggerFocusOnElement(this.getDOMElement("pays"));
@@ -249,8 +249,8 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
     testSelectEnd() {
         this.renderIntoDocument(elements, this.getTestId());
         this.eventEmitter.on(this.getTestId() + "paysDataSourceOnSelect", (item: any) => {
-            expect(_.isEqual(item.value, "3"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 3)).to.be.true;
-            expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "3"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 3)).to.be.true;
+            expect(isEqual(item.value, "3"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 3)).to.be.true;
+            expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "3"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 3)).to.be.true;
             this.end();
         });
         this.triggerFocusOnElement(this.getDOMElement("pays"));
@@ -269,10 +269,10 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
         let _id = this.getTestId();
         this.eventEmitter.on(_id + "villeDataSourceOnFilter", (results: any[]) => {
             if (results.length != 0) {
-                expect(_.isEqual(results.length, 3), ("testSelectUnknownInSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
+                expect(isEqual(results.length, 3), ("testSelectUnknownInSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
                 setTimeout(() => {
                     let elts = document.querySelectorAll("#" + this.getTestId() + "villeDiv" + " .autocomplete-item");
-                    expect(_.isEqual(elts.length, 3), ("testSelectUnknownInSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
+                    expect(isEqual(elts.length, 3), ("testSelectUnknownInSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
                     this.triggerFocusOnElement(this.getDOMElement("ville"));
                     this.triggerKeydownEvent(this.getDOMElement("ville"), "m", 77, true);
                     setTimeout(() => {
@@ -286,7 +286,7 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
                                     setTimeout(() => {
                                         this.triggerKeydownEvent(this.getDOMElement("ville"), "enter", 13);
                                         setTimeout(() => {
-                                            expect(_.isEqual(this.villeDataSources[ this.currentTest ].selected, null), ("testSelectUnknownInSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected + " doit être identique à l'element suivant : " + undefined)).to.be.true;
+                                            expect(isEqual(this.villeDataSources[ this.currentTest ].selected, null), ("testSelectUnknownInSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected + " doit être identique à l'element suivant : " + undefined)).to.be.true;
                                             this.end();
                                         }, 250);
                                     }, 250);
@@ -306,10 +306,10 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
         this.paysDataSourceOnSelectListener();
         this.eventEmitter.on(this.getTestId() + "villeDataSourceOnFilter", (results: any[]) => {
             if (results.length != 0) {
-                expect(_.isEqual(results.length, 3), ("testSelecNotAllowedInSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
+                expect(isEqual(results.length, 3), ("testSelecNotAllowedInSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
                 setTimeout(() => {
                     let elts = document.querySelectorAll("#" + this.getTestId() + "villeDiv" + " .autocomplete-item");
-                    expect(_.isEqual(elts.length, 3), ("testSelecNotAllowedInSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
+                    expect(isEqual(elts.length, 3), ("testSelecNotAllowedInSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
                     this.triggerFocusOnElement(this.getDOMElement("ville"));
                     this.triggerKeydownEvent(this.getDOMElement("ville"), "m", 77, true);
                     setTimeout(() => {
@@ -325,7 +325,7 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
                                         setTimeout(() => {
                                             this.triggerKeydownEvent(this.getDOMElement("ville"), "enter", 13);
                                             setTimeout(() => {
-                                                expect(_.isEqual(this.villeDataSources[ this.currentTest ].selected, null), ("testSelecNotAllowedInSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected + " doit être identique à l'element suivant : null" )).to.be.true;
+                                                expect(isEqual(this.villeDataSources[ this.currentTest ].selected, null), ("testSelecNotAllowedInSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected + " doit être identique à l'element suivant : null" )).to.be.true;
                                                 this.end();
                                             }, 250);
                                         }, 250);
@@ -346,10 +346,10 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
         this.paysDataSourceOnSelectListener();
         this.eventEmitter.on(this.getTestId() + "villeDataSourceOnFilter", (results: any[]) => {
             if (results.length != 0) {
-                expect(_.isEqual(results.length, 3), ("testSelectWithSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
+                expect(isEqual(results.length, 3), ("testSelectWithSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
                 setTimeout(() => {
                     let elts = document.querySelectorAll("#" + this.getTestId() + "villeDiv" + " .autocomplete-item");
-                    expect(_.isEqual(elts.length, 3), ("testSelectWithSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
+                    expect(isEqual(elts.length, 3), ("testSelectWithSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
                     this.triggerFocusOnElement(this.getDOMElement("ville"));
                     this.triggerKeydownEvent(this.getDOMElement("ville"), "n", 78, true);
                     setTimeout(() => {
@@ -365,7 +365,7 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
                                         setTimeout(() => {
                                             this.triggerKeydownEvent(this.getDOMElement("ville"), "enter", 13);
                                             setTimeout(() => {
-                                                expect(_.isEqual(this.villeDataSources[ this.currentTest ].selected.value, "5"), ("testSelectWithSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected.value + " doit être identique à l'element suivant : " + 5)).to.be.true;
+                                                expect(isEqual(this.villeDataSources[ this.currentTest ].selected.value, "5"), ("testSelectWithSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected.value + " doit être identique à l'element suivant : " + 5)).to.be.true;
                                                 this.end();
                                             }, 500);
                                         }, 250);
@@ -387,10 +387,10 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
         this.eventEmitter.on(this.getTestId() + "villeDataSourceOnFilter", (results: any[]) => {
 
             if (results.length != 0) {
-                expect(_.isEqual(results.length, 3), ("testAutoSelectWithSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
+                expect(isEqual(results.length, 3), ("testAutoSelectWithSlave-L'autocomplete ville est mis à jour pour contenir les résultats liés à la sélection de l'autocomplete pays")).to.be.true;
                 setTimeout(() => {
                     let elts = document.querySelectorAll("#" + this.getTestId() + "villeDiv" + " .autocomplete-item");
-                    expect(_.isEqual(elts.length, 3), ("testAutoSelectWithSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
+                    expect(isEqual(elts.length, 3), ("testAutoSelectWithSlave-L'autocomplete ville est mis à jour et dans le DOM on trouve bien les " + elts.length + " villes filtrées pour le pays sélectioné :" + 3)).to.be.true;
                     this.triggerFocusOnElement(this.getDOMElement("ville"));
                     this.triggerKeydownEvent(this.getDOMElement("ville"), "n", 78, true);
                     setTimeout(() => {
@@ -404,7 +404,7 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
                                     setTimeout(() => {
                                         this.triggerKeydownEvent(this.getDOMElement("ville"), "s", 83, true);
                                         setTimeout(() => {
-                                            expect(_.isEqual(this.villeDataSources[ this.currentTest ].selected.value, "5"), ("testAutoSelectWithSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected.value + " doit être identique à l'element suivant : " + 5)).to.be.true;
+                                            expect(isEqual(this.villeDataSources[ this.currentTest ].selected.value, "5"), ("testAutoSelectWithSlave-L'élément sélectionné dans le villeDataSource " + this.villeDataSources[ this.currentTest ].selected.value + " doit être identique à l'element suivant : " + 5)).to.be.true;
                                             this.end();
                                         }, 1000);
                                     }, 250);
@@ -439,14 +439,14 @@ class AutoCompleteFieldLieesTest extends HornetReactTest {
     /** Méthodes */
 
     private checkPaysDataSourceSelectedValue() {
-        expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "1"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " ne doit pas être identique à l'élément suivant : " + 1)).to.be.false;
-        expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "2"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 2)).to.be.true;
-        expect(_.isEqual(this.paysDataSources[this.currentTest].selected.value, "3"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " ne doit pas être identique à l'élément suivant : " + 3)).to.be.false;
+        expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "1"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " ne doit pas être identique à l'élément suivant : " + 1)).to.be.false;
+        expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "2"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " doit être identique à l'element suivant : " + 2)).to.be.true;
+        expect(isEqual(this.paysDataSources[this.currentTest].selected.value, "3"), ("L'élément sélectionné dans le paysDataSource " + this.paysDataSources[this.currentTest].selected.value + " ne doit pas être identique à l'élément suivant : " + 3)).to.be.false;
     }
 
     private paysDataSourceOnSelectListener() {
         this.eventEmitter.on(this.getTestId() + "paysDataSourceOnSelect", (item: any) => {
-            expect(_.isEqual(item.value, "2"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 2)).to.be.true;
+            expect(isEqual(item.value, "2"), ("la valeur passée par l'event select de paysDataSource " + item.value + " doit être identique à la valeur suivante : " + 2)).to.be.true;
             this.checkPaysDataSourceSelectedValue();
         });
     }

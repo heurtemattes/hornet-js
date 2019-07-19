@@ -3,6 +3,7 @@
 /// Couleurs propres au composant
 $ddLanguageBoxShadow: rgba(0, 0, 0, 0.45);
 $globalTimeOutColor: rgba(46, 88, 110, 1); //#2e586e
+$btnGlobalStates: theme-color($variant: 'states');
 
 %fixedElem {
     position: fixed;
@@ -68,15 +69,38 @@ $globalTimeOutColor: rgba(46, 88, 110, 1); //#2e586e
     width: 1.625em;
     border: none;
     font-size: 1em;
+    background-color: transparent;
     cursor: pointer;
+    svg {
+        fill: $globalErrorColor;
+    }
+    svg:nth-child(1) {
+        display: inherit;
+    }
+    svg:nth-child(2) {
+        display: none;
+    }
 
-    @include svgAsBackground($globalErrorColor, "../img/expand-open.svg");
+    &:hover,
+    &:focus {
+        border-radius: 50%;
+        outline: none;
+        box-shadow: 0 0 0.3em 0em $btnGlobalStates;
+        transition: all 0.3s;
+    }
+
 }
 
 .error-button-close {
     @extend .error-button-open;
 
-    @include svgAsBackground($globalErrorColor, "../img/expand-close.svg");
+    svg:nth-child(1) {
+        display: none;
+    }
+    svg:nth-child(2) {
+        display: inherit;
+    }
+
 }
 
 .error-message-list.close,
@@ -87,8 +111,10 @@ $globalTimeOutColor: rgba(46, 88, 110, 1); //#2e586e
 
 .info-button {
     @extend .error-button-open;
+    svg {
+        fill: $globalInfoColor;
+    }
 
-    @include svgAsBackground($globalInfoColor, "../img/close.svg");
 }
 
 .notification-timeout {
@@ -224,6 +250,15 @@ $globalTimeOutColor: rgba(46, 88, 110, 1); //#2e586e
 
 .isHide {
     animation: slideOut 0.3s ease-in-out;
+}
+
+.personnal-message-list,
+.info-message-list,
+.error-message-list,
+.warning-message-list {
+    li > a {
+        outline-color: currentColor;
+    }
 }
 
 @media screen and (max-width: #{$mediaXS-405}) {

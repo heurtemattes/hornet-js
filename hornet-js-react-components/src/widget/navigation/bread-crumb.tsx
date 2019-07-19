@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,7 +87,7 @@ import { MenuItemConfig } from "src/widget/navigation/menu";
 import { BreadCrumbItem } from "src/widget/navigation/bread-crumb-item";
 import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils";
 import { URL_CHANGE_EVENT } from "hornet-js-core/src/routes/router-client-async-elements";
-import * as _ from "lodash";
+import isEqual = require("lodash.isequal");
 
 import "src/widget/navigation/sass/_breadcrumb.scss";
 
@@ -181,7 +181,7 @@ export class BreadCrumb extends HornetComponent<HornetComponentProps, any> {
                 datas = datas.concat(this.loopElement(menuDatas[ i ].submenu, currentPath, menuDatas[ i ], currentItemSelected));
             }
             if (datas.length === 0) {
-                if (_.isEqual(menuDatas[ i ], currentItemSelected)) {
+                if (isEqual(menuDatas[ i ], currentItemSelected)) {
 
                     datas.unshift(menuDatas[ i ]);
                     break;

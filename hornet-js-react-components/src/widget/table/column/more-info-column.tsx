@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,6 @@ import { ColumnState } from "src/widget/table/column";
 import { MoreInfoBodyCell } from "src/widget/table/column/cell/more-info/more-info-body-cell";
 import { BodyCellProps } from "src/widget/table/column/cell/body-cell";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import * as _ from "lodash";
 
 /**
  * Classe permettant de gérer les colonnes de type CheckBox

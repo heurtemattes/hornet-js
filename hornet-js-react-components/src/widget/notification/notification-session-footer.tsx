@@ -110,9 +110,9 @@ export class NotificationSessionFooter extends HornetComponent<NotificationSessi
             "notification-reduced": this.state.reduced
         };
 
-        let imgSrc: any = <SvgSprites icon="next" color="#2E586E" height="3em" width="2em" />;
+        let imgSrc: any = <SvgSprites icon="next" color="#2E586E" height="3em" width="2em" tabIndex={-1}/>;
         if (this.state.reduced) {
-            imgSrc = <SvgSprites icon="previous" color="#0579BE" height="3em" width="2em" />;
+            imgSrc = <SvgSprites icon="previous" color="#0579BE" height="3em" width="2em"  tabIndex={-1}/>;
         }
 
         let tabIndex: number = this.state.reduced ? -1 : 0;

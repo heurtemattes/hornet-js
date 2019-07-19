@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -86,6 +86,10 @@ import { Class } from "hornet-js-utils/src/typescript-utils";
 import { ServerConfiguration } from "src/server-conf";
 import { Timer } from "src/timers/timer";
 import { Promise } from "hornet-js-utils/src/promise-api";
+import isUndefined = require("lodash.isundefined");
+import some = require("lodash.some");
+import cloneDeep = require("lodash.clonedeep");
+import merge = require("lodash.merge");
 
 const isEnvProduction: boolean = (process.env["NODE_ENV"] === "production");
 
@@ -455,7 +459,7 @@ export class MulterMiddleware extends AbstractHornetMiddleware {
     constructor() {
         const option: multer.Options = MulterMiddleware.defaultOption;
         if (MulterMiddleware.option) {
-            _.merge(option, MulterMiddleware.option);
+            merge(option, MulterMiddleware.option);
         }
         super(multer(option).any());
     }
@@ -609,14 +613,22 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
 
     protected hstsConfiguration(app) {
         if (checkSecurityConfiguration("security.hsts", true, "HSTS 'HTTP Strict-Transport-Security'", SecurityMiddleware.logger)) {
-            // Ajoute le header Strict-Transport-Security pour demander au navigateur client un accès au site en https
-            app.use(helmet.hsts({
+            const hstsMiddleware = helmet.hsts({
                 // Must be at least 18 weeks to be approved by Google
                 maxAge: Utils.config.getOrDefault("security.hsts.maxAge", 10886400000),
                 // Must be enabled to be approved by Google
                 includeSubDomains: Utils.config.getOrDefault("security.hsts.includeSubDomains", true),
                 preload: Utils.config.getOrDefault("security.hsts.preload", false),
-            }));
+            });
+
+            app.use((req, res, next) => {
+                if (req.secure) {
+                    // Ajoute le header Strict-Transport-Security pour demander au navigateur client un accès au site en https
+                    hstsMiddleware(req, res, next);
+                } else {
+                    next();
+                }
+            });
         }
     }
 }
@@ -624,7 +636,6 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      CsrfMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
-import * as _ from "lodash";
 import director = require("director");
 
 export class CsrfMiddleware extends AbstractHornetMiddleware {
@@ -664,7 +675,7 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
         const routesAuthorization = Utils.hasCls() && Utils.getCls("hornet.routeAuthorization");
         if (req.method === "PUT" || (req.method === "POST" && (!routesAuthorization || routesAuthorization.length > 0)) || req.method === "PATCH" || req.method === "DELETE") {
             let incomingCsrf = req.headers[CsrfMiddleware.HEADER_CSRF_NAME];
-            if (_.isUndefined(incomingCsrf)) {
+            if (isUndefined(incomingCsrf)) {
                 CsrfMiddleware.logger.trace(CsrfMiddleware.HEADER_CSRF_NAME, "non present, recherche dans le body de la requête");
                 incomingCsrf = req.body && req.body[CsrfMiddleware.HEADER_CSRF_NAME];
             }
@@ -768,7 +779,7 @@ export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
         }
 
         super((req, res, next: Function) => {
-            if (_.some(appConfig.internationalization.getLocales(), { locale: req.params.i18n })) {
+            if (some(appConfig.internationalization.getLocales(), { locale: req.params.i18n })) {
 
                 ChangeI18nLocaleMiddleware.logger.trace("ChangeI18nLocaleMiddleware :  Changement de la locale " + req.params.i18n);
                 const shortLang = req.params.i18n.split("-");
@@ -1016,7 +1027,7 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
 
                             const validator = action.getDataValidator();
                             if (validator) {
-                                const data = _.cloneDeep(action.getPayload());
+                                const data = cloneDeep(action.getPayload());
 
                                 const validationRes = validator.validate(data);
 
@@ -1104,7 +1115,7 @@ export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
 
                             const validator = action.getDataValidator();
                             if (validator) {
-                                const data = _.cloneDeep(action.getPayload());
+                                const data = cloneDeep(action.getPayload());
 
                                 const validationRes = validator.validate(data);
 

@@ -34,10 +34,12 @@ $headerBannerBg: theme-color($variant: 'primary');
 .sub-header-link {
     display: block;
     line-height: 4em;
+    outline: none;
 
     @include smoothTransition(all, 0.2s);
 
-    &:hover {
+    &:hover,
+    &:focus {
         outline: 1px solid $headerSubLinkHover;
     }
 }

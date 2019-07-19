@@ -167,15 +167,15 @@ $autocompleteBadge: rgba(255, 64, 129, 1); //#ff4081
         
         .input-reset {
             a {
-                &:focus {
+                &:focus,
+                &:hover {
                     outline-width: 0;
                     color: $autocompleteblack;
                 
-                    img {
-                        background-color: $inputResetFocusImg;
+                    svg {
                         border-radius: 50%;
                         outline: none;
-                        box-shadow: 0 0 0 1px $inputResetFocusImgBoxShadow;
+                        box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
                     }
                 }
             }

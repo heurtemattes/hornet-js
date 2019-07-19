@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,7 +89,15 @@ import {
 } from "src/widget/form/abstract-field";
 import { AutoCompleteSelector } from "src/widget/form/auto-complete-selector";
 import { FieldErrorProps } from "src/widget/form/field-error";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import deburr = require("lodash.deburr");
+import find = require("lodash.find");
+import findIndex = require("lodash.findindex");
+import isEqual = require("lodash.isequal");
+import isUndefined = require("lodash.isundefined");
+import startsWith = require("lodash.startswith");
+import throttle = require("lodash.throttle");
 import { HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -100,7 +108,7 @@ import { AbstractFieldDatasource } from "src/widget/form/abstract-field-datasour
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
-import { SvgSprites } from '../icon/svg-sprites';
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 
 import "src/widget/form/sass/_autocomplete.scss";
 
@@ -159,7 +167,7 @@ export interface AutoCompleteFieldProps extends AbstractFieldProps, HornetWritta
 export class AutoCompleteField<P extends AutoCompleteFieldProps> extends AbstractFieldDatasource<AutoCompleteFieldProps, any> {
     public readonly props: Readonly<AutoCompleteFieldProps>;
 
-    static defaultProps: any = _.assign({
+    static defaultProps: any = assign({
         minValueLength: 1,
         readOnly: false,
         disabled: false,
@@ -243,7 +251,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     componentDidMount() {
 
         if (!Utils.isServer) {
-            if (!_.isUndefined(this.props["var"])) {
+            if (!isUndefined(this.props["var"])) {
                 logger.warn("The var props is only available in DEV");
             }
         }
@@ -251,7 +259,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         this.mounted = true;
         logger.trace("auto-complete componentDidMount");
 
-        this._throttledTriggerAction = _.throttle(this.triggerAction, this.state.delay);
+        this._throttledTriggerAction = throttle(this.triggerAction, this.state.delay);
 
         this.props.dataSource.on("fetch", this.fetchEventCallback);
         this.props.dataSource.on("add", this.addEventCallback);
@@ -284,8 +292,8 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     componentWillUpdate(nextProps: AutoCompleteFieldProps, nextState: any, nextContext: any): void {
         super.componentWillUpdate(nextProps, nextState, nextContext);
         if (this.state.delay !== nextState.delay) {
-            /* Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec _.throttle */
-            this._throttledTriggerAction = _.throttle(this.triggerAction, nextState.delay);
+            /* Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec throttle */
+            this._throttledTriggerAction = throttle(this.triggerAction, nextState.delay);
         }
     }
 
@@ -298,7 +306,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             || ((nextState.choices && !this.state.choices)
                 || (!nextState.choices && this.state.choices)
                 || (nextState.choices && this.state.choices.length !== nextState.choices.length))
-            || !_.isEqual(nextState.choices, this.state.choices)
+            || !isEqual(nextState.choices, this.state.choices)
             || (this.state.errors !== nextState.errors)
             || (this.state.readOnly !== nextState.readOnly)
             || (this.state.disabled !== nextState.disabled)
@@ -333,7 +341,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         }
 
         let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
-        htmlProps = _.assign(htmlProps, {
+        htmlProps = assign(htmlProps, {
             onKeyDown: this.handleKeyDown,
             onFocus: this.handleFocus,
             onBlur: this.handleBlur,
@@ -417,7 +425,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @returns {any}
      */
     renderResetButton(): JSX.Element {
-        const htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = cloneDeep(this.getHtmlProps());
 
         const hidden = htmlProps["type"] === "hidden";
 
@@ -435,7 +443,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         }
 
         let spanProps: React.HTMLAttributes<HTMLElement> = {};
-        spanProps = _.assign(spanProps, {
+        spanProps = assign(spanProps, {
             id: this.inferResetButtonId(),
             "aria-hidden": !this.isValued(),
             className: classNames(classList),
@@ -445,7 +453,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         return (
             <span {...spanProps}>
                 <a {...aProps}>
-                    <SvgSprites icon="close" color="#757575" />
+                    <SvgSprites icon="close" color="#757575" tabIndex={ -1 }/>
                 </a>
             </span>
         );
@@ -799,7 +807,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             (this.state as any).selectedIndex = -1;
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, "", null);
         } else {
-            (this.state as any).selectedIndex = _.findIndex(this.state.choices, { text: this.typedValueOnFocus });
+            (this.state as any).selectedIndex = findIndex(this.state.choices, { text: this.typedValueOnFocus });
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, null);
         }
     }
@@ -829,7 +837,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
                     val = (typeof this.state.allChoices[0]
                         .value === "number") ? parseInt(this.hiddenInput.value, 10) : this.hiddenInput.value;
                 }
-                this.emitDataSourceSelectEvent(_.find(this.state.allChoices, { value: val }));
+                this.emitDataSourceSelectEvent(find(this.state.allChoices, { value: val }));
             }
         }
         this.hideChoices();
@@ -915,7 +923,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     protected changeSelectedChoiceWhenOneChoice(newText: string): void {
         if (this.state.choices && this.state.choices[0] && this.state.choices.length === 1
-            && _.deburr(newText).toLowerCase() === _.deburr(this.state.choices[0].text).toLowerCase()) {
+            && deburr(newText).toLowerCase() === deburr(this.state.choices[0].text).toLowerCase()) {
             this.changeSelectedChoice(this.state.choices[0]);
             if (this.props.dataSource.selected !== this.state.choices[0]) {
                 this.emitDataSourceSelectEvent(this.state.choices[0]);
@@ -1023,7 +1031,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     protected startsWithText(choice: any, current: string) {
         const choiceText: string = choice ? choice["text"] ? choice["text"].toLowerCase() : null : null;
-        return _.startsWith(choiceText, current);
+        return startsWith(choiceText, current);
     }
 
     /**
@@ -1093,7 +1101,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     protected onListWidgetSelected(event: React.MouseEvent<HTMLElement>, choice: any): void {
         if (choice) {
             logger.trace("Selection click [", choice.value, "]:", choice.text);
-            const index = _.findIndex(this.state.choices, choice);
+            const index = findIndex(this.state.choices, choice);
             (this.state as any).selectedIndex = index;
             this.autoCompleteState.choiceFocused = index;
             this.changeSelectedChoice(choice);

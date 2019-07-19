@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -99,7 +99,13 @@ import { DateUtils } from "src/date-utils";
 import { ConfigLib } from "src/config-lib";
 import { AppSharedProps } from "src/app-shared-props";
 import { ContinuationLocalStorage } from "src/continuation-local-storage";
-import * as _ from "lodash";
+import isundefined = require ("lodash.isundefined");
+import startswith = require ("lodash.startswith");
+import endswith = require ("lodash.endswith");
+import first = require ("lodash.first");
+import has = require ("lodash.has");
+import isfunction = require ("lodash.isfunction");
+import drop = require ("lodash.drop");
 
 export class Utils {
     static isServer: boolean = Register.isServer;
@@ -131,13 +137,13 @@ export class Utils {
      * @return {string}
      */
     static getContextPath() {
-        if (_.isUndefined(Utils._contextPath)) {
+        if (isundefined(Utils._contextPath)) {
             let context = Utils.config.getOrDefault("contextPath", "");
-            if (!_.startsWith(context, "/")) {
+            if (!startswith(context, "/")) {
                 // On force le démarrage par un slash
                 context = "/" + context;
             }
-            if (_.endsWith(context, "/")) {
+            if (endswith(context, "/")) {
                 // On enlève le slash de fin si présent
                 context = context.substr(0, context.length - 1);
             }
@@ -155,13 +161,13 @@ export class Utils {
         let retour = path;
 
         const contextPath = Utils.getContextPath();
-        if (path === "" || (_.startsWith(path, "/") && !_.startsWith(path, contextPath))) {
+        if (path === "" || (startswith(path, "/") && !startswith(path, contextPath))) {
             // On ne prend que les urls relatives à la racine (=> commence par "/")
             // On ne concatène que lorsque ca ne commence pas déja par le contextPath
             retour = contextPath + path;
         }
 
-        if (_.endsWith(retour, "/")) {
+        if (endswith(retour, "/")) {
             // On enlève toujours le dernier slash
             retour = retour.substr(0, retour.length - 1);
         }
@@ -178,13 +184,13 @@ export class Utils {
         let retour = path;
 
         const contextPath = Utils.getContextPath();
-        if (_.startsWith(path, "/") && !_.startsWith(path, contextPath)) {
+        if (startswith(path, "/") && !startswith(path, contextPath)) {
             // On ne prend que les urls relatives à la racine (=> commence par "/")
             // On ne concatène que lorsque ca ne commence pas déja par le contextPath
             retour = contextPath + Utils.getStaticPath() + path;
         }
 
-        if (_.endsWith(retour, "/")) {
+        if (endswith(retour, "/")) {
             // On enlève toujours le dernier slash
             retour = retour.substr(0, retour.length - 1);
         }
@@ -272,13 +278,13 @@ export class Utils {
         let tab = (chaine ? chaine.split(".") : []);
         let newObject: any = object;
         let lastValue: any = null;
-        let first: any = _.first(tab);
+        let firstElt: any = first(tab);
 
         // tant que l'on en a un
-        while (first && newObject) {
+        while (firstElt && newObject) {
             // si l'on a bien la propriété demandée
-            if (_.has(newObject, first) || _.isFunction(newObject[ first ])) {
-                newObject = _.isFunction(newObject[ first ]) ? newObject[ first ]() : newObject[ first ];
+            if (has(newObject, firstElt) || isfunction(newObject[ firstElt ])) {
+                newObject = isfunction(newObject[ firstElt ]) ? newObject[ firstElt ]() : newObject[ firstElt ];
                 // s'il en reste plus qu'un
                 if (tab.length === 1) {
                     // on a trouvé notre propriété
@@ -286,10 +292,10 @@ export class Utils {
                 }
 
                 // on enlève le premier
-                tab = _.drop(tab);
+                tab = drop(tab);
 
                 // et on réaffecte la prochaine propriété
-                first = _.first(tab);
+                firstElt = first(tab);
             }
             else {
                 break;

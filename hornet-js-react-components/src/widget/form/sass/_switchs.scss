@@ -178,4 +178,13 @@ $switchLabelContent: rgba(69, 69, 69, 1); //#454545
     &-handle {
         transition:All .3s ease;
     }
+
+    .switch{
+        &-input:focus+.switch-label,
+        &-input+.switch-label:hover {
+            box-shadow: 0 0 0 1.5pt #4D90FE;
+            outline: none;
+        }
+    }
+    
 }

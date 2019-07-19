@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -118,7 +118,7 @@ export interface DropdownProps extends HornetComponentProps {
     disabled?: boolean;
     /** Icone svg du composant */
     icon?: string;
-    srcImg?: string;
+    srcImg?: JSX.Element | string;
     items?: any;
     valueCurrent?: number;
     // label du lien généré par le dropdown
@@ -242,7 +242,11 @@ export class Dropdown extends HornetComponent<DropdownProps, any> {
                         className={this.props.className+"-img icon"}
                         alt={this.props.title} />;
                 } else {
-                    img = this.props.srcImg;
+                    if (this.props.srcImg && this.props.srcImg.type == SvgSprites) {
+                        img = <SvgSprites {...{...this.props.srcImg.props, tabIndex: -1}}/>
+                    } else {
+                        img = this.props.srcImg;
+                    }
                 }
             } else {
                 this.props.srcImg ? img = this.props.srcImg : img = null;

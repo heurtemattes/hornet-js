@@ -2,7 +2,7 @@ import { Class } from "hornet-js-utils/src/typescript-utils";
 import { HornetEntity } from "src/decorators/dec-seq-entity";
 import { HornetSequelizeEntityAttributes, HornetSequelizeInstanceModel } from "src/sequelize/hornet-sequelize-attributes";
 import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
-import * as _ from "lodash";
+import assignIn = require("lodash.assignin");
 import { BeanUtils } from "hornet-js-bean/src/bean-utils";
 import { HornetDbConnector } from "src/sequelize/hornet-db-connector";
 import { Promise } from "hornet-js-utils/src/promise-api";
@@ -177,19 +177,19 @@ export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
     protected getQueryObject(criteres: Criteria): any {
         let queryObject = {};
         if (criteres.attributes) {
-            queryObject = _.assignIn(queryObject, this.getAttributesConf(criteres.attributes));
+            queryObject = assignIn(queryObject, this.getAttributesConf(criteres.attributes));
         }
         if (criteres.paginate) {
-            queryObject = _.assignIn(queryObject, this.getPaginationConf(criteres.paginate));
+            queryObject = assignIn(queryObject, this.getPaginationConf(criteres.paginate));
         }
         if (criteres.where) {
-            queryObject = _.assignIn(queryObject, this.getWhereConf(criteres.where));
+            queryObject = assignIn(queryObject, this.getWhereConf(criteres.where));
         }
         if (criteres.include) {
-            queryObject = _.assignIn(queryObject, this.getIncludeConf(criteres.include));
+            queryObject = assignIn(queryObject, this.getIncludeConf(criteres.include));
         }
         if (criteres.order) {
-            queryObject = _.assignIn(queryObject, this.getOrderConf(criteres.order));
+            queryObject = assignIn(queryObject, this.getOrderConf(criteres.order));
         }
         return queryObject;
     }

@@ -83,7 +83,6 @@ Utils.setConfigObj({});
 import { TestUtils } from "hornet-js-test/src/test-utils";
 const expect = TestUtils.chai.expect;
 
-import * as _ from "lodash";
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";

@@ -1,3 +1,359 @@
+# Montée de version vers Hornet.js 5.4.0
+
+# NPM
+
+Il faut au minimum en npm  version 6
+
+# Package.json
+
+- passer les éventuelles dépendences de typage de `tsDefinitionDependencies` vers `devDependencies` sauf pour les projets hornet-js-* qui sont embarquées dans chacuns des projets, il faut ensuite adapter la configuration du transpilateur typescript (exemple [ci après](#tsconfig.json)).
+- `appDependencies` devient `dependencies`
+- `buildDependencies` et `testDependencies` sont à tranférer dans `devDependencies`.
+
+
+# Logger
+
+La partie logger a été déplacé dans son propre module, donc :
+
+remplacer les imports<br>
+- `import { Logger } from 'hornet-js-utils/src/logger';`<br>par<br>
+- `import { Logger } from 'hornet-js-logger/src/logger';`
+
+remplacer l'instanciation du logger exemple :<br>
+- `const logger: Logger = Utils.getLogger(`<br>par<br>
+- `const logger: Logger = Logger.getLogger(`
+
+# Sequelize (montée de version)
+
+Ce qu'on a identifié :
+
+remplacer<br>
+- `Sequelize.DefineAttributes`<br>par<br>
+- `Sequelize.ModelAttributes`
+
+remplacer<br>
+- `findById`<br>par<br>
+- `findByPk`
+
+remplacer<br>
+- `find`<br>par<br>
+- `findOne`
+
+# Gestion de icone (taille et couleur paramétrable)
+
+Le composant Picto a été remplacé par le composant SvgSprites, prenant directement en paramètre la taille et la couleur.
+
+remplacer<br>
+- `import { Picto } from 'hornet-js-react-components/src/img/picto';<br>par<br>
+- `import { SvgSprites } from 'hornet-js-react-components/src/widget/icon/svg-sprites';`
+
+remplacer les utilisations dans les menuAcion<br>
+- `Picto.white.ajouter`<br>par<br>
+`<SvgSprites icon="add" height="1.5em" width="1.5em" color="#FFF" />`
+
+remplacer les utilisations dans les Action column<br>
+- `Picto.blue.supprimer`<br>par<br>
+- `<SvgSprites icon="delete" height="2em" width="2em" color="#0579be" />`
+
+NB: Si le pictogramme n'est pas focusable, il faudra ajouter la props tabIndex au composant `SvgSprites` et la valoriser à -1.
+
+# dépendances 
+
+ajout dépendances  de dev manquantes (node, react,...), exemple :
+- "@types/node": "10.14.10",
+- "@types/react": "16.7.22",
+- "chai": "4.2.0",
+- "mocha": "5.2.0",
+- "tslib": "1.9.3"
+- "@types/lodash": "4.14.134",
+- "sequelize": "5.8.9",
+- "pg": "7.11.0",
+- "classnames": "2.2.6",
+
+# default.json
+
+Retirez l'information themeName présente dans le fichier de config
+
+```json
+"themeName": "hornet-themes-intranet",
+```
+
+# index.ts
+
+```javascript
+// Bootstrap de lancement de l'application
+// permet la résolution de modules dans des répertoires autres que "node_modules"
+var Module = require("module").Module;
+import * as fs from "fs";
+import * as path from "path";
+
+
+const appDirectory = process.cwd();
+// On conserve la méthode originale pour rétablir le fonctionnement normal en cas d'un requireGlobal
+Module._oldNodeModulePaths = Module._nodeModulePaths;
+
+const NODE_MODULES = "node_modules";
+
+Module.prototype._oldCompile = Module.prototype._compile;
+Module.prototype._compile = function(content, filename) {
+    if ((path.extname(filename) === ".scss") || (path.extname(filename) === ".svg")) {
+        content = "module.exports = {};";
+    }
+    return this._oldCompile(content, filename);
+};
+
+
+// on surcharge la méthode de résolution interne nodejs pour gérer d'autres répertoires
+Module._newNodeModulePaths = function(from) {
+    var paths = Module._oldNodeModulePaths.call(this, from);
+    paths.push(path.join(appDirectory));
+    paths.push(path.join(appDirectory, NODE_MODULES));
+
+    let modulePath = from
+    do {
+        if (fs.existsSync(path.join(modulePath, NODE_MODULES))) {
+            paths.push(path.join(modulePath, NODE_MODULES));
+        }
+        modulePath = path.dirname(modulePath)
+    } while (modulePath.length > 1)
+    return paths;
+};
+Module._nodeModulePaths = Module._newNodeModulePaths;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Gestion du cas particulier du main (car nodejs le considère différent des autres modules ...)  //
+require.main.paths = [];
+require.main.paths.push(path.join(process.cwd()));
+require.main.paths.push(path.join(process.cwd(), NODE_MODULES));
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// gestion des sourcemap dans les stack nodejs
+require("source-map-support").install();
+
+// autorise le format json5 dans les extensions .json
+import { JSONLoader } from "hornet-js-utils/src/json-loader";
+JSONLoader.allowJSON5();
+
+// auto configuration des logs server
+import { ServerLogConfigurator } from "hornet-js-core/src/log/server-log-configurator";
+ServerLogConfigurator.configure();
+
+
+// ================================================
+// Configuration de L'appli selon l'environnement
+// ================================================
+const environnement = process.env.NODE_CONFIG_ENV || 'development';
+console.info(`Starting prevoirh in [${ environnement }] mode`);
+const configsPath = `_onePoint/configs/${ environnement }`;
+if (fs.existsSync(configsPath)) {
+    // Installation des certificats selon l'environnement
+    fs.copyFileSync(`${ configsPath }/cert.pem`, `config/idp/cert.pem`);
+    fs.copyFileSync(`${ configsPath }/key.pem`, `config/idp/key.pem`);
+}
+
+// initialisation des infos de l'application courante
+import { AppSharedProps } from "hornet-js-utils/src/app-shared-props";
+import { Utils } from "hornet-js-utils";
+
+var packageJson = require("./package");
+AppSharedProps.set("appName", packageJson.name);
+AppSharedProps.set("appVersion", packageJson.version);
+AppSharedProps.set("appDescription", packageJson.description);
+AppSharedProps.set("appAuthor", packageJson.author);
+AppSharedProps.set("sessionTimeout", Utils.config.get("server.sessionTimeout"));
+AppSharedProps.set("notifSessionTimeout", Utils.config.get("server.notifications.sessionTimeoutDelay"));
+
+// ==============================
+// Configuration de Moment
+// ==============================
+
+import moment = require('moment');
+
+// On configure le serveur sur l'heure de Paris
+(moment as any).tz.setDefault('Europe/Paris');
+
+import { Server } from "src/server";
+Server.startApplication();
+```
+
+# builder.js
+
+variabilisez la configuration clientContext et remplacez le:
+
+```javascript
+const clientContext = [
+    [/moment[\/\\]locale$/, /fr|en/],
+    [/intl[\/\\]locale-data[\/\\]jsonp$/, /fr|en/],
+    [/^\.$/, (context) => {
+        if (!/\/locale-data\//.test(context.context)) console.log("locale-daa", context);
+        if (!/\/log4js\/lib$/.test(context.context)) return;
+        context.regExp = /^\.\/appenders\/console.*$/;
+        context.request = ".";
+    }]
+];
+[...]
+clientContext: clientContext,
+```
+
+Retirez : helper.excludeNodeModulesFromWebpack et dev
+
+Pour plus de clareté, il est possible et conseillé de déplacer la configuration webpack et karma en dehors du fchier `builder.js`, dans des fichiers séparés (cf documentation builder chapitre 'Configuration webpack' et 'Configuration karma'), voici un exemple possible :
+
+ficher `webpack.addons.config.js` à la racine du projet, avec le contenu suivant :
+
+```javascript
+const path = require("path");
+
+const clientContext = [
+    [/moment[\/\\]locale$/, /fr|en/],
+    [/intl[\/\\]locale-data[\/\\]jsonp$/, /((fr)|(en))$/],
+    [/^\.$/, (context) => {
+        if (!/\/log4js\/lib\/appenders$/.test(context.context)) return;
+        Object.assign(context, {
+            regExp: /^console.*$/,
+            request: "."
+        });
+        
+    }]
+];
+
+const dev = {
+    dllEntry: {
+        vendor: ["hornet-js-react-components", "hornet-js-components", "hornet-js-utils", "hornet-js-core"]
+    }
+}
+
+const externals = [
+        new RegExp(path.join("src", "services", "data") + "/.*"),
+        new RegExp(path.join("src", "dao") + "/.*"),
+        /src\/middleware\/.*/,
+        new RegExp(path.join("src", "services", "data") + "/.*-data-\.*"),
+        "hornet-js-database",
+        "config",
+        "continuation-local-storage",
+        "sequelize",
+        "pdfmake",
+        "carbone",
+        "csv-parser",
+        "nodemailer",
+        "tls",
+        "child_process",
+        "net",
+        "fs",
+        "dns"
+]
+
+module.exports = (project, conf, helper, webpackConfigPart, configuration, webpack) => {
+    const projectPlugins = [...webpackConfigPart.addContextReplacement(clientContext).plugins];
+    if (helper.isDevMode()) {
+        conf.dev = dev;
+        const dllReference =  webpackConfigPart.addDllReferencePlugins(project, "static", "js", "dll");
+        if(dllReference && dllReference.plugins) {
+            projectPlugins.push(...dllReference.plugins);
+        }
+    }
+    return {
+        ...configuration,
+        plugins: [...configuration.plugins, ...projectPlugins,
+        ],
+        externals : (context, request, callback) => {
+                if(/log4js\/lib\/appenders/.test(context) && (!/console/.test(request)) && (/^\.\//.test(request))) {
+                    return callback(null, "{}");
+                } 
+                for (let i = 0; i < externals.length; i++) {
+                    let extern = externals[i];
+                    if (extern.test) { // c'est une regexp'
+                        if (extern.test(request)) {
+                            return callback(null, "{}");
+                        }
+                    } else if (request == extern) {
+                        return callback(null, "{}");
+                    }
+                }
+
+                return callback();
+            },
+            optimization: {
+                splitChunks: {
+                    chunks: 'all',
+                    minChunks: 3,
+                    minSize: 3000000
+                },
+            },
+            watchOptions: {
+                aggregateTimeout: 3000
+            }
+    }
+
+}
+```
+
+<a name="#tsconfig.json"></a>
+# tsconfig.json
+
+``` JSON
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "emitDecoratorMetadata": true,    
+    "esModuleInterop": false,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES5",
+    "preserveSymlinks": true
+  },
+  "include": [
+    "index.ts",
+    "src/**/*.ts*",
+    "test/**/*.ts*",
+    "./node_modules/hornet-js-bean/index.d.ts",
+    "./node_modules/hornet-js-components/index.d.ts",
+    "./node_modules/hornet-js-core/index.d.ts",
+    "./node_modules/hornet-js-database/index.d.ts",
+    "./node_modules/hornet-js-logger/index.d.ts",
+    "./node_modules/hornet-js-utils/index.d.ts",
+    "./node_modules/hornet-js-passport/index.d.ts",
+    "./node_modules/hornet-js-react-components/index.d.ts",
+    "./node_modules/hornet-js-test/index.d.ts"
+  ],
+  "exclude": [
+    "istanbul"
+  ]
+}
+```
+# hornet-layout.tsx
+
+remplacer<br>
+- `<link rel="stylesheet" type="text/css" href={HornetLayout.genUrlTheme(this.state.fwkTheme)} />`<br>par<br>
+- `<link rel="stylesheet" type="text/css" href={this.genUrlStatic("/css/appli.min.css")} />`
+- 
+# hornet-app.tsx
+
+dans le fichier 'hornet-app.tsx', ajouter:
+- `import "hornet-js-react-components/src/widget/sass/gen.scss";`
+
+qui est le template des styles de base du placement du layout applicatif.
+
+# client.ts
+
+ajouter l'import des fonts utilisées :
+```
+let context = require["context"]("hornet-js-react-components/src/widget/component/fonts", true, /\.ttf$/);
+context.keys().forEach(context);
+```
+
+# Utilisation d'une classe css hornet pour les composants customs
+
+Ne pas oublier d'importer le fichier scss nécessaire.
+
+
 # Montée de version vers Hornet.js 5.3.0
 
 ## Reprise accéssibilité props hasPopup

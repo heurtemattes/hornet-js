@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,8 @@ import {
     HornetClickableProps,
     AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
 import KeyboardEventHandler = React.KeyboardEventHandler;
@@ -114,7 +115,7 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
     public readonly props: Readonly<SwitchFieldProps>;
     public state: any;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         labelKey: "label",
         valueKey: "value",
         readOnly: false,
@@ -368,7 +369,7 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      */
     setItems(items: any[]): void {
         this.setState({
-            items: _.cloneDeep(items),
+            items: cloneDeep(items),
             selected: null,
             currentValue: null,
         });
@@ -379,7 +380,7 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * @param {any[] | any} items choix à ajouter
      */
     addItems(items: any[] | any): void {
-        let newItems = _.cloneDeep(this.state.items);
+        let newItems = cloneDeep(this.state.items);
         const selected = this.state.selected;
         if (!newItems || newItems.length && newItems.length === 0) {
             newItems = [];
@@ -399,7 +400,7 @@ export class SwitchField extends AbstractField<SwitchFieldProps, any> {
      * @param {any[] | any} items valeurs à supprimer
      */
     deleteItems(items: any[] | any): void {
-        const newItems = _.cloneDeep(this.state.items);
+        const newItems = cloneDeep(this.state.items);
         for (let i = 0; i < items.length; i++) {
             for (let j = 0; j < newItems.length; j++) {
                 if (items[i][this.props.valueKey] === newItems[j][this.props.valueKey]) {

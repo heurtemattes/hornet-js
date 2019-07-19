@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,6 @@ import { Column, ColumnProps, ColumnState } from "src/widget/table/column";
 import { ActionBodyCell, ActionBodyCellProps } from "src/widget/table/column/cell/action/action-body-cell";
 import { ActionHeaderCell, ActionHeaderCellProps } from "src/widget/table/column/cell/action/action-header-cell";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import * as _ from "lodash";
 
 export interface ActionColumnProps extends ColumnProps {
     /** src de l'image */

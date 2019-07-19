@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,6 +82,8 @@ import { ActionBodyCell, ActionBodyCellProps } from "src/widget/table/column/cel
 import * as React from "react";
 import classNames from "classnames";
 import { SvgSprites } from 'src/widget/icon/svg-sprites';
+import { LineAfter } from 'src/widget/table/line/line-after';
+import { LineBefore } from 'src/widget/table/line/line-before';
 
 const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
 
@@ -98,7 +100,6 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
     link: HTMLLinkElement;
 
     static defaultProps = {
-        srcImg: <SvgSprites icon="user" color="#0579BE" ariaLabel="Plus d'information" />,
         keyShouldComponentUpdate: "id",
     };
 
@@ -157,7 +158,7 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
             this.state.visible ?
 
                 <a {...aProps}>
-                    <SvgSprites icon="user" color="#0579BE" ariaLabel={aProps.title} />
+                    <SvgSprites icon="user" color="#0579BE" ariaLabel={aProps.title} tabIndex={-1} />
                     <span className="label-button-action">
                         {this.state.label}
                     </span>
@@ -213,11 +214,11 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
      * @returns {string} - l'id de l'expandable line
      */
     buildExpandableLineId(): string {
-        const childrenType:string = this.props.children && (this.props.children as any).type && (this.props.children as any).type.name;
+        const childrenType = this.props.children && (this.props.children as React.ReactElement<any>).type;
         let lineType:string;
-        if (childrenType === "LineAfter") {
+        if (childrenType == LineAfter) {
             lineType = LINE_AFTER;
-        } else if (childrenType === "LineBefore") {
+        } else if (childrenType == LineBefore) {
             lineType = LINE_BEFORE;
         }
         return this.props.coordinates && `${this.props.id}-expandable-line-${lineType}-${this.props.coordinates.row}`;

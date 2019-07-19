@@ -2,16 +2,20 @@
 
 $toolTipFocus: theme-color($variant: 'states');
 $tooltipLabelBg: rgba(51, 51, 51, 0.9);
+$inputResetFocusImgBoxShadow: rgba(0, 97, 255, 1); //#0061ff
 
 .tooltip {
     position: relative;
     display: inline-block;
     vertical-align: middle;
     margin-left: 1.125em;
-
-    a {
+    
+    svg {
+        outline: none;
+        &:hover,
         &:focus {
-            outline: 1px solid $toolTipFocus;
+            border-radius: 50%;
+            box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
         }
     }
 

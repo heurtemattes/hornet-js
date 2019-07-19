@@ -3,6 +3,7 @@
 $textAreaFocus: theme-color($variant: 'states');
 $charCounterColor: rgba(102, 102, 102, 1); //#666
 $charCounterColorWarning: rgba(214, 0, 0, 1); //#d60000
+$inputResetFocusImgBoxShadow: rgba(0, 97, 255, 1); //#0061ff
 
 .textarea-container {
     textarea.has-error {
@@ -28,6 +29,19 @@ $charCounterColorWarning: rgba(214, 0, 0, 1); //#d60000
     .textarea-reset {
         display: inline-flex;
         margin-top: 1.5em;
+        a {
+            outline: none;
+            @include smoothTransition(all, 0.3s);
+    
+            &:hover,
+            &:focus {
+                svg {
+                    border-radius: 50%;
+                    outline: none;
+                    box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
+                }
+            }
+        }
     }
 
     .textarea-reset-scrollbar {

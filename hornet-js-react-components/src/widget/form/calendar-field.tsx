@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,7 +85,10 @@ import {
     AbstractField,
 } from "src/widget/form/abstract-field";
 import { Modal } from "src/widget/dialog/modal";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import clone = require("lodash.clone");
+import cloneDeep = require("lodash.clonedeep");
+
 import * as moment from "moment";
 import { DateUtils } from "hornet-js-utils/src/date-utils";
 import { InputField, InputFieldProps } from "src/widget/form/input-field";
@@ -161,7 +164,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
     readonly props: Readonly<CalendarFieldProps>;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         disabled: false,
         isDatePicker: true,
         valideOnForm: true,
@@ -238,11 +241,11 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                     title={this.state.title || this.state.calendarLocale.agendaTitle}
                     disabled={this.state.readOnly || this.state.disabled} value="calendar"
                 >
-                    <SvgSprites icon="calendar" color="#007BA7" />
+                    <SvgSprites icon="calendar" color="#007BA7" tabIndex={-1} />
                 </button>;
 
             /*RcCalendar prend un Moment en paramètre*/
-            const date = _.clone(this.state.currentValue);
+            const date = clone(this.state.currentValue);
             let currentDate: any;
             if (!date) {
                 currentDate = moment();
@@ -289,7 +292,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             ? this.state.currentValue
             : "";
 
-        htmlProps = _.assign(htmlProps, {
+        htmlProps = assign(htmlProps, {
             type: "text",
             size: this.state.inputSize,
             value: formatedValue,
@@ -304,9 +307,9 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
         if (this.props.currentValue != null) {
             if (this.props.currentValue instanceof Date) {
-                _.assign(htmlProps, { defaultValue: this.formatCalendarDate((this.props.currentValue as any).getTime(), this.state.calendarLocale) });
+                assign(htmlProps, { defaultValue: this.formatCalendarDate((this.props.currentValue as any).getTime(), this.state.calendarLocale) });
             } else {
-                _.assign(htmlProps, { defaultValue: this.props.currentValue });
+                assign(htmlProps, { defaultValue: this.props.currentValue });
             }
         }
 

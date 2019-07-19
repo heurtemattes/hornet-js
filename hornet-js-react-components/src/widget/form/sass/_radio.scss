@@ -6,6 +6,7 @@ $radioLabelDisabled: rgba(147, 147, 147, 1); //#939393
 $radioLabelCheckDisabled: rgba(122, 122, 122, 1); //#7a7a7a
 $selectedFieldBorder: rgba(174, 174, 174, 1); //#aeaeae
 $radioBaseColor: theme-color('global', 'white');
+$inputResetFocusImgBoxShadow: rgba(0, 97, 255, 1); //#0061ff
 
 .radio {
     list-style: none;
@@ -26,6 +27,7 @@ $radioBaseColor: theme-color('global', 'white');
     cursor: pointer;
 
     .outer {
+        outline: none;
         @include smoothTransition(all, 0.3s);
     }
     
@@ -38,10 +40,13 @@ $radioBaseColor: theme-color('global', 'white');
             transform: scale(1);
             opacity: 1;
             border: 0.35em solid $formCheckboxChecked;
+            
         }
 
-        &:focus~.outer {
-            outline: 1px solid $formSwitchLabel;
+        &:focus~.outer,
+        &:hover~.outer {
+            outline: none;
+            box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
         }
 
         &:disabled~.outer {

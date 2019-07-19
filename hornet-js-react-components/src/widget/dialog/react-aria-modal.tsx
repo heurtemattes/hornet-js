@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,8 @@ import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 
 import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
+import findIndex = require("lodash.findindex");
+import remove = require("lodash.remove");
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { Logger } from "hornet-js-logger/src/logger";
 
@@ -151,7 +152,7 @@ class ModalManager {
     static unregister(modal) {
         if (ModalManager.modals.length === 1) ModalManager.leave();
 
-        let oModal = _.remove(ModalManager.modals, (obj) => {
+        let oModal = remove(ModalManager.modals, (obj) => {
             return obj.modal === modal;
         });
         if (ModalManager.modals.length > 0) {
@@ -159,7 +160,7 @@ class ModalManager {
             ModalManager.modals.forEach((mObj) => {
                 maxIdx = Math.max(maxIdx, mObj.idx);
             });
-            let modalPos = _.findIndex(ModalManager.modals, (mObj) => {
+            let modalPos = findIndex(ModalManager.modals, (mObj) => {
                 return mObj.idx === maxIdx;
             });
             ModalManager.active = ModalManager.modals[ modalPos ];

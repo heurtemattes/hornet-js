@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,9 @@ import { DomAdapter } from "src/widget/form/dom-adapter";
 import { NotificationType, Notifications } from "hornet-js-core/src/notification/notification-manager";
 import { UploadedFile } from "hornet-js-core/src/data/file";
 
-import * as _ from "lodash";
+import get = require("lodash.get");
+import isEmpty = require("lodash.isempty");
+import isString = require("lodash.isstring");
 import * as ajv from "ajv";
 import ErrorObject = ajv.ErrorObject;
 import DependenciesParams = ajv.DependenciesParams;
@@ -130,9 +132,9 @@ export abstract class FormUtils {
      */
     static extractMessage(keyword: string, fieldName: string, fieldsMessages?: any, genericValidationMessages?: any, complement?: any, field?: DomAdapter<any, any>): string {
         let message: string;
-        const specificMessage: any = _.get(fieldsMessages, fieldName + "." + keyword);
+        const specificMessage: any = get(fieldsMessages, fieldName + "." + keyword);
 
-        if (_.isString(specificMessage)) {
+        if (isString(specificMessage)) {
 
             message = specificMessage;
             if (complement) {
@@ -143,10 +145,10 @@ export abstract class FormUtils {
 
         } else if (genericValidationMessages) {
             const genericMessage: any = genericValidationMessages[ keyword ] || genericValidationMessages[ "generic" ];
-            if (field && _.isString(field.state.label) && !_.isEmpty(field.state.label)) { // on récupére le label associé
+            if (field && isString(field.state.label) && !isEmpty(field.state.label)) { // on récupére le label associé
                 fieldName = field.state.label;
             }
-            if (_.isString(genericMessage)) {
+            if (isString(genericMessage)) {
                 const intlMsg = new IntlMessageFormat(genericMessage);
                 message = intlMsg.format({ field: fieldName });
             }

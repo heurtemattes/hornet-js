@@ -73,14 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
 import { RouteInfos } from "hornet-js-core/src/routes/abstract-routes";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
@@ -181,7 +181,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     constructor(props?: P, context?: any) {
         super(props, context);
 
-        this.attributes = _.assign({}, this.getRouteInfos().getAttributes());
+        this.attributes = assign({}, this.getRouteInfos().getAttributes());
         if (this.getRouteInfos().getService && this.getRouteInfos().getService()) {
             if (!(this.getRouteInfos().getService() as any).prototype) {
                 this.service = this.getRouteInfos().getService() as any;
@@ -222,7 +222,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
 
     componentWillReceiveProps(nextProps: P, nextContext: any) {
         super.componentWillReceiveProps(nextProps, nextContext);
-        this.attributes = _.assign({}, this.getRouteInfos().getAttributes());
+        this.attributes = assign({}, this.getRouteInfos().getAttributes());
     }
 
     componentDidCatch(error, info) {

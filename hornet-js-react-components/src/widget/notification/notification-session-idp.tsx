@@ -99,7 +99,7 @@ export class SessionIdpExpireNotification extends HornetComponent<SessionIdpExpi
             <div {...divProps}>
                 <div className={"fl notification-session-idp-button"} onClick={this.handleToggleNotification}>
                     <a href={""} onClick={this.handleToggleNotification} tabIndex={0}>
-                        <SvgSprites icon="close" color="#2E586E" />
+                        <SvgSprites icon="close" color="#2E586E" tabIndex={ -1 } />
                     </a>
                 </div>
                 <div className={classNames(labelClasses)}>

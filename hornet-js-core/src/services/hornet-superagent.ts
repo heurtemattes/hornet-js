@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,8 @@ import { Utils } from "hornet-js-utils";
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 import { Logger } from "hornet-js-logger/src/logger";
 
-import * as _ from "lodash";
+import isNumber = require("lodash.isnumber");
+import merge = require("lodash.merge");
 import * as superagent from "superagent";
 import { Response } from "superagent";
 import {
@@ -189,7 +190,7 @@ export class HornetSuperAgent {
 
         if (globalCacheActivated) {
             this.enableCache = true;
-            if (_.isNumber(timeToliveInCache)) {
+            if (isNumber(timeToliveInCache)) {
                 this.timeToLiveInCache = timeToliveInCache;
             } else {
                 this.timeToLiveInCache = cacheConf.timetolive || 3600;
@@ -271,8 +272,8 @@ export class HornetSuperAgent {
      */
     protected initSuperAgent(request: HornetRequest): superagent.SuperAgentRequest {
         if (!Utils.isServer) {
-            _.merge(this.clientSessionConfig, this.getClientSessionConfig());
-            _.merge(this.clientSessionConfig, request.clientTimeout);
+            merge(this.clientSessionConfig, this.getClientSessionConfig());
+            merge(this.clientSessionConfig, request.clientTimeout);
         }
         if (!this.superAgentRequest) {
 

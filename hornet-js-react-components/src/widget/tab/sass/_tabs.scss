@@ -111,6 +111,10 @@ $tabsArrowDisabled: rgba(211, 211, 211, 1); //#d3d3d3
                             display: inline-block;
                             padding: 0.7em;
                             color: $tabsPrimaryColor;
+                            
+                            &:focus {
+                                outline: none !important;
+                            }
                         }
 
                         .tab-panel:not(.tab-panel-selected) {
@@ -170,7 +174,6 @@ $tabsArrowDisabled: rgba(211, 211, 211, 1); //#d3d3d3
     
     .badge-selected-items-before-tab {
         &:before {
-            position: absolute;
             display: flex;
             flex-flow: row wrap;
             justify-content: center;
@@ -178,8 +181,6 @@ $tabsArrowDisabled: rgba(211, 211, 211, 1); //#d3d3d3
             align-items: center;
             width: 1.8em;
             height: 1.8em;
-            top: 0.2em;
-            right: 0.2em;
             font-family: "Roboto", "Helvetica", "Arial", sans-serif;
             font-size: 0.75em;
             font-weight: 600;
@@ -187,6 +188,7 @@ $tabsArrowDisabled: rgba(211, 211, 211, 1); //#d3d3d3
             background: $globalErrorColor;
             border-radius: 50%;
             color: $tabsBaseColor;
+            min-width: 1.8em;
         }
     }
 }

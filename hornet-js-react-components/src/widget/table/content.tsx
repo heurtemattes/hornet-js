@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -106,7 +106,12 @@ import { Form } from "src/widget/form/form";
 import { LineBefore } from "src/widget/table/line/line-before";
 import { LineAfter } from "src/widget/table/line/line-after";
 import classNames from "classnames";
-import * as _ from "lodash";
+import cloneDeep = require("lodash.clonedeep");
+import find = require("lodash.find");
+import findIndex = require("lodash.findindex");
+import intersectionWith = require("lodash.intersectionwith");
+import isUndefined = require("lodash.isundefined");
+import merge = require("lodash.merge");
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { ICustomValidation } from "hornet-js-core/src/validation/data-validator";
 import { AlertDiv } from "src/widget/table/alert-div";
@@ -117,7 +122,6 @@ import "src/widget/table/sass/_datatable-sortable.scss";
 import "src/widget/form/sass/_form-entities.scss";
 import { element } from 'prop-types';
 
-export const UNIT_SIZE = "em";
 export const UPDATE_COLUMN_VISIBILITY = new HornetEvent<ColumnState | string>("UPDATE_COLUMN_VISIBILITY");
 
 /**
@@ -366,7 +370,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         this.hiddenColumns = hiddenColumns;
         // this.columnsWithVisibilityMap.push({
         this.columnsWithVisibilityMap.forEach((column, index) => {
-            if (!_.isUndefined(hiddenColumns[this.columnsWithVisibilityMap[index].column])) {
+            if (!isUndefined(hiddenColumns[this.columnsWithVisibilityMap[index].column])) {
                 this.columnsWithVisibilityMap[index].isVisible = !hiddenColumns[this.columnsWithVisibilityMap[index].column];
             }
         });
@@ -566,7 +570,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         if (this.sortData) {
             columns.map((column) => {
                 if (column.props) {
-                    const sortColumn = _.find(this.sortData, { key: column.props.keyColumn });
+                    const sortColumn = find(this.sortData, { key: column.props.keyColumn });
                     if (sortColumn) {
                         title += ":" + this.i18n("table.sortedByTitle", { columnTitle: column.props.title }) + " ";
                         title += (sortColumn as SortData).dir === SortDirection.ASC ? this.i18n("table.ascending") : this.i18n("table.descending");
@@ -660,7 +664,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         columns.map((column: any, index: number) => {
 
             const props: any = this.getColProps(columns, index);
-            const sortColumn = _.find(this.sortData, { key: (column.props as ColumnProps).keyColumn });
+            const sortColumn = find(this.sortData, { key: (column.props as ColumnProps).keyColumn });
             if (this.sortData && sortColumn) {
                 (props as ColumnProps).sortData = sortColumn;
             }
@@ -676,7 +680,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
             props.style = props.style || column.props.style;
             props.key = this.state.id + "-" + props.coordinates.row + "-" + props.coordinates.column;
 
-            const columnsProps: any = _.merge({}, column.props);
+            const columnsProps: any = merge({}, column.props);
             if (columnsProps.style && props.style.display === "none") columnsProps.style.display = props.style.display;
             if (!column.type.prototype.getHeaderCell.__deprecated__) {
                 logger.deprecated("DEPRECATED", "Pour des raison de performance, il est préconisé d'utiliser des méthodes static - cf.UPGRADING.md");
@@ -698,7 +702,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
         const tdProps: React.AllHTMLAttributes<HTMLElement> = {};
         tdProps.colSpan = this.totalColumns;
         tdProps.className = classNames({ "datatable-message-content": true, txtcenter: true });
-        tdProps.style = { width: this.state.width + UNIT_SIZE };
+        tdProps.style = { width: this.state.width + Content.UNIT_SIZE };
         return (
             <tr key="emptyRow">
                 <td {...tdProps}><span role="alert">{content}</span></td>
@@ -774,7 +778,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
 
                 if (column.props.headers && Array.isArray(column.props.headers)) {
                     column.props.headers.map((headerKey) => {
-                        const idx = _.findIndex(columns, { props: { keyColumn: headerKey } });
+                        const idx = findIndex(columns, { props: { keyColumn: headerKey } });
                         if (idx > -1) headersHtmlAttr += props.key = this.props.id + "-colHeader-0-" + idx + " ";
                     });
                 } else {
@@ -881,7 +885,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
                 props.showAlert = this.showAlert;
             }
 
-            const columnsProps: any = _.merge({}, column.props);
+            const columnsProps: any = merge({}, column.props);
             if (columnsProps.style && props.style.display === "none") columnsProps.style.display = props.style.display;
 
             if (!column.type.prototype.getBodyCell.__deprecated__) {
@@ -922,7 +926,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     handleChangeSelectedItems(selectedItems: any[]) {
         this.tableTrsRef.map((element: any) => {
             if (element && element.instance.classList) {
-                if (_.findIndex(selectedItems, { id: element.value.id }) !== -1) {
+                if (findIndex(selectedItems, { id: element.value.id }) !== -1) {
                     if (!element.instance.classList.contains("datatable-line-selected")) {
                         element.instance.classList.add("datatable-line-selected");
                     }
@@ -1062,7 +1066,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
     protected toggleSelectLines(item: any) {
         this.updateAlertDiv(null);
         if (this.state.contentState.hasCheckColumnMassSelection) {
-            const items = _.cloneDeep(this.state.items);
+            const items = cloneDeep(this.state.items);
 
             // recupere la liste des items selectionnés sur la page courante
             let selectedItems: any[] = ArrayUtils.intersectionWith(this.props.dataSource.selected,
@@ -1111,7 +1115,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {any[]}
      */
     intersectionWith(object: any[], other: any[]): any[] {
-        const listResult: any[] = _.intersectionWith(object, other,
+        const listResult: any[] = intersectionWith(object, other,
             (item1, item2) => {
                 return item1[this.state.contentState.keyColumnMassSelection] === item2[this.state.contentState.keyColumnMassSelection];
             });
@@ -1126,7 +1130,7 @@ export class Content extends HornetComponent<ContentProps, any> implements IHorn
      * @returns {any[]}
      */
     static intersectionWith(object: any[], other: any[]): any[] {
-        const listResult: any[] = _.intersectionWith(object, other,
+        const listResult: any[] = intersectionWith(object, other,
             (item1, item2) => {
                 return item1.id === item2.id;
             });

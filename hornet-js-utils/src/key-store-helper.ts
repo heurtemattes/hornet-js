@@ -73,14 +73,14 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as fs from "fs";
 import * as https from "https";
-import * as _ from "lodash";
+import assign = require ("lodash.assign");
 
 /**
  * Interface décrivant une clé privée SSL
@@ -135,7 +135,7 @@ export class KeyStoreBuilder {
         const KEYs = KeyStoreBuilder.buildKEYs(keyStoreOptions.KEYs);
         const PKCS12 = KeyStoreBuilder.buildPKCS12(keyStoreOptions.PKCS12);
 
-        const options = _.assign({}, agentOptions, {
+        const options = assign({}, agentOptions, {
             ca: CAs,
             cert: CERTs,
             key: KEYs,

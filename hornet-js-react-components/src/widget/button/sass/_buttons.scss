@@ -20,7 +20,7 @@
     text-transform: uppercase;
     box-shadow: 0 0 0 0 $buttonBoxShadow;
 
-    @include smoothTransition(all, 0.2s);
+    // @include smoothTransition(all, 0.2s);
 
     &:active {
         box-shadow: 0 10px 15px 0 $buttonBoxShadow;
@@ -31,11 +31,23 @@
     &:focus {
         background: $buttonBgStates;
         outline: 2px solid $buttonBorderStates;
+        &.hornet-dialogue-croix {
+            border-top-right-radius: 59%;
+            border-bottom-right-radius: 59%;
+            outline: none;
+            border-top-left-radius: 59%;
+            border-bottom-left-radius: 59%;            
+        }
     }
     
     @media (max-width: #{$mediaS-543}) {
         width: 100%;
     }
+}
+
+%menuStyleFocusAndHover {
+    outline: none;
+    border-radius: 50%;
 }
 
 button {
@@ -45,10 +57,15 @@ button {
     }
 
     &.toggler {
-        &:hover,
         &:focus {
-            background: $buttonBgStates;
-            outline: 2px solid $buttonBorderStates;
+            @extend %menuStyleFocusAndHover;
+            background: $buttonMenuBgFocus;
+            box-shadow: 0 0 0 0.2em $buttonMenuBgFocus;
+        }
+        &:hover {
+            @extend %menuStyleFocusAndHover;
+            background: $buttonMenuBgHover;
+            box-shadow: 0 0 0 0.2em $buttonMenuBgHover;
         }
     }
 

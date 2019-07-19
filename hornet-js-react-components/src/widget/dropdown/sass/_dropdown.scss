@@ -30,6 +30,7 @@ $ddBaseColorDark: theme-color('global', 'texts');
     }
 
     .dropdown-button {
+        transition: none;
         padding: 0.4em;
     }
 
@@ -50,6 +51,14 @@ $ddBaseColorDark: theme-color('global', 'texts');
         @include arrowDropdown("bottom-left", $top: -0.43em, $left: 1.5em);
     }
 
+    .position-top-left {
+        z-index: 1;
+    }
+
+    .position-top-right {
+        z-index: 1;
+    }
+
     .position-bottom-right {
         top: 2.8em;
         right: -0.5em;
@@ -68,7 +77,7 @@ $ddBaseColorDark: theme-color('global', 'texts');
         &.position-top-left {
             bottom: 2.4em;
             left: 0;
-            
+
             @include arrowDropdown("top-left", $left: 1.5em, $bottom: -0.43em, $zIndex: 0);
         }
 
@@ -76,6 +85,23 @@ $ddBaseColorDark: theme-color('global', 'texts');
             display: none !important;
         }
     }
+
+    .dropdown-button svg {
+        outline: none;
+    }
+
+    .dropdown-button[aria-expanded=true]:not(:focus) {
+        transition: none;
+        outline: 1px solid $ddLinkfocusOutline;
+    }
+    .dropdown-button {
+        &:hover,
+        &:focus {
+            @include smoothTransition(outline, 0.3s);
+            outline: 1px solid $ddLinkfocusOutline;    
+        }
+    }
+
 }
 
 .dropdown-list {
@@ -135,7 +161,6 @@ $ddBaseColorDark: theme-color('global', 'texts');
 
         .toggle-column-item-content {
             position: relative;
-            @include smoothTransition(all, 0.3s);
 
             &:hover {
                 color: $ddBaseColorDark;

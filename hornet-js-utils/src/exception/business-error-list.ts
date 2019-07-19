@@ -73,13 +73,12 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.4.0
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { BusinessError } from "src/exception/business-error";
-import * as _ from "lodash";
 
 /**
  * Liste d'erreurs métier
@@ -91,7 +90,7 @@ export class BusinessErrorList extends BusinessError {
         super(undefined, undefined, undefined);
         this.name = "BusinessErrorList";
 
-        if (_.isArray(businessErrors)) {
+        if (Array.isArray(businessErrors)) {
             this.errors = [].concat(businessErrors);
         } else {
             this.errors = [];
