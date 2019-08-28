@@ -73,25 +73,24 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import * as ReactDom from "react-dom";
-import { Dropdown, Position } from "hornet-js-react-components/src/widget/dropdown/dropdown";
+import { Dropdown, Position } from "src/widget/dropdown/dropdown";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
-
-var chai = require('chai');
-const expect = chai.expect;
-
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
 
 function renderIntoDocument(element, id) {
-    let div = document.createElement('div');
+    const div = document.createElement("div");
     if (id) {
         div.id = id;
     }
@@ -103,7 +102,6 @@ import forEach = require("lodash/forEach");
 import { HornetTestAssert } from 'hornet-js-test/src/hornet-test-assert';
 import { HornetReactTest } from 'hornet-js-test/src/hornet-react-test';
 import { KeyCodes } from 'hornet-js-components/src/event/key-codes';
-const logger = Utils.getLogger("hornet-js-react-components.test.dropdown.dropdown");
 let element, element1: JSX.Element;
 
 

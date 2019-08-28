@@ -1,11 +1,12 @@
-import { Class, AbstractClass } from "hornet-js-utils/src/typescript-utils";
-import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
-import { CodesError } from "hornet-js-utils/src/exception/codes-error";
+import { Class } from "hornet-js-utils/src/typescript-utils";
+import { HornetEntity } from "src/decorators/dec-seq-entity";
 import { HornetSequelizeEntityAttributes, HornetSequelizeInstanceModel } from "src/sequelize/hornet-sequelize-attributes";
 import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
-import * as _ from "lodash";
+import assignIn = require("lodash.assignin");
 import { BeanUtils } from "hornet-js-bean/src/bean-utils";
 import { HornetDbConnector } from "src/sequelize/hornet-db-connector";
+import { Promise } from "hornet-js-utils/src/promise-api";
+import * as Sequelize from "sequelize";
 
 type Id<T> = {[P in keyof T]?: T[P]};
 
@@ -41,7 +42,7 @@ export interface Criteria {
 export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
     extends HornetSequelizeEntityAttributes> extends HornetDbConnector<T> {
     protected classEntity: Class<ENTITY>;
-    entity: ENTITY; 
+    entity: Class<HornetEntity<Sequelize.ModelAttributes>>;
     
     constructor(entity: Class<ENTITY>, modelDAO?: T) {
         super(modelDAO);
@@ -75,19 +76,16 @@ export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
                 return p.then((results) => {
                     return BeanUtils.mapArray(bean, results);
                 });
-            } else {
-                return p;
             }
-        } else {
-            const p = this.modelDAO[this.classEntity["entityName"]].findAll();
-            if (bean) {
-                return p.then((results) => {
-                    return BeanUtils.mapArray(bean, results);
-                });
-            } else {
-                return p;
-            }
+            return p;
         }
+        const p = this.modelDAO[this.classEntity["entityName"]].findAll();
+        if (bean) {
+            return p.then((results) => {
+                return BeanUtils.mapArray(bean, results);
+            });
+        }
+        return p;
     }
 
     /**
@@ -105,9 +103,8 @@ export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
             return p.then((result) => {
                 return BeanUtils.mapObject(bean, result);
             });
-        } else {
-            return p;
         }
+        return p;
     }
 
     /**
@@ -150,7 +147,7 @@ export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
     /**
      * Transforme un tableau d'attributs en liste d'attributs
      * à requêter par Sequelize
-     * @param attributes 
+     * @param attributes
      */
     protected getAttributesConf(attributes: string[]): any {
         return { attributes };
@@ -159,7 +156,7 @@ export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
     /**
      * Utilise les informations fournies pour préparer les critères
      * de la requête utilisés par Sequelize
-     * @param where 
+     * @param where
      */
     protected getWhereConf(where: Partial<ENTITY>): any {
         return { where };
@@ -175,24 +172,24 @@ export class HornetGenericDAO<T extends HornetSequelizeModel, ENTITY
 
     /**
      * Construit l'objet passé à la méthode de requêtage sequelize
-     * @param criteres 
+     * @param criteres
      */
     protected getQueryObject(criteres: Criteria): any {
         let queryObject = {};
         if (criteres.attributes) {
-            queryObject = _.assignIn(queryObject, this.getAttributesConf(criteres.attributes));
+            queryObject = assignIn(queryObject, this.getAttributesConf(criteres.attributes));
         }
         if (criteres.paginate) {
-            queryObject = _.assignIn(queryObject, this.getPaginationConf(criteres.paginate));
+            queryObject = assignIn(queryObject, this.getPaginationConf(criteres.paginate));
         }
         if (criteres.where) {
-            queryObject = _.assignIn(queryObject, this.getWhereConf(criteres.where));
+            queryObject = assignIn(queryObject, this.getWhereConf(criteres.where));
         }
         if (criteres.include) {
-            queryObject = _.assignIn(queryObject, this.getIncludeConf(criteres.include));
+            queryObject = assignIn(queryObject, this.getIncludeConf(criteres.include));
         }
         if (criteres.order) {
-            queryObject = _.assignIn(queryObject, this.getOrderConf(criteres.order));
+            queryObject = assignIn(queryObject, this.getOrderConf(criteres.order));
         }
         return queryObject;
     }

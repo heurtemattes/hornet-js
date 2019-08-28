@@ -73,14 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
 import { RouteInfos } from "hornet-js-core/src/routes/abstract-routes";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { IHornetPage } from "hornet-js-components/src/component/ihornet-page";
@@ -90,11 +90,14 @@ import { CHANGE_URL_WITH_DATA_EVENT, HornetEvent, fireHornetEvent } from "hornet
 import { UPDATE_PAGE_EXPAND, UPDATE_PAGE_EXPAND_MENU } from "src/widget/screen/layout-switcher";
 import { URL_CHANGE_EVENT } from "hornet-js-core/src/routes/router-client-async-elements";
 import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { ExpandingLayout } from "hornet-js-core/src/services/default/expanding-layout";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.component.hornet-page");
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.component.hornet-page");
+
+
 
 /**
  * Propriétés HornetPage
@@ -178,7 +181,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
     constructor(props?: P, context?: any) {
         super(props, context);
 
-        this.attributes = _.assign({}, this.getRouteInfos().getAttributes());
+        this.attributes = assign({}, this.getRouteInfos().getAttributes());
         if (this.getRouteInfos().getService && this.getRouteInfos().getService()) {
             if (!(this.getRouteInfos().getService() as any).prototype) {
                 this.service = this.getRouteInfos().getService() as any;
@@ -219,7 +222,7 @@ export class HornetPage<T extends IService, P extends HornetPageProps, S extends
 
     componentWillReceiveProps(nextProps: P, nextContext: any) {
         super.componentWillReceiveProps(nextProps, nextContext);
-        this.attributes = _.assign({}, this.getRouteInfos().getAttributes());
+        this.attributes = assign({}, this.getRouteInfos().getAttributes());
     }
 
     componentDidCatch(error, info) {

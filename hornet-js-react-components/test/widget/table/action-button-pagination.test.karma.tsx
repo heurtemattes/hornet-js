@@ -73,14 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
@@ -88,19 +90,17 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 import {ActionButton, TypeAction} from "src/widget/table/action-button";
-import { Utils } from "hornet-js-utils";
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-Utils.setConfigObj({});
-import { MenuActions } from "hornet-js-react-components/src/widget/table/menu-actions";
+import { Content } from "src/widget/table/content";
+import { MenuActions } from "src/widget/table/menu-actions";
 import { CheckColumn } from "src/widget/table/column/check-column";
-import { Footer } from "hornet-js-react-components/src/widget/table/footer";
-import { Pager, PaginationProps } from "hornet-js-react-components/src/widget/pager/pager";
+import { Footer } from "src/widget/table/footer";
+import { Pager } from "src/widget/pager/pager";
 
 let actionButtonElement: JSX.Element;
 let dataSourceTableEditable: PaginateDataSource<any>;

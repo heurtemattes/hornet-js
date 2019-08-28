@@ -73,18 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { Header } from "src/widget/table/header";
-import { Content, UNIT_SIZE } from "src/widget/table/content";
+import { Content } from "src/widget/table/content";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { Columns } from "src/widget/table/columns";
 import { Footer } from "src/widget/table/footer";
@@ -93,7 +91,9 @@ import { Notification } from "src/widget/notification/notification";
 import { ToggleColumnsButton } from "src/widget/table/toggle-columns-button";
 import { CheckColumn } from "src/widget/table/column/check-column";
 
-const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.table");
+import "src/widget/table/sass/_table.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-components.widget.table.table");
 
 /**
  * Propriétés du composant Table
@@ -118,7 +118,6 @@ export class Table extends HornetComponent<TableProps, any> {
     protected contentState: ContentState;
 
     static defaultProps = {
-        className: "hornet-datatable-header",
         isVisible: true,
     };
 
@@ -174,7 +173,7 @@ export class Table extends HornetComponent<TableProps, any> {
         if (this.state.isVisible) {
             return componentContent ?
                 <div><Notification id={notifId} /> {this.renderTable(myContents)}</div> :
-                <div className = {this.state.className} > {this.renderTable(myContents)} </div>;
+                this.renderTable(myContents);
         }
 
         return <div />;
@@ -194,8 +193,14 @@ export class Table extends HornetComponent<TableProps, any> {
      */
     protected renderTable(myContents): JSX.Element {
         const myHeader: any = this.getComponentBy(Header);
+        let classTable = "datatable-container";
+        
+        if (this.props.className) {
+            classTable = "datatable-container " + this.props.className;
+        }
+
         return (
-            <div className="datatable-container" id={this.props.id}>
+            <div className={classTable} id={this.props.id}>
                 {this.renderHeader(myHeader, myContents)}
                 {this.renderContent(myHeader, myContents)}
                 <div className="hornet-datatable-bottom">
@@ -224,7 +229,7 @@ export class Table extends HornetComponent<TableProps, any> {
                             keyColumns.push({
                                 keyColumn: column.props.keyColumn,
                                 title: column.props.title,
-                                width: (column.props.defaultWidth || column.props.width) + UNIT_SIZE,
+                                width: (column.props.defaultWidth || column.props.width) + Table.UNIT_SIZE,
                             });
                         }
                     });
@@ -364,7 +369,7 @@ export class Table extends HornetComponent<TableProps, any> {
         React.Children.map(startElement.props.children, (child: React.ReactChild) => {
             const reactElement = (child as React.ReactElement<any>);
             if (reactElement) {
-                if (reactElement.type === CheckColumn) {
+                if ((reactElement.type as any) === CheckColumn) {
                     children.push(child);
                     children = this.getCheckColumnChildrenDeep(child, children);
                 } else if (Array.isArray(reactElement.props.children)) {
@@ -376,6 +381,6 @@ export class Table extends HornetComponent<TableProps, any> {
                 }
             }
         });
-        return children.filter((element) => (element != null && element));
+        return children.filter(element => element != null && element);
     }
 }

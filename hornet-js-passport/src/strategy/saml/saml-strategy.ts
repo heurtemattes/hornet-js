@@ -73,7 +73,7 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
@@ -81,16 +81,23 @@
 import { AuthenticationStrategy } from "src/strategy/authentication-strategy";
 import { AuthenticationUtils } from "src/authentication-utils";
 import { Saml } from "src/strategy/saml/saml";
-import { SamlConfiguration, IdentityProviderProps } from "hornet-js-passport/src/strategy/saml/saml-configuration";
+import { SamlConfiguration, IdentityProviderProps } from "src/strategy/saml/saml-configuration";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as ReactDOMServer from "react-dom/server";
 import { ConnexionPage } from "src/strategy/saml/views/cnx/connexion-page";
-import * as _ from "lodash";
+import merge = require("lodash.merge");
 import { Request, Response } from "express";
 
+const logger: Logger = Logger.getLogger("hornet-js-passport.strategy.saml.saml-strategy");
 
-const logger: Logger = Utils.getLogger("hornet-js-passport.strategy.saml.saml-strategy");
+declare global {
+    namespace Express {
+        interface Request {
+            getSession(): any;
+        }
+    }
+}
 
 export class SamlStrategy implements AuthenticationStrategy {
 
@@ -328,7 +335,7 @@ export class SamlStrategy implements AuthenticationStrategy {
      */
     protected renderMultiIdpPage() {
 
-        const props = _.merge(this.connexionComponent.defaultProps || {}, { idps: this.availableIdp });
+        const props = merge(this.connexionComponent.defaultProps || {}, { idps: this.availableIdp });
 
         const htmlApp = ReactDOMServer.renderToStaticMarkup(new this.connexionComponent(props).render());
         const docTypeHtml: string = "<!DOCTYPE html>";

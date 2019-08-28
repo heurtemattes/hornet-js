@@ -73,19 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
 import { SpinnerComponent, SpinnerProps } from "src/widget/spinner/spinner-component";
-import { UNIT_SIZE } from "src/widget/table/content";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as classNames from "classnames";
+import { Logger } from "hornet-js-logger/src/logger";
+import classNames from "classnames";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.spinner-table");
+import "src/widget/table/sass/_datatable-loader.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.spinner-table");
 
 export interface SpinnerTableProps extends SpinnerProps {
     nbColumns?: number;
@@ -120,18 +121,18 @@ export class SpinnerLoader<P extends SpinnerTableProps, S extends SpinnerTablePr
      * Render spinner
      */
     renderLoader(): JSX.Element {
-        const classDiv: ClassDictionary = {
+        const classDiv = {
             "datatable-loader": this.state.isVisible && this.count > 0,
             "datatable-loaded": !this.state.isVisible,
         };
 
-        const classTr: ClassDictionary = { "datatable-line-loader": true };
+        const classTr = { "datatable-line-loader": true };
         classTr[ this.props[ "className" ] + "-line-loader" ] = true;
         classTr[ this.props[ "className" ] + "-tr-with-colspan" ] = true;
 
         return (
             <tr className={classNames(classTr)}>
-                <th colSpan={this.state[ "nbColumns" ]} style={{ width: this.props[ "width" ] + UNIT_SIZE }}>
+                <th colSpan={this.state[ "nbColumns" ]} style={{ width: this.props[ "width" ] + SpinnerLoader.UNIT_SIZE }}>
                     <div className={classNames(classDiv)} />
                 </th>
             </tr>

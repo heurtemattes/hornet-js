@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,22 +82,26 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as React from "react";
-import * as assert from "assert";
 import { expect } from "chai";
 
 import { InputField } from "src/widget/form/input-field";
 import { Form } from "src/widget/form/form";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { Utils } from "hornet-js-utils";
 
-let elementBase, elementWithValue, elementWithValueEtCompteur, elementWithOnChange: JSX.Element;
-let $element;
+let elementBase: JSX.Element;
+let elementWithValue: JSX.Element;
+let elementWithValueEtCompteur: JSX.Element;
+let elementWithOnChange: JSX.Element;
+let elementFocusable: JSX.Element;
+let elementWithValueAndCompteurWithoutAlert: JSX.Element;
 let count: number = 0;
 let onChangeCpt: number = 0;
 
 @Decorators.describe("Test Karma InputField")
 class InputFieldTest extends HornetReactTest {
     protected inputField;
+    protected inputFieldFocusable;
 
     @Decorators.beforeEach
     beforeEach() {
@@ -142,6 +146,18 @@ class InputFieldTest extends HornetReactTest {
             showAlert={true}
         />);
 
+        elementWithValueAndCompteurWithoutAlert = (<InputField name="testWithoutAlert"
+            ref={elt => { this.inputField = elt; }}
+            id="testWithoutAlert"
+            label={"testWithoutAlert"}
+            maxLength={50}
+            resettable={true}
+            maxChar={25}
+            displayMaxCharInLabel={true}
+            displayCharNumber={true}
+            showAlert={false}
+        />);
+
         elementWithOnChange = (
             <InputField name="testOnChange"
                 id="testOnChange"
@@ -150,35 +166,44 @@ class InputFieldTest extends HornetReactTest {
                 requiredLabel="testOnChange"
                 maxLength={50}
                 resettable={true}
-                onChange={() => {onChangeCpt = 1; }}
+                onChange={() => { onChangeCpt = 1; }}
+            />
+        );
+
+        elementFocusable = (
+            <InputField name="prenomFocusable"
+                id="prenomFocusable"
+                label={"prénom"}
+                required={true}
+                requiredLabel="Prénom obligatoire"
+                maxLength={50}
+                resettable={true}
+                ref={(element) => { this.inputFieldFocusable = element; }}
             />
         );
     }
 
-    @Decorators.it("Test OK")
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
-    }
-
     @Decorators.it("Vérifier l'existence du champ Input")
     testInput() {
-        $element = this.renderIntoDocument(elementBase, "main1");
-        expect(document.querySelector("#main1 #prenom"), "Problème élément Input non trouvé").to.exist;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementBase, id);
+        expect(document.querySelector(`#${id} #prenom`), "Problème élément Input non trouvé").to.exist;
         this.end();
     }
 
     @Decorators.it("Vérifier la non existence du bouton reset lorsqu'un champ est vide")
     testNoResetButton() {
-        $element = this.renderIntoDocument(elementBase, "main2");
-        expect(document.querySelector("#main2 #prenomResetButton.input-reset.input-reset-hidden"), "bouton reset trouvé").to.not.exist;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementBase, id);
+        expect(document.querySelector(`#${id} #prenomResetButton.input-reset.input-reset-hidden`), "bouton reset trouvé").to.not.exist;
         this.end();
     }
 
     @Decorators.it("Vérifier l'existence du bouton reset lorsqu'un champ est valorisé")
     testResetButton() {
-        $element = this.renderIntoDocument(elementWithValue, "main3");
-        expect(document.querySelector("#main3 #prenomResetButton.input-reset"), "bouton reset non trouvé").to.exist;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValue, id);
+        expect(document.querySelector(`#${id} #prenomResetButton.input-reset`), "bouton reset non trouvé").to.exist;
         this.end();
     }
 
@@ -193,40 +218,43 @@ class InputFieldTest extends HornetReactTest {
         setTimeout(() => {
             expect(document.querySelector(`#${id} .abstractfield-container-reverse-label`)).to.exist;
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test du compte de caractère")
     testCharsCounter() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main400");
-        const inputNom = document.querySelector("#main400 #nom") as HTMLTextAreaElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
+        const inputNom = document.querySelector(`#${id} #nom`) as HTMLTextAreaElement;
         this.triggerKeydownEvent(inputNom, "m", 77, true);
         setTimeout(() => {
-            const charLabel = document.querySelector("#main400 .chars-counter") as HTMLDivElement;
+            const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
             expect(charLabel).to.exist;
             expect(charLabel.innerHTML).to.equals("1 caractère");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test du compte de caractère avec setCurrentValue")
     testCharsCounterWithSetCurrentValue() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main401");
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
         this.inputField.setCurrentValue("Malam");
-        const charLabel = document.querySelector("#main401 .chars-counter") as HTMLDivElement;
+        const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
         setTimeout(() => {
             expect(charLabel).to.exist;
             expect(charLabel.innerHTML).to.equals("5 caractères");
             expect(charLabel.className).to.be.equals("chars-counter");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage de l'alerte avec setCurrentValue")
     testCharsCounterWithAlertWithSetCurrentValue() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main402");
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
         this.inputField.setCurrentValue("Adria moratizna zenimaheri");
-        const charLabel = document.querySelector("#main402 .chars-counter") as HTMLDivElement;
+        const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
         setTimeout(() => {
             expect(charLabel.innerHTML).to.be.equal("26 caractères");
             expect(charLabel.className).to.be.equals("chars-counter chars-counter-too-many-char");
@@ -240,22 +268,24 @@ class InputFieldTest extends HornetReactTest {
             const titre: string = "Nombre de caractères trop élevé";
             expect(alertTitle.innerText.toLowerCase()).to.be.equals(titre.toLowerCase());
             expect(alertBody).to.exist;
-            expect(alertBody.innerText).to.be.equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (26/25).");
+            expect(alertBody.innerText).to.be.
+                equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (26/25).");
 
             (alertOk as any).click();
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage de l'alerte avec setCurrentValue")
     testAffichageAlert() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main403");
-        const inputNom = document.querySelector("#main403 #nom") as HTMLTextAreaElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
+        const inputNom = document.querySelector(`#${id} #nom`) as HTMLTextAreaElement;
         let i;
         for (i = 0; i < 26; i++) {
             this.triggerKeydownEvent(inputNom, "m", 77, true);
         }
-        const charLabel = document.querySelector("#main403 .chars-counter") as HTMLDivElement;
+        const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
         setTimeout(() => {
             expect(charLabel.innerHTML).to.be.equal("26 caractères");
             const alert = document.querySelector(".widget-alert-body");
@@ -268,35 +298,38 @@ class InputFieldTest extends HornetReactTest {
             const titre: string = "Nombre de caractères trop élevé";
             expect(alertTitle.innerText.toLowerCase()).to.be.equals(titre.toLowerCase());
             expect(alertBody).to.exist;
-            expect(alertBody.innerText).to.be.equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (26/25).");
+            expect(alertBody.innerText).to.be.
+                equals("Le nombre de caractères renseignés est trop élevé par rapport au nombre maximum (26/25).");
 
             (alertOk as any).click();
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de non activation du compteur")
     testNoCharsCount() {
-        $element = this.renderIntoDocument(elementWithValue, "main404");
-        const inputPrenom = document.querySelector("#main404 #prenom") as HTMLTextAreaElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValue, id);
+        const inputPrenom = document.querySelector(`#${id} #prenom`) as HTMLTextAreaElement;
         let i;
         for (i = 0; i < 30; i++) {
             this.triggerKeydownEvent(inputPrenom, "m", 77, true);
         }
         setTimeout(() => {
-            const charLabel = document.querySelector("#main404 .chars-counter") as HTMLDivElement;
+            const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
             expect(inputPrenom.hasAttribute("aria-labelledby")).to.be.true;
             expect(inputPrenom.getAttribute("aria-labelledby")).to.be.equals("prenom-span-label");
             expect(charLabel).to.be.null;
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'activation de l'alerte si dernier caractere est espace")
     testShowAlertWithEspaceInLastPosition() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main405");
-        const inputNom = document.querySelector("#main405 #nom") as HTMLTextAreaElement;
-        const charLabel = document.querySelector("#main405 .chars-counter") as HTMLDivElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
+        const inputNom = document.querySelector(`#${id} #nom`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
         let i;
         for (i = 0; i < 25; i++) {
             this.triggerKeydownEvent(inputNom, "m", 77, true);
@@ -310,34 +343,74 @@ class InputFieldTest extends HornetReactTest {
             expect(alertOk).to.exist;
             (alertOk as any).click();
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage du label sans maxChar")
     testLabelWithoutMaxChar() {
-        $element = this.renderIntoDocument(elementBase, "main406");
-        const label = document.querySelector("#main406 .label") as HTMLSpanElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementBase, id);
+        const label = document.querySelector(`#${id} .label`) as HTMLSpanElement;
         setTimeout(() => {
             expect(label.innerHTML).to.be.equal("prénom");
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test de l'affichage du label avec maxChar")
     testLabelWithMaxChar() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main407");
-        const label = document.querySelector("#main407 .label") as HTMLSpanElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
+        const label = document.querySelector(`#${id} .label`) as HTMLSpanElement;
         setTimeout(() => {
             expect(label.innerHTML).to.be.equal("Nom (limite 25 caractères)");
             this.end();
-        },         250);
+        }, 250);
+    }
+
+    @Decorators.it("Test changement de classe du charCounter sans alert")
+    testCharsCounterWithoutAlert() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueAndCompteurWithoutAlert, id);
+        const inputTestWithoutAlert = document.querySelector(`#${id} #testWithoutAlert`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
+        // Vérifier que label ne contient pas la classe chars-counter-too-many-char
+        expect(
+            charLabel.getAttribute("class").indexOf("chars-counter-too-many-char") === -1,
+            "1: La classe 'chars-counter-too-many-char' est appliquée").to.be.true;
+        let i;
+        for (i = 0; i < 26; i++) {
+            this.triggerKeydownEvent(inputTestWithoutAlert, "m", 77, true);
+        }
+        setTimeout(() => {
+            // Vérifier que label contient la classe chars-counter-too-many-char
+            expect(
+                charLabel.getAttribute("class").indexOf("chars-counter-too-many-char") >= 0,
+                "1 : La classe 'chars-counter-too-many-char' n'est pas appliquée").to.be.true;
+            // Supprimer un caractère et vérifier que label ne contient pas la classe chars-counter-too-many-char
+            // On passe de 26 caractères à 25
+            this.inputField.setCurrentValue("mmmmmmmmmmmmmmmmmmmmmmmmm");
+            setTimeout(() => {
+                expect(
+                    charLabel.getAttribute("class").indexOf("chars-counter-too-many-char") === -1,
+                    "2 : La classe 'chars-counter-too-many-char' est appliquée").to.be.true;
+                // Cliquer sur la croix et vérifier que label est vide
+                this.triggerMouseEvent(document.querySelector(`#${id} #testWithoutAlertResetButton a`), "click");
+                setTimeout(() => {
+                    expect(charLabel.textContent, "Le chars counter n'est pas vide").to.be.empty;
+                    this.end();
+                }, 250);
+
+            }, 250);
+        }, 250);
     }
 
     @Decorators.it("Test des attributs RGAA")
     testAriaAttributes() {
-        $element = this.renderIntoDocument(elementWithValueEtCompteur, "main408");
-        const inputNom = document.querySelector("#main408 #nom") as HTMLTextAreaElement;
-        const charLabel = document.querySelector("#main408 .chars-counter") as HTMLDivElement;
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementWithValueEtCompteur, id);
+        const inputNom = document.querySelector(`#${id} #nom`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} .chars-counter`) as HTMLDivElement;
         setTimeout(() => {
             expect(inputNom.hasAttribute("aria-labelledby")).to.be.true;
             expect(inputNom.getAttribute("aria-labelledby")).to.be.equals("nom-span-label chars-counter-nom");
@@ -346,7 +419,7 @@ class InputFieldTest extends HornetReactTest {
             expect(charLabel.getAttribute("role")).to.be.equals("log");
 
             this.end();
-        },         250);
+        }, 250);
     }
 
     @Decorators.it("Test onChange après click bouton reset")
@@ -360,8 +433,49 @@ class InputFieldTest extends HornetReactTest {
             setTimeout(() => {
                 expect(onChangeCpt).to.be.equal(1);
                 this.end();
-            },         250);
-        },         250);
+            }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Test de la gestion du focus")
+    testSetFocusSurElement() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(elementFocusable, id);
+        expect(document.querySelector(`#${id} #prenomFocusable`), "Problème élément Input non trouvé").to.exist;
+        this.inputFieldFocusable.setFocus();
+        setTimeout(() => {
+            const isCurrentFocusElement = document.querySelector(`#${id} #prenomFocusable`) === document.activeElement;
+            expect(isCurrentFocusElement, "L'élément n'a pas reçu le focus").to.be.true;
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test fonctionnement de la props onChange")
+    testOnChangeProps() {
+        let isEnd: boolean;
+        let inputValue: string;
+        const onChangeHandler = (e) => {
+            expect(e.target.value, `La e.target.value: ${e.target.value} n'est pas égale à inputValue: ${inputValue}`)
+                .to.equal(inputValue);
+            if (isEnd) {
+                this.end();
+            }
+        };
+        const inputTag = (
+            <InputField
+                name={"input-onChange-test"}
+                label={"test input-onChange-test"}
+                onChange={onChangeHandler}
+            />);
+        const id = this.generateMainId();
+        this.renderIntoDocument(inputTag, id);
+        inputValue = "m";
+        this.triggerKeydownEvent(document.querySelector(`#${id} #input-onChange-test`), "m", 77, true);
+        setTimeout(() => {
+            inputValue = "";
+            isEnd = true;
+            this.triggerMouseEvent(document.querySelector(`#${id} #input-onChange-testResetButton a`), "click");
+        }, 250);
     }
 
 }

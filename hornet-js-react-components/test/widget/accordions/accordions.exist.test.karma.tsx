@@ -73,16 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 'use strict';
 
-var chai = require('chai');
-const expect = chai.expect;
-import * as _ from "lodash";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
@@ -129,22 +129,25 @@ class AccordionTest extends BaseTest {
 
     @Decorators.it("Test 1 - Vérifier l'existence du header")
     testHeaderExist() {
-        data = this.renderIntoDocument(element, "main1");
-        expect(document.querySelector("#main1 .accordion-header-container #accordions-test-accordionheader").id, "Problème contenu header non trouvé").to.exist;
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        expect(document.querySelector(`#${id} .accordion-header-container #accordions-test-accordionheader`).id, "Problème contenu header non trouvé").to.exist;
         this.end();
     };
 
     @Decorators.it("Test 2 - Vérifier l'existence du composant info")
     testInfoExist() {
-        data = this.renderIntoDocument(element, "main2");
-        expect(document.querySelector("#main2 .accordion-info-container #accordions-test-accordioninfo").id, "Problème contenu info non trouvé").to.exist;
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        expect(document.querySelector(`#${id} .accordion-info-container #accordions-test-accordioninfo`).id, "Problème contenu info non trouvé").to.exist;
         this.end();
     };
 
     @Decorators.it("Test 3 - Vérifier l'existence du contenu")
     testContentExist() {
-        data = this.renderIntoDocument(element, "main3");
-        expect(document.querySelector("#main3 #accordions-test-content").id, "Problème contenu non trouvé").to.exist;
+        const id = this.generateMainId();
+        data = this.renderIntoDocument(element, id);
+        expect(document.querySelector(`#${id} #accordions-test-content`).id, "Problème contenu non trouvé").to.exist;
         this.end();
     };
 

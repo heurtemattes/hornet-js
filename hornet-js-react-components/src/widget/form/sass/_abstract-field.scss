@@ -1,0 +1,34 @@
+@import '../../sass/core';
+
+
+.label-container {
+    margin-bottom: 0.5em;
+}
+
+.abstractfield-container {
+    margin-bottom: 1.250em;
+    min-width: 15.469em;
+
+    .label{
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+
+    @media (max-width: #{$mediaM-600}) {
+        width: 100%;
+    }
+}
+
+.abstractfield-container.inline > * {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 1.125em;
+}
+
+label {
+    cursor: default;
+}
+
+.abstractfield-field-content {
+    position: relative;
+}

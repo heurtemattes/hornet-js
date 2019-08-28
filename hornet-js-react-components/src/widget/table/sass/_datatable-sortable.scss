@@ -1,0 +1,324 @@
+@import '../../sass/core';
+
+$tableBaseColorDark: theme-color('global', 'dark');
+$tableContentColor: rgba(0, 0, 0, 0.87);
+$tableSelected: rgba(226, 239, 247, 1); //#e2eff7
+$tableEditionBoxShadow: theme-color('global', 'boxShadows');
+$tableGlobalStates: theme-color($variant: 'states');
+$tableSortableHover: rgba(0, 0, 0, .26);
+$tableExpandable: rgba(250, 250, 250, 1); //#fafafa
+$tablebadgeBg: rgba(255, 64, 129, 1); //#ff4081
+$tableCardColor: theme-color($variant: 'texts');
+$tableButtonBoxShadow: rgba(0, 97, 255, 1); //#0061ff
+
+
+/// Composant table qui se compose de :
+/// _table.scss
+/// _pagination.scss
+/// datatable-sortable.scss
+/// _datatable-loader.scss
+.datatable-header-no-text-overflow {
+    text-overflow: inherit;
+}
+
+.datatable-header-sort-liner {
+    cursor: pointer;
+}
+
+.datatable-header-sort-liner,
+.datatable-header {
+    .arrow-sort {
+       padding-bottom: 0.18em;
+       width: 1.125em;
+       margin-left: 0.2em;
+       
+       @include smoothTransition(all, 0.3s);
+   }
+}
+
+.datatable-header-sort-liner {
+    .arrow-sort-container {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 80%;
+        margin: 0.1em;
+        color: $tableHeaderColor;
+        word-break: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+        text-decoration: underline;
+        line-height: 2.2;
+    }
+
+    &:hover,
+    &:focus {
+        .arrow-sort-container {
+            color: $tableBaseColorDark;
+        }
+    }
+}    
+
+td:focus,
+th > div:focus,
+th > div:hover {
+    outline: 0.0625em solid $tableGlobalStates;
+ 
+}
+
+td:focus,
+th > div:focus div {
+    color: $tableBaseColorDark;
+}
+
+.datatable-header-sortable-column {
+    svg {
+        color: $tableSortableHover;
+        opacity: 0;
+        transition: transform 0.25s ease 0.1s, opacity 0.25s ease 0.1s;
+    }
+}
+
+.datatable-header-sortable-column:hover,
+.datatable-header-sorted-asc,
+.datatable-header-sorted-desc {
+    svg {
+        opacity: 1;
+    }
+}
+
+td.datatable-cell.default-body-cell {
+    min-width: 1.125em;
+    padding: 0.2em 0 0.2em 0.8em;
+}
+
+.label-button-action {
+    padding-left: 0.2em;
+    font-size: 0.9em;
+    color: $tableSortableHover;
+}
+
+.datatable-cell {
+    .button-action {
+        height: 100%;
+    }
+
+    .button-action img,
+    .edition-button-action svg {
+        vertical-align: middle;
+    }
+
+}
+
+tbody {
+    .datatable-cell {
+        .button-action {
+            height: 100%;
+            transition: none;
+            outline: none;
+            &:hover,
+            &:focus {
+                svg {
+                    @include smoothTransition(all, 0.2s);
+                    box-shadow: 0 0 0.2em 0 $tableButtonBoxShadow;
+                    border-radius: 50%;
+                }
+            }
+        }
+    }
+}
+
+.edition-button-action {
+    border: none;
+    padding: 0 0.5em;
+    cursor: pointer;
+    background: none;
+}
+
+.edition-button-action-before {
+    svg {
+        display: inline-block;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+}
+
+.hidden-label {
+    display: none;
+}
+
+.edition-button-action {
+    &:hover,
+    &:focus {
+        outline: 0.0625em solid $tableGlobalStates;
+    }
+
+    &-before {
+        img {
+            &:hover {
+                outline: 0.0625em solid $tableGlobalStates;
+            }
+        }
+    }
+}
+
+.datatable-content {
+    table {
+        margin-bottom: 0;
+        border-right: none;
+    }
+}
+
+.table-cell-input {
+    height: 2.2em;
+    padding: 0 0.5em;
+    appearance: none;
+    border: none;
+    min-width: 0;
+}
+
+.table-cell-container {
+    min-width: 0;
+    margin: 0;
+}
+
+@media screen and (max-width: #{$media-720}) {
+    .datatable-title-span {
+        line-height: 1.5;
+    }
+
+    .datatable-title {
+        overflow: hidden;
+        white-space: inherit;
+    }
+
+    .datatable-header-title {
+        height: auto;
+        flex-direction: row;
+    }
+
+    .datatable-cell .button-action img,
+    .datatable-cell .edition-button-action img {
+        width: 1.5em;
+    }
+}
+
+.datatable-masked {
+    display: none;
+}
+
+.is_disabled {
+    cursor: none;
+}
+
+.td-no-padding {
+    padding: 0 !important;
+}
+
+.datatable-expandable-line td {
+    &:hover {
+        background-color: transparent;
+    }
+}
+
+.datatable-expandable-line {
+    &.datatable-expandable-line-hidden {
+        display: none;
+    }
+}
+
+.datatable-expandable-line {
+    &.datatable-expandable-line-displayed {
+        display: table-row;
+        background-color: $tableExpandable;
+    }
+}
+
+.table-cell-container {
+    .input-reset {
+        margin: -.1em -2em;
+    }
+}
+
+.table-cell-input {
+    padding: 0.5em 2em 0.5em 1em;
+}
+
+.badge-checkbox-all {
+    position: relative;
+}
+
+.badge-selected-items-before {
+    &:before {
+        position: absolute;
+        display: flex;
+        flex-flow: row wrap;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        left: -0.625em;
+        top: -0.5625em;
+        width: 1.8em;
+        height: 1.8em;
+        color: $tableBaseColor;
+        background: $tablebadgeBg none repeat scroll 0 0;
+        border-radius: 50%;
+        content: attr(data-badge);
+        font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        font-size: 0.75em;
+        font-weight: 600;
+    }
+}
+
+.card-content-title {
+    color: $tableContentColor;
+    cursor: default;
+    font-family: $notoRegular;
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.card-content-list-item {
+    padding: 0;
+    color: $tableCardColor;
+    font-family: $notoRegular;
+    font-size: 0.875em;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1.5em;
+}
+
+.datatable-line-selected td[disabled] {
+    opacity: 1;
+    filter: none;
+    background: $tableSelected;
+    box-shadow: 0 0.125em 0 $tableEditionBoxShadow;
+}
+
+.datatable-line-selected {
+    .datatable-cell-in-edition {
+        a {
+            img {
+                opacity: 0.5;
+                filter: grayscale(1);
+                box-shadow: 0 0 ;
+            }
+            svg {
+                opacity: 0.5;
+                filter: grayscale(1);
+                box-shadow: 0 0 ;
+            }
+        }
+    }
+}
+
+.arrow-sort-container {
+    &:hover,
+    &:focus {
+        color: $tableBaseColorDark;
+    }
+}
+
+.datatable-cell-custom-idMore {
+    white-space: inherit;
+}

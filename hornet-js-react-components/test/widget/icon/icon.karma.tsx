@@ -1,8 +1,12 @@
-import { Decorators } from "hornet-js-test/src/decorators";
+import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
+import { Decorators } from "hornet-js-test/src/decorators";
+
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
 import { Icon } from "src/widget/icon/icon";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
-import { BaseTest } from "hornet-js-test/src/base-test";
 import * as React from "react";
 import { ButtonInfoAccessibilite } from "src/widget/button/button-info-accessibilite";
 
@@ -37,7 +41,7 @@ class IconTest extends BaseTest {
         );
     }
 
-    @Decorators.it("Test OK")
+    @Decorators.it("Contrôle du DOM")
     testOk() {
         element = this.renderIntoDocument(iconElement, this.generateMainId());
         const buttonElements = document.getElementsByTagName("button");

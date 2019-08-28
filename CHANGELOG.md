@@ -1,25 +1,194 @@
+# hornet-js 5.4.1
+
+- 2cbc63e7 PROJ[ACC]: reprise color sur l'outline des messages
+- 26a1faaf PROJ[ACC] : gestion tabIndex sur la navigation des onglets
+- 5c7600f3 FIX[]: test si edition avant de lancer le clic
+- 3f5cdfbd PROJ[ACC]: grise svg des boutons action du tableau
+- 0ec48f83 PROJ[ACC] : ajout style hover lien dans footer
+- 0e71b8bc PROJ[]: Ajout nota bene sur les picto non focusable
+- 0ca9dd5e PROJ[ACC]: Affichage dropdown pager
+- 1d085c84 PROJ[ACC] : correction navigation et signialisation focus sur les boutons dans les notifications
+- 131c381d PROJ[ACC] : revue zindex
+- b7cd1080 PROJ[ACC] : sur disabled rend focus impossible sur le bouton upload
+- 79487b40 PROJ[ACC] : correction style badge
+- 98da8f50 FIX[] : Correction focus onglet et navigation clavier
+- d7ac38f9 ACC[]: Correction navigation clavier sur les svg
+- 08e231b4 PROJ[] : Ajout first et last dans le sprite
+- cb8cef76 PROJ[ACC] : ajout outline sur upload file
+- e99c77a7 PROJ[ACC] : correction focus reset
+- 4562a90b PROJ[ACC] : passage outline en box-shadow
+- 79ddb8c2 FIX[] : correction navigation clavier onglets
+- 844b3585 FIX[]: Correction style button croix des modales
+- 0586e3cb PROG [ACC] : ajout tabIndex -1 sur svg calendar
+- 0a2731fa PROJ[ACC] : uniformisation outline
+- c1f420a1 PROJ[ACC] : ajout tabIndex -1 sur svg dans a du reset
+- d1f80738 PROJ [] : Filtrage du hsts seulement sur les requêtes sécurisées
+- PROJ[] : passage en lodash (4.17.11) en dépendances modulaires
+- 9a5bf900 FIX[] : correction typage icon Dropdown
+- aec100c8 FIX[ACC] : force tabindex -1 pour svg dans Dropdown
+- 9cbfe053 FIX[] : correction suite minification (classe name : children.type.name) dans les MoreInfoColumn
+
+# hornet-js 5.4.0
+
+- 340143d8 PROJ[] : Update package.json
+- 6aef26e3 PROJ[] :Update hbw.sh
+- b440d11b FIX[] : on conserve les states issus des props dans le constructeur de NotificationContent afin de conserver les exceptions et erros envoyées depuis Notification
+- febeac94 FIX[]: Correction navigation clavier sur les tabs
+- 22798a55 FIX[] : compare de DefaultSort gère l'abscence de valeur et la remplace par une chaine vide
+- d803e85c PROJ[] : ajout heigth et width sur le bouton d'accessibilité
+- 39643b16 FIX[] : deplacement middleware expandedLayout
+- 56f412bd PROJ[]: Fix animation checkbox
+- da9fb7da PROJ[] : correction pour retailler l'image dans les colonnes
+- 45a66282 FIX[]: correction TU sur les actions-body-cell
+- 1e431b2e FIX[m73805]: Fix warning react sur le composant switch
+- 14ba28bd FIX[]: Prise en compte des changements des props defaultValue, datas et disabled lors du rendu
+- 7ae2d319 FIX[SUPPORT_ALLOR]: ajout props autofilter
+- 77f5bfd4 FIX[] : problème d'enchainement de middleware avec director
+- ebbf1700 FIX[]: bugs sur les tooltips
+- 71419866 FIX[] : probleme isolation config serveur
+- 376e473d PROJ[] : verification route public sur post
+- 4bae706e FIX[]: Correction regression sur le logger côté client
+- 83159fd0 FIX[task1301]: Correction du problème de lenteur sur les tableau
+- a04723c7 PROJ[] : passage node 10
+- 8f03499c EVOL[] : ajout d'un header fixe dans le composant table
+- e0bd777e PROJ[] : typage typescript / react
+- f6147252 PROJ[] : update sequelise / sqlite3
+- e16b598c FIX[task1293]: Correction de l'accès à une propriété d'un objet potentiellement null
+- 617f1aa1 FIX[SUPPORT_ALLOR]: autocomplete charge les choix avec "no data found" lorsqu'il est prérempli avec updateField
+- 8b9ef9ee EVOL[PREVOIR]: exposition de la props shouldRadioBeChecked du SwitchField
+- 2ada2d5e PROJ[] : update varsion typescript
+- 3a450c27 EVOL[] : ajout des boutons flottant sur longs formulaires
+- 1321fe60 PROJ[] : Update version et déplacement de log4js dans les dépendancies
+- 1fb4dbdd PROJ[] : changement des couleurs vers rgba
+- 076adc67 FIX[S413] : précision pour ignorer ERROR React dans CheckHeaderCell et CheckBodyCell sur l'assignation via this.state
+- 958079fc FIX[S413] : correction utils.config et <tr> hors <table>
+- b4ffb60f PROJ[] : integration des chips et autocomplete multiple
+- 4f4c3551 PROJ[] : déplacement devDep -> dep
+- 0de65c76 PROJ[] : passage des tabs en flex
+- 21452080 EVOL[S407]: gestion id des tests karma par generateMainId()
+- ec1b6e80 FIX[] : problème d'isolation du CLS
+- d08428d1 PROJ[] : typage du type sur les boutons
+- 4765d29d EVOL[] : refonte de la structuration des fichiers sass + preparation au theming avancé
+- 1c9c0dfe PROJ[] : Utilisation du nouveau builder
+- 31b20f39 PROJ[] : passage en 5.4.0
+- 61e342da PROJ[] : exclusion outils
+- b9588c9d EVOL[] : clean des svg et ajout de sprites
+- 37cfb6b9 EVOL[S447] : refacto du css en sass
+
+# hornet-js 5.3.0
+
+- f8169029 EVOL[s362] : AutoCompleteMultiField avec chips
+- b5950c4b EVOL[]: prise en compte du httpStatus (pour les API's)
+- 66c82ee4 FIX[s424] - Accessiblite : gestion focus
+- 132b75f5 EVOL[m73085] : méthode de tri sans accent et exposition de méthodes de tri réutilisables
+- 10fae808 DOC[t1187] : maj UPGRADING.md
+- 44c84c8e FIX[m71409] - AutoCompleteField : selection lors d'une tabulation sans tenir compte de la casse
+- 9c60e166 FIX[]: correction gestion focus accordion contenant erreur
+- 661ef0e7 EVOL[s249]: new switch
+- e15e1fcf EVOL[s305] - Textarea : rendre resizable lorsque l'extandable est à false
+- b5b85d7a Fix[m70914]: chars counter without alert
+- cea9ba20 EVOL[s305-task1161]: Check header cell ajout classname
+- e0a7a548 EVOL[m71844]:  stop load tab
+- dfd4cb4a EVOL[S196]: optimisation de chargement I18n et nettoyage timeout test unitaire
+- 65254ed6 EVOL[s441] - AutoCompleteField : Affichage des libellés des options tels qu'ils sont dans le dataSource
+- 3defad39 FIX[m72524]: textarea on change non appele
+- 4a3d7b62 FIX[s426]: Accessibilite navigation clavier
+- 9ec978ba EVOL[s305] - CheckBoxField : suppression classe appliquée deux fois
+- 7bc6a62c FIX[s392] - Dropdown : prise en compte de la props icon si présente
+- 67a97698 FIX[s305] - RadioField : Prise en compte de la props onChange et foctorisation
+- 51e15878 FIX[s425] - Accessiblite : suppression aria-haspopup
+- fd44dfe0 EVOL[305-task1156] -  AutoCompleteField: appel de la méthode onChange passée en props
+- 2b54a382 FIX[s305] - InputField : affichage du bouton reset lors de la modification inline
+- 59cad035 PROJ[S383]: update version carbone
+- ffe23d6f FIX[s437-M72523]:  action column correction update visible
+- c8fafa99 FIX[s392]:  Correction icon dropdown
+- 52b3093f PROJ[]: changement du niveau de log pour les timers non présents
+- 7823847f PROJ[]: optimisation des tests
+- 92af562f EVOL[S317] - optimisation du render des accordions en cas d'erreur de validation d'un formulaire
+- 61d41faa PROJ[] : correction des TU's
+- f7426acf EVOL[s305] -  Form : Ajout possibilité de faire un updateFields partielle et factorisation
+- b4f9f4ce EVOL[s405-M68238/68237]: cancellable promise
+- 508ac303 PROJ[] : ajout filtre test et index
+- 07eba229 EVOL[] : optimisation de chargement
+- 5536de93 FIX[s424] - accesssibilite : gestion focus
+- 19240288 FIX[s418] - Button : Accessibilité des boutons affichant et masquant une zone
+- 99404de2 FIX[S418]: TU accessibilité aria button
+- 48df0d75 FIX[s422] - accessibilite : upload file field
+- c35a0ced FIX[s430]: Bouton fermeture tabs inaccessible au clavier
+- 86075f7f FIX[s419]: Boutons contrôlant une zone masquée
+- 5041013a FIX[S401-1131]:  Ajout d'un TU vérifiant les années inférieures à 1000 pour le calendar
+- ec7631a3 FIX[]:  Support crrv autocomplete multi value 0
+- 1a08f131 FIX[s424] - accessiblite : gestion focus
+- 36f3d4b1 FIX[s416]: titre tableau changement visibilité
+- d4c43cb4 FIX[] - RadioField : problème lors de la selection de null sur le dataSource
+- a3ff2789 FIX[] - Support crrv : itemSelectedLabel non pris en compte
+- f876c8ef EVOL[]: Ajout classname et id dans les dropdown item du menu actions table
+- 0c0dd8eb MERGE[S295] : super agent
+- 2bc2985b Merge[S342] -  AutoComplete rendu sur maj des props
+- 30937532 FIX[s418]: Utilisation du modèle de conception ARIA "button"
+- 85425c9b EVOL[s396] - click molette : correction tests unitaires
+- 71325b42 EVOL[S398]: calendar - Autoriser la saisie d'une date sans les barres obliques
+- 318db809 FIX[s394]: correction problème de rerender sur les accordions
+- f81a5c54 FIX[s406]: clean handleinputkeypress calendarfield
+- b07cbb4b FIX[s398]: changement nom variable
+- 1ba85b64 MERGE[] : correction config db non trouvée en test global
+- a85e0b00 MERGE[]: Mutualisation des connexions à sqlite pour tests unitaires mocha
+- bc327ea0 EVOL[s396] - click molette : Ouverture d'un lien vers un autre onglet depuis une icône d'action
+- b9f22b7d MERGE[]: Correction des connexions à sqlite pour tests unitaires mocha
+- dd1c3ce9 FIX[]:  correction calendarfield dateFormat
+- 916b6a64 MERGE[]: lock optimistic
+- 7a9b184d PROJ[]:  ajout pour karma firefox headless
+- 1ebf8227 EVOL[]: feat_170_LockOptimistic ajout du typage pour la version
+- 3fb0d49d PROJ[]: Correction reporter sonar
+- c308e35e EVOL[s314] - ServerConfiguration : Ajout clé permettant d'initialiser le cls
+- 8725c0cf EVOL[m70434] - relecture : import avec des chemin absolus
+- 57fa6ec0 FIX[m0071925] -  Form : correction imgFilePath undefined sur un composant
+- 1b77e6ca EVOL [s378] -  EditionActionBodyCell : Retour focus sur bouton après edition en ligne tableau
+- b1f31f7a FIX[s338]: correction du decorateur logger
+- 57c17c7 FIX[T1049]: correction problème readonly sur l'uploadfilefield
+- e039b9cf FIX[S361] - AutoCompleteField : onSelect du datasource déclenché sans raison
+- 1fee7430 FIX[S385]: setFocus dans domAdapter + TU inputfield
+- 5f049679 EVOL[s379]: form clean notification et erreurs sur les champs au validate
+- 5bd659cd FIX[s395]: readonly et disabled du champs non pris en compte
+- c30c20fc EVOL[s388]: dateformats calendarfield
+- fb8a3024 EVOL[s375] - Autocomplete : Refacto gestion évènements
+- a1071eae EVOL[s370]: suppression _.clone et _.cloneDeep dans le pager
+- e6ad0a42 FIX[]: augmentation timeout pour prise en compte click
+- 25ec3489 EVOL[m70829]: Ajout custom component dans header
+- b6325843 FIX[]: augmentation timeout pour cloture modal dans test karma
+- beee4034 FIX[t1042]: ajout prise en compte de la props placeholder dans le calendarfield
+- 28ce4244 EVOL[S363-M70612]:  ajout du nombre total de page
+- 625cef5a FIX[BuildFailed]: contournement problème avec phantomJS
+- 52769617 FIX[JenkinsFile]: option sonarReporter manquante dans Test
+- 27c2c2b0 FIX[SUPPORT_42]: render textAreaField on required props change
+- 48354146 EVOL[s392]:  ajout possibilité de mettre un picto sur un dropdown
+- 67b84814 FIX[s384] - RadioField : ajout id sur le container
+- 576d001f FIX[s391] - DataBodyCell : prise en compte des dates au format string
+- 472d39ca FIX[]: postProcessRequest après utilisation du hook, sinon jamais accès à la requête d'origine
+
+
 # hornet-js 5.2.4
 
-- PROJ - hornet-js-react-components - Tabs et Accordion : performances et render intempestif liés à la gestion d'erreur sur accordions et tabs
-- FIX - hornet-js-react-components - Table: Ajout d'id sur le container du tableau
-- FIX - hornet-js-react-components - Form: désactivation TU form-props à cause de phantomJS et son accès aux attributs html obsolete
-- FIX [m71066] - hornet-js-react-components - CheckBoxField : prise en compte de l'action clic sur le label du switch
-- FIX - hornet-js-core - Correction message I18N
-- FIX [m70149] - hornet-js-react-components - Row : Fix gestion props className
-- FIX [s165] - hornet-js-utils : suppression  DateFileSyncAppender
-- PROJ [s382] - hornet-js-core : possibilité de mettre un nom de fichier aux PDF
-- FIX [m71360] - hornet-js-react-components - MessageItem: Gestion de l'erreur rémontée lorsque la méthode document.getElementsByName envoie un tableau vide
-- PROJ - hornet-js-react-components - correction des TU
-- PROJ - hornet-js-react-components - ActionButton :  Ajout id 
-- FIX [s378] - hornet-js-react-components - Table: suprression aria-describedby dans un champs de tableau éditable
-- FIX [s325] - hornet-js-react-components - RadioField: formatage de l'id en kebab case
-- FIX [s369] - hornet-js-react-components - Form : possibilité d'ajouter des props générique html - correction pour ne prendre que les props html
-- FIX [m69816] - hornet-js-react-components - ActionBodyCell : Calcul de l'url du lien de l'action colonne
-- FIX [s356] - hornet-js-react-components - AutoCompleteField: regression sur autocomplete multi avec value undefined
-- FIX [m70820] - hornet-js-core: probleme requete patch en minuscule
-- FIX [m70816]  - hornet-js-react-components - AutoCompleteField: Correction placeholder sur autocomplete multi 
-- FIX [m70834]: - hornet-js-core - hornet-superagent:  la modale empêche le téléchargement
-- FIX [m70802]: - hornet-js-react-components - Table: prise en compte du className sur le table
+- 2ada8b13 PROJ - hornet-js-react-components - Tabs et Accordion : performances et render intempestif liés à la gestion d'erreur sur accordions et tabs
+- 679f0316 FIX - hornet-js-react-components - Table: Ajout d'id sur le container du tableau
+- 1770165e FIX - hornet-js-react-components - Form: désactivation TU form-props à cause de phantomJS et son accès aux attributs html obsolete
+- 734251d7 FIX [m71066] - hornet-js-react-components - CheckBoxField : prise en compte de l'action clic sur le label du switch
+- 7a1a96cc FIX - hornet-js-core - Correction message I18N
+- 14a9266e FIX [m70149] - hornet-js-react-components - Row : Fix gestion props className
+- b317b4f0 FIX [s165] - hornet-js-utils : suppression  DateFileSyncAppender
+- 0bf2a714 PROJ [s382] - hornet-js-core : possibilité de mettre un nom de fichier aux PDF
+- d4200d62 FIX [m71360] - hornet-js-react-components - MessageItem: Gestion de l'erreur rémontée lorsque la méthode document.getElementsByName envoie un tableau vide
+- d9a87f70 PROJ - hornet-js-react-components - correction des TU
+- 7577bd8a PROJ - hornet-js-react-components - ActionButton :  Ajout id 
+- 2e5f2db9 FIX [s378] - hornet-js-react-components - Table: suprression aria-describedby dans un champs de tableau éditable
+- 3737d875 FIX [s325] - hornet-js-react-components - RadioField: formatage de l'id en kebab case
+- 13169cec FIX [s369] - hornet-js-react-components - Form : possibilité d'ajouter des props générique html - correction pour ne prendre que les props html
+- b965d8a6 FIX [m69816] - hornet-js-react-components - ActionBodyCell : Calcul de l'url du lien de l'action colonne
+- 4fd5e780 FIX [s356] - hornet-js-react-components - AutoCompleteField: regression sur autocomplete multi avec value undefined
+- 53fa4eb0 FIX [m70820] - hornet-js-core: probleme requete patch en minuscule
+- a95af28a FIX [m70816]  - hornet-js-react-components - AutoCompleteField: Correction placeholder sur autocomplete multi 
+- 772aa50e FIX [m70834]: - hornet-js-core - hornet-superagent:  la modale empêche le téléchargement
+- fd05382e FIX [m70802]: - hornet-js-react-components - Table: prise en compte du className sur le table
 
 # hornet-js 5.2.3
 

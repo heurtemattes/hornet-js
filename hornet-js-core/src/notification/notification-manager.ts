@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import {
     ADD_NOTIFICATION_EVENT,
     CLEAN_NOTIFICATION_EVENT,
     CLEAN_ALL_NOTIFICATION_EVENT,
-} from "hornet-js-core/src/notification/notification-events"
+} from "src/notification/notification-events"
 import { fireHornetEvent } from "src/event/hornet-event";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 
@@ -107,9 +107,11 @@ export class NotificationManager {
      * @param infos informations éventuelles détail des informations éventuelles
      * @param exceptions exceptions détail des exceptions éventuelles
      * @param warnings détail des warnings éventuelles
+     * @param personnals messages personnalisés
+     * @param cb callback
      */
-    static notify(id: string, idComponent: string, errors: any, infos?: any, exceptions?: BaseError[], warnings?: any, personnals?: any) {
-        fireHornetEvent(ADD_NOTIFICATION_EVENT.withData({ id, idComponent, errors, infos, exceptions, warnings, personnals }));
+    static notify(id: string, idComponent: string, errors: any, infos?: any, exceptions?: BaseError[], warnings?: any, personnals?: any, cb?: Function) {
+        fireHornetEvent(ADD_NOTIFICATION_EVENT.withData({ id, idComponent, errors, infos, exceptions, warnings, personnals, cb }));
     }
 }
 
@@ -117,12 +119,14 @@ export class Notifications implements INotifications {
 
     color: string;
     logo: string;
+    isAlert?: boolean;
     notifications: Array<INotificationType>;
     canRenderRealComponent: boolean;
 
-    constructor(color?: string, logo?: string) {
+    constructor(color?: string, logo?: string, isAlert?: boolean) {
         this.notifications = new Array<INotificationType>();
         this.canRenderRealComponent = false;
+        this.isAlert = (isAlert) ? isAlert : false;
         this.color = (color) ? color : "black";
         this.logo = (logo) ? logo : "";
     }
@@ -152,14 +156,15 @@ export class Notifications implements INotifications {
      * @param id identifiant de la notification à créer
      * @param text message de la notification
      */
-    static makeSingleNotification(id: string, text: string): Notifications {
+    static makeSingleNotification(id: string, text: string, alert?:boolean): Notifications {
         const notif: NotificationType = new NotificationType();
         notif.id = id;
         notif.text = text;
-
+        alert ? notif.isAlert = alert : notif.isAlert = false;       
+        
         const notifs: Notifications = new Notifications();
         notifs.addNotification(notif);
-
+        
         return notifs;
     }
 }
@@ -169,6 +174,7 @@ export class NotificationType implements INotificationType {
     text: string;
     anchor: string;
     field: string;
+    isAlert?: boolean;
     canRenderRealComponent: boolean;
     additionalInfos: any;
 
@@ -190,6 +196,7 @@ export interface INotificationType {
     text: string;
     anchor: string;
     field: string;
+    isAlert?: boolean;
     canRenderRealComponent: boolean;
     additionalInfos: AdditionalInfos;
 }

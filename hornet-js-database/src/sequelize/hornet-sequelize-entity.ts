@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,10 +81,9 @@
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
 import * as Sequelize from "sequelize";
 import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
-const logger: Logger = Utils.getLogger("hornet-js-database.src.sequelize.hornet-sequelize-entity");
+const logger: Logger = Logger.getLogger("hornet-js-database.src.sequelize.hornet-sequelize-entity");
 
 /**
  * @deprecated Utiliser HornetDbConnector<T extends HornetSequelizeModel>

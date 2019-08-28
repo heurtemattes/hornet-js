@@ -73,13 +73,11 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { TestUtils } from "hornet-js-test/src/test-utils";
-//import { calendarLocale } from "test/locale/fr-fr";
 const calendarLocale = {
     title: "Calendrier",
     choiceDate: "Choisir une date",
@@ -104,12 +102,11 @@ import * as _ from "lodash";
 const shortFormatLocale = _.cloneDeep(calendarLocale);
 shortFormatLocale.dateFormat = "DD/MM";
 
-import chai = require("chai");
-import { DateUtils } from "src/date-utils";
-import Moment = moment.Moment;
-import * as moment from "moment";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
 
-const expect = chai.expect;
+import { DateUtils } from "src/date-utils";
+const moment = require("moment");
 
 describe("DateUtils", () => {
     it("should parse date", () => {

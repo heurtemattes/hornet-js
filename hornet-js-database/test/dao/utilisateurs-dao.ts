@@ -73,13 +73,11 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { EntityDAO } from "test/dao/entity-dao";
 import Map from "hornet-js-bean/src/decorators/Map";
 import { UtilisateurMetier } from "test/models/user-mod";
 import { HornetGenericDAO } from "src/sequelize/hornet-generic-dao";
@@ -87,8 +85,8 @@ import { HornetSequelizeInstanceModel } from "src/sequelize/hornet-sequelize-att
 import { ModelDAO } from "test/dao/model-dao";
 import { UtilisateurAttributes } from "test/models/seq-user-mod";
 import { inject } from "hornet-js-core/src/inject/inject";
-import { Injector } from "hornet-js-core/src/inject/injector";
 import { injectable } from "hornet-js-core/src/inject/injectable";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 @injectable()
 export class UtilisateursDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeInstanceModel<UtilisateurAttributes>> {
@@ -99,38 +97,38 @@ export class UtilisateursDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeI
 
     @Map(UtilisateurMetier)
     findOne(data): Promise<UtilisateurMetier> {
-        return this.modelDAO.utilisateurEntity.findOne(data);
+        return this.entity.findOne(data);
     }
 
     @Map(UtilisateurMetier)
     listerUtilisateurs(): Promise<Array<UtilisateurMetier>> {
-        return this.modelDAO.utilisateurEntity.findAll();
+        return this.entity.findAll();
     }
 
     updateById(id: number, data) {
-        return this.modelDAO.utilisateurEntity.update(data, { where: { id }, individualHooks: true });
+        return this.entity.update(data, {where: {id}, individualHooks: true});
     }
 
-    insert(data) {
+    insert(data): Promise<HornetSequelizeInstanceModel<UtilisateurAttributes>> {
         return this.insertGeneric(data);
     }
 
     deleteById(id: number | Array<number>) {
-        return this.modelDAO.utilisateurEntity.destroy({ where: { id } });
+        return this.entity.destroy({where: {id}});
     }
 
     @Map(UtilisateurMetier)
     getRole(data): Promise<UtilisateurMetier> {
-        return this.modelDAO.utilisateurEntity.findOne({
-            where: {
-                login: data.login,
-                password: data.password
-            },
-            include: [{
-                model: this.modelDAO.roleEntity,
-                as: "listeRole"
-            }]
-        }
+        return this.entity.findOne({
+                where: {
+                    login: data.login,
+                    password: data.password
+                },
+                include: [{
+                    model: this.modelDAO.roleEntity,
+                    as: "listeRole"
+                }]
+            }
         );
     }
 

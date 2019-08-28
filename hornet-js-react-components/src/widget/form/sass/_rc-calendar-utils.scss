@@ -1,0 +1,331 @@
+@import '../../sass/core';
+
+$calendarThirdColor: rgba(235, 250, 255, 1); //#ebfaff
+$calendarFifthColor: rgba(204, 204, 204, 1); //#ccc
+$calendarSixthColor: rgba(233, 233, 233, 1); //#e9e9e9
+$rcCalendarTimeBorder: rgba(217, 217, 217, 1); //#d9d9d9
+$rcCalendarSwitcherHover: rgba(45, 183, 245, 0.8);
+$rcCalendarFullScreenBorder: rgba(238, 238, 238, 1); //#eee
+$rcCalendarRange: rgba(235, 244, 248, 1); //#ebf4f8
+
+.rc-calendar-range {
+    width: 500.125em;
+    overflow: hidden;
+
+    .rc-calendar-date-panel {
+        &:after {
+            content: ".";
+            display: block;
+            clear: both;
+            visibility: hidden;
+            height: 0;
+        }
+    }
+    
+    .rc-calendar-input-wrap {
+        height: 30.3125em;
+    }
+    
+    .rc-calendar-input,
+    .rc-time-picker-input {
+        padding: 0.0625em 0.4375em;
+        height: 20.125em;
+    }
+    
+    .rc-calendar-body,
+    .rc-calendar-decade-panel-body,
+    .rc-calendar-year-panel-body,
+    .rc-calendar-month-panel-body {
+        border-bottom: 0.0625em solid $calendarSixthColor;
+    }
+    
+    .rc-calendar-week-number {
+        width: 570.25em;
+
+        .rc-calendar-range-part {
+            width: 280.375em;
+        }
+    }
+    
+    .rc-calendar-week-number {
+        .rc-calendar-range-part {
+            .rc-calendar-time-picker {
+                top: 60.5625em;
+            }
+
+            .rc-calendar-time-picker-panel-select {
+                width: 80.5625em;
+            }
+
+            .rc-calendar-range-right {
+                .rc-calendar-time-picker-panel {
+                    left: 2.25em;
+                }
+            }
+        }
+    }
+    
+    .rc-calendar-year-panel,
+    .rc-calendar-month-panel {
+        top: 30.3125em;
+    }
+    
+    .rc-calendar-decade-panel-table,
+    .rc-calendar-year-panel-table,
+    .rc-calendar-month-panel-table {
+        height: 12.375em;
+    }
+    
+    .rc-calendar-in-range-cell {
+        background: $rcCalendarRange;
+        border-radius: 0;
+    }
+    
+    .rc-calendar-range-bottom {
+        text-align: right;
+    }
+    
+    .rc-calendar-footer {
+        border-top: none;
+        padding: 0;
+    }
+    
+    .rc-calendar-footer-btn {
+        padding: 0.625em 0.75em 0.625em 0;
+    }
+    
+    .rc-calendar-ok-btn {
+        position: static;
+    }
+    
+    .rc-calendar-today-btn {
+        float: left;
+    }
+}
+
+.rc-calendar-range-part {
+    width: 15.625em;
+    position: relative;
+
+    .rc-calendar-time-picker {
+        top: 60.5625em;
+    }
+
+    .rc-calendar-time-picker-panel-select {
+        width: 4.8125em;
+    }
+}
+
+.rc-calendar-range-left {
+    float: left;
+
+    .rc-calendar-time-picker-panel-select {
+        &:last-child {
+            border-right: 0.0625em solid $calendarSixthColor;
+        }
+    }
+}
+
+.rc-calendar-range-right {
+    float: right;
+    
+    .rc-calendar-time-picker-panel {
+        left: 20.0625em;
+    }
+
+    .rc-calendar-time-picker-panel-select {
+        &:first-child {
+            border-left: 0.0625em solid $calendarSixthColor;
+        }
+    }
+}
+
+.rc-calendar-range-middle {
+    position: absolute;
+    height: 30.3125em;
+    margin-left: -0.625em;
+    text-align: center;
+    line-height: 30.3125em;
+}
+
+.rc-calendar-full {
+    width: 270.3125em;
+}
+
+.rc-calendar-full-header {
+    padding: 0.3125em 0.625em;
+    text-align: center;
+    user-select: none;
+    border-bottom: 0.0625em solid $calendarFifthColor;
+    overflow: hidden;
+}
+
+.rc-calendar-full-header-month-select,
+.rc-calendar-full-header-year-select {
+    float: right;
+    width: 4.375em;
+    margin-right: 0.3125em;
+}
+
+.rc-calendar-full-header-switcher {
+    display: inline-block;
+}
+
+.rc-calendar-full-header-switcher-normal {
+    &:hover {
+        border-color: $calendarPrimaryColor;
+        box-shadow: 0 0 0.125em $rcCalendarSwitcherHover;
+        cursor: pointer;
+    }
+}
+
+.rc-calendar-full-header-switcher-focus {
+    border-color: $calendarPrimaryColor;
+    background-color: $calendarPrimaryColor;
+    color: $calendarBaseColor;
+}
+
+.rc-calendar-full-header-switcher {
+    span {
+        float: left;
+        padding: 0 0.625em;
+        height: 1.75em;
+        line-height: 20.25em;
+        color: $calendarSecondaryColor;
+        border: 0.0625em solid $rcCalendarTimeBorder;
+
+        &:first-child {
+            border-top-left-radius: 0.25em;
+            border-bottom-left-radius: 0.25em;
+            border-right: none;
+        }
+
+        &:last-child {
+            border-top-right-radius: 0.25em;
+            border-bottom-right-radius: 0.25em;
+            border-left: none;
+        }
+    }
+}
+
+.rc-calendar-fullscreen {
+    width: auto;
+
+    .rc-calendar-full-header {
+        border-bottom: none;
+    }
+
+    .rc-calendar-column-header {
+        text-align: right;
+        padding-right: 0.75em;
+    }
+
+    .rc-calendar-cell {
+        padding: 0;
+    }
+}
+
+.rc-calendar-fullscreen .rc-calendar-cell .rc-calendar-date,
+.rc-calendar-fullscreen .rc-calendar-month-panel-cell .rc-calendar-month-panel-month {
+    display: block;
+    margin: 0 0.25em;
+    padding-right: 0.5em;
+    height: 11em;
+    width: auto;
+    border-radius: 0;
+    border: none;
+    border-top: 0.125em solid $rcCalendarFullScreenBorder;
+    text-align: right;
+}
+
+.rc-calendar-fullscreen .rc-calendar-selected-day .rc-calendar-date,
+.rc-calendar-fullscreen .rc-calendar-month-panel-selected-cell .rc-calendar-month-panel-month {
+    background-color: $calendarThirdColor;
+    color: $calendarSecondaryColor;
+}
+
+.rc-calendar-fullscreen .rc-calendar-today .rc-calendar-date,
+.rc-calendar-fullscreen .rc-calendar-month-panel-selected-cell .rc-calendar-month-panel-month {
+    border-top-color: $calendarPrimaryColor;
+    color: $calendarPrimaryColor;
+}
+
+.rc-calendar-picker-slide-up-enter.rc-calendar-picker-slide-up-enter-active.rc-calendar-picker-placement-bottomLeft,
+.rc-calendar-picker-slide-up-enter.rc-calendar-picker-slide-up-enter-active.rc-calendar-picker-placement-bottomRight,
+.rc-calendar-picker-slide-up-appear.rc-calendar-picker-slide-up-appear-active.rc-calendar-picker-placement-bottomLeft,
+.rc-calendar-picker-slide-up-appear.rc-calendar-picker-slide-up-appear-active.rc-calendar-picker-placement-bottomRight {
+    animation-name: rcDropdownSlideUpIn;
+    animation-play-state: running;
+}
+
+.rc-calendar-picker-slide-up-enter.rc-calendar-picker-slide-up-enter-active.rc-calendar-picker-placement-topLeft,
+.rc-calendar-picker-slide-up-enter.rc-calendar-picker-slide-up-enter-active.rc-calendar-picker-placement-topRight,
+.rc-calendar-picker-slide-up-appear.rc-calendar-picker-slide-up-appear-active.rc-calendar-picker-placement-topLeft,
+.rc-calendar-picker-slide-up-appear.rc-calendar-picker-slide-up-appear-active.rc-caloutline {
+    animation-name: rcDropdownSlideDownIn;
+    animation-play-state: running;
+}
+
+.rc-calendar-picker-slide-up-leave.rc-calendar-picker-slide-up-leave-active.rc-calendar-picker-placement-bottomLeft,
+.rc-calendar-picker-slide-up-leave.rc-calendar-picker-slide-up-leave-active.rc-calendar-picker-placement-bottomRight {
+    animation-name: rcDropdownSlideUpOut;
+    animation-play-state: running;
+}
+
+.rc-calendar-picker-slide-up-leave.rc-calendar-picker-slide-up-leave-active.rc-calendar-picker-placement-topLeft,
+.rc-calendar-picker-slide-up-leave.rc-calendar-picker-slide-up-leave-active.rc-calendar-picker-placement-topRight {
+    animation-name: rcDropdownSlideDownOut;
+    animation-play-state: running;
+}
+
+@keyframes rcDropdownSlideUpIn {
+    0% {
+        opacity: 0;
+        transform-origin: 0% 0%;
+        transform: scaleY(0);
+    }
+    100% {
+        opacity: 1;
+        transform-origin: 0% 0%;
+        transform: scaleY(1);
+    }
+}
+
+@keyframes rcDropdownSlideUpOut {
+    0% {
+        opacity: 1;
+        transform-origin: 0% 0%;
+        transform: scaleY(1);
+    }
+    100% {
+        opacity: 0;
+        transform-origin: 0% 0%;
+        transform: scaleY(0);
+    }
+}
+
+@keyframes rcDropdownSlideDownIn {
+    0% {
+        opacity: 0;
+        transform-origin: 100% 100%;
+        transform: scaleY(0);
+    }
+    100% {
+        opacity: 1;
+        transform-origin: 100% 100%;
+        transform: scaleY(1);
+    }
+}
+
+@keyframes rcDropdownSlideDownOut {
+    0% {
+        opacity: 1;
+        transform-origin: 100% 100%;
+        transform: scaleY(1);
+    }
+    100% {
+        opacity: 0;
+        transform-origin: 100% 100%;
+        transform: scaleY(0);
+    }
+}

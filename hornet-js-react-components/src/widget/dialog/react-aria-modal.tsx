@@ -73,24 +73,27 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponent } from "src/widget/component/hornet-component";
 
 import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
+import findIndex = require("lodash.findindex");
+import remove = require("lodash.remove");
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { Logger } from "hornet-js-logger/src/logger";
+
+import "src/widget/dialog/sass/_modal.scss";
 
 const Draggable = require("react-draggable");
 const tabbable = require("tabbable");
 const noScroll = require("no-scroll");
 
-const logger = Utils.getLogger("hornet-js-react-components.widget.dialog.react-aria-modal");
+const logger = Logger.getLogger("hornet-js-react-components.widget.dialog.react-aria-modal");
 
 class ModalManager {
     static modals: Array<any> = [];
@@ -149,7 +152,7 @@ class ModalManager {
     static unregister(modal) {
         if (ModalManager.modals.length === 1) ModalManager.leave();
 
-        let oModal = _.remove(ModalManager.modals, (obj) => {
+        let oModal = remove(ModalManager.modals, (obj) => {
             return obj.modal === modal;
         });
         if (ModalManager.modals.length > 0) {
@@ -157,7 +160,7 @@ class ModalManager {
             ModalManager.modals.forEach((mObj) => {
                 maxIdx = Math.max(maxIdx, mObj.idx);
             });
-            let modalPos = _.findIndex(ModalManager.modals, (mObj) => {
+            let modalPos = findIndex(ModalManager.modals, (mObj) => {
                 return mObj.idx === maxIdx;
             });
             ModalManager.active = ModalManager.modals[ modalPos ];
@@ -217,7 +220,7 @@ class ModalManager {
 
 class ReactAriaModalUnderlay extends HornetComponent<any, any> {
     render() {
-        let style: __React.CSSProperties = {
+        let style: React.CSSProperties = {
             position: "fixed",
             top: 0,
             left: 0,
@@ -262,7 +265,7 @@ class ReactAriaModalDialog extends HornetComponent<any, any> {
 
         const transformValue = (this.state.verticallyCenter) ? "translate(-50%, -50%)" : "translateX(-50%)";
         const topValue = (this.state.verticallyCenter) ? "50%" : "0";
-        const style: __React.CSSProperties = {
+        const style: React.CSSProperties = {
             position: "absolute",
             left: this.state.isDraggable ? "40%" : "50%",
             top: this.state.isDraggable ? "35%" : topValue,

@@ -73,22 +73,23 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 "use strict";
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
-import { Form } from "hornet-js-react-components/src/widget/form/form";
-import * as schema from "hornet-js-react-components/test/widget/form/form-validate.submit.json";
+import { Form } from "src/widget/form/form";
+const schema = require ("test/widget/form/form-validate.submit.json");
 import { InputField } from "src/widget/form/input-field";
 import { CalendarField } from "src/widget/form/calendar-field";
 import { Row } from "src/widget/form/row";
@@ -96,7 +97,7 @@ import { ButtonsArea } from "src/widget/form/buttons-area";
 import { Button } from "src/widget/button/button";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 import { Utils } from "hornet-js-utils";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 
 let element: JSX.Element;
 const dataSet = { nom: "Secteur9", desc: "Secteur 9", date: new Date("2015-03-25") };

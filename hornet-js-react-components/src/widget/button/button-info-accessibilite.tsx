@@ -73,21 +73,23 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { Icon } from "src/widget/icon/icon";
 import { Modal } from "src/widget/dialog/modal";
+import { SvgSprites } from '../icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.button.button-info-accessibilite");
+import "src/widget/button/sass/_buttons.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.button.button-info-accessibilite");
 
 /**
  * Propriétés du bouton et de sa modale d'information
@@ -98,7 +100,13 @@ export interface ButtonInfoAccessibiliteProps extends HornetComponentProps {
     /** Descriptions de raccourcis clavier */
     shortcutDescriptions?: ShortcutDescription[];
     /** Source de l'image associé */
-    srcImg?: string;
+    srcImg?: any;
+    /** color hexa de l'image par défaut */
+    color?:string;
+    /** height de l'image par défaut */
+    height?:string;
+    /** width de l'image par défaut */
+    width?:string;
 }
 
 /**
@@ -126,6 +134,9 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
     static defaultProps = {
         message: "",
         shortcutDescriptions: [],
+        color: "#027caf",
+        height: "1em",
+        width:"1em",
     };
 
     /**
@@ -134,6 +145,19 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
     render(): JSX.Element {
         logger.debug("ButtonInfoAccessibilite render");
 
+        let img;
+        if (this.props.srcImg) {
+            if (typeof this.props.srcImg === "string") {
+                img = <img
+                    src={this.props.srcImg}
+                    alt={this.state.message.shortcuts ? this.state.message.shortcuts.iconTitle : this.shortcutsI18n.iconTitle} />;
+            } else {
+                img = this.props.srcImg;
+            }
+        } else {
+            img = <SvgSprites height={this.props.height} width={this.props.width} icon="info" color={this.props.color} tabIndex={ -1 } ariaLabel={this.state.message.shortcuts ? this.state.message.shortcuts.iconTitle : this.shortcutsI18n.iconTitle}/>;
+        }
+
         return (
             <div className="button-info-accessibilite">
                 <Icon
@@ -141,9 +165,8 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
                     alt={this.state.message.shortcuts ? this.state.message.shortcuts.iconTitle : this.shortcutsI18n.iconTitle}
                     action={this.handleShowInfoModal}
                     url={"#"}
-                    src={this.props.srcImg || ButtonInfoAccessibilite.genUrlTheme() + "/img/button/icon_info.svg"}
+                    src={ img }
                     classLink="button-info-accessibilite-button button-action"
-                    hasPopUp={true}
                     ref={(icon) => { this.htmlIcon = icon; }}
                 />
                 {this.renderModal()}
@@ -209,6 +232,5 @@ export class ButtonInfoAccessibilite<P extends ButtonInfoAccessibiliteProps> ext
                 el.focus();
             }
         });
-
     }
 }

@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,49 +89,42 @@ export class TableButtonInfoAccessibilite extends ButtonInfoAccessibilite<Button
         message: TableButtonInfoAccessibilite.getI18n("table"),
         shortcutDescriptions: [
             {
-                shortcuts: [ "←", "↑", "→", "↓" ],
+                shortcuts: ["←", "↑", "→", "↓"],
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.navigation"),
                 or: true,
             },
             {
-                shortcuts: [ "⇞" ],
+                shortcuts: ["⇞"],
                 and: true,
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.firstLine"),
             },
 
             {
-                shortcuts: [ "⇟" ],
+                shortcuts: ["⇟"],
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.lastLine"),
                 or: true,
             },
             {
-                shortcuts: [ "↖" ],
+                shortcuts: ["↖"],
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.lineBeginning"),
             },
             {
-                shortcuts: [ "Fin" ],
+                shortcuts: ["Fin"],
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.lineEnd"),
             },
             {
-                shortcuts: [ "Ctrl", "A" ],
+                shortcuts: ["Ctrl", "A"],
                 and: true,
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.selectAll"),
             },
             {
-                shortcuts: [ "Shift", "Space" ],
+                shortcuts: ["Shift", "Space"],
                 and: true,
                 description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.selectCurrentLine"),
             },
-            {
-                shortcuts: [ "Enter", "F2" ],
-                or: true,
-                description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.toggleMode"),
-            },
-            {
-                shortcuts: [ "Echap" ],
-                and: true,
-                description: TableButtonInfoAccessibilite.getI18n("table.shortcuts.escape"),
-            },
         ],
+        color: "#ffffff",
+        height: "1.7em",
+        width: "1.7em",
     };
 }

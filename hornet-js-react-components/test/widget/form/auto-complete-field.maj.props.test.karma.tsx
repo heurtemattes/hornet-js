@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,14 +82,9 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as React from "react";
-import { SortDirection } from "hornet-js-core/src/component/sort-data";
 
 import { HornetTestAssert } from 'hornet-js-test/src/hornet-test-assert';
-import { HornetComponent } from 'src/widget/component/hornet-component';
-import { DataSource } from 'hornet-js-core/src/component/datasource/datasource';
-import { HornetComponentProps } from 'hornet-js-components/src/component/ihornet-component';
-import { AutoCompleteField } from 'src/widget/form/auto-complete-field';
-import { DefaultSort } from 'hornet-js-core/src/component/datasource/options/datasource-option';
+import { AutoCompleteFieldTestImplementation } from "test/widget/form/auto-complete-field/auto-complete-field-implementation";
 
 let element: JSX.Element;
 
@@ -131,65 +126,5 @@ class AutoCompleteFieldMajPropsTest extends BaseTest {
 
 }
 
-
-interface AutoCompleteFieldTestImplementationProps extends HornetComponentProps {
-    inactif: boolean;
-    consult: boolean;
-}
-
-class AutoCompleteFieldTestImplementation extends HornetComponent<AutoCompleteFieldTestImplementationProps, any> {
-    
-    listeCivilites: { id: number; libelle: string; }[];
-    dataSourceCivilite: DataSource<any>;
-
-    constructor(props) {
-        super(props);
-        this.state = { inactif: true, consult: true }
-        this.changeUo = this.changeUo.bind(this);
-        this.changeConsult = this.changeConsult.bind(this);
-
-        this.listeCivilites = [
-            { id: 1, libelle: "Madame" },
-            { id: 2, libelle: "Monsieur" },
-            { id: 3, libelle: "Mademoiselle" }
-        ];
-
-        this.dataSourceCivilite = new DataSource<any>(this.listeCivilites, { value: "id", text: "libelle" }, [ new DefaultSort([ { key: "text", dir: SortDirection.ASC } ]) ]);
-    }
-
-    changeUo() {
-        const inactif = this.state.inactif ? false : true;
-        this.setState({ inactif: inactif, consult: this.state.consult })
-    }
-
-    changeConsult() {
-        const consult = this.state.consult ? false : true;
-        this.setState({ inactif: this.state.inactif, consult: consult })
-    }
-
-    render() {
-        const isConsult = this.state.consult;
-        return (
-            <React.Fragment>
-                <button id="ChangeUo" name="ChangeUo" onClick={ this.changeUo }>Activer/Désactiver champ</button>
-                <div>{ "Champ inactif: " + this.state.inactif }</div>
-                
-
-                <button id="ChangeConsult" name="ChangeConsult" onClick={ this.changeConsult }>Activer/Désactiver consultation</button>
-                <div>{ "Mode consultation: " + isConsult }</div>
-                
-
-                <AutoCompleteField
-                    dataSource={ this.dataSourceCivilite }
-                    name="Civilité"
-                    label={ isConsult ? "Consulter Civilité" : "Modifier Civilité" }
-                    placeholder={ isConsult ? "" : "Placeholder" }
-                    disabled={ this.state.inactif }
-                    required={ !isConsult } />
-            
-            </React.Fragment>
-        );
-    }
-}
 // lancement des Tests
 runTest(new AutoCompleteFieldMajPropsTest());

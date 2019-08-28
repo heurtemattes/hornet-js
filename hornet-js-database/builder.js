@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,11 +83,6 @@ module.exports = {
 
 
     gulpTasks: function (gulp, project, conf, helper) {
-        var path = require("path");
-
-        // chemin vers le fichier "definition.d.ts" généré
-        conf.generatedTypings.dir = path.join("..", project.name + "-dts");
-        conf.generatedTypings.file = project.name + ".d.ts";
     },
     config: {
         autoGenerateIndex: true

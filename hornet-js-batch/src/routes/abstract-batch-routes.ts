@@ -73,14 +73,13 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { BatchUnit } from "src/core/batch-unit";
-import Options = ajv.Options;
 import { RouteActionService, RouteAttributes } from "hornet-js-core/src/routes/abstract-routes";
 import { IService } from "hornet-js-core/src/services/service-api";
 

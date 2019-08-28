@@ -73,14 +73,20 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import merge = require ("lodash.merge");
 import * as util from "util";
 
+declare global {
+
+    interface Error {
+        toLog?: Function;
+    }
+}
 export class BaseError {
     /**
      * Timestamp (en ms depuis Epoch) correspondant à la date de création de l'erreur. L'utilisation d'un timestamp
@@ -98,19 +104,37 @@ export class BaseError {
     public stack: any;
     public backend: boolean = false;
 
-    constructor(code: string = "", message: string = "", args: { [ key: string ]: any } = {}, cause?: Error) {
+    constructor(code: string = "", message: string = "", args: { [ key: string ]: any } = {}, cause?: Error ) {
         Error.call(this);
 
         this.date = new Date().getTime();
         this.code = code;
         this.message = message;
-        this.args = _.merge(args || {}, {});
+        this.args = merge(args || {}, {});
         (<any>Error).captureStackTrace(this, this.constructor);
         this.err_cause = cause;
     }
 
     cause() {
         return this.err_cause;
+    }
+
+    toLog() {
+        const errStr = this.toString();
+    
+        let infoSupp;
+        try {
+            infoSupp = JSON.stringify(this);
+        }
+        catch (err) {
+            infoSupp = "<stringifyErr>";
+        }
+
+        let stacks = this.stack;
+        if (this.cause() && this.cause()["toLog"]) {
+            stacks = stacks + "\nCaused by:\n" + this.cause().toLog();
+        }
+        return errStr + "\nInformations supplémentaires :\n" + infoSupp + "\n" + stacks;
     }
 }
 
@@ -129,3 +153,15 @@ BaseError.prototype.toString = function () {
     }
     return str;
 };
+
+if(!(Error as any).prototype.toLog) {
+    (Error as any).prototype.toLog = function () {
+        let errString;
+        try {
+            errString = JSON.stringify(this);
+        } catch (err) {
+            errString = "<stringifyErr>";
+        }
+        return (this.stack || (this.toString && this.toString()) || this) + "\n Informations supplémentaires :\n" + errString;
+    }
+}

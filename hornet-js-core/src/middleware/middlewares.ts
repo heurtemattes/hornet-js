@@ -73,19 +73,23 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as path from "path";
 
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { ServerConfiguration } from "src/server-conf";
-import ErrorObject = ajv.ErrorObject;
 import { Timer } from "src/timers/timer";
+import { Promise } from "hornet-js-utils/src/promise-api";
+import isUndefined = require("lodash.isundefined");
+import some = require("lodash.some");
+import cloneDeep = require("lodash.clonedeep");
+import merge = require("lodash.merge");
 
 const isEnvProduction: boolean = (process.env["NODE_ENV"] === "production");
 
@@ -204,6 +208,8 @@ import { RouteType } from "src/routes/abstract-routes";
 export class HornetContextInitializerMiddleware extends AbstractHornetMiddleware {
     constructor() {
         const callbacksStorage = Utils.getContinuationStorage();
+        const appConfig = AbstractHornetMiddleware.APP_CONFIG;
+
         const dataPathPrefix = Utils.buildContextPath(
             Utils.config.getOrDefault("fullSpa.name", AbstractHornetMiddleware.APP_CONFIG.routesDataContext));
         super((req, res, next) => {
@@ -221,6 +227,13 @@ export class HornetContextInitializerMiddleware extends AbstractHornetMiddleware
                 const relativePathname = currentUrl.replace(Utils.getContextPath(), "");
                 callbacksStorage.set("hornet.routePath", relativePathname);
                 callbacksStorage.set("hornet.currentUrl", currentUrl);
+
+                if (appConfig.initCls) {
+                    const initCls = appConfig.initCls.evaluateInitCls();
+                    if (initCls) {
+                        callbacksStorage.set("hornet.initCls", initCls);
+                    }
+                }
                 next();
             });
         });
@@ -251,10 +264,12 @@ export class LoggerTIDMiddleware extends AbstractHornetMiddleware {
 
     constructor() {
         super((req, res, next) => {
-            Utils.setCls("hornet.tid", uuid.v4().substr(0, 8));
-            Timer.startTimer(Timer.TIMER_REQUEST);
-            Timer.startTimer(Timer.TIMER_SERVER_HTTP);
-            next();
+            Utils.getContinuationStorage().bind((req, res, next) => {
+                Utils.setCls("hornet.tid", uuid.v4().substr(0, 8));
+                Timer.startTimer(Timer.TIMER_REQUEST);
+                Timer.startTimer(Timer.TIMER_SERVER_HTTP);
+                next();
+            })(req, res, next);
         });
     }
 
@@ -264,7 +279,7 @@ export class LoggerTIDMiddleware extends AbstractHornetMiddleware {
 //                                      LoggerUserMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class LoggerUserMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.LoggerUserMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.LoggerUserMiddleware");
 
     constructor() {
         super((req, res, next) => {
@@ -280,7 +295,7 @@ export class LoggerUserMiddleware extends AbstractHornetMiddleware {
 const parseUrl = require("parseurl");
 
 export class WelcomePageRedirectMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.WelcomePageRedirectMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.WelcomePageRedirectMiddleware");
 
     constructor() {
         const contextPath = Utils.buildContextPath("/").replace(/(^.*)([^\/]+)\/+$/g, "$1$2");
@@ -318,7 +333,7 @@ export class WithoutSlashPageRedirectMiddleware extends AbstractHornetMiddleware
 //                                      StaticNodeHttpHeaderMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class StaticNodeHttpHeaderMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticNodeHttpHeaderMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.StaticNodeHttpHeaderMiddleware");
 
     constructor() {
         const staticUrl = Utils.buildStaticPath("/").replace(Utils.getContextPath(), "");
@@ -336,7 +351,7 @@ export class StaticNodeHttpHeaderMiddleware extends AbstractHornetMiddleware {
 import * as express from "express";
 
 export class StaticPathMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticPathMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.StaticPathMiddleware");
 
     constructor() {
         const appConfig = AbstractHornetMiddleware.APP_CONFIG;
@@ -354,7 +369,7 @@ export class StaticPathMiddleware extends AbstractHornetMiddleware {
 //                                      StaticPathErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class StaticPathErrorMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.StaticPathErrorMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.StaticPathErrorMiddleware");
 
     constructor() {
 
@@ -444,7 +459,7 @@ export class MulterMiddleware extends AbstractHornetMiddleware {
     constructor() {
         const option: multer.Options = MulterMiddleware.defaultOption;
         if (MulterMiddleware.option) {
-            _.merge(option, MulterMiddleware.option);
+            merge(option, MulterMiddleware.option);
         }
         super(multer(option).any());
     }
@@ -458,7 +473,7 @@ import hpp = require("hpp");
 const helmet = require("helmet");
 
 export class SecurityMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SecurityMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.SecurityMiddleware");
 
     public insertMiddleware(app) {
         if (isSecurityEnabled(isEnvProduction, SecurityMiddleware.logger)) {
@@ -598,14 +613,22 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
 
     protected hstsConfiguration(app) {
         if (checkSecurityConfiguration("security.hsts", true, "HSTS 'HTTP Strict-Transport-Security'", SecurityMiddleware.logger)) {
-            // Ajoute le header Strict-Transport-Security pour demander au navigateur client un accès au site en https
-            app.use(helmet.hsts({
+            const hstsMiddleware = helmet.hsts({
                 // Must be at least 18 weeks to be approved by Google
                 maxAge: Utils.config.getOrDefault("security.hsts.maxAge", 10886400000),
                 // Must be enabled to be approved by Google
                 includeSubDomains: Utils.config.getOrDefault("security.hsts.includeSubDomains", true),
                 preload: Utils.config.getOrDefault("security.hsts.preload", false),
-            }));
+            });
+
+            app.use((req, res, next) => {
+                if (req.secure) {
+                    // Ajoute le header Strict-Transport-Security pour demander au navigateur client un accès au site en https
+                    hstsMiddleware(req, res, next);
+                } else {
+                    next();
+                }
+            });
         }
     }
 }
@@ -613,11 +636,10 @@ export class SecurityMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      CsrfMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
-import * as _ from "lodash";
 import director = require("director");
 
 export class CsrfMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.CsrfMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.CsrfMiddleware");
     static HEADER_CSRF_NAME = "x-csrf-token";
     static CSRF_SESSION_KEY = "security.csrf";
 
@@ -650,9 +672,10 @@ export class CsrfMiddleware extends AbstractHornetMiddleware {
      * @param next
      */
     static middleware(req, res: director.DirectorResponse, next) {
-        if (req.method === "PUT" || req.method === "POST" || req.method === "PATCH" || req.method === "DELETE") {
+        const routesAuthorization = Utils.hasCls() && Utils.getCls("hornet.routeAuthorization");
+        if (req.method === "PUT" || (req.method === "POST" && (!routesAuthorization || routesAuthorization.length > 0)) || req.method === "PATCH" || req.method === "DELETE") {
             let incomingCsrf = req.headers[CsrfMiddleware.HEADER_CSRF_NAME];
-            if (_.isUndefined(incomingCsrf)) {
+            if (isUndefined(incomingCsrf)) {
                 CsrfMiddleware.logger.trace(CsrfMiddleware.HEADER_CSRF_NAME, "non present, recherche dans le body de la requête");
                 incomingCsrf = req.body && req.body[CsrfMiddleware.HEADER_CSRF_NAME];
             }
@@ -708,7 +731,7 @@ import { CookieManager } from "src/session/cookie-manager";
 
 export class InternationalizationMiddleware extends AbstractHornetMiddleware {
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.InternationalizationMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.InternationalizationMiddleware");
 
     constructor(config?: ServerConfiguration) {
 
@@ -746,7 +769,7 @@ export class InternationalizationMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.ChangeI18nLocaleMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.ChangeI18nLocaleMiddleware");
 
     constructor() {
         const appConfig = AbstractHornetMiddleware.APP_CONFIG;
@@ -756,7 +779,7 @@ export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
         }
 
         super((req, res, next: Function) => {
-            if (_.some(appConfig.internationalization.getLocales(), { locale: req.params.i18n })) {
+            if (some(appConfig.internationalization.getLocales(), { locale: req.params.i18n })) {
 
                 ChangeI18nLocaleMiddleware.logger.trace("ChangeI18nLocaleMiddleware :  Changement de la locale " + req.params.i18n);
                 const shortLang = req.params.i18n.split("-");
@@ -788,7 +811,7 @@ export class ChangeI18nLocaleMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.SetExpandedLayoutMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.SetExpandedLayoutMiddleware");
 
     constructor() {
         super((req, res, next: Function) => {
@@ -810,7 +833,7 @@ export class SetExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.IsExpandedLayoutMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.IsExpandedLayoutMiddleware");
 
     constructor() {
 
@@ -832,7 +855,7 @@ export class IsExpandedLayoutMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class ExpandedLayoutHandlerMiddleware extends AbstractHornetMiddleware {
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.ExpandedLayoutHandlerMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.ExpandedLayoutHandlerMiddleware");
 
     constructor(config?: ServerConfiguration) {
 
@@ -851,7 +874,7 @@ export class ExpandedLayoutHandlerMiddleware extends AbstractHornetMiddleware {
 // ------------------------------------------------------------------------------------------------------------------- //
 export class wakeUpNodeSessionMiddleware extends AbstractHornetMiddleware {
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.wakeUpNodeSessionMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.wakeUpNodeSessionMiddleware");
 
     constructor() {
 
@@ -921,7 +944,7 @@ import { SecurityError } from "hornet-js-utils/src/exception/security-error";
 import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 
 export class UserAccessSecurityMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.UserAccessSecurityMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.UserAccessSecurityMiddleware");
 
     constructor() {
         super((req, res, next) => {
@@ -947,7 +970,7 @@ export class UserAccessSecurityMiddleware extends AbstractHornetMiddleware {
 export class MenuConfigMiddleware extends AbstractHornetMiddleware {
     constructor() {
         super((req, res, next) => {
-            Utils.setCls("hornet.menuConfig", AbstractHornetMiddleware.APP_CONFIG.menuConfig);
+            Utils.setCls("hornet.menuConfig", [...AbstractHornetMiddleware.APP_CONFIG.menuConfig]);
             next();
         });
     }
@@ -966,7 +989,7 @@ import { ResultStream } from "src/result/result-stream";
 import { ResultJSON } from "src/result/result-json";
 
 export class DataRenderingMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
 
     constructor() {
         super((req: Request, res: Response, next: Function) => {
@@ -986,7 +1009,7 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
                     } else {
 
                         const executor = new AsyncExecutor();
-                        executor.addElement(new AsyncElement((next: (err?: any, data?: any) => void) => {
+                        executor.addElement(new AsyncElement(Utils.getContinuationStorage().bind((next: (err?: any, data?: any) => void) => {
                             Timer.startTimer(Timer.TIMER_ACTION, Timer.TIMER_SERVER_HTTP);
                             const action = new (dataRouteInfos.getAction())();
                             action.req = req;
@@ -1004,7 +1027,7 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
 
                             const validator = action.getDataValidator();
                             if (validator) {
-                                const data = _.cloneDeep(action.getPayload());
+                                const data = cloneDeep(action.getPayload());
 
                                 const validationRes = validator.validate(data);
 
@@ -1016,26 +1039,26 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
 
                             const exec: Promise<any> = action.execute();
 
-                            exec.then((result: any | HornetResult) => {
+                            exec.then(Utils.getContinuationStorage().bind((result: any | HornetResult) => {
                                 Timer.startTimer(Timer.TIMER_SERVER_HTTP, Timer.TIMER_ACTION);
                                 const newResult: HornetResult = (result instanceof HornetResult) ? result : new ResultJSON({ data: result });
                                 if (!(newResult instanceof ResultStream)) {
                                     res.status(newResult.status);
                                 }
                                 return newResult.manageResponse(res, req);
-                            }).then((send) => {
+                            })).then(Utils.getContinuationStorage().bind((send) => {
                                 Timer.stopTimer(Timer.TIMER_SERVER_HTTP);
                                 Timer.stopTimer(Timer.TIMER_REQUEST);
                                 Timer.logFinally(req.originalUrl, res.statusCode);
                                 if (send) {
                                     res.end();
                                 }
-                            }).catch((error) => {
+                            })).catch(Utils.getContinuationStorage().bind((error) => {
                                 Timer.startTimer(Timer.TIMER_SERVER_HTTP, Timer.TIMER_ACTION);
                                 DataRenderingMiddleware.logger.error("Erreur de service..." + error);
                                 next(error);
-                            });
-                        }));
+                            }));
+                        })));
 
                         executor.on("end", (err) => {
                             if (err) {
@@ -1054,7 +1077,7 @@ export class DataRenderingMiddleware extends AbstractHornetMiddleware {
 }
 
 export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
-    private static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
+    private static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
 
     constructor() {
         super((req: Request, res: Response, next: Function) => {
@@ -1074,7 +1097,7 @@ export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
                     } else {
 
                         const executor = new AsyncExecutor();
-                        executor.addElement(new AsyncElement((next: (err?: any, data?: any) => void) => {
+                        executor.addElement(new AsyncElement(Utils.getContinuationStorage().bind((next: (err?: any, data?: any) => void) => {
                             Timer.startTimer(Timer.TIMER_ACTION, Timer.TIMER_SERVER_HTTP);
                             const action = new (dataRouteInfos.getAction())();
                             action.req = req;
@@ -1092,7 +1115,7 @@ export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
 
                             const validator = action.getDataValidator();
                             if (validator) {
-                                const data = _.cloneDeep(action.getPayload());
+                                const data = cloneDeep(action.getPayload());
 
                                 const validationRes = validator.validate(data);
 
@@ -1106,7 +1129,7 @@ export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
 
                             const exec: Promise<any> = action.execute();
 
-                            exec.then((result: any | HornetResult) => {
+                            exec.then(Utils.getContinuationStorage().bind((result: any | HornetResult) => {
                                 Timer.startTimer(Timer.TIMER_SERVER_HTTP, Timer.TIMER_ACTION);
                                 const newResult: HornetResult = (result instanceof HornetResult)
                                     ? result
@@ -1115,19 +1138,19 @@ export class DataRenderingSubMiddleware extends AbstractHornetSubMiddleware {
                                     res.status(newResult.status);
                                 }
                                 return newResult.manageResponse(res, req);
-                            }).then((send) => {
+                            })).then(Utils.getContinuationStorage().bind((send) => {
                                 Timer.stopTimer(Timer.TIMER_SERVER_HTTP);
                                 Timer.stopTimer(Timer.TIMER_REQUEST);
                                 Timer.logFinally(req.originalUrl, res.statusCode);
                                 if (send) {
                                     res.end();
                                 }
-                            }).catch((error) => {
+                            })).catch(Utils.getContinuationStorage().bind((error) => {
                                 Timer.startTimer(Timer.TIMER_SERVER_HTTP, Timer.TIMER_ACTION);
                                 DataRenderingSubMiddleware.logger.error("Erreur de service..." + error);
                                 next(error);
-                            });
-                        }));
+                            }));
+                        })));
 
                         executor.on("end", (err) => {
                             if (err) {
@@ -1156,7 +1179,7 @@ import { ServiceRequest } from "../services/service-request";
 //                                      UnmanagedDataErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.UnmanagedDataErrorMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.UnmanagedDataErrorMiddleware");
 
     constructor() {
         super((err, req, res, next: any) => {
@@ -1183,6 +1206,8 @@ export class UnmanagedDataErrorMiddleware extends AbstractHornetMiddleware {
                         res.status(err.status);
                     } else if (err.args && err.args.httpStatus && typeof err.args.httpStatus === "number") { // gestion avec les NodeApiError
                         res.status(err.args.httpStatus);
+                    } else if (err.httpStatus && typeof err.httpStatus === "number") {// gestion avec les HttpError
+                        res.status(err.httpStatus);
                     } else {
                         res.status(500);
                     }
@@ -1251,20 +1276,19 @@ export const DEFAULT_HORNET_MIDDLEWARES: Array<Class<AbstractHornetMiddleware>> 
     BodyParserJsonMiddleware,
     BodyParserUrlEncodedMiddleware,
 
-    // MockManagerMiddleware,
     SessionMiddleware,
     InternationalizationMiddleware,
     ChangeI18nLocaleMiddleware,
     wakeUpNodeSessionMiddleware,
     LoggerUserMiddleware,
-    CsrfMiddleware,
-    MulterMiddleware,
     SetExpandedLayoutMiddleware,
     IsExpandedLayoutMiddleware,
     ExpandedLayoutHandlerMiddleware,
+    CsrfMiddleware,
+    MulterMiddleware,
+    RouterServerMiddleware,
 
     MenuConfigMiddleware,
-    RouterServerMiddleware,
     UserAccessSecurityMiddleware,
     DataRenderingMiddleware,
 

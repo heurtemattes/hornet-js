@@ -73,18 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
-import * as React from "react";
+import assign = require("lodash.assign");
 import * as moment from "moment";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.date.date-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.date.date-body-cell");
 
 export interface DateBodyCellProps extends AbstractBodyCellProps {
     /** format d'affichage de la valeur */
@@ -110,7 +110,7 @@ export class DateBodyCell<P extends DateBodyCellProps, S> extends AbstractBodyCe
 
     componentWillReceiveProps(nextProps: P, nextContext: any): void {
         const value = DateBodyCell.getTemplatedValue(nextProps);
-        const props = _.assign({}, {...(nextProps as any), value});
+        const props = assign({}, { ...(nextProps as any), value });
 
         if (value !== this.state.value) {
             this.setState({
@@ -126,8 +126,8 @@ export class DateBodyCell<P extends DateBodyCellProps, S> extends AbstractBodyCe
             value = props.value;
         } else if (!isNaN(props.value) && isFinite(props.value)) {
             value = Number(props.value); // nombre de milliseconds
-        } else if (props.inputFormat) {
-            const mom = moment(props.value, props.inputFormat, true);
+        } else if (props.inputFormat || typeof props.value  === "string") {
+            const mom = moment(props.value, props.inputFormat || this.getI18n("calendar.dateFormat"), true);
             if (mom.isValid()) {
                 value = mom.toDate(); // nombre de milliseconds
             }

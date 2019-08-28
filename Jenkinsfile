@@ -77,17 +77,19 @@ pipeline {
 
 						if ( BRANCH_NAME.equals("develop") ) {
 							mapEnv["BUILD_VERSION"] = mapEnv["MODULE_VERSION"] + "-" + mapEnv["BUILD_TIMESTAMP"] + "-" + env.BUILD_NUMBER
-						} else if ( BRANCH_NAME.equals("master") ){
+						} else if ( BRANCH_NAME.equals("release_candidate") ) {
+							mapEnv["BUILD_VERSION"] = "RC"
+						} else if ( BRANCH_NAME.equals("master") ) {
 							mapEnv["BUILD_VERSION"] = mapEnv["MODULE_VERSION"]
 						}
 
 						// Publication
 						mapEnv["REPOSITORY_BASENAME"] = mapEnv["PROJECT_ID"]
 
-						if ( BRANCH_NAME.equals("develop") ) {
+						if ( BRANCH_NAME.equals("develop") || BRANCH_NAME.equals("release_candidate") ) {
 							mapEnv["PUBLISH_VERSION"] = mapEnv["MODULE_VERSION"] + "-SNAPSHOT"
 							mapEnv["PUBLISH_REPOSITORY_NPM"] = mapEnv["REPOSITORY_BASENAME"] + "-npm-snapshot"
-						} else if ( BRANCH_NAME.equals("master") ) {
+						} else if ( BRANCH_NAME.equals("master")) {
 							mapEnv["PUBLISH_VERSION"] = mapEnv["MODULE_VERSION"]
 							mapEnv["PUBLISH_REPOSITORY_NPM"] = mapEnv["REPOSITORY_BASENAME"] + "-npm-release"
 						}
@@ -97,7 +99,7 @@ pipeline {
 			                echo sh(script: "env|sort", returnStdout: true)
 
 				            sh '''
-				                bash hbw.sh versions:set --versionFix=${BUILD_VERSION}
+				                bash hbw.sh versions:set --versionFix=${BUILD_VERSION} -E
 				            '''
 						}
 					}
@@ -120,7 +122,7 @@ pipeline {
 					script {
 						def propEnv = mapEnv.collect { key, value -> return key+'='+value }
 						withEnv(propEnv) {
-			                sh "bash hbw.sh publish --publish-registry ${ARTIFACTORY_URL}/api/npm/${PUBLISH_REPOSITORY_NPM} --skipTests"
+			                sh "bash hbw.sh publish --publish-registry ${ARTIFACTORY_URL}/api/npm/${PUBLISH_REPOSITORY_NPM} --skipTests  -E"
 						}
 					}
 				}
@@ -136,13 +138,14 @@ pipeline {
         }
 
         stage("Test") {
+
             steps {
 				dir("${WORKSPACE}") {
 					script {
                         mapEnv["NODE_ENV"] = "integration"
 						def propEnv = mapEnv.collect { key, value -> return key+'='+value }
 						withEnv(propEnv) {
-			                sh "bash hbw.sh test"
+						    sh "xvfb-run bash hbw.sh test"
 						}
 					}
 				}
@@ -180,15 +183,15 @@ pipeline {
 
                                     hornet-js-batch.sonar.projectName=hornet-js-batch
                                     hornet-js-batch.sonar.sources=src
-                                    hornet-js-batch.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-batch.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
                                     hornet-js-bean.sonar.projectName=hornet-js-bean
                                     hornet-js-bean.sonar.sources=src
                                     hornet-js-bean.sonar.tests=test
-                                    hornet-js-bean.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-bean.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
                                     hornet-js-components.sonar.projectName=hornet-js-components
                                     hornet-js-components.sonar.sources=src
                                     hornet-js-components.tests=test
-                                    hornet-js-components.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-components.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
                                     hornet-js-core.sonar.projectName=hornet-js-core
                                     hornet-js-core.sonar.sources=src
                                     hornet-js-core.sonar.tests=test
@@ -196,10 +199,10 @@ pipeline {
                                     hornet-js-database.sonar.projectName=hornet-js-database
                                     hornet-js-database.sonar.sources=src
                                     hornet-js-database.sonar.tests=test
-                                    hornet-js-database.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-database.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
                                     hornet-js-passport.sonar.projectName=hornet-js-passport
                                     hornet-js-passport.sonar.sources=src
-                                    hornet-js-passport.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-passport.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
                                     hornet-js-react-components.sonar.projectName=hornet-js-react-components
                                     hornet-js-react-components.sonar.sources=src
                                     hornet-js-react-components.sonar.tests=test
@@ -207,11 +210,11 @@ pipeline {
                                     hornet-js-test.sonar.projectName=hornet-js-test
                                     hornet-js-test.sonar.sources=src
                                     hornet-js-test.sonar.tests=test
-                                    hornet-js-test.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-test.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
                                     hornet-js-utils.sonar.projectName=hornet-js-utils
                                     hornet-js-utils.sonar.sources=src
                                     hornet-js-utils.sonar.tests=test
-                                    hornet-js-utils.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml, test_report/karma/test-sonar-results.xml
+                                    hornet-js-utils.sonar.testExecutionReportPaths=test_report/mocha/test-results.xml
 
                                     sonar.exclusions=**/node_modules/**,**/*.spec.ts
                                     

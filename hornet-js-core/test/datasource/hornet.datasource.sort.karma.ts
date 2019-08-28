@@ -73,6 +73,22 @@ class DatasourceSortTest extends BaseTest {
         },
     ];
 
+
+    readonly dataForCustomSortAcdent: any[] = [
+        {
+            nom: "Contexte international et géopolitique",
+        },
+        {
+            nom: "Défense",
+        },
+        {
+            nom: "Droit / Réglementation",
+        },
+        {
+            nom: "Economie/Finances",
+        },
+    ];
+
     readonly dataVille: any[] = [
         {
             lib: "BUDAPEST",
@@ -286,6 +302,21 @@ class DatasourceSortTest extends BaseTest {
         } catch (e) {
             this.end(e);
         }
+    }
+
+    @Decorators.it("Test tri ascendant d'un datasource sur Init avec methodes de comparaison WITHOUT_CASE_AND_ACCENT")
+    testCase14() {
+        const sort: DefaultSort = new DefaultSort([new SortData("nom", SortDirection.DESC)], CompareMethod.WITHOUT_CASE_AND_ACCENT);
+        this.dataSource = new DataSource(this.dataForCustomSortAcdent, {}, [sort]);
+        this.dataSource.on("fetch", (result) => {
+            HornetTestAssert.assertEquals(this.dataSource.results, result, "");
+            HornetTestAssert.assertEquals("Economie/Finances", result[0].nom, "");
+            HornetTestAssert.assertEquals("Droit / Réglementation", result[1].nom, "");
+            HornetTestAssert.assertEquals("Défense", result[2].nom, "");
+            HornetTestAssert.assertEquals("Contexte international et géopolitique", result[3].nom, "");
+            this.end();
+        });
+        this.dataSource.fetch(true);
     }
 
     private sortMethode(sortData, a: any, b: any): number {

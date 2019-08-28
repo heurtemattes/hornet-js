@@ -73,34 +73,34 @@
  * hornet-js-test - Ensemble des composants pour les tests hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 import * as path from "path";
-if (typeof window !== "undefined") {
-    (process as any).env.LOG4JS_CONFIG = {
-        "disableClustering": true,
-        "appenders": {
-            "console": {
-                "type": "console",
-                "layout": {
-                    "type": "pattern",
-                    "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
-                }
-            }
-        },
-        "categories": {
-            "default": { "appenders": [ "console" ], "level": "INFO" }
+const defaultConfiguration = {
+    "disableClustering": true,
+    "appenders": {
+        "console": {
+        "type": "console",
+        "layout": {
+            "type": "pattern",
+            "pattern": "%[%d{ISO8601}|%p|%c|%m%]"
         }
+        }
+    },
+    "categories": {
+        "default": { appenders: ["console"], level: "INFO" }
     }
+}
+if (typeof window !== "undefined") {
+    (process as any).env.LOG4JS_CONFIG = defaultConfiguration;
 } else {
     process.env.LOG4JS_CONFIG = path.join(__dirname, "log-config.json");
 }
 
 import * as Log4jsNode from "log4js";
 import * as _ from "lodash";
-import * as fs from "fs";
 
 export class TestLogger {
 
@@ -130,45 +130,32 @@ export class TestLogger {
      * @param logConfig Le configuration log
      * @returns {function(any): undefined}
      */
-    static getLoggerBuilder(logConfig) {
-        Object.keys(logConfig.appenders).forEach((keyAppender) => {
-            let appender = logConfig.appenders[ keyAppender ];
+    static getLoggerBuilder(logConfig?) {
+        
+        const config = logConfig ? {...defaultConfiguration, ...logConfig} : defaultConfiguration;
+
+        Object.keys(config.appenders).forEach((keyAppender) => {
+            let appender = config.appenders[ keyAppender ];
             if (appender.layout) {
                 appender.layout.tokens = TestLogger.appenderLayoutTokens;
             }
         }
         );
 
-        (Log4jsNode as any).configure = function () {
-
-        };
-
-        Log4jsNode.configure(logConfig);
-
-        var consoleLogger = Log4jsNode.getLogger("hornet-js.console");
-
-        console.log = function () {
-            consoleLogger.info.apply(consoleLogger, arguments);
-        };
-        console.info = function () {
-            consoleLogger.info.apply(consoleLogger, arguments);
-        };
-        console.error = function () {
-            consoleLogger.error.apply(consoleLogger, arguments);
-        };
-        console.warn = function () {
-            consoleLogger.warn.apply(consoleLogger, arguments);
-        };
-        console.debug = function () {
-            consoleLogger.debug.apply(consoleLogger, arguments);
-        };
-        console.trace = function () {
-            consoleLogger.trace.apply(consoleLogger, arguments);
-        };
+        Log4jsNode.configure(config);
 
         return function (category) {
             this.log4jsLogger = Log4jsNode.getLogger(category);
         };
+    }
+
+    static resetLoggerBuilder() {
+        console.log = console["__old_log"];
+        console.info = console["__old_info"];
+        console.error = console["__old_error"];
+        console.warn = console["__old_warn"];
+        console.debug = console["__old_debug"];
+        console.trace = console["__old_trace"];
     }
 
     /**

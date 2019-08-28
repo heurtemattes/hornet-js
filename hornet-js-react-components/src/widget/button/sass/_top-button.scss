@@ -1,0 +1,36 @@
+@import
+    '../../sass/core',
+    'colors';
+
+.top-button {
+    position: fixed;
+    height: 3.25em;
+    width: 3.25em;
+    bottom: 1.25em;
+    right: 1em;
+    opacity: 0.4;
+    border-radius: 50%;
+    background: $topButtonBg;
+
+    &:hover {
+        opacity: 0.6;
+        cursor: pointer;
+    }
+
+    .top-button-content {
+        display: inline-block;
+        position: relative;
+        width: 1em;
+        height: 1em;
+        top: 1.25em;
+        left: 1.15em;
+        border-right: 0.2em solid $buttonBaseColor;
+        border-top: 0.2em solid $buttonBaseColor;
+        color: $buttonBaseColor;
+        transform: rotate(-45deg);
+    }
+    
+    @media screen and (max-width: #{$mediaXXL}) {
+        right: 0.313em;
+    }
+}

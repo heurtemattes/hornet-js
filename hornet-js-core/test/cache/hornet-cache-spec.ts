@@ -73,14 +73,14 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestLogger } from "hornet-js-test/src/test-logger";
 import { TestUtils } from "hornet-js-test/src/test-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     appenders: {
         console: {

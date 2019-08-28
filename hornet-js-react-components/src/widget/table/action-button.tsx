@@ -73,19 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { Button, ButtonProps, ButtonState } from "src/widget/button/button";
-import * as classNames from "classnames";
-import * as _ from "lodash";
+import classNames from "classnames";
+import assign = require("lodash.assign");
+import { KeyCodes } from "hornet-js-components/src/event/key-codes";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.action-button");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.action-button");
 
 /**
  * Enumeration des types d'action
@@ -96,7 +97,7 @@ export enum TypeAction {
 }
 
 export interface ActionButtonProps extends ButtonProps {
-    srcImg?: JSX.Element | string;
+    srcImg?: JSX.Element | string | SvgSprites;
     classNameImg?: string;
     typeAction?: TypeAction;
     messageAlert?: string;
@@ -117,7 +118,7 @@ export interface ActionButtonState extends ButtonState {
 
 export class ActionButton<P extends ActionButtonProps, S extends ActionButtonState> extends Button<ActionButtonProps, ActionButtonState> {
 
-    static defaultProps = _.assign(Button.defaultProps, {
+    static defaultProps = assign(Button.defaultProps, {
         displayedWithoutResult: false,
     });
 
@@ -142,43 +143,43 @@ export class ActionButton<P extends ActionButtonProps, S extends ActionButtonSta
     render(): JSX.Element {
         logger.debug("ActionButton render");
 
-        const classes: ClassDictionary = {};
+        const classes = {};
         if (this.props.className) {
-            classes[ this.props.className ] = true;
+            classes[this.props.className] = true;
         }
 
-        classes[ "picto-svg" ] = true;
-        classes[ "button-action" ] = true;
-
-        let img = null;
-        if (typeof this.props.srcImg === "string") {
-            img = <img
-                src={this.props.srcImg}
-                className={this.props.classNameImg}
-                alt={this.props.title} />;
+        classes["picto-svg"] = true;
+        classes["button-action"] = true;
+        
+        let img;
+        if (this.props.srcImg) {
+            if (typeof this.props.srcImg === "string") {
+                img = <img
+                    src={this.props.srcImg}
+                    className={this.props.classNameImg}
+                    alt={this.props.title}
+                    tabIndex={-1} />;
+            } else {
+                img = this.props.srcImg;
+            }
         } else {
-            img = this.props.srcImg;
-        }
-
-        let keyDownFunction = null;
-        if (this.props.onKeyDown) {
-            keyDownFunction = (e) => {
-                this.props.onKeyDown(e, this.props.onClick || this.onClick);
-            };
+            this.props.srcImg ? img = this.props.srcImg : img = null;
         }
 
         const aProps: any = {
             disabled: this.state.disabled,
-            id: this.props.id};
+            id: this.props.id
+        };
 
         return (
             this.state.visible ?
                 <a href={this.props.url || "#"}
+                    role="button"
+                    tabIndex={0}
                     className={classNames(classes)}
                     title={this.props.title}
                     onClick={this.props.onClick || this.onClick}
-                    onKeyDown={keyDownFunction}
-                    aria-haspopup={this.props.hasPopUp}
+                    onKeyDown={this.buildKeyDownHandler()}
                     {...aProps}
                 >
                     {img}
@@ -187,6 +188,26 @@ export class ActionButton<P extends ActionButtonProps, S extends ActionButtonSta
                 </a>
                 : null
         );
+    }
+
+    /**
+     * Construit le handler de l'évènement onKeyDown
+     * @returns {Function} - le handle de l'evènement onKeyDown
+     */
+    protected buildKeyDownHandler(): Function {
+        // Si une props onKeyDown est passée, alors elle serait appelée
+        if (this.props.onKeyDown) {
+            return (e) => {
+                this.props.onKeyDown(e, this.props.onClick || this.onClick);
+            };
+        }
+        /** Si pas de props onKeyDown alors on appelle la fonction onClick uniquement si
+        le keyCode est la touche Espcae. La touche entrée est nativement gérée par react */
+        return (e) => {
+            if (e && e.keyCode === KeyCodes.SPACEBAR) {
+                this.props.onClick ? this.props.onClick(e) : this.onClick(e);
+            }
+        };
     }
 
     /**

@@ -73,35 +73,38 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { ActionBodyCell, ActionBodyCellProps } from "src/widget/table/column/cell/action/action-body-cell";
-import { Picto } from "src/img/picto";
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
+import { LineAfter } from 'src/widget/table/line/line-after';
+import { LineBefore } from 'src/widget/table/line/line-before';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.more-info.more-info-body-cell");
+
+const LINE_BEFORE = "before";
+const LINE_AFTER = "after";
 
 export interface MoreInfoBodyCellProps extends ActionBodyCellProps {
     /** Clé sur laquelle se base la méthode shouldComponentUpdate */
-    keyShouldComponentUpdate? : string;
+    keyShouldComponentUpdate?: string;
 }
 
 export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends ActionBodyCell<P, any> {
 
+    link: HTMLLinkElement;
+
     static defaultProps = {
-        srcImg: Picto.blue.user,
         keyShouldComponentUpdate: "id",
     };
 
     constructor(props: P, context: any) {
         super(props, context);
-
         this.state = {
             ...this.state,
             url: (props.url) ? this.genUrlWithParams(props.url, props.value) : null,
@@ -116,24 +119,26 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
     componentWillReceiveProps(nextProps: MoreInfoBodyCellProps, context) {
         super.componentWillReceiveProps(nextProps as any, context);
         // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
-         this.state = {...this.state, ...nextProps,
+        this.state = {
+            ...this.state, ...nextProps,
             url: (nextProps.url) ? this.genUrlWithParams(nextProps.url, nextProps.value) : null,
-            visible:(nextProps.visible) ? nextProps.visible(nextProps.value) : true,
-         };
+            visible: (nextProps.visible) ? nextProps.visible(nextProps.value) : true,
+        };
     }
 
     /**
      * @inheritDoc
      */
     renderCell(): JSX.Element {
-        logger.debug("render MoreInfoBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
+        logger.debug(`render MoreInfoBodyCell-> column, ${this.props.coordinates.column} - line , ${this.props.coordinates.row}`);
+
         this.title = this.getCellTitleWithProps(this.props);
 
-        const classes: ClassDictionary = {
+        const classes = {
             "button-action": true,
         };
         if (this.state.className) {
-            classes[ this.state.className ] = true;
+            classes[this.state.className] = true;
         }
         const aProps: any = {
             href: this.state.url || "#",
@@ -143,16 +148,20 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
             disabled: this.props.contentState.itemInEdition && this.state.isEditing === false,
             tabIndex: -1,
             onKeyDown: this.handleKeyDownButton,
-            "aria-haspopup": this.state.hasPopUp,
+            role: "button",
+            "aria-controls": this.buildExpandableLineId(),
+            "aria-expanded": false,
+            ref: (a) => { this.link = a; },
         };
 
         return (
             this.state.visible ?
 
                 <a {...aProps}>
-                    <img src={(this.props as any).srcImg} className={this.state.classNameImg}
-                        alt={this.title} />
-                    <span className="label-button-action">{this.state.label}</span>
+                    <SvgSprites icon="user" color="#0579BE" ariaLabel={aProps.title} tabIndex={-1} />
+                    <span className="label-button-action">
+                        {this.state.label}
+                    </span>
                 </a>
                 : null
         );
@@ -162,35 +171,56 @@ export class MoreInfoBodyCell<P extends MoreInfoBodyCellProps, S> extends Action
      * Click sur le lien
      */
     onClick(e): void {
-        // Gestion de la line-before
-        this.expandLine(true);
-
-        // Gestion de la line-after
-        this.expandLine(false);
+        // toggle line
+        this.expandLine();
     }
 
     /**
      * Permet de masquer/afficher  une ligne de tableau
-     * @param before
      */
-    expandLine(before ? : boolean) {
-        const type: string = before ? "before" : "after";
-        const selector: string = this.props.id + "-expandable-line-" + type + "-" + this.props.coordinates.row;
+    expandLine() {
+        const selector: string = this.buildExpandableLineId();
 
         const element = document.getElementById(selector);
 
-        if (element) {
-            if (element.classList && element.classList.contains("datatable-expandable-line-hidden")) {
-                element.classList.remove("datatable-expandable-line-hidden");
-                element.classList.add("datatable-expandable-line-displayed");
-            } else {
-                element.classList.remove("datatable-expandable-line-displayed");
-                element.classList.add("datatable-expandable-line-hidden");
-            }
+        if (element && element.classList && element.classList.contains("datatable-expandable-line-hidden")) {
+            element.classList.remove("datatable-expandable-line-hidden");
+            element.classList.add("datatable-expandable-line-displayed");
+            this.setLinkAriaExpandedAttribute(true);
 
-            if (this.props.action) {
-                this.props.action(this.props.value);
-            }
+        } else if (element) {
+            element.classList.remove("datatable-expandable-line-displayed");
+            element.classList.add("datatable-expandable-line-hidden");
+            this.setLinkAriaExpandedAttribute(false);
         }
+
+        if (this.props.action) {
+            this.props.action(this.props.value);
+        }
+    }
+
+    /**
+     * Valorise l'attribut aria-expanded du lien avec la value passée en paramètre
+     * @param {boolean} - value : Valeur de l'attribut aria-expanded du lien
+     */
+    setLinkAriaExpandedAttribute(value: boolean) {
+        if (this.link) {
+            this.link.setAttribute("aria-expanded", `${value}`);
+        }
+    }
+
+    /**
+     * Construit l'id de l'expandable line
+     * @returns {string} - l'id de l'expandable line
+     */
+    buildExpandableLineId(): string {
+        const childrenType = this.props.children && (this.props.children as React.ReactElement<any>).type;
+        let lineType:string;
+        if (childrenType == LineAfter) {
+            lineType = LINE_AFTER;
+        } else if (childrenType == LineBefore) {
+            lineType = LINE_BEFORE;
+        }
+        return this.props.coordinates && `${this.props.id}-expandable-line-${lineType}-${this.props.coordinates.row}`;
     }
 }

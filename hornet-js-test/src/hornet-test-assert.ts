@@ -79,7 +79,7 @@ const expect = chai.expect;
  *
  * @class HornetTestAssert
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  *
@@ -149,7 +149,7 @@ export class HornetTestAssert {
      * @param {string} message
      */
     static assertGreaterThan(reference: any, actual: any, message: string) {
-        expect(_.gte(actual, reference), message).to.be.true;
+        expect(_.gt(actual, reference), message).to.be.true;
     }
 
     /**
@@ -159,6 +159,26 @@ export class HornetTestAssert {
      * @param {string} message
      */
     static assertLesserThan(reference: any, actual: any, message: string) {
+        expect(_.lt(actual, reference), message).to.be.true;
+    }
+
+    /**
+     * Valide l'assert si actual est supérieur ou égal à reference
+     * @param reference
+     * @param actual
+     * @param {string} message
+     */
+    static assertGreaterOrEqualThan(reference: any, actual: any, message: string) {
+        expect(_.gte(actual, reference), message).to.be.true;
+    }
+
+    /**
+     * Valide l'assert si actuel est inférieur ou égal à reference
+     * @param reference
+     * @param actual
+     * @param {string} message
+     */
+    static assertLesserOrEqualThan(reference: any, actual: any, message: string) {
         expect(_.lte(actual, reference), message).to.be.true;
     }
 

@@ -73,7 +73,7 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -87,12 +87,11 @@ import {
     LoggerUserMiddleware,
     RouterServerMiddleware,
     UserAccessSecurityMiddleware,
-    DataRenderingMiddleware,
 } from "hornet-js-core/src/middleware/middlewares";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { Request, Response } from "express";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { RouteInfos, DataRouteInfos, RouteType } from "hornet-js-core/src/routes/abstract-routes";
 import { HornetResult } from "hornet-js-core/src/result/hornet-result";
@@ -103,7 +102,8 @@ import { ResultJSON } from "hornet-js-core/src/result/result-json";
 import { AsyncExecutor } from "hornet-js-core/src/executor/async-executor";
 import { AsyncElement } from "hornet-js-core/src/executor/async-element";
 import { ValidationError } from "hornet-js-utils/src/exception/validation-error";
-import * as _ from "lodash";
+import { Promise } from "hornet-js-utils/src/promise-api";
+import clonedeep = require("lodash.clonedeep");
 
 
 
@@ -112,7 +112,7 @@ import * as _ from "lodash";
 // ------------------------------------------------------------------------------------------------------------------- //
 
 export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.middlewares.DataRenderingMiddleware");
 
     constructor() {
         super((req: Request, res: Response, next: Function) => {
@@ -151,7 +151,7 @@ export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
 
                             const validator = action.getDataValidator();
                             if (validator) {
-                                const data = _.cloneDeep(action.getPayload());
+                                const data = clonedeep(action.getPayload());
 
                                 const validationRes = validator.validate(data);
 
@@ -170,7 +170,7 @@ export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
                             if (action instanceof RouteActionBatch && isBusy) {
                                 exec = Promise.resolve(new ResultBatch({ isExist: isBusy }));
                             } else {
-                                exec = action.execute();
+                                exec = <Promise<any>><PromiseLike<any>>action.execute();
                             }
 
                             exec.then((result: any | HornetResult) => {
@@ -187,7 +187,7 @@ export class BatchRenderingMiddleware extends AbstractHornetMiddleware {
                                     result[ "history" ] = query[ "history" ];
                                 }
                                 const newResult: HornetResult = (result instanceof HornetResult) ? 
-                                result : new ResultJSON({ data: result });
+                                result : <HornetResult> new ResultJSON({ data: result });
                                 return newResult.manageResponse(res);
                             }).then((send) => {
                                 if (send) {

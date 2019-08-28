@@ -73,13 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -97,7 +96,9 @@ import {
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { HornetEvent, fireHornetEvent } from "hornet-js-core/src/event/hornet-event";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-link");
+import "src/widget/navigation/sass/_menu.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.navigation.menu-link");
 
 export let MENU_LINK_ACTIVATED = new HornetEvent<any>("MENU_LINK_ACTIVATED");
 

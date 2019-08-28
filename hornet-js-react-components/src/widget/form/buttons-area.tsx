@@ -73,28 +73,32 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { ButtonProps } from "src/widget/button/button";
 import { AbstractField } from "src/widget/form/abstract-field";
-import * as classNames from "classnames";
-import * as _ from "lodash";
+import classNames from "classnames";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.buttons-area");
+import "src/widget/form/sass/_form-entities.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.buttons-area");
 
 /**
  * Propriétés de la zone de boutons du formulaire hornet.
  */
 export interface ButtonsAreaProps extends HornetComponentProps {
-    width?: number;
     className?: string;
+    id?: string;
+    /* Ajoute ou non la classe sticky au conteneur de boutons */
+    isSticky?: boolean;
 }
 
 /**
@@ -102,65 +106,35 @@ export interface ButtonsAreaProps extends HornetComponentProps {
  */
 export class ButtonsArea extends HornetComponent<ButtonsAreaProps, any> {
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
-        width: 100,
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
     });
 
-    constructor(props, context?: any) {
+    //readonly props: Readonly<ButtonsAreaProps>;
+
+    constructor(props:ButtonsAreaProps, context?: any) {
         super(props, context);
     }
 
-    /**
-     * Génère la configuration des boutons par défaut : "Valider" de type "submit" et "Annuler" de type "reset".
-     * @returns {*[]}
-     */
-    getDefaultButtons(): ButtonProps[] {
-        return [
-            {
-                type: "submit",
-                id: "form_btnValider",
-                name: "action:valid",
-                value: this.i18n("form").valid,
-                className: "hornet-button",
-                label: this.i18n("form").valid,
-                title: this.i18n("form").validTitle,
-            },
-            {
-                type: "reset",
-                id: "form_btnCancel",
-                name: "action:cancel",
-                value: this.i18n("form").cancel,
-                className: "hornet-button",
-                onClick: null,
-                label: this.i18n("form").cancel,
-                title: this.i18n("form").cancelTitle,
-            },
-        ];
-    }
-
+    
     /**
      * @inheritDoc
      */
     render(): JSX.Element {
         logger.debug("ButtonsArea render");
-        let buttons: ButtonProps[];
-        if (!this.state.children) {
-            buttons = this.getDefaultButtons();
-        }
 
-        const classList: ClassDictionary = {
-            "button-area": true,
-            grid: true,
-            "has-gutter": ((this.state.children) && (this.state.children.length > 1)) ? true : false,
-            "flex-container": true,
+        //par defaut la classe est isFixed, passe en isSticky via les events scroll de notification-session-footer
+        const classList = {
+            "button-area-isFixed": true,
+            "button-area-sticky": this.state.isSticky
         };
+
         if (this.props.className) classList[ this.props.className ] = true;
 
-        const width = this.props.width + "%";
-
         return (
-            <div className={classNames(classList)} style={{ width }}>
-                {this.state.children}
+            <div id={ this.props.id ? this.props.id : "button-container" } className={ classNames(classList) }>
+                <div className="wrapButton">
+                    {this.state.children}
+                </div>
             </div>
         );
     }

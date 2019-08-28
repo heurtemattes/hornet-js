@@ -73,46 +73,43 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
-import {SpinnerLoader} from "src/widget/table/spinner-table"
-import { Utils } from "hornet-js-utils";
-Utils.setConfigObj({});
+import { SpinnerLoader } from "src/widget/table/spinner-table"
 
 let spinnerElement: JSX.Element;
 
 @Decorators.describe("Test Spinner table")
 class SpinnerTableTest extends HornetReactTest {
 
-    @Decorators.it("Test OK")
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
-    }
-
-
     @Decorators.it("Afficher spinner-table")
     testSpinnerVisible() {
         const id = this.generateMainId();
         spinnerElement = (
-            <SpinnerLoader isVisible={true} nbColumns={7}/>
+            <table>
+                <tbody id={`tb${id}`}>
+                    <SpinnerLoader isVisible={true} nbColumns={7}/>
+                </tbody>
+            </table>
         );
         this.renderIntoDocument(spinnerElement, id);
         setTimeout(()=> {
-            expect(document.querySelector(`#${id} tr.datatable-line-loader`)).to.exist;
-            expect(document.querySelector(`#${id} th`).getAttribute("colSpan")).to.equals("7");
+            expect(document.querySelector(`#tb${id} tr.datatable-line-loader`)).to.exist;
+            expect(document.querySelector(`#tb${id} th`).getAttribute("colSpan")).to.equals("7");
             this.end();
         }, 500);
     }
@@ -121,10 +118,15 @@ class SpinnerTableTest extends HornetReactTest {
     testSpinnerInvisible() {
         const id = this.generateMainId();
         spinnerElement = (
-            <SpinnerLoader isVisible={false} nbColumns={7} />
+            <table>
+                <tbody id={`tb${id}`}>
+                    <SpinnerLoader isVisible={false} nbColumns={7} />
+                </tbody>
+            </table>
         );
         this.renderIntoDocument(spinnerElement, id);
-        expect(document.querySelector(`#${id}`).innerHTML).to.be.empty;
+        const select = document.querySelector(`#tb${id}`).innerHTML;
+        expect(select).to.be.empty;
         this.end();
     }
 

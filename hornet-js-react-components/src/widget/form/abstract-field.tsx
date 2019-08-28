@@ -73,18 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
 import * as React from "react";
 
-import * as classNames from "classnames";
-import * as _ from "lodash";
+import classNames from "classnames";
+import camelCase = require("lodash.camelcase");
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { DomAdapter } from "src/widget/form/dom-adapter";
 import { FieldError, FieldErrorProps } from "src/widget/form/field-error";
@@ -92,25 +92,26 @@ import { INotificationType } from "hornet-js-core/src/notification/notification-
 import { HTML_ATTRIBUTES } from "src/widget/form/html-attributes";
 import { ToolTip } from "src/widget/tool-tip/tool-tip";
 
-import ComponentClass = __React.ComponentClass;
-import ReactElement = __React.ReactElement;
-import HTMLAttributes = __React.HTMLAttributes;
-import ReactNode = __React.ReactNode;
-import ClipboardEventHandler = __React.ClipboardEventHandler;
-import CompositionEventHandler = __React.CompositionEventHandler;
-import FocusEventHandler = __React.FocusEventHandler;
-import FormEventHandler = __React.FormEventHandler;
-import ReactEventHandler = __React.ReactEventHandler;
-import KeyboardEventHandler = __React.KeyboardEventHandler;
-import MouseEventHandler = __React.MouseEventHandler;
-import DragEventHandler = __React.DragEventHandler;
-import TouchEventHandler = __React.TouchEventHandler;
-import UIEventHandler = __React.UIEventHandler;
-import WheelEventHandler = __React.WheelEventHandler;
-import AnimationEventHandler = __React.AnimationEventHandler;
-import TransitionEventHandler = __React.TransitionEventHandler;
+import "src/widget/form/sass/_abstract-field.scss";
+import "src/widget/form/sass/_switchs.scss";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.abstract-field");
+import ComponentClass = React.ComponentClass;
+import ReactElement = React.ReactElement;
+import ClipboardEventHandler = React.ClipboardEventHandler;
+import CompositionEventHandler = React.CompositionEventHandler;
+import FocusEventHandler = React.FocusEventHandler;
+import FormEventHandler = React.FormEventHandler;
+import ReactEventHandler = React.ReactEventHandler;
+import KeyboardEventHandler = React.KeyboardEventHandler;
+import MouseEventHandler = React.MouseEventHandler;
+import DragEventHandler = React.DragEventHandler;
+import TouchEventHandler = React.TouchEventHandler;
+import UIEventHandler = React.UIEventHandler;
+import WheelEventHandler = React.WheelEventHandler;
+import AnimationEventHandler = React.AnimationEventHandler;
+import TransitionEventHandler = React.TransitionEventHandler;
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.abstract-field");
 
 /**
  * Propriétés standards pour un élément HTML
@@ -468,7 +469,7 @@ export interface ReactTransitionDOMAttributes {
 }
 
 export interface ReactBasicDOMAttributes {
-    children?: ReactNode;
+    children?: React.ReactNode;
     dangerouslySetInnerHTML?: {
         __html: string;
     };
@@ -541,7 +542,6 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
         labelClass: "",
         /* Le champ occupe la moitié du neoud parent */
         fieldClass: "",
-        icoToolTip: "/img/tooltip/tooltip.svg",
         markRequired: true,
         errorComponent: FieldError,
         lang: (Utils.getCls("hornet.internationalization") && Utils.getCls("hornet.internationalization").lang)
@@ -604,7 +604,7 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
                     this.setAttribute(key, nextProps[key]);
                 } else {
                     /* Propriété spécifique hornet : un 'setter' est certainement présent */
-                    const setterName: string = _.camelCase("set " + (key));
+                    const setterName: string = camelCase("set " + (key));
                     if (this[setterName]) {
                         this[setterName](nextProps[key]);
                     } else {
@@ -885,7 +885,11 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
      */
     renderLabel(fieldId: string, fieldName: string, label: string, required: boolean): JSX.Element {
         const urlTheme = this.state.imgFilePath || AbstractField.genUrlTheme();
-        const urlIcoTooltip = urlTheme + this.state.icoToolTip;
+        let urlIcoTooltip = "";
+
+        if(this.state.icoToolTip) {
+            urlIcoTooltip = urlTheme + this.state.icoToolTip;
+        }
 
         if ((this.state as any).abbr && !this.state.lang) {
             logger.warn("Field ", fieldName, " Must have lang with abbr configuration");
@@ -915,9 +919,9 @@ export abstract class AbstractField<P extends AbstractFieldProps, S> extends Dom
     /**
      * Méthode permettant de calculer les classNames du label
      */
-    protected calculateLabelClassName():ClassDictionary {
+    protected calculateLabelClassName():{ [id: string]: any;} {
 
-        const classes: ClassDictionary = {
+        const classes = {
             "label-container": true,
             "label-row-inline": true,
         };

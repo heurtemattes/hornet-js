@@ -73,20 +73,22 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
 import * as React from "react";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { ButtonInfoAccessibilite } from "src/widget/button/button-info-accessibilite";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-info-accessibilite");
+import "src/widget/navigation/sass/_menu.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.navigation.menu-info-accessibilite");
 
 /**
  * Propriétés du bouton et de sa modale d'information

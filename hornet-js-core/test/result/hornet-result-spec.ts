@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l"'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,16 +84,15 @@ import { ConfigLib } from "hornet-js-utils/src/config-lib";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Utils } from "hornet-js-utils";
-import { NodeApiResultBuilder } from "src/services/service-api-results";
-import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
 import { Options } from "src/result/hornet-result-interface";
 import { ResultJSON } from "src/result/result-json";
 import { ResultCSV } from "src/result/result-csv";
 import { HornetSuperAgent } from 'src/services/hornet-superagent';
 import {
-    HornetRequest, HornetSuperAgentRequest
+    HornetRequest
 } from "src/services/hornet-superagent-request";
 import { Response } from "superagent";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 const expect = TestUtils.chai.expect;
 const assert = TestUtils.chai.assert;

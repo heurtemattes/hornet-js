@@ -1,0 +1,85 @@
+@import
+    '../../sass/core',
+    './colors';
+
+
+%resetChips {
+    border: none;
+    outline: none;
+    color: $chipsColor;
+    cursor: pointer;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+%disabledChips {
+    background: $chipsDisabled;
+    box-shadow: none;
+    color: $chipsDisabledColor;
+}
+
+.chips-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2em;
+    margin: 0.25em;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 1em;
+    white-space: nowrap;
+    border-radius: 1em;
+    background-color: $chipsBgColor;
+    transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+                box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    
+    @extend %resetChips;
+    
+    &:focus,
+    &:hover,
+    .active {
+        background-color: $chipsBgColorHover;
+        box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    &.disabled,
+    &.readonly {
+        @extend %disabledChips;
+
+        &:hover,
+        &:focus {
+            @extend %disabledChips;
+        }
+    }
+
+    &.disabled {
+        .chips-reset {
+            &:hover,
+            &:focus {
+                color: $chipsDisabledColor;
+            }
+        }
+    }
+
+    .chips-text {
+        padding-left: 0.75em;
+        padding-right: 1em;
+        white-space: nowrap;
+        user-select: none;
+    }
+
+    .chips-reset {
+        margin: 0 0.275em 0 -0.5em;
+        width: 1em;
+        height: 1em;
+        fill: currentColor;
+        transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+
+        &:hover,
+        &:focus {
+            color: theme-color('global', 'white');
+        }
+    }
+}

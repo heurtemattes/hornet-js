@@ -25,10 +25,10 @@ Ajouter au package.json
 
 ```shell
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.X.X"
+    "hornet-js-ts-typings": "5.3.X"
   }
   "appDependencies": {
-    "hornet-js-batch": "5.X.X"
+    "hornet-js-batch": "531.X"
   }
 ```
 

@@ -73,13 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
@@ -88,18 +89,18 @@ import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
+import { Content } from "src/widget/table/content";
 /*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
 import { CheckColumn } from "src/widget/table/column/check-column";
 
 
-import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
-import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
+import { Tabs } from "src/widget/tab/tabs";
+import { Tab } from "src/widget/tab/tab";
 import { TabContent } from "src/widget/tab/tab-content";
 
 import SyntheticEvent = React.SyntheticEvent;

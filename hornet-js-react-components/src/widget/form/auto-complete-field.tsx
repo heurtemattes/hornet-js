@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,7 +89,15 @@ import {
 } from "src/widget/form/abstract-field";
 import { AutoCompleteSelector } from "src/widget/form/auto-complete-selector";
 import { FieldErrorProps } from "src/widget/form/field-error";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import deburr = require("lodash.deburr");
+import find = require("lodash.find");
+import findIndex = require("lodash.findindex");
+import isEqual = require("lodash.isequal");
+import isUndefined = require("lodash.isundefined");
+import startsWith = require("lodash.startswith");
+import throttle = require("lodash.throttle");
 import { HornetComponentChoicesProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponentDatasourceProps } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
@@ -97,14 +105,14 @@ import { INotificationType } from "hornet-js-core/src/notification/notification-
 import { AutoCompleteState } from "src/widget/form/auto-complete-state";
 import { DataSourceMaster } from "hornet-js-core/src/component/datasource/datasource-master";
 import { AbstractFieldDatasource } from "src/widget/form/abstract-field-datasource";
-import FormEvent = __React.FormEvent;
-import HTMLAttributes = __React.HTMLAttributes;
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Logger } from "hornet-js-utils/src/logger";
-import { Picto } from "src/img/picto";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as classNames from "classnames";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.auto-complete-field");
+import "src/widget/form/sass/_autocomplete.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.auto-complete-field");
 
 export enum FilterTextType {
     beginWith = 1,
@@ -141,12 +149,15 @@ export interface AutoCompleteFieldProps extends AbstractFieldProps, HornetWritta
     name: string;
 
     // surcharge du label lors qu'on a pas de resultat
-    noResultLabel?: String;
+    noResultLabel?: string;
 
     // définit si le champs peut être réinitialiser
     resettable?: boolean;
     // définit le title du bouton si le champs peut être réinitialiser
-    resetTitle?:string;
+    resetTitle?: string;
+
+    // force le filtre de la liste de choix par rapport à l'élément sélectionné
+    autoFilter?: boolean;
 }
 
 /**
@@ -156,20 +167,22 @@ export interface AutoCompleteFieldProps extends AbstractFieldProps, HornetWritta
 export class AutoCompleteField<P extends AutoCompleteFieldProps> extends AbstractFieldDatasource<AutoCompleteFieldProps, any> {
     public readonly props: Readonly<AutoCompleteFieldProps>;
 
-    static defaultProps: any = _.assign({
-            minValueLength: 1,
-            readOnly: false,
-            disabled: false,
-            delay: 1000,
-            valueKey: "value",
-            labelKey: "text",
-            maxHeight: null,
-            writable: true,
-            filterText: FilterTextType.indexOf,
-            resettable: true,
-            resetTitle: "form.autoCompleteField.resetTitle",
-        },
-                                        AbstractField.defaultProps);
+    static defaultProps: any = assign({
+        minValueLength: 1,
+        readOnly: false,
+        disabled: false,
+        delay: 1000,
+        valueKey: "value",
+        labelKey: "text",
+        maxHeight: null,
+        writable: true,
+        filterText: FilterTextType.indexOf,
+        resettable: true,
+        resetTitle: "form.autoCompleteField.resetTitle",
+        init: true,
+        autoFilter: false
+    },
+        AbstractField.defaultProps);
 
     protected _throttledTriggerAction: Function;
 
@@ -184,6 +197,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     /** Indicateur si la valeur dans l'autocomplete a changé depuis le dernier focus */
     protected isUpdated: boolean;
     protected typedValueOnFocus: string;
+    protected isTyping: boolean;
 
     constructor(props: P, context?: any) {
         super(props, context);
@@ -197,7 +211,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             shouldShowChoices: false, // indique si la liste des choix est visible ou non
             ariaSelectorId, // identifiant du selector
             isApiLoading: false, // loader
-            allChoices: (this.props.dataSource.results) ? this.props.dataSource.results : [], // liste de tous les choix (non filtré par le texte)
+            allChoices: (this.props.dataSource.results) ? this.props.dataSource.results : [], // liste de tous les choix (non filtré par le texte),
         };
 
         this.autoCompleteState = new AutoCompleteState();
@@ -210,7 +224,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @returns {AutoComplete}
      */
     public setIsApiLoading(value: boolean, callback?: () => any): this {
-        this.setState({isApiLoading: value}, callback);
+        this.setState({ isApiLoading: value }, callback);
         return this;
     }
 
@@ -221,7 +235,13 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @returns {AutoComplete}
      */
     setChoices(value: any[], callback?: () => any): this {
-        this.setState({choices: value}, callback);
+        let choices: any[] = [];
+        if (value && !Array.isArray(value)) {
+            choices.push(value);
+        } else {
+            choices = value;
+        }
+        this.setState({ choices }, callback);
         return this;
     }
 
@@ -231,7 +251,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     componentDidMount() {
 
         if (!Utils.isServer) {
-            if (!_.isUndefined(this.props["var"])) {
+            if (!isUndefined(this.props["var"])) {
                 logger.warn("The var props is only available in DEV");
             }
         }
@@ -239,7 +259,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         this.mounted = true;
         logger.trace("auto-complete componentDidMount");
 
-        this._throttledTriggerAction = _.throttle(this.triggerAction, this.state.delay);
+        this._throttledTriggerAction = throttle(this.triggerAction, this.state.delay);
 
         this.props.dataSource.on("fetch", this.fetchEventCallback);
         this.props.dataSource.on("add", this.addEventCallback);
@@ -248,7 +268,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         this.props.dataSource.on("filter", this.filterEventCallback);
         this.props.dataSource.on("init", this.initEventCallback);
         this.props.dataSource.on("loadingData", this.displaySpinner);
-
     }
 
     /**
@@ -265,7 +284,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         this.props.dataSource.removeListener("delete", this.setDeleteResultCallback);
         this.props.dataSource.removeListener("sort", this.setResultCallback);
         this.props.dataSource.removeListener("loadingData", this.displaySpinner);
-
     }
 
     /**
@@ -274,8 +292,8 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     componentWillUpdate(nextProps: AutoCompleteFieldProps, nextState: any, nextContext: any): void {
         super.componentWillUpdate(nextProps, nextState, nextContext);
         if (this.state.delay !== nextState.delay) {
-            /* Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec _.throttle */
-            this._throttledTriggerAction = _.throttle(this.triggerAction, nextState.delay);
+            /* Le délai d'appel de l'action a changé : on doit donc refaire ici l'encaspulation avec throttle */
+            this._throttledTriggerAction = throttle(this.triggerAction, nextState.delay);
         }
     }
 
@@ -288,13 +306,14 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             || ((nextState.choices && !this.state.choices)
                 || (!nextState.choices && this.state.choices)
                 || (nextState.choices && this.state.choices.length !== nextState.choices.length))
-            || !_.isEqual(nextState.choices, this.state.choices)
+            || !isEqual(nextState.choices, this.state.choices)
             || (this.state.errors !== nextState.errors)
             || (this.state.readOnly !== nextState.readOnly)
             || (this.state.disabled !== nextState.disabled)
             || (this.state.label !== nextState.label)
             || (this.state.placeholder !== nextState.placeholder)
             || (this.state.required !== nextState.required)
+            || (this.state.selectedIndex !== nextState.selectedIndex)
         ) {
             return true;
         }
@@ -321,13 +340,13 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             className += " " + this.state.className;
         }
 
-        let htmlProps: HTMLAttributes<HTMLElement> = this.getHtmlProps();
-        htmlProps = _.assign(htmlProps, {
-            onKeyDown: this.handleOnKeyDown,
-            onFocus: this.handleOnFocus,
-            onBlur: this.handleOnBlur,
-            onDoubleClick: this.handleOnFocus,
-            onClick: this.handleOnFocus,
+        let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
+        htmlProps = assign(htmlProps, {
+            onKeyDown: this.handleKeyDown,
+            onFocus: this.handleFocus,
+            onBlur: this.handleBlur,
+            onDoubleClick: this.handleDoubleClick,
+            onClick: this.handleClick,
             onChange: this.handleChangeTextInput,
             autoComplete: "off",
             "aria-autocomplete": "list",
@@ -338,19 +357,23 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             type: "text",
             name: this.getFreeTypingFieldName(),
             className,
-        } as HTMLAttributes<HTMLElement>);
+        } as React.HTMLAttributes<HTMLElement>);
+
+        // Dans le cas où l'autocomplete est mis à jour avec une donnée sélectionnée depuis le datasource
+        // la liste des choix du selector est uniquement alimentée par le choix sélectionné comme si il avait été saisi à la main
+        // const choices = (this.state.dataSource.selected) ? this.state.dataSource.selected : this.state.choices;
 
         /* Le champ caché contient l'identifiant de l'élément sélectionné. C'est cet identifiant qui est ensuite
          utilisé par les actions. */
         return (
 
             <div className="autocomplete-container">
-                <input type="hidden" name={this.getValueFieldName()} ref={this.registerHiddenInput}/>
+                <input type="hidden" name={this.getValueFieldName()} ref={this.registerHiddenInput} />
 
                 {/* Champ de saisie libre */}
                 <input {...htmlProps}
-                       ref={this.registerTextInput}
-                       readOnly={this.state.readOnly || !this.state.writable} data-writable={this.state.writable}
+                    ref={this.registerTextInput}
+                    readOnly={this.state.readOnly || !this.state.writable} data-writable={this.state.writable}
                 />
                 {this.state.disabled || !this.state.resettable ? null : this.renderResetButton()}
                 <AutoCompleteSelector
@@ -370,37 +393,67 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     }
 
     /**
+     * Gère l'évènement focus sur l'autocomplete
+     * @param {any} event l'évènement focus
+     */
+    protected handleFocus(event: any) {
+        (this.state as any).focused = true;
+        // L'attribut DOM onBlur est éventuellement aussi renseigné sur le composant auto-complete
+        if (this.state.onFocus) {
+            this.state.onFocus(event);
+        }
+    }
+
+    /**
+     * Gère l'évènement doubleclick sur l'autocomplete
+     * @param {any} event l'évènement focus
+     */
+    protected handleDoubleClick(event: any) {
+        this.handleClickAndDoubleClick(event);
+    }
+
+    /**
+     * Gère l'évènement click sur l'autocomplete
+     * @param {any} event l'évènement focus
+     */
+    protected handleClick(event: any) {
+        this.handleClickAndDoubleClick(event);
+    }
+
+    /**
      * rendu html du bouton reset
      * @returns {any}
      */
     renderResetButton(): JSX.Element {
-        const htmlProps = _.cloneDeep(this.getHtmlProps());
+        const htmlProps = cloneDeep(this.getHtmlProps());
 
-        const hidden = htmlProps[ "type" ] === "hidden";
+        const hidden = htmlProps["type"] === "hidden";
 
-        const classList: ClassDictionary = {
+        const classList: classNames.ClassDictionary = {
             "input-reset autocomplete-reset": true,
-            "input-reset-hidden": (!this.isValued() || hidden)};
+            "input-reset-hidden": (!this.isValued() || hidden),
+        };
 
         const aProps: any = {};
         if (this.isValued()) {
-            aProps[ "onClick" ] = this.reset;
-            aProps[ "tabIndex" ] = 0;
-            aProps[ "title"] = this.i18n(this.state.resetTitle, {...this.state});
+            aProps["onClick"] = this.reset;
+            aProps["tabIndex"] = 0;
+            aProps["title"] = this.i18n(this.state.resetTitle, { ...this.state });
+            aProps["role"] = "button";
         }
 
-        let spanProps: HTMLAttributes<HTMLElement> = {};
-        spanProps = _.assign(spanProps, {
-            id: this.props.id || this.props.name + "ResetButton",
+        let spanProps: React.HTMLAttributes<HTMLElement> = {};
+        spanProps = assign(spanProps, {
+            id: this.inferResetButtonId(),
             "aria-hidden": !this.isValued(),
-            role: "button",
             className: classNames(classList),
-            onKeyDown: this.handleResetKeyDown} as HTMLAttributes<HTMLElement>);
-
+            onKeyDown: this.handleResetKeyDown,
+        } as React.HTMLAttributes<HTMLElement>);
+        logger.trace("render resetButton", spanProps, aProps);
         return (
             <span {...spanProps}>
                 <a {...aProps}>
-                    <img src={Picto.grey.close} alt={aProps.title} />
+                    <SvgSprites icon="close" color="#757575" tabIndex={ -1 }/>
                 </a>
             </span>
         );
@@ -411,14 +464,32 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         if (key === KeyCodes.ENTER || key === KeyCodes.SPACEBAR) {
             e.preventDefault();
             e.stopPropagation();
-           this.reset();
+            this.reset(e);
         }
     }
 
-    reset() {
+    clear(event) {
+        if (event) {
+            event.preventDefault();
+        }
         this.resetField();
-        this.props.dataSource.select(null);
+        this.emitDataSourceSelectEvent(null);
+        if (this.state.onChange) {
+            this.state.onChange({
+                target: this.textInput,
+                currentTarget: this.textInput,
+                preventDefault: () => { },
+                stopPropagation: () => { },
+            });
+        }
+        this.clearFilterData();
         this.setFocus();
+    }
+
+
+    reset(event) {
+        this.clear(event);
+        this.handleClickAndDoubleClick();
     }
 
     isValued(): boolean {
@@ -437,13 +508,10 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         // dans le cas writable, le composant n'a pas besoin de recharger la liste des choix
         // elle est disponible directement
         if (this.props.writable) {
-            if (!this.state.onListWidgetSelected) {
-                this.prepareChoices(true);
-            } else {
-                this.prepareChoices(false);
-            }
+            this.prepareChoices();
+        } else {
+            this.showChoices();
         }
-        (this.state as any).onListWidgetSelected = false;
     }
 
     /**
@@ -513,9 +581,9 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Réinitialise le champs autocomplete
      */
     public resetField() {
-        this.resetSelectedValue();
+        this.setState({ selectedIndex: -1 });
         this.resetSelectedText();
-        (this.state as any).selectedIndex = -1;
+        this.resetSelectedValue();
         return this;
     }
 
@@ -527,7 +595,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             this.hiddenInput.value = "";
         }
         this.autoCompleteState.choiceFocused = null;
-        (this.state as any).selectedIndex = -1;
     }
 
     /**
@@ -547,8 +614,8 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param e évènement
      * @protected
      */
-    protected handleOnKeyDown(e: React.KeyboardEvent<HTMLElement>) {
-        /* L'attribut DOM onKeyDown est éventuellement aussi renseigné sur le composant auto-complete */
+    protected handleKeyDown(e: React.KeyboardEvent<HTMLElement>) {
+        // L'attribut DOM onKeyDown est éventuellement aussi renseigné sur le composant auto-complete
         if (this.state.onKeyDown) {
             this.state.onKeyDown(event);
         }
@@ -560,6 +627,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
         if (key === KeyCodes.DOWN_ARROW) {
             if (e.altKey) {
                 this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, null);
+                this.handleClickAndDoubleClick();
                 this.showChoices();
             } else {
                 this.navigateInChoices(1);
@@ -575,11 +643,8 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             }
             e.preventDefault();
         } else if (key === KeyCodes.ESCAPE) {
-            // test si une valeur existait
-            if (this.hiddenInput.value) {
-                this.selectedChoice(this.hiddenInput.value);
-                this.selectCurrentIndex();
-            }
+            // clear la zone de saisie et le datasource (règle d'acccéssibilité)
+            this.clear(e);
             // On demande le masquage des choix
             this.hideChoices();
             e.preventDefault();
@@ -588,7 +653,9 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             // ne fait rien sinon (valide le formulaire)
             if (this.state.shouldShowChoices) {
                 e.preventDefault();
-                this.validateSelectedValue(shouldShow);
+                if (this.state.choices && this.state.choices.length > 0) {
+                    this.validateSelectedValue(shouldShow);
+                }
             }
         } else if (key === KeyCodes.SPACEBAR && !this.state.writable) {
             // valide un choix si on est sur un autocomplete et non writable
@@ -627,11 +694,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
 
     /**
      * gère la tabulation
-     * @param {__React.KeyboardEvent<HTMLElement>} e
+     * @param {React.KeyboardEvent<HTMLElement>} e
      * @param {boolean} shouldShow
      * @param {boolean} preventDefault
      */
-    protected tabHandlerForValueChange(e: __React.KeyboardEvent<HTMLElement>, shouldShow: boolean) {
+    protected tabHandlerForValueChange(e: React.KeyboardEvent<HTMLElement>, shouldShow: boolean) {
         if (this.isUpdated) {
             this.validateSelectedValue(shouldShow);
             this.isUpdated = false;
@@ -650,20 +717,21 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             // place le selectedIndex sur le choix
             if (!this.state.selectedIndex) {
                 this.state.choices.map((element, index) => {
-                    if (element.text === this.getCurrentText()) {
+                    const isElementContainsText = element && element.text;
+                    const currentText = this.getCurrentText();
+                    if (isElementContainsText && currentText && element.text.toLowerCase() === currentText.toLowerCase()) {
                         (this.state as any).selectedIndex = index;
                     }
                 });
             }
             // choix sélectionné
-            const selection: any = (this.state.choices[this.state.selectedIndex] || this.state.allChoices[this.state.selectedIndex]);
-
+            const selection: any = this.state.choices[this.state.selectedIndex];
             if (selection != null) {
                 this.setCurrentValue(selection.value);
-                this.props.dataSource.select(selection);
+                this.emitDataSourceSelectEvent(selection);
             } else {
                 this.setCurrentValue(undefined);
-                this.props.dataSource.select(undefined);
+                this.emitDataSourceSelectEvent(undefined);
             }
 
             this.selectCurrentIndex();
@@ -674,57 +742,72 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     }
 
     /**
-     * Gestion de l'évènement onFocus pour le champ de saisie libre.
-     * @param event
+     * Emet l'évènement select sur le dataSource
+     * si l'objet déjà sélectionné est différent de celui en paramètre
+     * @param {any} - nouvelle sélection
      */
-    protected handleOnFocus(event: any): void {
-        this.typedValueOnFocus = this.getCurrentText();
-        (this.state as any).focused = true;
-        this.showChoices();
-        /* L'attribut DOM onBlur est éventuellement aussi renseigné sur le composant auto-complete */
-        if (this.state.onFocus) {
-            this.state.onFocus(event);
+    emitDataSourceSelectEvent(newSelection) {
+        const actualSelection = this.props.dataSource.selected;
+        if ((!actualSelection && newSelection)
+            || (actualSelection && !newSelection)
+            || (actualSelection
+                && newSelection
+                && (actualSelection.text !== newSelection.text || actualSelection.value !== newSelection.value))
+            || (actualSelection !== newSelection)) {
+            this.props.dataSource.select(newSelection);
         }
+    }
 
-        if (this.state.allChoices) {
-            if (this.isValidText(this.typedValueOnFocus) || !this.props.writable) {
-                logger.trace("auto-complete : prise en compte du texte présent au focus : ", this.typedValueOnFocus);
-                if (!this.props.dataSource.status) {
-                    this.props.dataSource.init();
-                } else {
-                    if ((!this.props.writable) || this.state.choices.length === 0 && this.hiddenInput.value) {
-                        this.setChoices(this.state.allChoices, () => { // setState
-                            if (this.state.allChoices.length > 0) {
-                                const index = _.findIndex(this.state.allChoices, {text: this.typedValueOnFocus});
-                                (this.state as any).selectedIndex = index === undefined ? -1 : index;
-                                this.showChoices();
-                                this.changeSelectedChoiceWhenOneChoice(this.typedValueOnFocus);
-                            }
-                        });
-                    }
-                }
-                // this._throttledTriggerAction(this.typedValueOnFocus);
+    /**
+     * Initialise les tableaux allChoices choices du state
+     */
+    initChoicesAndAllChoices() {
+        (this.state as any).allChoices = [];
+        (this.state as any).choices = [];
+    }
 
-                this.changeSelectedChoiceWhenOneChoice(this.typedValueOnFocus);
+    /**
+     * Méthode déclenchée lors du click ou doubleClick sur le champ autocomplete
+     * @param {any} event évènement propagé
+     */
+    protected handleClickAndDoubleClick(event?: any): void {
+        this.prepareChoices();
+        this.typedValueOnFocus = this.getCurrentText();
 
-            } else {
-                this.setChoices(this.state.allChoices, () => { // setState
-                    if (this.state.allChoices.length > 0) {
-                        this.showChoices();
-                        (this.state as any).selectedIndex = -1;
-                        this.autoCompleteState.setFocusOn(this.state.selectedIndex, "", null);
-                    }
-                });
-            }
+        if (!this.isValidText(this.typedValueOnFocus) && this.state.allChoices) {
+            this.initChoicesAndAllChoices();
+        }
+        if (!this.props.dataSource.isSlave && ((!this.isValidText(this.typedValueOnFocus) && this.props.init) || !this.props.writable)) {
+            // Si le nombre de caractères saisi dans l'input est inférieur au minimum requis  et que la props init est à true
+            // ou si l'autocomplete n'est pas writtable, on initialise le datasource
+            this._throttledTriggerAction(this.typedValueOnFocus);
+        } else if (!this.props.dataSource.isSlave) {
+            this.showChoices();
+        } else if ((this.props.dataSource.getFetchArgs(null, null)
+            || (this.props.init && !this.props.dataSource.isDatasourceArray()))
+            && !this.isValidText(this.typedValueOnFocus)) {
+            this._throttledTriggerAction(this.typedValueOnFocus);
+            this.showChoices();
         } else {
+            if (this.props.init && !this.isValidText(this.typedValueOnFocus)) {
+                (this.state as any).choices = this.props.dataSource.getResultBackup();
+                if (!this.state.choices || this.state.choices.length === 0) {
+                    this._throttledTriggerAction(this.typedValueOnFocus);
+                } else {
+                    this.props.dataSource.results = this.props.dataSource.getResultBackup();
+                }
+            } else if (!this.isValidText(this.typedValueOnFocus)) {
+                this.initChoicesAndAllChoices();
+            }
             this.showChoices();
         }
+
         if (!this.hiddenInput || this.hiddenInput.value.length === 0 || !this.textInput || this.textInput.value.length === 0) {
             this.clearFilterData();
             (this.state as any).selectedIndex = -1;
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, "", null);
         } else {
-            (this.state as any).selectedIndex = _.findIndex(this.state.allChoices, {text: this.typedValueOnFocus});
+            (this.state as any).selectedIndex = findIndex(this.state.choices, { text: this.typedValueOnFocus });
             this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, null);
         }
     }
@@ -733,42 +816,40 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Fonction déclenchée lorsque le champ de saisie libre perd le focus
      * @param event
      */
-    protected handleOnBlur(event: React.FocusEvent<HTMLElement>): void {
+    protected handleBlur(event: React.FocusEvent<HTMLElement>): void {
         (this.state as any).focused = false;
         // L'attribut DOM onBlur est éventuellement aussi renseigné sur ce composant auto-complete
         if (this.state.onBlur) {
             this.state.onBlur(event);
         }
 
-        const currentText = this.getCurrentText();
-        if (this.state.allChoices) {
-            this.state.allChoices.filter((choice: any) => {
-                let res = false;
-                if (!choice.text) {
-                    res = choice.text.toLowerCase() === currentText.toLowerCase();
-                }
-                return res;
-            });
-        }
-
         if (!this.props.dataSource.selected || (this.props.dataSource.selected &&
-                this.props.dataSource.selected.value &&
-                this.props.dataSource.selected.value.toString() !== this.hiddenInput.value)) {
+            this.props.dataSource.selected.value &&
+            this.props.dataSource.selected.value.toString() !== this.hiddenInput.value)) {
             if (!this.hiddenInput || !this.hiddenInput.value || this.hiddenInput.value.length === 0) {
                 this.clearFilterData();
-                if (!this.state.isShiftTab) this.props.dataSource.select(undefined);
+                if (!this.state.isShiftTab) {
+                    this.emitDataSourceSelectEvent(null);
+                }
             } else {
                 let val;
                 if (this.state.allChoices.length > 0) {
                     val = (typeof this.state.allChoices[0]
                         .value === "number") ? parseInt(this.hiddenInput.value, 10) : this.hiddenInput.value;
                 }
-                this.props.dataSource.select(_.find(this.state.allChoices, { value: val }));
+                this.emitDataSourceSelectEvent(find(this.state.allChoices, { value: val }));
             }
         }
-
         this.hideChoices();
         this.isUpdated = false;
+    }
+
+    /**
+     * Déduit l'id du button reset de l'autocomplete
+     * @returns {string} id du bouton reset
+     */
+    protected inferResetButtonId(): string {
+        return this.props.id || this.props.name + "ResetButton";
     }
 
     /**
@@ -776,9 +857,15 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     clearFilterData() {
         if (this.props.dataSource instanceof DataSourceMaster) {
-            (this.props.dataSource as DataSourceMaster<any>).getSlaves().forEach((item: DataSource<any>) => {
+            this.props.dataSource.getSlaves().forEach((item: DataSource<any>) => {
                 item.emit("filter", []);
             });
+        }
+    }
+
+    protected onChangeForceEmit(event): void {
+        if (this.state.onChange) {
+            this.state.onChange(event);
         }
     }
 
@@ -786,16 +873,16 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Fonction déclenchée sur une modification du champ de saisie libre
      * @param event
      */
-    protected handleChangeTextInput(event: FormEvent<HTMLElement>): void {
-
+    protected handleChangeTextInput(event?: React.FormEvent<HTMLElement>): void {
+        this.isTyping = true;
         logger.trace("auto-complete handleChangeTextInput");
-        /* Le texte a changé donc on réinitialise la valeur */
+        // Le texte a changé donc on réinitialise la valeur
         this.resetSelectedValue();
         (this.state as any).selectedIndex = null;
 
-        /* L'attribut DOM onChange est éventuellement aussi renseigné sur le composant auto-complete */
-        if (this.state.onChange) {
-            this.state.onChange(event);
+        // L'attribut DOM onChange est éventuellement aussi renseigné sur le composant auto-complete
+        if (event) {
+            this.onChangeForceEmit(event);
         }
 
         const newText = this.getCurrentText();
@@ -807,21 +894,25 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             (this.refs.selector as AutoCompleteSelector).setCurrentTypedText(newText);
         }
 
-        if (this.isValidText(newText)) {
+        // Si le texte saisi contient le nombre de caractères minumum pour lancer la recherche
+        // ou si rien n'est saisi mais qu'il faut afficher tout les choix par défaut, alors
+        // on lance la recherche
+        if ((this.isValidText(newText)
+            || (!newText && this.state.init)
+            || !this.state.writable)
+            && (!this.props.dataSource.isSlave
+                || this.props.dataSource.getFetchArgs(null, null)
+                || this.state.init)) {
             logger.trace("auto-complete : prise en compte du texte saisi : ", newText);
             this._throttledTriggerAction(newText);
+        } else if (this.props.dataSource.isSlave && !this.props.dataSource.getFetchArgs(null, null)) {
+            this.initChoicesAndAllChoices();
+            this.emitDataSourceSelectEvent(null);
+            this.forceUpdate();
         } else {
+            this.initChoicesAndAllChoices();
             this.hideChoices();
-        }
-
-        if (newText.length === 0) {
-            this.setChoices(this.state.allChoices, () => { // setState
-                if (this.state.allChoices.length > 0) {
-                    this.showChoices();
-                } else {
-                    this.props.dataSource.select(null);
-                }
-            });
+            this.emitDataSourceSelectEvent(null);
         }
     }
 
@@ -832,9 +923,11 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     protected changeSelectedChoiceWhenOneChoice(newText: string): void {
         if (this.state.choices && this.state.choices[0] && this.state.choices.length === 1
-            && _.deburr(newText).toLowerCase() === _.deburr(this.state.choices[0].text).toLowerCase()) {
+            && deburr(newText).toLowerCase() === deburr(this.state.choices[0].text).toLowerCase()) {
             this.changeSelectedChoice(this.state.choices[0]);
-            this.props.dataSource.select(this.state.choices[0]);
+            if (this.props.dataSource.selected !== this.state.choices[0]) {
+                this.emitDataSourceSelectEvent(this.state.choices[0]);
+            }
             this.autoCompleteState.setFocusOn(0, this.state.choices[0].value, 0);
         }
     }
@@ -846,7 +939,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     setCurrentValue(value: any): this {
         super.setCurrentValue(value);
-        this.setState({listDefaultValue: value});
+        this.setState({ listDefaultValue: value });
         return this;
     }
 
@@ -855,6 +948,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param newText texte saisi
      */
     protected triggerAction(newText: string) {
+        logger.trace("triggerAction texte ", newText);
         this.setIsApiLoading(true);
         this.props.dataSource.fetch(true, newText, true);
     }
@@ -870,30 +964,50 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     /**
      * Charge la liste de choix dans le composant
      */
-    protected prepareChoices(display = true) {
-        const newChoices = [];
-        let cnt: number = 0;
-        if (this.state.choices) {
-            this.state.choices.map((choice: any) => {
-                if (this.findText(choice, this.getCurrentText().toLowerCase()) && !this.isMaxElementNumberReached(cnt)) {
-                    newChoices.push(choice);
-                    cnt++;
+    protected prepareChoices(): void {
+        const newText = this.getCurrentText();
+        if (this.isValidText(newText) || (!newText && this.state.init) || !this.state.writable) {
+            const choicesListToUse = (this.state.choices && this.state.choices.length > 0) ? this.state.choices : this.state.allChoices;
+            const newChoices = this.inferNewChoices(choicesListToUse, newText);
+
+            // mets a jour la liste des choix
+            this.setChoices(newChoices, () => {
+                if (newChoices.length > 0) {
+                    // si il n'y a plus qu'un choix on le valide
+                    this.changeSelectedChoiceWhenOneChoice(this.getCurrentText());
+                    this.showChoices();
+                } else if (newChoices.length === 0) {
+                    this.hiddenInput.value = "";
+                    this.emitDataSourceSelectEvent(null);
                 }
             });
         }
+    }
 
-        // mets a jour la liste des choix
-        this.setChoices(newChoices, () => {
-            if (newChoices.length > 0 && display) {
-                // si il n'y a plus qu'un choix on le valide
-                this.changeSelectedChoiceWhenOneChoice(this.getCurrentText());
-                this.showChoices();
-            } else {
-                this.hiddenInput.value = "";
-                this.props.dataSource.select(null);
-                this.showChoices();
+    /**
+     * Calculer la nouvelle liste des choix à afficher
+     * @param {Array} - actualChoices : liste des choix actuelle
+     * @param {string} - inputValue : la valeur du champ autocomplete
+     * @returns {Array} - la nouvelle liste de choix
+     */
+    protected inferNewChoices(actualChoices, inputValue): any[] {
+        let newChoices = [];
+        if (actualChoices) {
+            newChoices = actualChoices;
+            const maxElements = this.state.maxElements ? this.state.maxElements : actualChoices.length;
+            // Dans le cas d'un datasource array, le filter est pour l'instant porté par l'autocomplete
+            if (this.props.dataSource && (this.props.autoFilter || this.isTyping)) {
+                newChoices = actualChoices.filter((choice: any) => {
+                    return this.findText(choice, inputValue.toLowerCase());
+                });
+                this.isTyping = false;
             }
-        });
+
+            newChoices = newChoices.filter((item, index) => {
+                return index < maxElements;
+            });
+        }
+        return newChoices;
     }
 
     /**
@@ -901,8 +1015,12 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param resultItems éléments obtenus. ceux-ci doivent contenir une propr
      */
     protected choicesLoaderCallback(resultItems: any[]): void {
-        this.setIsApiLoading(false);
-        this.setChoices(resultItems);
+        const newText = this.getCurrentText();
+        if (this.isValidText(newText) || (!newText && this.state.init) || !this.state.writable) {
+            this.setIsApiLoading(false);
+            this.setChoices(resultItems);
+            this.setResultCallback(resultItems);
+        }
     }
 
     /**
@@ -913,7 +1031,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     protected startsWithText(choice: any, current: string) {
         const choiceText: string = choice ? choice["text"] ? choice["text"].toLowerCase() : null : null;
-        return _.startsWith(choiceText, current);
+        return startsWith(choiceText, current);
     }
 
     /**
@@ -936,13 +1054,15 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param current
      * @returns {boolean}
      */
-    protected findText(choice: any, current: string) {
+    protected findText(choice: any, current: string): boolean {
 
         if (typeof this.props.filterText === "function") {
             return this.props.filterText(choice, current);
-        } else if (this.props.filterText === FilterTextType.beginWith) {
+        }
+        if (this.props.filterText === FilterTextType.beginWith) {
             return this.startsWithText(choice, current);
-        } else if (this.props.filterText === FilterTextType.indexOf) {
+        }
+        if (this.props.filterText === FilterTextType.indexOf) {
             return this.indexOfText(choice, current);
         }
 
@@ -954,10 +1074,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @param choice élément sélectionné
      */
     public changeSelectedChoice(choice?: any) {
-        // if (this.refs.selector) {
-        //     (this.refs.selector as AutoCompleteSelector).setCurrentTypedText("");
-        // }
-
         this.textInput.value = choice ? choice.text : "";
         this.hiddenInput.value = choice ? choice.value : "";
     }
@@ -982,22 +1098,24 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Fonction appelée lorsque l'utilisateur clique sur un item de la liste des valeurs possibles
      * @param event
      */
-    protected onListWidgetSelected(event: __React.MouseEvent<HTMLElement>, choice: any): void {
+    protected onListWidgetSelected(event: React.MouseEvent<HTMLElement>, choice: any): void {
         if (choice) {
             logger.trace("Selection click [", choice.value, "]:", choice.text);
-            const index = _.findIndex(this.state.choices, choice);
+            const index = findIndex(this.state.choices, choice);
             (this.state as any).selectedIndex = index;
             this.autoCompleteState.choiceFocused = index;
             this.changeSelectedChoice(choice);
             this.hiddenInput.value = choice.value;
             this.selectedChoice(choice.value);
-            this.props.dataSource.select(choice);
+            this.emitDataSourceSelectEvent(choice);
 
-            if (this.state.onChange) {
-                this.state.onChange(event);
-            }
+            this.onChangeForceEmit({
+                target: this.textInput,
+                currentTarget: this.textInput,
+                preventDefault: () => { },
+                stopPropagation: () => { },
+            });
         }
-        (this.state as any).onListWidgetSelected = true;
         this.hideChoices();
     }
 
@@ -1017,7 +1135,6 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * @protected
      */
     protected navigateInChoices(delta: number) {
-
         let newIndex: number = this.state.selectedIndex === null ? (delta === 1 ? 0 : delta) : this.state.selectedIndex + delta;
         const choicesLength: number = this.state.choices ? this.state.choices.length : 0;
 
@@ -1029,25 +1146,21 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             newIndex = 0;
         }
 
-        // on valide le choix sur lequel on est
-        this.setState({selectedIndex: newIndex}, () => {
-            this.selectCurrentIndex();
-            if (!this.state.shouldShowChoices) {
-                const selection: any = (this.state.choices[this.state.selectedIndex]);
-                if (selection != null) {
-
-                    this.changeSelectedChoice(selection);
-                    this.setCurrentValue(selection.value);
-                }
-            }
-            this.autoCompleteState.setFocusOn(this.state.selectedIndex, this.hiddenInput.value, newIndex);
-
-        });
-
-        // On s'assure de l'affichage de la liste déroulante
-        if (this.state.shouldShowChoices) {
-            this.showChoices();
+        const selection: any = (this.state.choices[newIndex]);
+        if (selection != null) {
+            this.changeSelectedChoice(selection);
+            super.setCurrentValue(selection.value);
+            this.setState({ currentValue: selection.value, selectedIndex: newIndex });
         }
+
+        this.onChangeForceEmit({
+            target: this.textInput,
+            currentTarget: this.textInput,
+            preventDefault: () => { },
+            stopPropagation: () => { },
+        });
+        this.autoCompleteState.setFocusOn(newIndex, this.hiddenInput.value, newIndex);
+
     }
 
     /**
@@ -1071,7 +1184,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
     public showChoices(): void {
         if (this.state.shouldShowChoices !== true && this.state.focused) {
             if (this.isValidText(this.textInput.value) || this.textInput.value.length === 0 || !this.props.writable) {
-                this.setState({shouldShowChoices: true});
+                this.setState({ shouldShowChoices: true });
             }
         }
     }
@@ -1082,7 +1195,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      */
     public hideChoices(): void {
         if (this.state.shouldShowChoices !== false) {
-            this.setState({shouldShowChoices: false});
+            this.setState({ shouldShowChoices: false });
         }
     }
 
@@ -1112,7 +1225,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
      * Surcharge le rendu des erreurs de validation : le nom du champ à mettre en évidence est le champ de saisie libre
      * @override
      */
-    renderErrors(): __React.ReactElement<FieldErrorProps> {
+    renderErrors(): React.ReactElement<FieldErrorProps> {
         const fieldErrorProps: FieldErrorProps = {
             errors: this.state.errors,
             fieldName: this.getFreeTypingFieldName(),
@@ -1169,7 +1282,7 @@ export class AutoCompleteField<P extends AutoCompleteFieldProps> extends Abstrac
             fieldErrors = this.state.errors.filter(function (error: INotificationType): boolean {
                 const name = this.state.name + "." + this.state.labelKey;
                 return (error.field === name || error.field === this.state.name);
-            },                                     this);
+            }, this);
         }
         if (fieldErrors && (fieldErrors.length > 0)) {
             return true;

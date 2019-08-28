@@ -73,37 +73,34 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
 Utils.setConfigObj({});
 
-
-
-import SyntheticEvent = React.SyntheticEvent;
 import { User } from 'src/widget/user/user';
-import { isArray } from 'util';
 import { HornetReactTest } from 'hornet-js-test/src/hornet-react-test';
-const logger: Logger = Utils.getLogger("user.test.karma");
-
 
 let userElement: JSX.Element;
 let user;
+
+
 @Decorators.describe("Test Karma User")
-class userTest extends  HornetReactTest  {
+class userTest extends  BaseTest  {
+
     @Decorators.beforeEach
     beforeEach() {
         Utils.setCls("hornet.internationalization", { messages});

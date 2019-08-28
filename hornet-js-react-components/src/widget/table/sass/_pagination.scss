@@ -1,0 +1,135 @@
+@import '../../sass/core';
+
+$tableBaseColorDark: theme-color('global', 'dark');
+$tableGlobalStates: theme-color($variant: 'states');
+$paginationButtonBg: rgba(0, 0, 0, 0);
+$paginationButtonFill: rgba(0, 0, 0, 1);
+$paginationInputHover: rgba(238, 238, 238, 1); //#eee
+
+/// Composant table qui se compose de :
+/// _table.scss
+/// _pagination.scss
+/// datatable-sortable.scss
+/// _datatable-loader.scss
+.datatable-pagination {
+    display: flex;
+    justify-content: flex-end;
+    height: 3.5em;
+    max-width: 100%;
+    align-items: center;
+
+    .button-action {
+        .label {
+            color: $tableBaseColorDark;
+        }
+    }
+
+    .datatable-pagination-content {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 1.125em 0;
+        padding: 0.125em;
+    }
+}
+
+.datatable-pagination-button {
+    box-sizing: border-box;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    margin: 0.375em 0.5em;
+    padding: 0 0.375em;
+    align-items: center;
+    min-height: 2.25em;
+    min-width: 5.5em;
+    user-select: none;
+    border: 0 none;
+    border-radius: 0.1875em;
+    cursor: pointer;
+    color: currentcolor;
+    font-family: inherit;
+    font-size: 0.875em;
+    font-style: inherit;
+    font-variant: inherit;
+    font-weight: 500;
+    line-height: 2.25em;
+    background: $paginationButtonBg none repeat scroll 0 0;
+    outline: none;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s,
+    background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) 0.1s;
+    white-space: nowrap;
+   
+    &:hover,
+    &:focus {
+        border-radius: 50%;
+        outline: none;
+        box-shadow: 0 0 0.3em 0em $tableGlobalStates;
+        transition: all 0.3s;
+    }
+}
+
+.datatable-pagination-button-prev,
+.datatable-pagination-button-next,
+.datatable-pagination-button-prevpage,
+.datatable-pagination-button-nextpage,
+.datatable-pagination-button-firstpage,
+.datatable-pagination-button-lastpage {
+    margin: 0;
+    padding: 0 0.3em;
+    border-radius: 50%;
+    line-height: 1.5em;
+    min-width: 0;
+    use {
+        fill: $paginationButtonFill;
+    }
+}
+
+/*.datatable-pagination-button-prev,
+.datatable-pagination-button-prevpage {
+    background-position: 0.125em;
+
+    @include svgAsBackground($tableBaseColorDark, "../img/table-arrow-left.svg");
+}
+
+.datatable-pagination-button-firstpage {
+    background-position: 0.125em;
+
+    @include svgAsBackground($tableBaseColorDark, "../img/first-page.svg");
+}
+
+.datatable-pagination-button-next,
+.datatable-pagination-button-nextpage {
+    background-position: 0.125em;
+
+    @include svgAsBackground($tableBaseColorDark, "../img/table-arrow-right.svg");
+}
+
+.datatable-pagination-button-lastpage {
+    background-position: 0.125em;
+
+    @include svgAsBackground($tableBaseColorDark, "../img/last-page.svg");
+}*/
+
+.datatable-pagination-input {
+    width: 3em;
+    height: 1.5em;
+    border: 0.0625em solid transparent;
+    text-align: center;
+
+    &:hover {
+        border: 0.0625em solid $paginationInputHover;
+    }
+
+    &:invalid {
+        box-shadow: none;
+    }
+
+    &-label {
+        position: fixed;
+        left: -5000px;
+    }
+}

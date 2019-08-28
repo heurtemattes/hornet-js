@@ -143,6 +143,10 @@
     "tab": "Onglet {tabTitle}"
   },
   "table": {
+    "linesUnselected":"Tout désélectionné",
+    "linesSelected":"Tout sélectionné",
+    "lineUnselected": "Ligne désélectionnée",
+    "lineSelected":"Ligne sélectionnée",
     "pager": {
       "dropdownTitle": "Nombre d'éléments du {summary}",
       "inputLabel": "Numéro de la page affichée du {summary}",
@@ -207,9 +211,7 @@
       "lineBeginning": "Début de ligne",
       "lineEnd": "Fin de ligne",
       "selectAll": "Sélectionner toutes les lignes",
-      "selectCurrentLine": "Sélectionner la ligne courante",
-      "toggleMode": "Basculer entre mode navigation simple (la tabulation fait sortir du tableau) et mode édition (la tabulation navigue entre les différents boutons d'action)",
-      "escape": "Retourner au mode navigation simple (la tabulation fait sortir du tableau)"
+      "selectCurrentLine": "Sélectionner la ligne courante"
     },
     "booleanOui": "oui",
     "booleanNon": "non"
@@ -309,6 +311,7 @@
       "ERR_TECH_10013": "Sequelize - Erreur de validation - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10014": "Sequelize - Unique Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10015": "Sequelize - Erreur de base de données - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
+      "ERR_TECH_10020": "Sequelize - Erreur de base de données - Une erreur de version est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10301": "Datasource - Fetch Error - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10302": "Datasource - Erreur de tri - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
       "ERR_TECH_10303": "Datasource - Erreur de filtre - Une erreur technique est survenue : {errorMessage} / rapport d'incident : {reportId}",
@@ -332,3 +335,4 @@
     }
   }
 }
+

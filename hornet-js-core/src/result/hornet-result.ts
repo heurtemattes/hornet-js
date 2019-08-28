@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,7 +82,7 @@ import { Response, Request } from "express";
 import { MediaType } from "src/protocol/media-type";
 import { Options } from "src/result/hornet-result-interface";
 import { NodeApiResultBuilder } from "src/services/service-api-results";
-
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 /**
  * @class
@@ -125,7 +125,7 @@ export class HornetResult {
     }
 
     get status() {
-        return this._options.status || (this._options.data ? 200 : 206);
+        return this._options.status || (this._options.data ? 200 : 204);
     }
 
     /**

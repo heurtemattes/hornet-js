@@ -73,17 +73,15 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as Log4jsNode from "log4js";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
 import { ContinuationLocalStorage } from "hornet-js-utils/src/continuation-local-storage";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as path from "path";
-import * as fs from "fs";
+import { Logger } from "hornet-js-logger/src/logger";
 
 export class ServerLog {
 
@@ -117,7 +115,7 @@ export class ServerLog {
      * @param tokenWithFunc : objet de la forme {"token":function(){return "valeur"}}
      */
     static addLayoutTokens(tokenWithFunc: any): void {
-        _.assign(ServerLog.appenderLayoutTokens, tokenWithFunc);
+        assign(ServerLog.appenderLayoutTokens, tokenWithFunc);
     }
 
     /**

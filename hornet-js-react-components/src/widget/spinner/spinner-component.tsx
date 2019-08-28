@@ -73,13 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
@@ -87,7 +86,9 @@ import { ASYNCHRONOUS_REQUEST_EVENT_COMPONENT } from "hornet-js-core/src/event/h
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { RequestEventDetail } from "hornet-js-core/src/event/hornet-event";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.spinner.spinner-component");
+import "src/widget/spinner/sass/_spinner.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.spinner.spinner-component");
 
 /**
  * Propriétés du spinner

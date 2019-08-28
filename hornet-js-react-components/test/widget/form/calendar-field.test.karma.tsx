@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,16 +82,16 @@
 import { runTest } from "hornet-js-test/src/test-run";
 import "hornet-js-test/src/test-run";
 
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 import { Utils } from "hornet-js-utils";
-
+Utils.setConfigObj({});
 import * as moment from "moment";
 import { CalendarField } from "src/widget/form/calendar-field";
 
@@ -105,7 +105,7 @@ class CalendarFieldTest extends HornetReactTest {
     beforeEach() {
 
         Utils.setCls("hornet.internationalization",
-                     {
+            {
                 messages: {
                     calendar: {
                         agendaTitle: "Agenda",
@@ -182,14 +182,14 @@ class CalendarFieldTest extends HornetReactTest {
             });
 
             this.end();
-        },         2500);
+        }, 2500);
     }
 
     @Decorators.it("Test saisie date valide")
     controlInvalidDateElement() {
         const id = this.generateMainId();
         form = this.renderIntoDocument(<CalendarField valideOnForm={false} label={"Test date"}
-            name="dateTest" />,        id);
+            name="dateTest" />, id);
 
         const dateInput = (document.querySelector(`#${id} .calendar-input`));
 
@@ -200,7 +200,7 @@ class CalendarFieldTest extends HornetReactTest {
 
             expect(document.querySelector(`#${id} .fielderror-content`)).to.not.exist;
             this.end();
-        },         2500);
+        }, 2500);
     }
 
     @Decorators.it("Test selection d'une date dans la boite de dialogue")
@@ -221,7 +221,6 @@ class CalendarFieldTest extends HornetReactTest {
             , id);
 
         setTimeout(() => {
-
             this.triggerMouseEvent(document.querySelector(`#${id} .agenda`), "click");
 
             expect(document.querySelector(".widget-dialogue-header")).to.exist;
@@ -237,7 +236,7 @@ class CalendarFieldTest extends HornetReactTest {
             expect(onValueChangeCount, "valueChangeCount").to.be.equal(2);
 
             this.end();
-        },         3000);
+        }, 2000);
     }
 
     @Decorators.it("Test prise en compte de la props alt si présente")
@@ -247,7 +246,6 @@ class CalendarFieldTest extends HornetReactTest {
             <CalendarField
                 valideOnForm={false}
                 label={"Test date alt props"}
-                alt={"test alt props"}
                 name="dateTestAltProps"
                 onSelect={(value) => { }}
                 onChange={(value) => { }}
@@ -256,13 +254,12 @@ class CalendarFieldTest extends HornetReactTest {
             , id);
 
         setTimeout(() => {
-            expect(document.querySelector(`#${id} img`)).to.exist;
-            expect((document.querySelector(`#${id} img`) as any).alt).to.equal("test alt props");
+            expect(document.querySelector(`#${id} svg`)).to.exist;
             expect(document.querySelector(`#${id} input`)).to.exist;
             expect((document.querySelector(`#${id} input`) as HTMLInputElement).hasAttribute("alt")).to.be.false;
 
             this.end();
-        },         120);
+        }, 120);
 
     }
 
@@ -293,7 +290,7 @@ class CalendarFieldTest extends HornetReactTest {
             this.triggerMouseEvent(document.querySelector(`.hornet-button.hornet-dialogue-croix`), "click");
             this.end();
         }
-            ,      300);
+            , 300);
     }
 
     /*
@@ -330,16 +327,16 @@ class CalendarFieldTest extends HornetReactTest {
             />
             , id);
 
-         /** Le Champ Input Est bien valorisé */
-         expect((document.querySelector(`#${id} .calendar-input`) as any).value).to.equal("26/03/1986");
+        /** Le Champ Input Est bien valorisé */
+        expect((document.querySelector(`#${id} .calendar-input`) as any).value).to.equal("26/03/1986");
 
-         /** La date sélectionnée dans la modal est la bonne */
-         this.triggerMouseEvent(document.querySelector(`#${id} .agenda`), "click");
-         expect((document.querySelector(`.dialog-content-alert .rc-calendar-date[aria-selected="true"]`) as any)
-             .innerHTML).to.equal("26");
+        /** La date sélectionnée dans la modal est la bonne */
+        this.triggerMouseEvent(document.querySelector(`#${id} .agenda`), "click");
+        expect((document.querySelector(`.dialog-content-alert .rc-calendar-date[aria-selected="true"]`) as any)
+            .innerHTML).to.equal("26");
 
-         this.triggerMouseEvent(document.querySelector(`.hornet-button.hornet-dialogue-croix`), "click");
-         this.end();
+        this.triggerMouseEvent(document.querySelector(`.hornet-button.hornet-dialogue-croix`), "click");
+        this.end();
     }
 
 }

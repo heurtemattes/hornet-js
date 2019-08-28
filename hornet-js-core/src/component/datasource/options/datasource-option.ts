@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,18 +84,19 @@ import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { DatasourceSortOption } from "src/component/datasource/options/datasource-sort-option";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-const logger: Logger = Utils.getLogger("hornet-js-core.component.datasource.options.datasource-option");
+import { StringUtils } from "hornet-js-utils/src/string-utils";
+import { Logger } from "hornet-js-logger/src/logger";
+const logger: Logger = Logger.getLogger("hornet-js-core.component.datasource.options.datasource-option");
 
 export interface DataSourceOption {
     sendToFetch(): boolean;
 }
 
-
 export enum CompareMethod {
     COMPARE_DEFAULT = 1,
     COMPARE_WITH_LOWERCASE = 2,
-    COMPARE_WITH_UPPERCASE = 3
+    COMPARE_WITH_UPPERCASE = 3,
+    WITHOUT_CASE_AND_ACCENT = 4,
 }
 
 export type CompareFn = (sortData, a: any, b: any) => number
@@ -127,6 +128,8 @@ export class DefaultSort implements DatasourceSortOption {
                 return this.compareLowerCase;
             case CompareMethod.COMPARE_WITH_UPPERCASE:
                 return this.compareUpperCase;
+            case CompareMethod.WITHOUT_CASE_AND_ACCENT:
+                return this.compareWithoutCaseAndAccent;
             default:
                 return this.compare;
         }
@@ -145,8 +148,8 @@ export class DefaultSort implements DatasourceSortOption {
             let result: number;
             sortDatas.every((sortData) => {
 
-                let aValue = a[ sortData[ "key" ] ];
-                let bValue = b[ sortData[ "key" ] ];
+                let aValue = (a[ sortData[ "key" ] ] == null) ? "" : a[ sortData[ "key" ] ];
+                let bValue = (b[ sortData[ "key" ] ] == null) ? "" : b[ sortData[ "key" ] ];
 
                 if (aValue < bValue) {
                     result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
@@ -174,21 +177,60 @@ export class DefaultSort implements DatasourceSortOption {
 
         }
 
-        let sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+        const sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+        return DefaultSort.compareUpperCase(sortDatas, a, b);
+        
+    }
+
+    public compareLowerCase = function (sort, a, b): number {
+        if (arguments.length < 3) {
+            let msg: string = "3 arguments sont necessaires [sortData, a, b]";
+            logger.error(msg);
+            throw new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ARGS_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, null);
+
+        }
+
+        const sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+        return DefaultSort.compareLowerCase(sortDatas, a, b);
+        
+    };
+
+    public compareWithoutCaseAndAccent = function (sort, a, b): number {
+        if (arguments.length < 3) {
+            let msg: string = "3 arguments sont necessaires [sortData, a, b]";
+            logger.error(msg);
+            throw new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ARGS_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, null);
+        }
+
+        const sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+        return DefaultSort.compareIgnoreCaseAndAccent(sortDatas, a, b);
+        
+    };
+
+    /**
+    * méthode de tri qui remplace les accents est passe en lowercase avant la comparaison
+    * @param {SortData[]} sortDatas  données de tri
+    * @param {any} a object 1 à comparer.
+    * @param {any} b object 2 à comparer.
+    */
+    static compareIgnoreCaseAndAccent(sortDatas, a, b) {
         let result: number;
         sortDatas.every((sortData) => {
 
-            let aValue = a[ sortData[ "key" ] ];
-            let bValue = b[ sortData[ "key" ] ];
+            let aValue = a[sortData["key"]];
+            let bValue = b[sortData["key"]];
 
+            aValue = (typeof a[ sortData[ "key" ] ] == "string") ? StringUtils.removeAccents(a[sortData["key"]]).toLowerCase() :
+             (typeof a[sortData["key"] ] == "undefined") ? "" : a[sortData["key"]];
 
-            aValue = (typeof a[ sortData[ "key" ] ] == "string") ? a[ sortData[ "key" ] ].toUpperCase() : (typeof a[ sortData[ "key" ] ] == "undefined") ? "" : a[ sortData[ "key" ] ];
-            bValue = (typeof b[ sortData[ "key" ] ] == "string") ? b[ sortData[ "key" ] ].toUpperCase() : (typeof b[ sortData[ "key" ] ] == "undefined") ? "" : b[ sortData[ "key" ] ];
+            bValue = (typeof b[sortData["key" ]] == "string") ? StringUtils.removeAccents(b[sortData["key"]]).toLowerCase() :
+            (typeof b[sortData["key"]] == "undefined") ? "" : b[sortData["key"]];
+
 
 
             if (aValue < bValue) {
                 result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
-                return false
+                return false;
             }
 
             if (aValue == bValue) {
@@ -203,29 +245,68 @@ export class DefaultSort implements DatasourceSortOption {
         return result;
     }
 
-    public compareLowerCase = function (sort, a, b): number {
-        if (arguments.length < 3) {
-            let msg: string = "3 arguments sont necessaires [sortData, a, b]";
-            logger.error(msg);
-            throw new TechnicalError("ERR_TECH_" + CodesError.DATASOURCE_SORT_ARGS_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG }, null);
-
-        }
-
-        let sortDatas = sort ? sort : (this.sort && this.sort.length > 0) ? this.sort : [];
+    /**
+    * méthode de tri qui passe en lowercase avant la comparaison
+    * @param {SortData[]} sortDatas  données de tri
+    * @param {any} a object 1 à comparer.
+    * @param {any} b object 2 à comparer.
+    */
+    static compareLowerCase(sortDatas, a, b): number {
         let result: number;
         sortDatas.every((sortData) => {
 
-            let aValue = a[ sortData[ "key" ] ];
-            let bValue = b[ sortData[ "key" ] ];
+            let aValue = a[sortData["key"]];
+            let bValue = b[sortData["key"]];
 
-            aValue = (typeof a[ sortData[ "key" ] ] == "string") ? a[ sortData[ "key" ] ].toLowerCase() : (typeof a[ sortData[ "key" ] ] == "undefined") ? "" : a[ sortData[ "key" ] ];
-            bValue = (typeof b[ sortData[ "key" ] ] == "string") ? b[ sortData[ "key" ] ].toLowerCase() : (typeof b[ sortData[ "key" ] ] == "undefined") ? "" : b[ sortData[ "key" ] ];
+            aValue = (typeof a[sortData["key"]] == "string") ? a[sortData["key"]].toLowerCase() :
+             (typeof a[sortData["key"]] == "undefined") ? "" : a[sortData["key"]];
+
+            bValue = (typeof b[sortData["key"]] == "string") ? b[sortData["key"]].toLowerCase() :
+             (typeof b[sortData["key"]] == "undefined") ? "" : b[sortData["key"]];
 
 
 
             if (aValue < bValue) {
                 result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
-                return false
+                return false;
+            }
+
+            if (aValue == bValue) {
+                return true;
+            }
+
+            if (aValue > bValue) {
+                result = (sortData.dir == SortDirection.ASC) ? 1 : -1;
+                return false;
+            }
+        });
+        return result;
+    }
+
+   /**
+    * méthode de tri qui passe en uppercase avant la comparaison 
+    * @param {SortData[]} sortDatas  données de tri
+    * @param {any} a object 1 à comparer.
+    * @param {any} b object 2 à comparer.
+    */
+    static compareUpperCase(sortDatas, a, b): number {
+        let result: number;
+        sortDatas.every((sortData) => {
+
+            let aValue = a[sortData["key"]];
+            let bValue = b[sortData["key"]];
+
+
+            aValue = (typeof a[sortData["key"]] == "string") ? a[sortData["key"]].toUpperCase() :
+             (typeof a[ sortData[ "key" ] ] == "undefined") ? "" : a[sortData["key"]];
+
+            bValue = (typeof b[sortData["key"]] == "string") ? b[sortData["key"]].toUpperCase() :
+             (typeof b[sortData["key"]] == "undefined") ? "" : b[sortData["key"]];
+
+
+            if (aValue < bValue) {
+                result = (sortData.dir == SortDirection.ASC) ? -1 : 1;
+                return false;
             }
 
             if (aValue == bValue) {

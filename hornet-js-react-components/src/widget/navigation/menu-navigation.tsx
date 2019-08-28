@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { MenuItemConfig } from "src/widget/navigation/menu";
 import { MENU_ROOT, LVL_SEPARATOR, MASKED_CLASSNAME } from "hornet-js-components/src/utils/menu-constantes";
@@ -87,19 +87,20 @@ import { NavigationUtils } from "hornet-js-components/src/utils/navigation-utils
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { MenuLink } from "src/widget/navigation/menu-link";
-import * as classNames from "classnames";
-import KeyboardEvent = __React.KeyboardEvent;
-import HTMLAttributes = __React.HTMLAttributes;
+import classNames from "classnames";
+import KeyboardEvent = React.KeyboardEvent;
+import HTMLAttributes = React.HTMLAttributes;
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { UPDATE_PAGE_EXPAND } from "src/widget/screen/layout-switcher";
-import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
+
+import "src/widget/navigation/sass/_menu.scss";
 
 const expandBreakPointSize = 1640;
 const expandSecondBreakPointSize = 1400;
 const expandMenuSize = "16.5%";
 const expandReducMenuSize = "20%";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.navigation.menu-navigation");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.navigation.menu-navigation");
 
 /**
  * Propriétés MenuNavigation
@@ -533,7 +534,7 @@ export class MenuNavigation extends HornetComponent<MenuNavigationProps, any> {
             }
         });
 
-        const classes: ClassDictionary = {
+        const classes = {
             nav: true,
             "flex-container": true,
             "sub-nav-1": (level === 1),

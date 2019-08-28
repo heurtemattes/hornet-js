@@ -73,18 +73,19 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { ASYNCHRONOUS_REQUEST_EVENT } from "hornet-js-core/src/event/hornet-event";
 import { SpinnerComponent, SpinnerProps } from "src/widget/spinner/spinner-component";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.spinner.spinner");
+import "src/widget/spinner/sass/_spinner.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.spinner.spinner");
 
 /**
  * Composant affichant une image (par défaut une roue dentée animée) et un texte d'attente

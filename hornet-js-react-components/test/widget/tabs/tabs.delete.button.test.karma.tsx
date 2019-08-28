@@ -73,14 +73,15 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 'use strict';
-var chai = require('chai');
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
@@ -88,22 +89,8 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
-/* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-/*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { CheckColumn } from "src/widget/table/column/check-column";
-
-
-import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
-import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
-import { TabContent } from "src/widget/tab/tab-content";
-
-import { TabHeader } from "src/widget/tab/tab-header";
+import { Tabs } from "src/widget/tab/tabs";
+import { Tab } from "src/widget/tab/tab";
 
 
 let tabsElement: JSX.Element;
@@ -115,6 +102,9 @@ let addDiv;
 
 @Decorators.describe('Test Karma tabs delete button')
 class tabsDeleteButtonTest extends BaseTest {
+
+    private id;
+    private id2;
 
     @Decorators.beforeEach
     beforeEach() {
@@ -146,7 +136,8 @@ class tabsDeleteButtonTest extends BaseTest {
     };
 
     deleteTabFunction() {
-        this.renderIntoDocument(addDiv, "main854");
+        this.id2 = this.generateMainId();
+        this.renderIntoDocument(addDiv, this.id2);
     }
 
     @Decorators.it('Test OK')
@@ -157,26 +148,29 @@ class tabsDeleteButtonTest extends BaseTest {
 
     @Decorators.it('affichage du bouton suppression du tab 1')
     testDeleteButtonExist() {
-        tabs = this.renderIntoDocument(tabsElement, "main853");
-        expect(document.querySelector('#main853 #tabs-0-delete-tab-button')).to.exist;
+        this.id = this.generateMainId();
+        tabs = this.renderIntoDocument(tabsElement, this.id);
+        expect(document.querySelector(`#${this.id} #tabs-0-delete-tab-button`)).to.exist;
         this.end();
     };
 
     // @Decorators.it('click sur le bouton de suppression')
     // clickOnDeleteButton() {
-    //     tabs = this.renderIntoDocument(tabsElement, "main854");
-    //     this.triggerMouseEvent(document.querySelector('#main854 #tabs-0-delete-tab-button'), "click");
+    //     this.id2 = this.generateMainId();
+    //     tabs = this.renderIntoDocument(tabsElement, this.id2);
+    //     this.triggerMouseEvent(document.querySelector(`#${this.id} #tabs-0-delete-tab-button`), "click");
     //     setTimeout(() => {
-    //         expect(document.querySelector('#main854 #testDiv')).to.exist;
+    //         expect(document.querySelector(`#${this.id} #testDiv`)).to.exist;
     //         this.end();
     //     }, 250);
     // };
 
     @Decorators.it('affichage du title du bouton suppression')
     testDeleteButtonTitleExist() {
-        tabs = this.renderIntoDocument(tabsElement, "main855");
-        expect(document.querySelector('#main855 #tabs-0-delete-tab-button[title="test"]')).to.exist;
-        expect(document.querySelector('#main855 #tabs-1-delete-tab-button[title="testtab2"]')).to.exist;
+        const id = this.generateMainId();
+        tabs = this.renderIntoDocument(tabsElement, id);
+        expect(document.querySelector(`#${id} #tabs-0-delete-tab-button[title="test"]`)).to.exist;
+        expect(document.querySelector(`#${id} #tabs-1-delete-tab-button[title="testtab2"]`)).to.exist;
         this.end();
     };
 

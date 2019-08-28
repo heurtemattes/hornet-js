@@ -73,24 +73,20 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { EntityDAO } from "test/dao/entity-dao";
 import Map from "hornet-js-bean/src/decorators/Map";
 import { HornetSequelizeInstanceModel } from "src/sequelize/hornet-sequelize-attributes";
 import { ModelDAO } from "test/dao/model-dao";
-import { UtilisateurAttributes } from "test/models/seq-user-mod";
 import { inject } from "hornet-js-core/src/inject/inject";
-import { Injector } from "hornet-js-core/src/inject/injector";
 import { injectable } from "hornet-js-core/src/inject/injectable";
 import { RoleAttributes } from "../models/model-role";
 import { HornetGenericDAO } from "src/sequelize/hornet-generic-dao";
 import { RoleMetier } from "test/models/user-mod";
-
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 @injectable()
 export class UserRoleDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeInstanceModel<RoleAttributes>> {
@@ -101,11 +97,11 @@ export class UserRoleDAO extends HornetGenericDAO<ModelDAO, HornetSequelizeInsta
 
     @Map(RoleMetier)
     findOne(data): Promise<RoleMetier> {
-        return this.modelDAO.roleEntity.findOne(data);
+        return this.entity.findOne(data);
     }
 
     insert(data) {
-        return this.modelDAO.roleEntity.create(data);
+        return this.entity.create(data);
     }
 
 }

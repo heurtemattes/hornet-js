@@ -73,20 +73,20 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { BatchOptions } from "src/core/batch-options";
 import { STATUS } from "src/core/batch-status";
 import { Batch } from "src/core/batch-executor";
 const uuid = require("uuid");
 
-const logger: Logger = Utils.getLogger("hornet-js-batch.batch-process");
+const logger: Logger = Logger.getLogger("hornet-js-batch.batch-process");
 
 export interface Process {
     execute(...args);

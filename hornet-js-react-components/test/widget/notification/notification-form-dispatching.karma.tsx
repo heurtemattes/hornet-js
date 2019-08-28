@@ -73,29 +73,31 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 import * as React from "react";
-import * as assert from "assert";
+
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { Form } from "hornet-js-react-components/src/widget/form/form";
-import { Row } from "hornet-js-react-components/src/widget/form/row";
-import { InputField } from "hornet-js-react-components/src/widget/form/input-field";
-import { Accordions } from "hornet-js-react-components/src/widget/accordion/accordions";
-import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
-import { ButtonsArea } from "hornet-js-react-components/src/widget/form/buttons-area";
-import { Button } from "hornet-js-react-components/src/widget/button/button";
+import { Form } from "src/widget/form/form";
+import { Row } from "src/widget/form/row";
+import { InputField } from "src/widget/form/input-field";
+import { Accordions } from "src/widget/accordion/accordions";
+import { Accordion } from "src/widget/accordion/accordion";
+import { ButtonsArea } from "src/widget/form/buttons-area";
+import { Button } from "src/widget/button/button";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 
-import * as schema from "test/widget/notification/validation1.json";
-import * as schema2 from "test/widget/notification/validation2.json";
-import * as schema3 from "test/widget/notification/validation3.json";
-import * as schema4 from "test/widget/notification/validation4.json";
+const schema = require("test/widget/notification/validation1.json");
+const schema2 = require("test/widget/notification/validation2.json");
+const schema3 = require("test/widget/notification/validation3.json");
+const schema4 = require("test/widget/notification/validation4.json");
 
 let renderedElement;
 
@@ -292,7 +294,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             accordionsTagErrorNumber = this.getNotificationNumberErrorAccordionForm("id-accordions-form-2-2-li", "errors-content");
             HornetTestAssert.assertEquals(0, accordionsTagErrorNumber, "Les tags de l'accordions doivent indiquer 0 erreur");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     protected getNotificationMessageListForm(form: string, className: string) {
@@ -333,7 +335,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             accordionsTagErrorNumber = this.getNotificationNumberErrorAccordionForm("id-accordions-form-2-2-li", "errors-content");
             HornetTestAssert.assertEquals(0, accordionsTagErrorNumber, "Les tags de l'accordions doivent indiquer 0 erreur");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     @Decorators.it("Valider formulaire 3")
@@ -357,7 +359,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             accordionsTagErrorNumber = this.getNotificationNumberErrorAccordionForm("id-accordions-form-2-2-li", "errors-content");
             HornetTestAssert.assertEquals(0, accordionsTagErrorNumber, "Les tags de l'accordions doivent indiquer 0 erreur");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     @Decorators.it("Valider formulaire 4")
@@ -381,7 +383,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             accordionsTagErrorNumber = this.getNotificationNumberErrorAccordionForm("id-accordions-form-2-2-li", "errors-content");
             HornetTestAssert.assertEquals(2, accordionsTagErrorNumber, "Les tags de l'accordions doivent indiquer 2 erreurs");
             this.end();
-        }, 500);
+        }, 750);
     };
 
 }

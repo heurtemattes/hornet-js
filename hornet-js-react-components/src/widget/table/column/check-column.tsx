@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -84,7 +84,6 @@ import { CheckHeaderCell } from "src/widget/table/column/cell/check/check-header
 import { BodyCellProps } from "src/widget/table/column/cell/body-cell";
 import { HeaderCellProps } from "src/widget/table/column/cell/header-cell";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import * as _ from "lodash";
 
 export interface CheckColumnProps extends ColumnProps {
     altSelect?: string;

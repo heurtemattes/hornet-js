@@ -73,37 +73,39 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { BaseTest } from "hornet-js-test/src/base-test";
+import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import * as assert from "assert";
 import { TextAreaField } from "src/widget/form/textarea-field";
 import { Form } from "src/widget/form/form";
-import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 
-const ReactTestUtils = require("react-dom/test-utils");
 let element: JSX.Element;
 let element2: JSX.Element;
 let element3: JSX.Element;
 let element4: JSX.Element;
 let element5: JSX.Element;
+let element6: JSX.Element;
+let element7: JSX.Element;
+let element8: JSX.Element;
 let textarea;
 
 @Decorators.describe("Test Karma textarea-field")
-class TextareaFieldTestKarma extends BaseTest {
+class TextareaFieldTestKarma extends HornetReactTest {
 
     protected test;
 
@@ -175,12 +177,41 @@ class TextareaFieldTestKarma extends BaseTest {
                 }
                 } />
         );
-    }
 
-    @Decorators.it("Test OK")
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
+        element6 = (
+            <TextAreaField
+                name={"textareaWithoutShowAlert"}
+                label={"textareaWithoutShowAlert"}
+                maxChar={25}
+                readOnly={false}
+                ref={(elt) => {
+                    this.test = elt;
+                }
+                }
+                showAlert={false}
+                displayMaxCharInLabel={true}
+            />);
+        element7 = (
+            <TextAreaField
+                name={"textareaExtendableFalse"}
+                label={"textareaExtendableFalse"}
+                extendable={false}
+                ref={(elt) => {
+                    this.test = elt;
+                }
+                } />
+        );
+
+        element8 = (
+            <TextAreaField
+                name={"textareaExtendableTrue"}
+                label={"textareaExtendableTrue"}
+                extendable={true}
+                ref={(elt) => {
+                    this.test = elt;
+                }
+                } />
+        );
     }
 
     @Decorators.it("Test de l' existence du textarea")
@@ -390,26 +421,6 @@ class TextareaFieldTestKarma extends BaseTest {
         }, 250);
     }
 
-    /*****************************************************/
-    protected handleChangeValueOnElement(changeValue: boolean, element: any, valueKey: string) {
-        if (changeValue) {
-            element.value = element.value + valueKey;
-            ReactTestUtils.Simulate.change(element);
-        }
-    }
-
-    /**
-     * Fonction déclenchant un keydown event sur un élement du DOM
-     * @param element element du DOM
-     * @param valueKey valeur "print" de la touche
-     * @param keyCode
-     * @param changeValue
-     */
-    protected triggerKeydownEvent(element: any, valueKey: string, keyCode: number, changeValue?: boolean): void {
-        ReactTestUtils.Simulate.keyDown(element, { key: valueKey, keyCode, which: keyCode });
-        this.handleChangeValueOnElement(changeValue, element, valueKey);
-    }
-
     @Decorators.it("Test du passage de readonly dans un formulaire readonly")
     testReadOnly() {
         const id = this.generateMainId();
@@ -432,6 +443,96 @@ class TextareaFieldTestKarma extends BaseTest {
             this.end();
         }, 250);
 
+    }
+
+    @Decorators.it("Test changement de classe du charCounter sans alert")
+    testCharsCounterWithoutAlert() {
+        const id = this.generateMainId();
+        this.renderIntoDocument(element6, id);
+        const textaeraTestWithoutAlert = document.querySelector(`#${id} #textareaWithoutShowAlert`) as HTMLTextAreaElement;
+        const charLabel = document.querySelector(`#${id} #chars-counter-textareaWithoutShowAlert`) as HTMLDivElement;
+        // Vérifier que label ne contient pas la classe textarea-too-many-char
+        expect(
+            charLabel.getAttribute("class").indexOf("textarea-too-many-char") === -1,
+            "1: La classe 'textarea-too-many-char' est appliquée").to.be.true;
+        let i;
+        for (i = 0; i < 26; i++) {
+            this.triggerKeydownEvent(textaeraTestWithoutAlert, "m", 77, true);
+        }
+        setTimeout(() => {
+            // Vérifier que label contient la classe textarea-too-many-char
+            expect(
+                charLabel.getAttribute("class").indexOf("textarea-too-many-char") >= 0,
+                "1 : La classe 'textarea-too-many-char' n'est pas appliquée").to.be.true;
+            // Supprimer un caractère et vérifier que label ne contient pas la classe textarea-too-many-char
+            // On passe de 26 caractères à 25
+            this.test.setCurrentValue("mmmmmmmmmmmmmmmmmmmmmmmmm");
+            setTimeout(() => {
+                expect(
+                    charLabel.getAttribute("class").indexOf("textarea-too-many-char") === -1,
+                    "2 : La classe 'textarea-too-many-char' est appliquée").to.be.true;
+                // Cliquer sur la croix et vérifier que label est vide
+                this.triggerMouseEvent(document.querySelector(`#${id} #textareaWithoutShowAlertResetButton a`), "click");
+                setTimeout(() => {
+                    expect(charLabel.textContent, "Le chars counter existe").to.be.empty;
+                    this.end();
+                }, 250);
+            }, 250);
+        }, 250);
+    }
+
+    @Decorators.it("Test fonctionnement de la props onChange")
+    testOnChangeProps() {
+        let isEnd: boolean;
+        let textareaValue: string;
+        const onChangeHandler = (e) => {
+            expect(e.target.value, `La e.target.value: ${e.target.value} n'est pas égale à textareaValue: ${textareaValue}`)
+                .to.equal(textareaValue);
+            if (isEnd) {
+                this.end();
+            }
+        };
+        const texteAreatag = (
+            <TextAreaField
+                name={"textarea-onChange-test"}
+                label={"test textarea-onChange-test"}
+                onChange={onChangeHandler}
+            />);
+        const id = this.generateMainId();
+        this.renderIntoDocument(texteAreatag, id);
+        textareaValue = "m";
+        this.triggerKeydownEvent(document.querySelector(`#${id} #textarea-onChange-test`), "m", 77, true);
+        setTimeout(() => {
+            textareaValue = "";
+            isEnd = true;
+            this.triggerMouseEvent(document.querySelector(`#${id} #textarea-onChange-testResetButton a`), "click");
+        }, 250);
+    }
+
+    @Decorators.it("Test comportement du textarea avec la props extendable=false")
+    testTextAreaExtendableFalse() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element7, id);
+        const area = document.querySelector(`#${id} textarea`);
+        setTimeout(() => {
+            // La props extendable est à false : le textarea doit avoir la classe textarea-resizable
+            expect(area.getAttribute("class").indexOf("textarea-resizable") > -1, "la classe textarea-resizable n'est pas appliquée").to.be.true;
+            expect(area.getAttribute("class").indexOf("textarea-unresizable") > -1, "la classe textarea-unresizable n'est pas appliquée").to.be.false;
+            this.end();
+        }, 250);
+    }
+
+    @Decorators.it("Test comportement du textarea avec la props extendable=true")
+    testTextAreaExtendableTrue() {
+        const id = this.generateMainId();
+        textarea = this.renderIntoDocument(element8, id);
+        const area = document.querySelector(`#${id} textarea`);
+        setTimeout(() => {
+            // La props extendable est à true : le textarea doit avoir la classe textarea-unresizable
+            expect(area.getAttribute("class").indexOf("textarea-resizable") > -1, "la classe textarea-resizable n'est pas appliquée").to.be.false;
+            expect(area.getAttribute("class").indexOf("textarea-unresizable") > -1, "la classe textarea-unresizable n'est pas appliquée").to.be.true;
+            this.end();
+        }, 250);
     }
 }
 

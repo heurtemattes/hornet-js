@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,10 +82,10 @@ import { Utils } from "hornet-js-utils";
 Utils.setConfigObj(window.Config);
 Utils.appSharedProps.rehydrate(window.AppSharedProps);
 
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { ClientLog } from "src/log/client-log";
 Logger.prototype.buildLogger = ClientLog.getLoggerBuilder(Utils.config.getOrDefault("logClient", {}));
-const logger: Logger = Utils.getLogger("hornet-js-core.client");
+const logger: Logger = Logger.getLogger("hornet-js-core.client");
 declare var __webpack_public_path__: string;
 
 import { ClientConfiguration } from "src/client-conf";
@@ -100,7 +100,6 @@ import { NodeApiError } from "src/services/service-api-results";
 import { manageError } from "src/component/error-manager";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
-import * as _ from "lodash";
 import * as path from "path";
 
 
@@ -164,7 +163,7 @@ export class Client {
      * @param clientInit gestionnaire d'intialisation spécifique au moteur de rendu du client
      */
     static initAndStart(appConfig: ClientConfiguration, clientInit: IClientInitializer<HornetEvent<ComponentChangeEventDetail>>) {
-        //const logger: Logger = Utils.getLogger("hornet-js-core.client");
+        //const logger: Logger = Logger.getLogger("hornet-js-core.client");
         logger.trace("Enter initAndStart");
 
         __webpack_public_path__ = Utils.buildStaticPath("/") + "/";

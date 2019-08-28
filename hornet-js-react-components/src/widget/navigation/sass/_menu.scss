@@ -1,0 +1,500 @@
+@import '../../sass/core',
+        'colors';
+
+$menuPrimaryColor: theme-color($variant: 'primary');
+$menuSecondaryColor: theme-color($variant: 'texts'); 
+$menuBoxShadow: theme-color('global', 'boxShadows');
+
+%menuStyleFocusAndHover {
+    outline: none;
+    border-radius: 50%;
+}
+
+/// Gestions du menu
+.noscroll {
+    overflow: hidden;
+}
+
+#menu-main {
+    display: inline-block;
+    vertical-align: bottom;
+
+    .vertical {
+        .nav {
+            .nav-item {
+                display: block;
+                box-sizing: border-box;
+                width: 100%;
+                margin: inherit;
+                padding: 0 0 0 1em;
+                text-decoration: none;
+
+                .having-sub-nav {
+                    span {
+                        &:after {
+                            @include createMenu(-45deg, $color: $baseColorDark);
+                        }
+                    }
+                }
+            }
+
+            .masked {
+                .having-sub-nav {
+                    span {
+                        &:after {
+                            @include createMenu(135deg, $baseColorDark, .15em);
+                        }
+                    }
+                }
+
+                .sub-nav-item {
+                    display: none;
+                }
+            }
+        }
+
+        .sub-nav-item {
+            .having-sub-nav {
+                span{
+                    &:after {
+                        @include createMenu(-45deg, $color: $baseColorDark);
+                    }
+                }
+            }
+
+            .masked {
+                .having-sub-nav {
+                    span {
+                        &:after {
+                            @include createMenu(135deg, $baseColorDark, .15em);
+                        }
+                    }
+                }
+
+                .nav-item,
+                .sub-nav-item {
+                    display: none;
+                }
+            }
+        }
+
+        .menulink-title {
+            margin: 0.7em 0;
+        }
+    }
+
+    button.toggler {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        height: 4rem;
+        width: 4.5rem;
+        padding: 0.4em;
+        background: $menuPrimaryColor;
+        cursor: pointer;
+        text-indent: -9999px;
+        font-weight: 700;
+        border: medium none;
+
+        @include smoothTransition(all, 0.3s);
+
+        &:focus {
+            @extend %menuStyleFocusAndHover;
+            background: $buttonMenuBgFocus;
+            box-shadow: 0 0 0 0.2em $buttonMenuBgFocus;
+        }
+        &:hover {
+            @extend %menuStyleFocusAndHover;
+            background: $buttonMenuBgHover;
+            box-shadow: 0 0 0 0.2em $buttonMenuBgHover;
+        }
+
+        span {
+            position: relative;
+            display: block;
+            height: 0.5rem;
+            background: $baseColorLight;
+
+            &:before {
+                position: absolute;
+                display: block;
+                height: 0.5rem;
+                width: 100%;
+                top: -1rem;
+                left: 0;
+                background: $baseColorLight;
+                content: "";
+                transition: all 0.3s ease-in-out;
+            }
+
+            &:after {
+                position: absolute;
+                display: block;
+                width: 100%;
+                height: 0.5rem;
+                left: 0;
+                background: $baseColorLight;
+                content: "";
+                transition: all 0.3s ease-in-out;
+                top: 1rem;
+            }
+        }
+    }
+
+    .is-active {
+        span {
+            background: none !important;
+
+            &:before {
+                top: 0 !important;
+                transition: all 0.3s ease-in-out 0.3s;
+                transform: rotate(45deg);
+            }
+            &:after {
+                top: 0 !important;
+                transition: all 0.3s ease-in-out 0.3s;
+                transform: rotate(-45deg);
+            }
+        }
+    }
+}
+
+.menu-main-conteneur {
+    display: flex;
+    vertical-align: middle;
+    flex-direction: column;
+    justify-content: center;
+    height: 3.7em;
+}
+
+.menu-container {
+    margin: auto;
+    max-width: 1200px;
+    box-shadow: 0 2px 10px $menuBoxShadow;
+    color: $menuSecondaryColor;
+
+    .menu-content {
+        position: fixed;
+        overflow-y: auto;
+        z-index: 3;
+        max-height: 90%;
+        width: 100%;
+        min-width: 1200px;
+        margin-left: -1.62em;
+        top: 6.2em;
+        background: $baseColorLight;
+        box-shadow: 3px 2px 10px -3px $menuBoxShadow;
+
+        .nav {
+            width: 100%;
+            padding-left: 0;
+            margin-top: 0;
+            list-style: outside none none;
+
+            .nav-item {
+                display: inline-block;
+                box-sizing: border-box;
+                vertical-align: top;
+                width: 25%;
+                padding: 1em;
+                text-decoration: none;
+
+                a {
+                    display: block;
+                    padding-left: 0.2em;
+                    margin: 0.1em 0;
+                    font-family: $notoBold;
+                    font-size: 1.25em;
+                    color: $menuSecondaryColor;
+                }
+
+                &:not(.is-active) {
+                    a {
+                        border-left: 4px solid $baseColorLight;
+
+                        &:hover {
+                            border-left: 4px solid $menuPrimaryColor;
+                            outline: none;
+                        }
+                    }
+                }
+                
+                a {
+                    .menulink-title {
+                        display: inline-block;
+                    }
+                }
+
+                .sub-nav-1 {
+                    display: block;
+                    padding-left: 1.25em;
+                    
+                    li {
+                        .sub-nav-2 {
+                            display: block;
+                            padding-left: 1.25em;
+                        }
+                    }
+                }
+            }
+            
+            .is-active {
+                background: $menuPrimaryColor;
+                
+                a {
+                    border-left: 4px solid $menuPrimaryColor;
+
+                    @include smoothTransition(all, 0.3s);
+
+                    .menulink-title {
+                        color: $baseColorLight;
+                    }
+
+                    &:hover,
+                    &:focus {
+                        outline: none;
+                        border-left: 4px solid $baseColorLight;
+
+                        .menulink-title {
+                            color: $baseColorLight;
+                        }
+                    }
+                }
+
+                .sub-nav-item {
+                    &:not(.is-active) {
+                        a {
+                            .menulink-title {
+                                color: $menuNavItemColor;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .sub-nav-item {
+                a {
+                    display: block;
+                    padding-left: 0.2em;
+                    margin: 0.1em 0;
+                    color: $menuSubnavLinkColor;
+                    font-family: $notoRegular;
+                    font-size: 1.125em;
+
+                    @include smoothTransition(color, 0.3s);
+
+                    &:hover,
+                    &:focus {
+                        color: $menuSecondaryColor;
+                        font-family: $notoRegular;
+                        font-size: 1.125em;
+                    }
+                }
+
+                ul {
+                    display: block;
+                    padding-left: 1.25em !important;
+                }
+
+                .is-active {
+                    a {
+                        @include smoothTransition(color, 0.3s);
+
+                        .menulink-title {
+                            color: $baseColorLight;
+                            
+                            &:hover,
+                            &:focus {
+                                color: $baseColorLight;
+                            }
+                        }
+
+                        &:hover,
+                        &:focus {
+                            .menulink-title {
+                                color: $baseColorLight;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .menu-overlay {
+        z-index: 2;
+        position: fixed;
+        width: 100%;
+        min-height: 100%;
+        left: 0;
+        background: $baseColorDark;
+        opacity: 0.6;
+    }
+}
+
+.menuEmpty {
+    width: 0;
+}
+
+@media screen and (max-width: #{$mediaXL}) {
+    .menu-content {
+        z-index: 3;
+        position: fixed;
+        overflow-y: auto;
+        min-width: 100%;
+        max-height: 82.5%;
+        margin-left: -1.62em;
+        top: 6.2em;
+        background: $baseColorLight;
+        box-shadow: 3px 2px 10px -3px $menuBoxShadow;
+    }
+    .menuEmpty {
+        width: 42px;
+    }
+}
+
+
+@media (min-width: #{$media-720}) {
+    .having-sub-nav {
+        cursor: default;
+    }
+}
+
+@media screen and (max-width: #{$mediaL}) {
+    .nav {
+        .nav-item {
+            box-sizing: border-box;
+            display: inline-block;
+            vertical-align: top;
+            width: 33%;
+            padding: 1em;
+            text-decoration: none;
+        }
+    }
+}
+
+@media screen and (max-width: #{$media-720}) {    
+    .menulink-title {
+        margin: 0.7em 0;
+    }
+
+    .nav-item.masked {
+        .sub-nav-item {
+            display: none;
+        }
+    }
+
+    .sub-nav-item.masked {
+        .nav-item {
+            display: none;
+        }
+    }
+
+    .sub-nav-item.masked {
+        .sub-nav-item {
+            display: none;
+        }
+    }
+
+    .nav {
+        .nav-item {
+            box-sizing: border-box;
+            display: block;
+            width: 100%;
+            margin: inherit;
+            padding: 0 0 0 1em;
+            text-decoration: none;
+
+            .having-sub-nav {
+                span {
+                    &:after {
+                        @include createMenu(-45deg, $color: $baseColorDark);
+                    }
+                }
+            }
+        }
+
+        .sub-nav-item {
+            .having-sub-nav {
+                span {
+                    &:after {
+                        @include createMenu(-45deg, $color: $baseColorDark);
+                    }
+                }
+            }
+        }
+
+        .sub-nav-item.masked {
+            .having-sub-nav {
+                span {
+                    &:after {
+                        @include createMenu(135deg, $baseColorDark, 0.15em);
+                    }
+                }
+            }
+        }
+
+        .nav-item.masked {
+            .having-sub-nav {
+                span {
+                    &:after {
+                        @include createMenu(135deg, $baseColorDark, 0.15em);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Accessibilite
+.top-menu-accessibilite {
+    &.focused {
+        height: auto;
+        top: 0;
+        opacity: 1;
+        padding: 1rem;
+        z-index: 900;
+    }
+}
+
+.top-menu-accessibilite {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    margin: 0 auto;
+    height: 0;
+    top: -50px;
+    background: $baseColorLight none repeat scroll 0 0;
+    list-style: outside none none;
+
+    @include smoothTransition(all, 0.3s);
+
+    a {
+        color: $globalLinkColor;
+        font-size: 1em;
+        font-family: $notoBold;
+    }
+}
+
+/// Sticky Menu
+.header.sticky {
+    header {
+        #header {
+            .top-menu-accessibilite.focused {
+                position: absolute;
+                opacity: 1;
+                z-index: 9999;
+                top: 0;
+                height: auto;
+                padding: 1rem;
+                background: $baseColorLight none repeat scroll 0 0;
+                
+                @include smoothTransition(all, 0.3s);
+            
+                a {
+                    color: $globalLinkColor;
+                }
+            }
+        }
+    }
+}

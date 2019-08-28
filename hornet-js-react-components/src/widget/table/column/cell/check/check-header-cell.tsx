@@ -73,19 +73,17 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractHeaderCell, AbstractHeaderCellProps } from "src/widget/table/column/cell/abstract-header-cell";
 import { CheckBox } from "src/widget/form/checkbox";
 import * as React from "react";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.check.check-header-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.check.check-header-cell");
 
 export interface CheckHeaderCellProps extends AbstractHeaderCellProps {
 
@@ -113,6 +111,7 @@ export class CheckHeaderCell<P extends CheckHeaderCellProps, S> extends Abstract
      */
     componentWillReceiveProps(nextProps: CheckHeaderCellProps) {
         // Ne pas utiliser this.setState pour ne pas avoir plusieurs appels au render
+        // Ignorer l'erreur React issu de cette assignation
         this.state = {...this.state, ...nextProps};
     }
 

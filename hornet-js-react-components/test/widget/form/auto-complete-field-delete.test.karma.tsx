@@ -73,32 +73,33 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { BaseTest } from "hornet-js-test/src/base-test";
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-const chai = require("chai");
-const expect = chai.expect;
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import * as assert from "assert";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import forEach = require("lodash/forEach");
 import { AutoCompleteField } from "src/widget/form/auto-complete-field";
 
 let dataSourceCivilite: DataSource<any>;
 let element: JSX.Element;
-let autocompleteElement: AutoCompleteField<any>;
 
 @Decorators.describe("Test Karma auto-complete-field delete")
 class AutoCompleteFieldDeleteTest extends HornetReactTest {
 
-    listeCivilites:any;
+    listeCivilites: any;
 
     @Decorators.beforeEach
     beforeEach() {
@@ -106,26 +107,24 @@ class AutoCompleteFieldDeleteTest extends HornetReactTest {
         this.addContent = this.addContent.bind(this);
 
         this.listeCivilites = [
-            {id: 1, libelle: "Madame"},
-            {id: 2, libelle: "Monsieur"},
-            {id: 3, libelle: "Mademoiselle"},
+            { id: 1, libelle: "Madame" },
+            { id: 2, libelle: "Monsieur" },
+            { id: 3, libelle: "Mademoiselle" },
         ];
 
-        dataSourceCivilite = new DataSource<any>(this.listeCivilites, {value: "id", text: "libelle"});
+        dataSourceCivilite = new DataSource<any>(this.listeCivilites, { value: "id", text: "libelle" });
 
-        element =  (
+        element = (
             <div>
-                <button id= "delete" name="Supprimer liste" onClick={ this.deleteContent }>Delete list</button>
-                <button id= "add" name="Ajouter liste" onClick={ this.addContent }>Add list</button>
+                <button id="delete" name="Supprimer liste" onClick={this.deleteContent}>Delete list</button>
+                <button id="add" name="Ajouter liste" onClick={this.addContent}>Add list</button>
                 <AutoCompleteField
                     dataSource={dataSourceCivilite}
                     name="civilite"
                     label={"Civilité"}
                     required={true}
-                    ref={(value) => {
-                        autocompleteElement = value;
-                    }} />
-        </div>);
+                />
+            </div>);
     }
 
     deleteContent() {
@@ -155,14 +154,14 @@ class AutoCompleteFieldDeleteTest extends HornetReactTest {
                     assert.equal(dataSourceCivilite.results.length, 3);
                     assert.equal(selector.childElementCount, 2);
                     let choices = document.querySelector(`#${id} #civilite_select_0`) as any;
-                    expect(choices).to.exist;
+                    expect(choices, "Les choix ne sont pas affichés").to.exist;
 
                     // deleteAll
                     deleteButton.click();
                     setTimeout(() => {
                         assert.equal(dataSourceCivilite.results.length, 0);
                         choices = document.querySelector(`#${id} #civilite_select_0`) as any;
-                        expect(choices).to.not.exist;
+                        expect(choices, "Les choix sont affichés").to.not.exist;
 
                         // add results
                         addButton.click();
@@ -170,13 +169,13 @@ class AutoCompleteFieldDeleteTest extends HornetReactTest {
                             assert.equal(dataSourceCivilite.results.length, 3);
                             assert.equal(selector.childElementCount, 2);
                             choices = document.querySelector(`#${id} #civilite_select_0`) as any;
-                            expect(choices).to.exist;
+                            expect(choices, "La liste de choix n'est pas affichées").to.exist;
                             this.end();
-                        },         250);
-                    },         250);
-                },         250);
-            },         250);
-        },         250);
+                        }, 250);
+                    }, 250);
+                }, 250);
+            }, 250);
+        }, 250);
     }
 
 }

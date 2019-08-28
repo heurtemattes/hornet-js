@@ -73,18 +73,18 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as Promise from "hornet-js-utils/src/promise-api";
+import { Logger } from "hornet-js-logger/src/logger";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 const OnionSkin = require("onionskin/src/browser");
-const logger: Logger = Utils.getLogger("hornet-js-core.cache.hornet-cache");
+const logger: Logger = Logger.getLogger("hornet-js-core.cache.hornet-cache");
 
 /**
  * Cache de l'application.

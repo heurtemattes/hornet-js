@@ -1,0 +1,30 @@
+/*
+*
+* TEST THEME 1 - MAIN 
+*
+*/
+/// variable de définition du thème
+$currentTheme: 'theme1';
+/// Technique 1 - importer les composants et les utils
+/// Génère un simili main.css
+/// Rapide et simple
+
+// @import 'abstract/theming';
+// @import 'abstract/colors';
+// @import 'abstract/mixins';
+// @import 'themes/theme-1';
+// @import 'base/breackpoint';
+// @import 'base/grid';
+// @import 'base/helpers';
+// @import 'base/reset';
+// @import 'base/typo';
+// @import 'base/global';
+
+
+/// Technique 2 - on ne récupère que les styles qui vont réellement changer
+/// Feuille plus légère mais demande de recopier des classes précises
+/// plus long à mettre en place
+@import 'abstract/theming';
+@import 'abstract/colors';
+@import 'abstract/mixins';
+@import 'themes/theme-1';

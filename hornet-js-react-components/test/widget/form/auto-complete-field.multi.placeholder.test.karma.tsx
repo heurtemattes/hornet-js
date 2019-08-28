@@ -73,25 +73,24 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({});
 import { Decorators } from "hornet-js-test/src/decorators";
 import { runTest } from "hornet-js-test/src/test-run";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
-import { BaseTest } from "hornet-js-test/src/base-test";
 import { Form } from "src/widget/form/form";
 import { AutoCompleteMultiField } from "src/widget/form/auto-complete-multi-field";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import * as messages from "hornet-js-core/src/i18n/hornet-messages-components.json";
-import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
+const messages = require("hornet-js-core/src/i18n/hornet-messages-components.json");
 import * as React from "react";
 
-@Decorators.describe("Test Karma")
+@Decorators.describe("Test Karma AutoCompleteMultiField placeholder")
 class AutoCompleteMultiFieldPlaceholderTest extends HornetReactTest {
     protected element: JSX.Element;
     protected dataSource:  DataSource<any>;
@@ -117,6 +116,7 @@ class AutoCompleteMultiFieldPlaceholderTest extends HornetReactTest {
                     valueKey="id"
                     noResultLabel="Aucun résultat trouvé pour le test"
                     placeholder="#jeSuisPlaceholder"
+                    init={true}
                     ref={(value) => {
                         this.autocompleteElement = value;
                     }}
@@ -125,39 +125,34 @@ class AutoCompleteMultiFieldPlaceholderTest extends HornetReactTest {
         );
     }
 
-    @Decorators.it("Test OK")
-    testOk() {
+    @Decorators.it("Test placeholder ok après sélection et désélection d'un item")
+    testPlaceHolderOkAfterSelectAndUnSelectItem() {
         const id = this.generateMainId();
-        let rendu = this.renderIntoDocument(this.element, `${id}`);
-        HornetTestAssert.assertEquals(1, 1, "mon message");
+        this.renderIntoDocument(this.element, `${id}`);
 
         this.dataSource.on("select", (result) => {
             setTimeout(() => {
                 if (result && result.length > 0) {
-                    (document.querySelector(`#${id} #testmulti`) as any).click();
-                    const elts = document.querySelectorAll(`#${id} #autocomplete-selector-checkbox-0`);
-                    this.triggerMouseEvent(elts[0], "mousedown");
-                } else if (result && result.length === 0) {
+                    this.triggerMouseEvent(document.querySelector(`#${id} #libelle-1-1-1`), "click");
+                } else if ((result && result.length === 0) || !result) {
                     const placeholder = (document.querySelector(`#${id} #testmulti`) as any).placeholder;
                     HornetTestAssert.assertEquals("#jeSuisPlaceholder", placeholder, "le placeholder de l'autocomplete multi n'est pas conservé à la déselection");
-                    this.autocompleteElement.setCurrentValue(undefined);
                     setTimeout(() => {
                         const placeholder = (document.querySelector(`#${id} #testmulti`) as any).placeholder;
                         HornetTestAssert.assertEquals("#jeSuisPlaceholder", placeholder, "le placeholder de l'autocomplete multi n'est pas conservé si value est undefined");
                         this.end();
                     }, 250);
                 }
-            }, 250);
+            }, 500);
         });
 
         this.dataSource.on("fetch", () => {
+            const elts = document.querySelectorAll(`#${id} #autocomplete-selector-checkbox-0`);
             setTimeout(() => {
-                (document.querySelector(`#${id} #testmulti`) as any).click();
-                const elts = document.querySelectorAll(`#${id} #autocomplete-selector-checkbox-0`);
                 this.triggerMouseEvent(elts[0], "mousedown");
-            }, 250);
+            }, 500);
         });
-        this.dataSource.reload();
+        (document.querySelector(`#${id} #testmulti`) as any).click();
     }
 
     @Decorators.after

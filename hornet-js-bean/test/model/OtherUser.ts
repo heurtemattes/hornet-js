@@ -73,13 +73,13 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import Bean from "hornet-js-bean/src/decorators/Bean";
-import Map from "hornet-js-bean/src/decorators/Map";
+import Bean from "src/decorators/Bean";
+import Map from "src/decorators/Map";
 import { Adress } from "./adress";
 
 @Bean

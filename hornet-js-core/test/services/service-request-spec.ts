@@ -73,12 +73,15 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
+import { TestLogger } from "hornet-js-test/src/test-logger";
+import { Logger } from "hornet-js-logger/src/logger";
+Logger.prototype.buildLogger = TestLogger.getLoggerBuilder();
 import { ServiceRequest } from "src/services/service-request";
 import { ConfigLib } from "hornet-js-utils/src/config-lib";
 import * as express from "express";
@@ -86,6 +89,9 @@ import * as bodyParser from "body-parser";
 import { Utils } from "hornet-js-utils";
 import { NodeApiResultBuilder } from "src/services/service-api-results";
 import { NotFoundError } from "hornet-js-utils/src/exception/not-found-error";
+import { HornetRequest, ErrorManagementType, ResponseManagementType } from "src/services/hornet-superagent-request";
+import { Request, Response, SuperAgentRequest } from "superagent";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 const expect = TestUtils.chai.expect;
 const assert = TestUtils.chai.assert;
@@ -112,11 +118,21 @@ class MyService extends ServiceRequest {
 
     sending(data): Promise<any> {
         const buildUrl = this.buildUrl("/" + data.data);
-        return this.fetch({ method: "post", url: buildUrl, data: data }); // .then((response) => { cb(response); });
+        return this.fetch({ method: "post", url: buildUrl, data: data}); // .then((response) => { cb(response); });
     }
     sendingCache(verb: "get" | "post"): Promise<any> {
         const buildUrl = this.buildUrl("/cache-test");
         return this.fetch({ method: verb, url: buildUrl}); // .then((response) => { cb(response); });
+    }
+
+    sendingUrlQuery(verb: "get" | "post", url: string, query: any): Promise<any> {
+        const buildUrl = this.buildUrl(url);
+        return this.fetch({ method: verb, url: buildUrl, noCached: true, query: query, headers: {custom: "customValue"}}); // .then((response) => { cb(response); });
+    }
+
+    sendingQuery(url: string, request: HornetRequest): Promise<any> {
+        const buildUrl = this.buildUrl(url);
+        return this.fetch({ ...request, url: buildUrl}); // .then((response) => { cb(response); });
     }
 }
 
@@ -124,11 +140,10 @@ describe("service-api-spec", () => {
 
     before(function (done) {
         _app = express();
-
+        _app.callCount = 0;
         _app.use(bodyParser.json()); // to support JSON-encoded bodies
 
         _app.post("/service-api-spec-service/ok", function (req, res) {
-            console.debug("/ok");
             res.json({
                 message: "Reçu : " + req.body.data,
                 date: new Date()
@@ -136,21 +151,18 @@ describe("service-api-spec", () => {
         });
 
         _app.get("/service-api-spec-service/cache-test", function (req, res) {
-            console.debug("/ok");
             res.json({
                 date: new Date()
             });
         });
 
         _app.post("/service-api-spec-service/cache-test", function (req, res) {
-            console.debug("reset cache for cache-test");
             res.json({
                 date: new Date()
             });
         });
 
         _app.post("/service-api-spec-service/ko", function (req, res) {
-            console.debug("/ko");
             res.status(500).json({
                 message: "Retour d'une erreur : " + req.body.data,
             });
@@ -171,6 +183,14 @@ describe("service-api-spec", () => {
                 res.status(500);
             }
             res.end();
+        });
+        _app.get("/service-api-spec-service/query", function (req, res) {
+            _app.callCount += 1;
+            res.json({
+                query: req.query || 10,
+                callCount: _app.callCount,
+                headers: req.headers
+            });
         });
 
         const testConfig = {
@@ -212,10 +232,8 @@ describe("service-api-spec", () => {
 
 
         service.sending({ data: "ok" }).then((result: any) => {
-            console.debug("result (should resolve):", result);
             expect(result).to.exist;
             expect(result.message).to.be.equal("Reçu : ok");
-            console.debug("FIN");
             dateCache = result.date;
             done();
         });
@@ -250,7 +268,6 @@ describe("service-api-spec", () => {
             done(new Error("Expected error, result got instead"));
         })
         .catch((error) => {
-            console.info("error:", error);
             expect(error.args.message).to.be.equal("Retour d\'une erreur : ko");
             done();
         });
@@ -265,6 +282,199 @@ describe("service-api-spec", () => {
         .catch((error) => {
             expect(error.args.message).to.be.equal("test mocha");
             done();
+        });
+    });
+
+    it("should use query for sending parameter", (done) => {
+        const service = new MyService();
+        service.sendingUrlQuery("get", "/query", { testquery: "query" })
+        .then((result: any) => {
+            expect(result).to.exist;
+            expect(result.query).to.exist;
+            expect(result.query.testquery).to.be.equal("query");
+            done();
+        })
+        .catch((error) => {
+            done(error);
+        });
+    });
+
+    it("should send custom header", (done) => {
+        const service = new MyService();
+        service.sendingUrlQuery("get", "/query", { testquery: "query" })
+        .then((result: any) => {
+            expect(result).to.exist;
+            expect(result.headers).to.exist;
+            expect(result.headers.custom).to.be.equal("customValue");
+            done();
+        })
+        .catch((error) => {
+            done(error);
+        });
+    });
+
+    describe('hook', function() {
+
+        it("should use request hook", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, hooks: {beforeRequest: (su: SuperAgentRequest, hr: HornetRequest) => {su.query({ testquery: "queryhook" })}}})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.query).to.exist;
+                expect(result.query.testquery).to.be.equal("queryhook");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+
+        it("should use init hook", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, hooks: {afterInit: (su: SuperAgentRequest, hr: HornetRequest) => {su.query({ testquery: "queryhook" })}}})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.query).to.exist;
+                expect(result.query.testquery).to.be.equal("queryhook");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+
+        it("should use afterSuccess hook", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, hooks: {afterRequestSuccess: (res: Response, hr: HornetRequest) => {return {hook: "afterRequestSuccess"}}}})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.hook).to.exist;
+                expect(result.hook).to.be.equal("afterRequestSuccess");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+        
+        it("should use afterError hook", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/kohornet", { method: "post", noCached: true, url: "/kohornet", manageError: ErrorManagementType.All, hooks: {afterRequestError: (res: Response, hr: HornetRequest) => {return new Error("test afterRequestError")}}})
+            .then((result: any) => {
+                done(new Error("Expected error, result got instead"));
+            })
+            .catch((error) => {
+                expect(error.message).to.be.equal("test afterRequestError");
+                done();
+            });
+        });
+    });
+
+    describe('response management process', function() {
+
+        it("should not use response management process", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.None})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.query).to.exist;
+                expect(result.query.testquery).to.be.equal("query");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+
+        it("should use response management process", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.All})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.body).to.exist;
+                expect(result.body.query.testquery).to.be.equal("query");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+
+        it("should not use response management process, there is no error", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.Error})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.query).to.exist;
+                expect(result.query.testquery).to.be.equal("query");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+
+        
+        it("should use response management process, there is no error", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", noCached: true, query:  { testquery: "query" }, manageTransformResponse: ResponseManagementType.OK})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.body).to.exist;
+                expect(result.body.query.testquery).to.be.equal("query");
+                done();
+            })
+            .catch((error) => {
+                done(error);
+            });
+        });
+
+        it("should use response management process, there is error", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/ko", { method: "post", noCached: true, url: "/ko", manageError: ErrorManagementType.All})
+            .then((result: any) => {
+                done(new Error("Expected error, result got instead"));
+            })
+            .catch((error) => {
+                expect(error.code).to.be.equal("ERR_HORNET_HTTP");
+                done();
+            });
+        });
+
+        it("should use response management process, there is error", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/ko", { method: "post", noCached: true, url: "/ko", data: { data: "ko" }, manageTransformResponse: ResponseManagementType.Error, manageError: ErrorManagementType.All})
+            .then((result: any) => {
+                done(new Error("Expected error, result got instead"));
+            })
+            .catch((error) => {
+                expect(error.body.message).to.be.equal("Retour d\'une erreur : ko");
+                done();
+            });
+        });
+    });
+
+    describe('cache', function() {
+
+        it("should use cache", (done) => {
+            const service = new MyService();
+            service.sendingQuery("/query", { url: "/query", timeToLiveInCache: 60})
+            .then((result: any) => {
+                expect(result).to.exist;
+                expect(result.callCount).to.exist;
+                expect(result.callCount).to.be.equal(10);
+                //done();
+                return service.sendingQuery("/query", { url: "/query", timeToLiveInCache: 60})
+                .then((result: any) => {
+                    expect(result).to.exist;
+                    expect(result.callCount).to.exist;
+                    expect(result.callCount).to.be.equal(10);
+                    done();
+                })
+            })
+            .catch((error) => {
+                done(error);
+            });
         });
     });
 });

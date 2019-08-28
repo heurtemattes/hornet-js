@@ -1,0 +1,200 @@
+@import '../../sass/core';
+
+$headerBg: theme-color($variant: 'secondary');
+$headerBaseColor: theme-color('global', 'white');
+$headerSubLinkHover: theme-color($variant: 'states');
+$headerBannerBoxShadow: rgba(0, 0, 0, 0.55);
+$headerBannerBg: theme-color($variant: 'primary');
+
+#header {
+    height: 2.188em;
+    background: $headerBg none repeat scroll 0 0;
+    line-height: 2.188em;
+
+    .header-link {
+        display: inline-block;
+        padding: 0 0.2em;
+        height: 100%;
+        color: $headerBaseColor;
+        font-family: $notoRegular;
+        font-size: 20px;
+        font-weight: normal;
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+
+        &:hover,
+        &:focus {
+            outline: 1px solid $headerSubLinkHover;
+            color: $headerBaseColor;
+        }
+    }
+}
+
+.sub-header-link {
+    display: block;
+    line-height: 4em;
+    outline: none;
+
+    @include smoothTransition(all, 0.2s);
+
+    &:hover,
+    &:focus {
+        outline: 1px solid $headerSubLinkHover;
+    }
+}
+
+#header-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+
+    header {
+        position: relative;
+    }
+
+    #banner {
+        position: absolute;
+        top: 2.188em;
+        left: 0;
+        right: 0;
+        height: 4em;
+        box-shadow: 0 0.1em 0.3em $headerBannerBoxShadow;
+        background: $headerBannerBg no-repeat scroll 0 0;
+        
+        @include smoothTransition(top, 0.3s);
+    }
+
+    .menu-content {
+        margin-left: -1.62em;
+    }
+
+    .menu-container {
+        .menu-overlay {
+            top: 6.188em;
+        }
+    }
+
+    #header-expanded-zone {
+        height: 100%;
+    }
+
+}
+
+#header-container.sticky {
+    #banner {
+        height: 3em;
+        top: 0;
+
+        @include smoothTransition(top, 0.4s);
+
+        .userlang {
+            visibility: visible;
+            padding-top: auto;
+            opacity: 1;
+            
+            @include smoothTransition(opacity, 0.4s);
+
+            @media (max-width: #{$mediaM-600}) {
+                float: none;
+                display: flex;
+            }
+
+            div {
+                display: inline-flex;
+                line-height: 2.188em;
+
+                @media (max-width: #{$mediaM-600}) {
+                    line-height: 2.188em;
+                }
+            }
+        }
+
+        .larger-screen {
+            opacity: 1;
+            position: relative;
+            visibility: visible;
+            top: 0.45em;
+
+            @media (max-width: #{$mediaM-600}) {
+                visibility: hidden;
+                display: none;
+            }
+        }
+
+        .profil-label {
+            @media (max-width: #{$mediaM-600}) {
+                display: none;
+            }
+        }
+
+        .dropdown-button {
+            @media (max-width: #{$mediaM-600}) {
+                padding-left: 0;
+            }
+        }
+    }
+
+    #header-expanded-zone {
+        height: 0;
+        display: none;
+    }
+
+    .menu-content {
+        top: 3em;
+    }
+
+    .menu-main-conteneur {
+        height: 3em;
+    }
+
+    .menu-container {
+        .menu-overlay {
+            top: 3em;
+        }
+    }
+
+    .sub-header-link {
+        line-height: 3em;
+    }
+}
+
+.header {
+    #banner {
+        .userlang,
+        .larger-screen {
+            visibility: hidden;
+            opacity: 0;
+        }
+    }
+}
+
+@media (max-width: #{$mediaM-600}) {
+    .profil-content {
+        .username > span {
+            display: none;
+        }
+    }
+
+    #banner-expanded-zone {
+        .mls {
+            margin-left: 0.75em;
+        }
+    }
+}
+
+header {
+    @media (max-width: #{$mediaXS-405}) {
+        .mll {
+            margin-left: 0.4em;
+        }
+        .mlm {
+            margin-left: 0;
+        }
+        h1 {
+            margin-top: 0 !important;
+        }
+    }
+}

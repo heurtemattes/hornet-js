@@ -73,14 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as React from "react";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Class } from "hornet-js-utils/src/typescript-utils";
@@ -91,13 +89,11 @@ import { BodyCell } from "src/widget/table/column/cell/body-cell";
 import { InputTextInLineBodyCell } from "src/widget/table/column/cell/input/input-text-in-line-body-cell";
 import { SortData } from "hornet-js-core/src/component/sort-data";
 import { CellCoordinates } from "src/widget/table/column/cell/cell-coordinates";
-import * as classNames from "classnames";
 import { ContentState } from "src/widget/table/table-state";
-import * as _ from "lodash";
 
 import { CSSProperties } from "react";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column");
 
 /**
  * Propriétés d'une colonne d'entête de tableau
@@ -233,10 +229,6 @@ export class Column<P extends ColumnProps, S extends ColumnState> extends Hornet
         if (this.props.style) {
             props.style = this.props.style;
         }
-        //
-        // if (this.props.headerFixed || this.props.defaultStyle) {
-        //     props.style = _.merge(props.style, this.props.defaultStyle);
-        // }
 
         props.isEditing = this.state.isEditing;
         props.nbColumns = this.props.nbColumns;

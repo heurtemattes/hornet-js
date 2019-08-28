@@ -27,10 +27,10 @@ Ajouter au package.json
 
 ```shell
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.X.X"
+    "hornet-js-ts-typings": "5.3.X"
   }
   "testDependencies": {
-    "hornet-js-test": "5.X.X"
+    "hornet-js-test": "5.3.X"
   }
   
 ```
@@ -68,7 +68,7 @@ et sur la fonction runTest() qui permet de lancer le test.
 
 ```javascript
 
-import { BaseTest } from "hornet-js-core/src/test/abstract-test";
+import { BaseTest } from "hornet-js-test/src/test/abstract-test";
 import { Decorators } from "hornet-js-test/src/decorators";
 import { runTest } from "hornet-js-test/src/test-run";
 import * as assert from "assert";
@@ -143,7 +143,7 @@ runTest(new clickTest());
 
 ```javascript
 
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { TestLogger } from "hornet-js-test/src/test-logger";
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     "appenders": {
@@ -161,7 +161,7 @@ Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
 });
 import { Utils } from "hornet-js-utils";
 Utils.setConfigObj({
-    "themeName": "hornet-themes-intranet",
+// ADD config for test
 });
 
 
@@ -353,11 +353,11 @@ Ajouter la définition dans le fichier `package.json` du projet en plus de l'imp
 
 ```json
 "tsDefinitionDependencies": {
-    "hornet-js-test-dts": "5.X.X"
+    "hornet-js-test-dts": "5.3.X"
 }
 
 "appDependencies": {
-    "hornet-js-test": "5.X.X"
+    "hornet-js-test": "5.3.X"
 }
 ```
 

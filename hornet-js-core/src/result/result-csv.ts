@@ -73,16 +73,16 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import assignIn = require("lodash.assignin");
 import { MediaTypes } from "src/protocol/media-type";
 import { ResultFile } from "src/result/result-file";
 import { OptionsCSV } from "src/result/hornet-result-interface";
-
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      ResultCSV
@@ -100,7 +100,7 @@ export class ResultCSV extends ResultFile {
 
     constructor(options: OptionsCSV) {
         super(options, MediaTypes.CSV);
-        this.options = _.extend({ data: null, del: ";" }, options);
+        this.options = assignIn({ data: null, del: ";" }, options);
     }
 
     /*
@@ -109,7 +109,7 @@ export class ResultCSV extends ResultFile {
     protected compute(): Promise<any> {
         return new Promise((resolve, reject) => {
             try {
-                this.options.data = json2csv(_.extend(this.options, { data: JSON.parse(JSON.stringify(this.options.data)) }));
+                this.options.data = json2csv(assignIn(this.options, { data: JSON.parse(JSON.stringify(this.options.data)) }));
                 resolve(true);
             } catch (e) {
                 reject(e);

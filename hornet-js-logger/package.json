@@ -1,0 +1,34 @@
+{
+  "name": "hornet-js-logger",
+  "version": "5.4.1",
+  "license": "CECILL-2.1",
+  "description": "Ensemble des composants de gestion de base hornet-js",
+  "bugs": {
+    "url": "https://github.com/diplomatiegouvfr/hornet-js/issues"
+  },
+  "types": "./index.dts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
+  },
+  "dependencies": {
+    "lodash.findlastindex": "4.6.0",
+    "lodash.iserror": "3.1.1",
+    "lodash.isfunction": "3.0.9",
+    "lodash.isstring": "4.0.1",
+    "lodash.last": "3.0.0",
+    "log4js": "4.3.0",
+    "reflect-metadata": "0.1.13",
+    "tslib": "1.9.3"
+  },
+  "devDependencies": {
+    "@types/lodash.findlastindex": "4.6.6",
+    "@types/lodash.iserror": "3.1.6",
+    "@types/lodash.isfunction": "3.0.6",
+    "@types/lodash.isstring": "4.0.6",
+    "@types/lodash.last": "3.0.6",
+    "@types/mocha": "5.2.6",
+    "@types/node": "10.14.9"
+  },
+  "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
+}

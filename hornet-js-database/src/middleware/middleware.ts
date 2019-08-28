@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -83,7 +83,7 @@ import {
     AbstractHornetMiddleware
 } from "hornet-js-core/src/middleware/middlewares";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { RouteType } from "hornet-js-core/src/routes/abstract-routes";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 
@@ -93,7 +93,7 @@ var sequelizeErrors = require("sequelize/lib/errors");
 //                                      DataBaseErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class DataBaseErrorMiddleware extends AbstractHornetMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-database.middlewares.DataBaseErrorMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-database.middlewares.DataBaseErrorMiddleware");
 
     constructor() {
         super((err, req, res, next: any) => {

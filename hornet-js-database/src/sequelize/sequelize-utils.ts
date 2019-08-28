@@ -73,20 +73,19 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-/// <reference path="sequelize.d.ts" />
-
-import { Utils } from "hornet-js-utils";
-import Sequelize = require("sequelize");
+import { Logger } from "hornet-js-logger/src/logger";
+import { Sequelize, Model, ThroughOptions } from "sequelize";
 import { Injector } from "hornet-js-core/src/inject/injector";
 import { HornetSequelizeModel } from "src/sequelize/hornet-sequelize-model";
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
+import { Class } from "hornet-js-utils/src/typescript-utils";
 
-const logger = Utils.getLogger("hornet-js-database.src.sequelize-utils");
+const logger = Logger.getLogger("hornet-js-database.src.sequelize-utils");
 
 export interface HornetSequelizeModelMap {
     name: string;
@@ -99,15 +98,15 @@ export interface HornetSequelizeModelMap {
  */
 export interface HornetSequelizeAssociationOptions {
     // fromEntity Entité correspondant au model portant la clé étrangère
-    fromEntity: Sequelize.Model<any, any>;
+    fromEntity: Class<Model<any, any>>;
     // toEntity Entité ciblée la clé étrangère
-    toEntity: Sequelize.Model<any, any>;
+    toEntity: Class<Model<any, any>>;
     // alias Nom à donner à l'attribut au sein de l'entité fromEntity portant la clé étrangère
     alias: string;
     // nom du champs de la base de donnée portant la clé étrangère
     foreignKey: string;
     // Nom de la table issue de la relation multiple, portant une référence vers fromEntiy et une vers toEntity
-    throughTable?: string | Sequelize.Model<any, any> | Sequelize.ThroughOptions;
+    throughTable?: string | Model<any, any> | ThroughOptions;
     // otherKey Nom de l'attribut au sein de l'entité cible référence à l'entité courante (optionnel)
     otherKey?: string;
     // Cible de clé primaire autre que celle par défaut
@@ -123,7 +122,7 @@ export module SequelizeUtils {
      */
     export function initRelationBelongsTo(options: HornetSequelizeAssociationOptions): void {
         if (!options.fromEntity["associations"] || (options.fromEntity["associations"]
-            && !options.fromEntity["associations"][options.alias])) {
+           && !options.fromEntity["associations"][options.alias])) {
             options.fromEntity.belongsTo(options.toEntity, {
                 as: options.alias,
                 foreignKey: options.foreignKey,
@@ -139,12 +138,11 @@ export module SequelizeUtils {
         if (!options.fromEntity["associations"]
             || (options.fromEntity["associations"] && !options.fromEntity["associations"][options.alias])) {
 
-            options.fromEntity.belongsToMany(options.toEntity, {
+                options.fromEntity.belongsToMany(options.toEntity, {
                 as: options.alias,
                 through: options.throughTable,
                 foreignKey: options.foreignKey,
-                otherKey: options.otherKey,
-                sourceKey: options.sourceKey });
+                otherKey: options.otherKey });
         }
     }
 
@@ -155,10 +153,9 @@ export module SequelizeUtils {
     export function initRelationHasOne(options: HornetSequelizeAssociationOptions) {
         if (!options.fromEntity["associations"]
             || (options.fromEntity["associations"] && !options.fromEntity["associations"][options.alias])) {
-            options.fromEntity.hasOne(options.toEntity, {
+                options.fromEntity.hasOne(options.toEntity, {
                 as: options.alias,
-                foreignKey: options.foreignKey,
-                sourceKey: options.sourceKey });
+                foreignKey: options.foreignKey });
         }
     }
 
@@ -169,7 +166,7 @@ export module SequelizeUtils {
     export function initRelationHasMany(options: HornetSequelizeAssociationOptions) {
         if (!options.fromEntity["associations"]
             || (options.fromEntity["associations"] && !options.fromEntity["associations"][options.alias])) {
-            options.fromEntity.hasMany(options.toEntity, {
+                options.fromEntity.hasMany(options.toEntity, {
                 as: options.alias,
                 foreignKey: options.foreignKey,
                 sourceKey: options.sourceKey });
@@ -211,7 +208,7 @@ export module SequelizeUtils {
     /**
      * @param configName
      */
-    export function getQuery(configName?: string): Sequelize.Sequelize {
-        return DbConnect.global[ configName || DbConnect.defaultConfigName ].sequelize;
+    export function getQuery(configName?: string): Sequelize {
+        return DbConnect.global[configName || DbConnect.defaultConfigName].sequelize;
     }
 }

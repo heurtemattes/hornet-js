@@ -73,20 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { DomAdapter } from "src/widget/form/dom-adapter";
-import * as _ from "lodash";
+import get = require("lodash.get");
+import set = require("lodash.set");
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.form");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.form");
 
 export interface AbstractFormProps extends HornetComponentProps {
     /** Indique que les champs enfants sont en lecture seule */
@@ -150,27 +150,39 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
 
     /**
      * Met à jour la propriété readOnly sur chacun des champs enfants
+     * @protected
      * @param isReadOnly valeur à assigner à la propriété 'readOnly'
      * @return cet objet
      */
     protected updateReadOnlyFields(isReadOnly: boolean): this {
         const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function (key: string): boolean {
+        Object.keys(fields).forEach(function (key: string): void {
             const field: DomAdapter<any, any> = fields[key];
-            if (field.props && field.props.writable && !isReadOnly) {
-                if (field.setState && (field && (field as any).mounted)) {
-                    field.setState({ readOnly: isReadOnly });
-                } else {
-                    field.setReadOnly(isReadOnly);
-                }
-            } else if (field.getAttribute("data-writable") !== "false") {
-                field.setReadOnly(isReadOnly);
-            } else {
-                field.setReadOnly(true);
+            if (!(!isReadOnly && field.props && field.props.readOnly !== undefined &&
+                 field.state && field.state.readOnly === field.props.readOnly)) {
+                AbstractForm.setReadOnlyAndState(isReadOnly, field);
             }
-            return true;
         });
         return this;
+    }
+
+    /**
+     * met à jour l'information readonly de l'instance ou le state dédié
+     * @param {boolean} isReadOnly valeur à donner au readonly
+     * @param {Object} field champ issus de l'extraction dans le DOM
+     */
+    static setReadOnlyAndState(isReadOnly: boolean, field: DomAdapter<any, any>): void {
+        if (field.props && field.props.writable && !isReadOnly) {
+            if (field && field.setState && (field as any).mounted) {
+                field.setState({ readOnly: isReadOnly });
+            } else {
+                field.setReadOnly(isReadOnly);
+            }
+        } else if (field.getAttribute("data-writable") !== "false") {
+            field.setReadOnly(isReadOnly);
+        } else {
+            field.setReadOnly(true);
+        }
     }
 
     /**
@@ -180,16 +192,20 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      */
     protected updateDisabledFields(isDisabled: boolean): this {
         const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function (key: string): boolean {
+        Object.keys(fields).forEach(function (key: string): void {
             const field: DomAdapter<any, any> = fields[key];
-            // if (field instanceof AbstractField) {
-            if (field.setState && (field && (field as any).mounted)) {
-                field.setState({ disabled: isDisabled });
-            } else {
-                field.setDisabled(isDisabled);
+            // Update de la value uniquement si isDisabled est a true ou si disabled false et que disabled n'est pas
+            // définit sur le champs
+            if (!(!isDisabled && field.props && field.props.disabled !== undefined &&
+                field.state && field.state.disabled === field.props.disabled)) {
+                // if (field instanceof AbstractField) {
+                if (field.setState && (field && (field as any).mounted)) {
+                    field.setState({ disabled: isDisabled });
+                } else {
+                    field.setDisabled(isDisabled);
+                }
+                // }
             }
-            // }
-            return true;
         });
         return this;
     }
@@ -199,7 +215,7 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
      */
     protected propagateParentState(): void {
         const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function (key: string): boolean {
+        Object.keys(fields).forEach(function (key: string): void {
             const field: DomAdapter<any, any> = fields[key];
             if (this.state.readOnly === true) {
                 field.setReadOnly(this.state.readOnly);
@@ -207,8 +223,7 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
             if (this.state.disabled === true) {
                 field.setDisabled(this.state.disabled);
             }
-            return true;
-        }, this);
+        },                          this);
     }
 
     /**
@@ -228,15 +243,15 @@ export abstract class AbstractForm<P extends AbstractFormProps, S> extends Horne
         for (const name in fields) {
             const value: any = fields[name].getCurrentValue(removeEmptyStrings);
             if ((value !== "" && value !== null && !(fields[name].getType() === "number" && isNaN(value))) || !removeEmptyStrings) {
-                _.set(data, name, value);
+                set(data, name, value);
             } else {
                 /* Le champ est vide : si son nom correspond à une arborescence d'objets, on s'assure tout de même
                 que l'objet parent existe */
                 const lastDotIndex = name.lastIndexOf(".");
                 if (lastDotIndex > 0) {
                     const parentPath: string = name.substring(0, lastDotIndex);
-                    if (_.get(data, parentPath) == null) {
-                        _.set(data, parentPath, {});
+                    if (get(data, parentPath) == null) {
+                        set(data, parentPath, {});
                     }
                 }
             }

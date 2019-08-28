@@ -73,12 +73,12 @@
  * hornet-js-passport - Gestion d'authentification
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license 
  */
 
-import * as _ from "lodash";
+import startsWith = require("lodash.startswith");
 import { Utils } from "hornet-js-utils";
 
 export class AuthenticationUtils {
@@ -104,7 +104,7 @@ export class AuthenticationUtils {
         const parseUrl = require("parseurl");
         const oUrl = parseUrl.original(req);
 
-        return _.startsWith(oUrl.pathname, Utils.buildContextPath(Utils.config.getOrDefault("fullSpa.name", "/services")));
+        return startsWith(oUrl.pathname, Utils.buildContextPath(Utils.config.getOrDefault("fullSpa.name", "/services")));
     }
 
     /**

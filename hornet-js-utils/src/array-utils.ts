@@ -73,13 +73,16 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
-import { Template } from "hornet-js-utils/src/template";
+import filter = require ("lodash.filter");
+import findindex = require ("lodash.findindex");
+import unionwith = require ("lodash.unionwith");
+import intersectionwith = require ("lodash.intersectionwith");
+import { Template } from "src/template";
 
 /**
  * Classe utilitaire sur les arrays.
@@ -95,7 +98,7 @@ export class ArrayUtils {
      */
     static getIndexById(objectList: any[], object: any): number {
         let result: number = -1;
-        result = object && objectList ? _.findIndex(objectList, (item) => {
+        result = object && objectList ? findindex(objectList, (item) => {
             return item.id === object.id;
         }) : result;
         return result;
@@ -112,7 +115,7 @@ export class ArrayUtils {
         if (objectList1 && objectList1.length === 0 && objectList2 && objectList2.length === 0) {
             return false;
         }
-        const result = _.filter(objectList1, (item) => {
+        const result = filter(objectList1, (item) => {
             const index = this.getIndexById(objectList2, item);
             return (index === -1);
         });
@@ -128,7 +131,7 @@ export class ArrayUtils {
      */
     static unionWith(object: any[], other: any[], key: string = "id"): any[] {
 
-        const listResult: any[] = _.unionWith(object, other,
+        const listResult: any[] = unionwith(object, other,
                                               (item1, item2) => {
 
                 const templateItem1 = new Template("${" + key + "}").process(item1, "id");
@@ -149,7 +152,7 @@ export class ArrayUtils {
      */
     static intersectionWith(object: any[], other: any[], key: string = "id"): any[] {
 
-        const listResult: any[] = _.intersectionWith(object, other,
+        const listResult: any[] = intersectionwith(object, other,
                                                      (item1, item2) => {
 
                 const templateItem1 = new Template("${" + key + "}").process(item1, "id");

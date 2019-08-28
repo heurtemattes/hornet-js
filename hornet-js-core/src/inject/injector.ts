@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,12 +81,13 @@
 import { Class, AbstractClass } from "hornet-js-utils/src/typescript-utils";
 import { Side, Scope } from "src/inject/injectable";
 import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
-import { Register } from "hornet-js-utils/src/common-register";
-import * as _ from "lodash";
+import isString = require("lodash.isstring");
+import uniqueId = require("lodash.uniqueid");
 
-var logger = Register.getLogger("hornet-js-utils.bean-utils");
+const logger:Logger = Logger.getLogger("hornet-js-utils.bean-utils");
 const ID_NAME = "__injectId__";
 
 export const INJECT_METADATA_KEY = "injectParameters";
@@ -107,7 +108,7 @@ export class Injector {
         }
         let id = key;
 
-        if (!_.isString(key)) {
+        if (!isString(key)) {
             id = key[ ID_NAME ];
         }
         return Injector.registry[ id as string ] && Injector.registry[ id as string ][ side ];
@@ -125,7 +126,7 @@ export class Injector {
 
         let id = key;
 
-        if (!_.isString(key)) {
+        if (!isString(key)) {
             id = key[ ID_NAME ];
         }
 
@@ -153,12 +154,12 @@ export class Injector {
 
         let id = key;
 
-        if (!_.isString(key)) {
+        if (!isString(key)) {
             id = key[ ID_NAME ];
         }
 
         if (!id) {
-            id = key[ ID_NAME ] = _.uniqueId();
+            id = key[ ID_NAME ] = uniqueId();
         }
 
         let registered = Injector.registry[ id as string ] && Injector.registry[ id as string ][ side ];

@@ -73,14 +73,16 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { BaseError } from "src/exception/base-error";
-import * as moment from "moment-timezone";
+import moment = require("moment-timezone");
 import * as os from "os";
+
+
 
 export class TechnicalError extends BaseError {
     
@@ -102,6 +104,26 @@ export class TechnicalError extends BaseError {
             + "@" + os.hostname() + "-" + moment(new Date()).format("YYMMDDHHmmssSSS") + "-" + parseInt((Math.random() * 1000) + "", 10);
         }
         this.httpStatus = 500;
+    }
+
+    toLog() {
+
+        const errStr: string = this.toString();
+
+        let infoSupp;
+        try {
+            infoSupp = JSON.stringify(this);
+        }
+        catch (err) {
+            infoSupp = "<stringifyErr>";
+        }
+
+        let stacks = this.stack;
+        if (this.cause() && this.cause()["toLog"]) {
+            stacks = stacks + "\nCaused by:\n" + this.cause().toLog();
+        }
+        return errStr + "\nInformations supplémentaires :\n" + infoSupp + "\n" + stacks;
+
     }
 
 }

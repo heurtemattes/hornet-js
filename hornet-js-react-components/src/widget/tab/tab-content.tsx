@@ -73,19 +73,18 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import * as React from "react";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
-import * as React from "react";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.tab.tab-content");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.tab.tab-content");
 
 export interface TabContentProps extends HornetComponentProps {
     dataSource?: DataSource<any>;

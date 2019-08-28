@@ -73,14 +73,11 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
-import * as React from "react";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { NavigateDirection } from "src/widget/table/navigation-direction";
@@ -88,7 +85,7 @@ import { CellCoordinates } from "src/widget/table/column/cell/cell-coordinates";
 import { ContentState } from "src/widget/table/table-state";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import * as _ from "lodash";
+import isNull = require("lodash.isnull");
 
 export interface AbstractCellProps extends HornetComponentProps {
     id?: string;
@@ -116,7 +113,7 @@ export interface AbstractCellProps extends HornetComponentProps {
 
 }
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-cell");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.abstract-cell");
 
 /**
  * Classe abstraite d'une cellule de tableau
@@ -302,7 +299,7 @@ export abstract class AbstractCell<P extends AbstractCellProps, S> extends Horne
      */
     handleEdition(lineIndex: number) {
         const nameClass: string = "default-body-cell";
-        if (_.isNull(lineIndex)) {
+        if (isNull(lineIndex)) {
             this.setState({ isEditing: false });
             this.tableCellRef.removeAttribute("disabled");
             this.tableCellRef.classList.remove("datatable-cell-in-edition");

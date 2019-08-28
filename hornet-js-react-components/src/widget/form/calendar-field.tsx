@@ -73,28 +73,33 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import {
     AbstractField,
-    HornetBasicFormFieldProps,
-    HornetClickableProps,
-    HornetWrittableProps,
 } from "src/widget/form/abstract-field";
 import { Modal } from "src/widget/dialog/modal";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import clone = require("lodash.clone");
+import cloneDeep = require("lodash.clonedeep");
+
 import * as moment from "moment";
 import { DateUtils } from "hornet-js-utils/src/date-utils";
 import { InputField, InputFieldProps } from "src/widget/form/input-field";
 import { KEYNAMES } from "hornet-js-components/src/event/key-codes";
+import { SvgSprites } from "src/widget/icon/svg-sprites";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.calendar-fied");
+import "src/widget/form/sass/_calendar.scss";
+import "src/widget/form/sass/_rc-calendar.scss";
+import "src/widget/form/sass/_rc-calendar-utils.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.calendar-fied");
 
 let RcCalendar = null;
 const defaultLocale = DateUtils.default_locale;
@@ -159,7 +164,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
     readonly props: Readonly<CalendarFieldProps>;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         disabled: false,
         isDatePicker: true,
         valideOnForm: true,
@@ -170,8 +175,11 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
     constructor(props?: P, context?: any) {
         super(props, context);
 
+        const formats = this.props.dateFormats ?
+            { dateFormats: this.props.dateFormats, dateFormat: this.props.dateFormats[0] } : {};
+
         const calendarLocale = Utils.getCls("hornet.internationalization") ?
-            this.i18n("calendar") : { dateFormat: "DD/MM/YYYY" };
+            { ...this.i18n("calendar"), ...formats } : { formats, ...{ dateFormat: "DD/MM/YYYY" } };
 
         /*récupération de la locale d'internationalisation*/
         const internationalisation = Utils.getCls("hornet.internationalization");
@@ -183,7 +191,18 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         }
 
         /* attribut HTML size du champ de saisie */
-        const inputSize: number = calendarLocale.dateFormat.length;
+        let inputSize: number = 0;
+        if (calendarLocale.dateFormats) {
+            // récupération de la taille la plus longue parmis les formats
+            let index: string;
+            for (index in calendarLocale.dateFormats) {
+                if (calendarLocale.dateFormats[index].length > inputSize) {
+                    inputSize = calendarLocale.dateFormats[index].length;
+                }
+            }
+        } else {
+            inputSize = calendarLocale.dateFormat.length;
+        }
 
         this.state = {
             ...this.state,
@@ -191,7 +210,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             calendarLocale,
             language,
             inputSize,
-            placeHolder: (!props.placeHolder) ? this.i18n("calendar.placeHolder") : "",
+            placeHolder: (!props.placeHolder) ? this.i18n("calendar.placeHolder") : props.placeHolder,
             currentValue: "",
             messageValidation: this.i18n("form.validation.format", { field: this.state.label }),
         };
@@ -199,18 +218,9 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
     componentDidMount() {
         super.componentDidMount();
-            if (this.props.currentValue) {
-                this.setCurrentValue(this.props.currentValue);
-            }
-    }
-
-    /**
-     * Récupère le format d'affichage des dates
-     */
-    protected getFormat() {
-        const internationalisation = Utils.getCls("hornet.internationalization");
-        const dateFormat = internationalisation.messages.calendar.dateFormat;
-        return dateFormat;
+        if (this.props.currentValue) {
+            this.setCurrentValue(this.props.currentValue);
+        }
     }
 
     /**
@@ -229,27 +239,31 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             reactIconTag =
                 <button className="agenda icon" type="button" onClick={this.showCalendar}
                     title={this.state.title || this.state.calendarLocale.agendaTitle}
-                    disabled={this.state.readOnly || this.state.disabled} aria-haspopup={true} value="calendar"
+                    disabled={this.state.readOnly || this.state.disabled} value="calendar"
                 >
-                    <img src={CalendarField.genUrlTheme("/img/calendar/icon_calendar.svg")}
-                        alt={this.state.alt || this.state.title || this.state.calendarLocale.agendaTitle} />
+                    <SvgSprites icon="calendar" color="#007BA7" tabIndex={-1} />
                 </button>;
 
             /*RcCalendar prend un Moment en paramètre*/
-            const date = _.clone(this.state.currentValue);
+            const date = clone(this.state.currentValue);
             let currentDate: any;
             if (!date) {
                 currentDate = moment();
             } else {
-                currentDate = moment(date, this.state.calendarLocale.dateFormat);
+                if (this.state.calendarLocale.dateFormats) {
+                    currentDate = DateUtils.parseMultipleFmt(date, this.state.calendarLocale.dateFormats,
+                        this.state.calendarLocale.dateFormat);
+                } else {
+                    currentDate = moment(date, this.state.calendarLocale.dateFormat);
+                }
             }
-            if (!currentDate.isValid()) {
+            if (!currentDate || !currentDate.isValid()) {
                 currentDate = moment();
             }
             currentDate.locale(this.state.language);
-            let format = this.getFormat();
+            let format = this.state.calendarLocale.dateFormat;
             if (format instanceof Array) {
-                format = format[ 0 ];
+                format = format[0];
             }
 
             reactCalendarDialogueTag =
@@ -272,20 +286,20 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                 </Modal>;
         }
 
-        let htmlProps: __React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
+        let htmlProps: React.HTMLAttributes<HTMLElement> = this.getHtmlProps();
 
         const formatedValue = this.state.currentValue.length >= 1
             ? this.state.currentValue
             : "";
 
-        htmlProps = _.assign(htmlProps, {
+        htmlProps = assign(htmlProps, {
             type: "text",
             size: this.state.inputSize,
             value: formatedValue,
             onChange: this.handleInputChange,
             onKeyPress: this.handleInputKeyPress,
             onBlur: this.handleInputLeave,
-        } as __React.HTMLAttributes<HTMLElement>);
+        } as React.HTMLAttributes<HTMLElement>);
 
         if ((htmlProps as any).label === htmlProps.title) {
             htmlProps.title = undefined;
@@ -293,14 +307,13 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
         if (this.props.currentValue != null) {
             if (this.props.currentValue instanceof Date) {
-                _.assign(htmlProps, { defaultValue: this.formatCalendarDate((this.props.currentValue as any).getTime(), this.state.calendarLocale) });
+                assign(htmlProps, { defaultValue: this.formatCalendarDate((this.props.currentValue as any).getTime(), this.state.calendarLocale) });
             } else {
-                _.assign(htmlProps, { defaultValue: this.props.currentValue });
+                assign(htmlProps, { defaultValue: this.props.currentValue });
             }
         }
 
         (htmlProps as any).label = undefined;
-        (htmlProps as any).alt = undefined;
 
         const hasError = this.hasErrors() ? " has-error" : "";
 
@@ -317,7 +330,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                     placeholder={placeHolder}
                 />
                 {!this.state.readOnly && !this.state.disabled && this.state.currentValue && this.state.resettable ?
-                     this.renderResetButton() : null}
+                    this.renderResetButton() : null}
                 {reactIconTag}
                 {reactCalendarDialogueTag}
             </div>
@@ -353,16 +366,16 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                 }
             }
             if (this.state.onChange) {
-                this.state.onChange(null);
+                this.state.onChange({
+                    target: this.htmlElement,
+                    currentTarget: this.htmlElement,
+                    preventDefault: () => { },
+                    stopPropagation: () => { },
+                } as React.FormEvent<HTMLElement>);
             }
             if (this.state.onValueChange) {
                 this.state.onValueChange(this.state.currentValue);
             }
-
-            if (this.htmlElement && this.htmlElement.onchange) {
-                this.htmlElement.onchange();
-            }
-
         });
     }
 
@@ -401,18 +414,13 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         const text = input.value;
 
         if (text.length > 0) {
-            const format = this.getFormat();
+            const format = this.state.calendarLocale.dateFormat;
             const time = moment(text, format, true);
             if (time.isValid()) {
-                if (format instanceof Array) {
-                    const newText = time.format(format[ 0 ]);
-                    this.setState({ currentValue: newText }, () => {
-                        if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
-                    });
-                } else {
-                    const newText = time.format(format);
-                    this.setState({ currentValue: newText });
-                }
+                const newText = time.format(format);
+                this.setState({ currentValue: newText }, () => {
+                    if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
+                });
             } else {
                 if (this.state.valideOnForm) {
                     this.setState({ currentValue: text }, () => {
@@ -420,7 +428,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
                     });
                 } else {
                     if (this.hasKeyPress) {
-                        this.setState({ errors: [ { field: this.state.name, text: this.state.messageValidation } ] }, () => {
+                        this.setState({ errors: [{ field: this.state.name, text: this.state.messageValidation }] }, () => {
                             this.htmlElement.focus();
                         });
                         this.hasKeyPress = false;
@@ -444,45 +452,18 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
      */
     protected handleInputKeyPress(e: React.KeyboardEvent<HTMLElement>): void {
 
-        const text = (e.target as HTMLInputElement).value;
-        const time = moment(text, this.getFormat());
-
         if (this.state.onKeyPress) {
             this.state.onKeyPress(event);
         }
 
         const key: string = e.key;
 
-        if (key === KEYNAMES.ArrowDown) {
-
-            if (time.isValid()) {
-                time.add(1, "days");
-                this.setState({ currentValue: time.toDate() }, () => {
-                    if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
-                });
-            }
-
-            e.preventDefault();
-        } else if (key === KEYNAMES.ArrowUp) {
-            if (time.isValid()) {
-                time.add(1, "days");
-                this.setState({ currentValue: time.toDate() }, () => {
-                    if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
-                });
-            }
-            e.preventDefault();
-        } else if (key === KEYNAMES.Home) {
-            this.setState({ currentValue: new Date() }, () => {
-                if (this.state.onValueChange) this.state.onValueChange(this.state.currentValue);
-            });
-
-            e.preventDefault();
-        } else if ((/[-.\/]/.test(key))
+        if ((/[-.\/]/.test(key))
             || (/\d/.test(key))
             || ((key.toUpperCase() === "A"
-            || key.toUpperCase() === "C"
-            || key.toUpperCase() === "V"
-            || key.toUpperCase() === "X") && e.ctrlKey)) {
+                || key.toUpperCase() === "C"
+                || key.toUpperCase() === "V"
+                || key.toUpperCase() === "X") && e.ctrlKey)) {
             if (key !== "Tab") {
                 this.hasKeyPress = true;
             }
@@ -500,9 +481,11 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
         let strValue: string;
         try {
             if (time) {
-                const format = this.getFormat();
-                strValue = moment(time).format(format);
-
+                if (calendarLocale.dateFormats) {
+                    strValue = DateUtils.formatMultipleFmt(time, calendarLocale.dateFormats);
+                } else {
+                    strValue = DateUtils.format(time, calendarLocale);
+                }
             }
         } catch (err) {
             logger.trace("Erreur pour formater la date suivante:", err);
@@ -525,7 +508,7 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
             this.setState({
                 currentValue: this.formatCalendarDate(value, this.state.calendarLocale),
                 valued: value !== "",
-            },            () => {
+            }, () => {
                 this.hideCalendar();
                 if (this.state.onSelect) {
                     this.state.onSelect(value);
@@ -581,11 +564,18 @@ export class CalendarField<P extends CalendarFieldProps, S extends CalendarField
 
     getCurrentValue(removeEmptyStrings: boolean = true): Date {
         let val;
-        if (this.state.valideOnForm) {
-            val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS)
-            || this.state.currentValue;
+        let value;
+        if (this.state.calendarLocale.dateFormats) {
+            value =
+                DateUtils.parseInTZMultipleFmt(this.state.currentValue, this.state.calendarLocale.dateFormats, Utils.dateUtils.TZ_EUROPE_PARIS);
         } else {
-            val = Utils.dateUtils.parseInTZ(this.state.currentValue, this.getFormat(), Utils.dateUtils.TZ_EUROPE_PARIS);
+            value =
+                DateUtils.parseInTZ(this.state.currentValue, this.state.calendarLocale.dateFormat, Utils.dateUtils.TZ_EUROPE_PARIS);
+        }
+        if (this.state.valideOnForm) {
+            val = value || this.state.currentValue;
+        } else {
+            val = value;
         }
         return (!removeEmptyStrings && this.props.nullable && val === "") ? null : val;
     }

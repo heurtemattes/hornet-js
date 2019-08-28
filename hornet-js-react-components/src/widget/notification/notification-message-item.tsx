@@ -73,20 +73,21 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
-import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
-import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
+import { Accordion } from "src/widget/accordion/accordion";
+import { Tabs } from "src/widget/tab/tabs";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-message-item");
+import "src/widget/notification/sass/_notification.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.notification.notification-message-item");
 
 /**
  * Propriétés D'un élément de message

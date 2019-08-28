@@ -1,11 +1,11 @@
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
-import { HornetComponent } from "hornet-js-react-components/src/widget/component/hornet-component";
+import { HornetComponent } from "src/widget/component/hornet-component";
 import * as moment from "moment-timezone";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.count-down");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.notification.count-down");
 
 (moment.duration as any).fn.format = function(){
     let str = "";

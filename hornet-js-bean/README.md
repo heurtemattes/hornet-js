@@ -28,10 +28,10 @@ Ajouter au package.json
 
 ```shell
   "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.X.X"
+    "hornet-js-ts-typings": "5.3.X"
   }
   "appDependencies": {
-    "hornet-js-bean": "5.X.X"
+    "hornet-js-bean": "5.3.X"
   }
 ```
 

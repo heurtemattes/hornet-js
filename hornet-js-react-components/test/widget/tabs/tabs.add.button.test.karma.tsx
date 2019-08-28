@@ -73,13 +73,14 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-const chai = require("chai");
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
@@ -87,21 +88,8 @@ import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
 
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
-/* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-/*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
-import { CheckColumn } from "src/widget/table/column/check-column";
-
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-
-import { Tabs } from "hornet-js-react-components/src/widget/tab/tabs";
-import { Tab } from "hornet-js-react-components/src/widget/tab/tab";
-import { TabContent } from "src/widget/tab/tab-content";
-import * as _ from "lodash";
+import { Tabs } from "src/widget/tab/tabs";
+import { Tab } from "src/widget/tab/tab";
 
 import { TabHeader } from "src/widget/tab/tab-header";
 
@@ -115,8 +103,11 @@ let addDiv;
 
 @Decorators.describe("Test Karma tabs add button")
 class tabsAddButtonTest extends BaseTest {
+    private id;
+
     @Decorators.beforeEach
     beforeEach() {
+        this.id = this.generateMainId();
         tabs = null;
         beforeHideTabCount = 0;
         afterShowTabCount = 0;
@@ -144,7 +135,7 @@ class tabsAddButtonTest extends BaseTest {
     }
 
     addFunction = () => {
-        this.renderIntoDocument(addDiv, "main999999");
+        this.renderIntoDocument(addDiv, this.id);
     }
 
     @Decorators.it("Test OK")
@@ -176,7 +167,7 @@ class tabsAddButtonTest extends BaseTest {
         tabs = this.renderIntoDocument(tabsElement, id);
         this.triggerMouseEvent(document.querySelector(`#${id} #tabs-add-button`), "click");
         setTimeout(() => {
-            expect(document.querySelector(`#main999999 #testAdd`)).to.exist;
+            expect(document.querySelector(`#${this.id} #testAdd`)).to.exist;
             this.end();
         }, 1000);
     }

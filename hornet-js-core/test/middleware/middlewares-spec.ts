@@ -73,12 +73,28 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import { TestLogger } from "hornet-js-test/src/test-logger";
 import { TestUtils } from "hornet-js-test/src/test-utils";
+import { Logger } from "hornet-js-logger/src/logger";
+Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
+    appenders: {
+        console: {
+            type: "console",
+            layout: {
+                type: "pattern",
+                pattern: "%[%d{ISO8601}|%p|%c|%m%]",
+            },
+        },
+    },
+    categories: {
+        default: { appenders: [ "console" ], level: "INFO" },
+    },
+});
 import { Utils } from "hornet-js-utils";
 import * as Middlewares from "src/middleware/middlewares";
 
@@ -86,7 +102,10 @@ var proxyquire = require("proxyquire").noCallThru();
 var expect = TestUtils.chai.expect;
 var sinon = TestUtils.sinon;
 var CsrfMiddleware = Middlewares.CsrfMiddleware;
+const HornetContextInitializerMiddleware = Middlewares.HornetContextInitializerMiddleware;
 Utils.setConfigObj({});
+
+const saveCls = Utils.setCls;
 
 describe("Middleware CsrfMiddleware", () => {
 
@@ -286,5 +305,9 @@ describe("Middleware CsrfMiddleware", () => {
             // assert
             expect(valid).to.equal(false);
         });
+    });
+
+    after(function() {
+        Utils.setCls = saveCls;
     });
 });

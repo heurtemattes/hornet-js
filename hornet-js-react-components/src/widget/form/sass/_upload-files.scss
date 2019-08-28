@@ -1,0 +1,74 @@
+@import '../../sass/core';
+
+$uploadBaseColor: theme-color('global', 'white');
+$uploadContent: theme-color($variant: 'secondary');
+$uploadBoxShadow: theme-color('global', 'boxShadows');
+$uploadHover: theme-color($variant: 'buttons');
+$uploadReadonlyContent: rgba(169, 169, 169, 1); //#a9a9a9
+
+.upload-container {
+    display: inline-block;
+
+    .uploadfile {
+        min-width: 15.469em;
+        width: 100%;
+        display: none;
+    }
+
+    .upload-content {
+        cursor: pointer;
+        display: inline-block;
+        padding: 0.3em;
+        min-width: 15.469em;
+        max-width: 100%;
+        margin-right: 1.5em;
+        margin-bottom: 0.5em;
+        padding-left: 2.5em;
+        padding-right: 1em;
+        color: $uploadBaseColor;
+        background: url("../img/upload.svg") no-repeat 0.5em $uploadContent;
+        border: medium none;
+        text-align: center;
+        font-family: $notoBold;
+        word-wrap: break-word;
+        box-shadow: 0 0 0 0 $uploadBoxShadow;
+        
+        @include smoothTransition(background-color, 0.3s);
+
+        @media (max-width: #{$mediaS-543}) {
+            width: 100%;
+        }
+
+        &:not([readonly]) {
+            &:hover,
+            &:focus {
+                background-color: $uploadHover;
+                outline: 2px solid #f99a05;
+            }
+        }
+
+        &[readonly] {
+            background-color: $uploadReadonlyContent;
+            cursor: default;
+        }
+
+        &:active {
+            box-shadow: 0 10px 15px 0 $uploadBoxShadow;
+            outline: none !important;
+        }
+
+        .upload-text {
+            word-break: break-all;
+            color: $uploadBaseColor;
+        }
+    }
+
+    .upload-delete-button {
+        float: right;
+        height: 2.15em;
+    }
+    
+    @media (max-width: #{$mediaS-543}) {
+        width: 100%;
+    }
+}

@@ -73,13 +73,14 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 process.env.HORNET_CONFIG_DIR_APPLI = __dirname + "/config";
+
 import { TestLogger } from "hornet-js-test/src/test-logger";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
 Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
     appenders: {
@@ -98,12 +99,10 @@ Logger.prototype.buildLogger = TestLogger.getLoggerBuilder({
 import { Utils } from "hornet-js-utils";
 import { TestUtils } from "hornet-js-test/src/test-utils";
 import { Injector } from "hornet-js-core/src/inject/injector";
-import { DbConnect } from "src/sequelize/dbconnect-sequelize";
-import { Database } from "hornet-js-database/src/sequelize/database";
+import { Database } from "src/sequelize/database";
 import { ModelDAO } from "test/dao/model-dao";
 import { Scope } from "hornet-js-core/src/inject/injectable";
 import * as path from "path";
-import * as Sequelize from "sequelize";
 import { Decorators } from 'hornet-js-test/src/decorators';
 import { BaseMochaTest } from 'hornet-js-test/src/base-mocha-test';
 import { runTest } from 'hornet-js-test/src/test-run';
@@ -111,54 +110,54 @@ import { UtilisateursDAO } from 'test/dao/utilisateurs-dao';
 import { RoleDAO } from 'test/dao/role-dao';
 import { Transactional } from 'src/decorators/dec-transactional';
 import { HornetTestAssert } from 'hornet-js-test/src/hornet-test-assert';
-const chai = require("chai");
-const expect = TestUtils.chai.expect;
-const dbConfig2 = "configTestBis";
-const dbConfig1 = "configTest";
-const conf = Utils.config.getConfigObj();
-if (!conf.database) {
-    conf.database = {
-        "configTest": {
-            "basename": "sequelizeOne",
-            "username": "test",
-            "password": "test",
-            "options": {
-                "dialect": "sqlite",
-                "pool": {
-                    "max": 15,
-                    "min": 0,
-                    "idle": 1000
-                },
-                "define": {
-                    "timestamps": false,
-                    "version": false
-                },
-                "loggingLevel": "DEBUG"
-            },
-            "reload": true
-        },
-        "configTestBis": {
-            "basename": "sequelizeTwo",
-            "username": "test",
-            "password": "test",
-            "options": {
-                "dialect": "sqlite",
-                "storage": "/database/database.sqlite",
-                "pool": {
-                    "max": 15,
-                    "min": 0,
-                    "idle": 1000
-                },
-                "timestamps": false,
-                "loggingLevel": "INFO",
-                "define": {
-                    "timestamps": false,
-                    "version": false
-                }
-            },
-            "reload": true
+import { Promise } from "hornet-js-utils/src/promise-api";
 
-        }
+const expect = TestUtils.chai.expect;
+const dbConfig1 = "configTest";
+const dbConfig2 = "configTestBis";
+const conf = Utils.config.getConfigObj();
+
+conf.database = {
+    "configTest": {
+        "basename": "sequelizeOne",
+        "username": "test",
+        "password": "test",
+        "options": {
+            "dialect": "sqlite",
+            "pool": {
+                "max": 15,
+                "min": 0,
+                "idle": 1000
+            },
+            "define": {
+                "timestamps": false,
+                "version": false
+            },
+            "loggingLevel": "DEBUG"
+        },
+        "reload": true
+    },
+    "configTestBis": {
+        "basename": "sequelizeTwo",
+        "username": "test",
+        "password": "test",
+        "options": {
+            "dialect": "sqlite",
+            "storage": "/database/database.sqlite",
+            "pool": {
+                "max": 15,
+                "min": 0,
+                "idle": 1000
+            },
+            "timestamps": false,
+            "loggingLevel": "INFO",
+            "define": {
+                "timestamps": false,
+                "version": false
+            }
+        },
+        "reload": true
+
     }
 }
 
@@ -167,24 +166,26 @@ if (conf.database.configTestBis.options.storage && !conf.database.configTestBis.
     Utils.config.setConfigObj(conf);
 }
 
-
 @Decorators.describe("Test du decorator Transactional")
 class TransactionalTest extends BaseMochaTest {
 
     @Decorators.beforeEach
     beforeEach(done) {
-        const files = [__dirname + "/../../test/database/01_createTablesSqlite.sql",
-        __dirname + "/../../test/database/02_initDataSqlite.sql"];
+        const files = [__dirname + "/../../test/database/01_createTablesSqlite.sql", __dirname + "/../../test/database/02_initDataSqlite.sql"];
         if (!Injector.getRegistered("databaseConfigName")) {
-            Injector.register("databaseConfigName", dbConfig2);
+            Injector.register("databaseConfigName", dbConfig1);
+        } else if (Injector.getRegistered("databaseConfigName") !== dbConfig1) {
+            Injector.removeRegistered("databaseConfigName");
+            Injector.register("databaseConfigName", dbConfig1);
         }
         Database.runScripts([{
-            configName: dbConfig2,
+            configName: dbConfig1,
             files: files
         }]).then(() => {
-            if (!Injector.getRegistered(ModelDAO)) {
-                Injector.register(ModelDAO, ModelDAO, Scope.SINGLETON_EAGER);
+            if (Injector.getRegistered(ModelDAO)) {
+                Injector.removeRegistered(ModelDAO);
             }
+            Injector.register(ModelDAO, ModelDAO, Scope.SINGLETON_EAGER);
             done();
         }).catch(e => { done(e) });
     }
@@ -238,6 +239,8 @@ class TransactionalTest extends BaseMochaTest {
                     });
                 })
             });
+        }).catch(e => {
+            this.end(e);
         });
     }
 
@@ -249,18 +252,16 @@ class TransactionalTest extends BaseMochaTest {
      * @param roleToFind : le role à chercher
      * @param newRole : le nouveau role
      */
-    @Transactional({ configDatabase: "configTestBis" })
+    @Transactional({ configDatabase: "configTest" })
     udpateUserAndRole(loginToFind, newLogin, roleToFind, newRole): Promise<any> {
-        return new UtilisateursDAO().findOne({ where: { login: loginToFind } }).then(user => {
-            user.login = newLogin
-            return new UtilisateursDAO().updateById(user.id, user).then(result => {
-                return new RoleDAO().findOne({ where: { rolNom: roleToFind } }).then(role => {
+        return new UtilisateursDAO().findOne({ where: { login: loginToFind } }).then((user) => {
+            user.login = newLogin;
+            return new UtilisateursDAO().updateById(user.id, user).then((result) => {
+                return new RoleDAO().findOne({ where: { rolNom: roleToFind } }).then((role) => {
                     return new RoleDAO().updateByIdGeneric(role.id, { rolNom: newRole });
                 });
             });
         });
-
-
     }
 }
 

@@ -73,7 +73,7 @@
  * hornet-js-database - Ensemble des composants de gestion de base hornet-js
  *
  * @author 
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,10 +81,11 @@
 import { Configuration } from "src/configuration";
 import * as fs from "fs";
 import { DbConnect } from "src/sequelize/dbconnect-sequelize";
-import * as _ from "lodash";
+import forEach = require("lodash.foreach");
 import Sequelize = require("sequelize");
 import { Utils } from "hornet-js-utils";
 import { Injector } from "hornet-js-core/src/inject/injector";
+import { Promise } from "hornet-js-utils/src/promise-api";
 
 export class Database {
     protected _config: Configuration;
@@ -139,7 +140,7 @@ export class Database {
 
     static runScripts(list: {}[]): Promise<Boolean> {
         let p: Promise<any>[] = [];
-        _.forEach(list, (item) => {
+        forEach(list, (item) => {
             DbConnect.init(item[ "configName" ]);
             let cfg: Database = DbConnect.getGlobal(item[ "configName" ]);
 

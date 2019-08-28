@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 import { Notification } from "src/widget/notification/notification";
 import { AbstractField } from "src/widget/form/abstract-field";
@@ -95,15 +95,22 @@ import {
 } from "hornet-js-core/src/notification/notification-manager";
 import { CheckBoxField } from "src/widget/form/checkbox-field";
 import { IValidationResult, ICustomValidation, DataValidator } from "hornet-js-core/src/validation/data-validator";
-import * as classNames from "classnames";
-import * as _ from "lodash";
+import classNames from "classnames";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
+import debounce = require("lodash.debounce");
+import get = require("lodash.get");
+import * as ajv from "ajv";
 import ErrorObject = ajv.ErrorObject;
 import { SelectField } from "src/widget/form/select-field";
 import { ButtonsArea } from "src/widget/form/buttons-area";
 import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
 import { VALUE_CHANGED_EVENT } from "src/widget/form/event";
 import { HTML_ATTRIBUTES } from "src/widget/form/html-attributes";
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.form.form");
+
+import "src/widget/form/sass/_form-entities.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.form.form");
 
 /**
  * Propriétés du formulaire hornet.
@@ -118,7 +125,7 @@ export interface FormProps extends AbstractFormProps {
     /** Fonction déclenchée lors de la soumission du formulaire, lorsque celui-ci est valide */
     onSubmit?: (data: any) => void;
     /** Fonction déclenchée lors de la modification d'un champ du formulaire */
-    onFormChange?: __React.FormEventHandler<HTMLElement>;
+    onFormChange?: React.FormEventHandler<HTMLElement>;
     /** Lorsque mis à true, le message d'information concernant les champs obligatoires est masqué.
      * Ignoré lorsque markRequired est à false car le message n'a pas lieu d'être affiché. */
     isMandatoryFieldsHidden?: boolean;
@@ -154,6 +161,12 @@ export interface FormProps extends AbstractFormProps {
     hideButtons?: boolean;
     // Ignorer ou non les informations non valorisées du formulaire
     omitNull?: boolean;
+    /* Ajoute ou non la classe sticky au formulaire */
+    isSticky?: boolean;
+    /* d de la zone de bouton sticky au formulaire */
+    buttonAreaIdSticky?: string;
+    /* id du footer pour gérer la visibilité de la zone de bouton sticky au formulaire */
+    footerId?: string;
 }
 
 /**
@@ -166,7 +179,7 @@ export class Form extends AbstractForm<FormProps, any> {
     protected debouncedValidateAndSubmit: any;
 
     /** Valeur de propriétés par défaut */
-    static defaultProps: FormProps = _.assign(_.cloneDeep(AbstractForm.defaultProps), {
+    static defaultProps: FormProps = assign(cloneDeep(AbstractForm.defaultProps), {
         markRequired: true,
         isMandatoryFieldsHidden: false,
         subTitle: null,
@@ -174,6 +187,9 @@ export class Form extends AbstractForm<FormProps, any> {
         customValidators: [],
         validationOptions: DataValidator.DEFAULT_VALIDATION_OPTIONS,
         omitNull: true,
+        isSticky: false,
+        buttonAreaIdSticky: "button-container",
+        footerId: "footer-container",
     });
 
     constructor(props?: FormProps, context?: any) {
@@ -194,7 +210,8 @@ export class Form extends AbstractForm<FormProps, any> {
         };
 
         this.listen(VALUE_CHANGED_EVENT, (ev: HornetEvent<any>) => {
-            if (ev.detail.form.id === this.state.id && this.state.onFormChange) {
+            const isEventContainsForm : boolean = ev && ev.detail && ev.detail.form;
+            if (isEventContainsForm && ev.detail.form.id === this.state.id && this.state.onFormChange) {
                 this.state.onFormChange();
             }
         });
@@ -212,7 +229,7 @@ export class Form extends AbstractForm<FormProps, any> {
         return this;
     }
 
-    setOnFormChange(handler: __React.FormEventHandler<HTMLElement>, callback?: () => any): this {
+    setOnFormChange(handler: React.FormEventHandler<HTMLElement>, callback?: () => any): this {
         this.setState({ onFormChange: handler }, callback);
         return this;
     }
@@ -282,17 +299,19 @@ export class Form extends AbstractForm<FormProps, any> {
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        window.removeEventListener("scroll", this.handleScroll);
         NotificationManager.clean(this.state.notifId, this.state.id);
         if (this.formElement) {
-            this.formElement[ "__component" ] = null;
+            this.formElement["__component"] = null;
         }
     }
 
     componentDidMount(): void {
         super.componentDidMount();
+        window.addEventListener("scroll", this.handleScroll);
         /* On évite la soumission intempestive du formulaire en cas de clics répétés ou de touche entrée maintenue
          sur le bouton de soumission*/
-        this.debouncedValidateAndSubmit = _.debounce(this.validateAndSubmit, 500);
+        this.debouncedValidateAndSubmit = debounce(this.validateAndSubmit, 500);
         if (this.state.defaultValues) {
             this.updateFields(this.state.defaultValues);
         }
@@ -307,10 +326,10 @@ export class Form extends AbstractForm<FormProps, any> {
      * @return ce formulaire
      */
     protected updateMarkRequiredFields(isMarkRequired: boolean): this {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
         /* Met à jour l'affichage de chaque champ en cas de readOnly*/
         Object.keys(fields).every(function (key: string): boolean {
-            const field: DomAdapter<any, any> = fields[ key ];
+            const field: DomAdapter<any, any> = fields[key];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setMarkRequired(isMarkRequired);
             }
@@ -325,83 +344,89 @@ export class Form extends AbstractForm<FormProps, any> {
      * @return ce formulaire
      */
     protected updateImagFilePathFields(imgFilePath: string): this {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function (key: string): boolean {
-            const field: DomAdapter<any, any> = fields[ key ];
-            if (field instanceof AbstractField) {
-                (field as AbstractField<any, any>).setImgFilePath(imgFilePath);
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
+        Object.keys(fields).forEach(function (key: string): void {
+            const field: DomAdapter<any, any> = fields[key];
+            if (field instanceof AbstractField && this.state.imgFilePath) {
+                field.setImgFilePath(imgFilePath);
             }
-            return true;
         });
         return this;
     }
 
     /**
      * Met à jour les valeurs courantes des champs du formulaire
-     * @param data données du formulaire (clé : nom du champ -> valeur du champ)
+     * @param {any} data données du formulaire (clé : nom du champ -> valeur du champ)
+     * @param {boolean} partial si true alors on n'écrase pas les champs qui ne sont présents dans data. False par défaut
      */
-    updateFields(data: any): void {
+    updateFields(data: any, partial: boolean = false): void {
         const fields = this.extractFields();
         this.propagateParentState();
-        for (const nameField in fields) {
-            const val = _.get(data, nameField);
-            if (val != null) {
-                if (fields[ nameField ] instanceof CheckBoxField) {
-                    fields[ nameField ].setCurrentChecked(val as boolean);
-                } else {
-                    if (fields[ nameField ] instanceof SelectField || fields[ nameField ] instanceof AutoCompleteField) {
-                        if (val instanceof Array) {
-                            const choices = [];
-                            /** TODO : a deplace dans le composant autocompleteField */
-                            if (fields[ nameField ].state.multiple) {
-                                for (let i = 0; i < fields[ nameField ].state.allChoices.length; i++) {
-                                    const choice = fields[ nameField ].state.allChoices[ i ];
-                                    for (let j = 0; j < val.length; j++) {
-                                        if (val[ j ].toString() === choice[ "value" ].toString()) {
-                                            choices.push(choice[ "value" ]);
-                                            break;
-                                        }
-                                    }
-                                }
-                            } else {
-                                for (let i = 0; i < fields[ nameField ].state.dataSource.length; i++) {
-                                    const choice = fields[ nameField ].state.dataSource[ i ];
-                                    for (let j = 0; j < val.length; j++) {
-                                        if (val[ j ].toString() === choice[ fields[ nameField ].state.valueKey ]) {
-                                            choices.push(choice[ fields[ nameField ].state.valueKey ]);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            fields[ nameField ].setCurrentValue(choices);
-                        } else {
-                            fields[ nameField ].setCurrentValue(val);
-                        }
-                    } else {
-                        /* Traitement des champs radio et select en mode readOnly */
-                        if ((fields[ nameField ].state.choices) && (this.state.readOnly || fields[ nameField ].state.readOnly)) {
-
-                            for (let i = 0; i < fields[ nameField ].state.dataSource.length; i++) {
-                                const choice = fields[ nameField ].state.dataSource[ i ];
-                                if (val.toString() === choice[ fields[ nameField ].state.valueKey ]) {
-                                    fields[ nameField ].setCurrentValue(choice[ fields[ nameField ].state.valueKey ]);
-                                    break;
-                                }
-                            }
-                        } else {
-                            fields[ nameField ].setCurrentValue(val);
-                        }
-                    }
+        Object.keys(fields).forEach((fiedName) => {
+            const fieldNewValue = get(data, fiedName);
+            const field = fields[fiedName];
+            if (fieldNewValue != null && fiedName && field) {
+                field.setCurrentValue(fieldNewValue);
+                if (field instanceof CheckBoxField) {
+                    field.setCurrentChecked(fieldNewValue as boolean);
+                } else if (field instanceof SelectField || field instanceof AutoCompleteField) {
+                    field.setCurrentValue(this.inferAutoCompleteAndSelectFieldValue(field, fieldNewValue));
+                } else if (field.state.choices && (this.state.readOnly || field.state.readOnly)) {
+                    // Traitement des champs radio et select en mode readOnly
+                    field.setCurrentValue(this.inferRadioFieldAndSelectReadOnlyValue(field, fieldNewValue));
                 }
-            } else {
-                if (fields[ nameField ] instanceof CheckBoxField) {
-                    fields[ nameField ].setCurrentChecked(false);
-                } else {
-                    fields[ nameField ].setCurrentValue(null);
+            } else if (fieldNewValue == null && !partial) {
+                field.setCurrentValue(null);
+                if (field instanceof CheckBoxField) {
+                    field.setCurrentChecked(false);
                 }
             }
+        });
+    }
+
+    /**
+     * Calcule la value du field passé en paramètre. Le field est soit un RadioField soit un SelectField readOnly
+     * @param {any} field
+     * @param {any} fieldValue
+     * @returns {any} la valeur du field
+     */
+    protected inferRadioFieldAndSelectReadOnlyValue(field: any, fieldValue: any): any {
+        let value;
+        field && field.state && field.state.dataSource && field.state.dataSource.forEach((item) => {
+            if (fieldValue && item && fieldValue.toString() === item[field.state.valueKey]) {
+                value = item[field.state.valueKey];
+            }
+        });
+        return value;
+    }
+
+    /**
+     * Calcule la value du field passé en paramètre. Ce field est soit un Autocomplete ou un Select
+     * @param {any} field
+     * @param {any} fieldValue
+     * @returns {any} la value de l'autocomplete
+     */
+    protected inferAutoCompleteAndSelectFieldValue(field: any, fieldValue: any): any {
+        if (!field || !field.state) {
+            return null;
         }
+        if (!(fieldValue instanceof Array)) {
+            return fieldValue;
+        }
+
+        const values = [];
+        const source = field.state.multiple ? field.state.allChoices : field.state.dataSource;
+
+        source && source.forEach((item) => {
+            fieldValue && fieldValue.forEach((c) => {
+                if (field.state.multiple && item && item["value"] && c && c.toString() === item["value"].toString()) {
+                    values.push(item["value"]);
+                } else if (!field.state.multiple && item && c && c.toString() === item[field.state.valueKey]) {
+                    values.push(item[field.state.valueKey]);
+                }
+            });
+        });
+        return values;
     }
 
     /**
@@ -409,12 +434,12 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param fields champs du formulaire
      * @param notifs notifications d'erreurs de validation
      */
-    protected processAutocompleteErrors(fields: { [ key: string ]: DomAdapter<any, any> }, notifs: Notifications): void {
+    protected processAutocompleteErrors(fields: { [key: string]: DomAdapter<any, any> }, notifs: Notifications): void {
         const processedNotifs: Array<INotificationType> = notifs.getNotifications().map(
             function (notif: INotificationType): INotificationType {
                 /* Parcours de tous les champs */
                 Object.keys(fields).every(function (key: string): boolean {
-                    const field: DomAdapter<any, any> = fields[ key ];
+                    const field: DomAdapter<any, any> = fields[key];
                     if (field instanceof AutoCompleteField) {
                         const autoField: AutoCompleteField<AutoCompleteFieldProps> = field as AutoCompleteField<AutoCompleteFieldProps>;
                         /* La notification référence le nom global du champ d'auto-complétion
@@ -429,7 +454,7 @@ export class Form extends AbstractForm<FormProps, any> {
                         }
                     }
                     return true;
-                },                        this);
+                }, this);
                 return notif;
             }, this);
         notifs.setNotifications(processedNotifs);
@@ -443,7 +468,7 @@ export class Form extends AbstractForm<FormProps, any> {
         if (errors) {
             const fieldsMessages = this.state.formMessages && this.state.formMessages.fields;
             const genericValidationMessages = this.i18n("form.validation");
-            const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+            const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
 
             const notificationsError: Notifications = FormUtils.getErrors(errors, fields, fieldsMessages, genericValidationMessages);
 
@@ -452,7 +477,7 @@ export class Form extends AbstractForm<FormProps, any> {
 
             /* Met à jour les erreurs affichées par chaque composant champ */
             Object.keys(fields).every(function (key: string): boolean {
-                const field: DomAdapter<any, any> = fields[ key ];
+                const field: DomAdapter<any, any> = fields[key];
                 if (field instanceof AbstractField) {
                     field.setErrors(notificationsError.getNotifications());
                 }
@@ -477,17 +502,18 @@ export class Form extends AbstractForm<FormProps, any> {
             const propNames: string[] = Object.keys(schema.properties);
             let property: any, propName: string;
             for (let i: number = 0; i < propNames.length; i++) {
-                propName = propNames[ i ];
-                property = schema.properties[ propName ];
+                propName = propNames[i];
+                property = schema.properties[propName];
                 if (property.type === "object") {
                     /* Appel récursif sur les éventuelles propriétés incluses dans le sous-schéma */
-                    this.transformDatesToISO(property, data[ propName ]);
+                    this.transformDatesToISO(property, data[propName]);
                 } else if (property.format === "date-time") {
-                    if (data[ propName ]) {
-                        const date: Date = Utils.dateUtils.parseInTZ(data[ propName ], this.state.calendarLocale.dateFormat, this.state.calendarLocale.timeZone);
+                    if (data[propName]) {
+                        const date: Date = Utils.dateUtils.parseInTZ(
+                            data[propName], this.state.calendarLocale.dateFormat, this.state.calendarLocale.timeZone);
                         if (date) {
                             /* La chaîne de caractères est une date valide pour la locale : on convertit en représentation ISO 8601.*/
-                            data[ propName ] = date.toISOString();
+                            data[propName] = date.toISOString();
                         }
                         /* Sinon la valeur incorrecte est conservée*/
                     }
@@ -528,7 +554,7 @@ export class Form extends AbstractForm<FormProps, any> {
      * @param data: data extraites du formulaire à valider
      */
     public getValidationResult(schema = DataValidator.transformRequiredStrings(this.state.schema), dataTovalidate?: any)
-    : IValidationResult {
+        : IValidationResult {
         const data = dataTovalidate || this.extractData(this.state.omitNull);
         if (this.state.onBeforeSubmit) {
             this.state.onBeforeSubmit(data);
@@ -542,7 +568,10 @@ export class Form extends AbstractForm<FormProps, any> {
      * Déclenche une validation du formulaire basée sur un schéma précis ou celui défini pour le formulaire
      * @param schema : schéma de validation, par défaut celui du formulaire
      */
-    public validate(notifyErrors: boolean, schema = DataValidator.transformRequiredStrings(this.state.schema)): boolean {
+    public validate(notifyErrors: boolean, schema = DataValidator.transformRequiredStrings(this.state.schema), cleanErrors?: boolean): boolean {
+        if (cleanErrors) {
+            this.cleanFormErrors();
+        }
         const validation: IValidationResult = this.getValidationResult(schema);
         if (notifyErrors && !validation.valid) {
             this.notifyErrors(validation.errors);
@@ -554,9 +583,9 @@ export class Form extends AbstractForm<FormProps, any> {
      * Supprime les nofifications d'erreurs et les erreurs associées à chaque champ de ce formulaire
      */
     cleanFormErrors(): void {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
         for (const fieldName in fields) {
-            const field: DomAdapter<any, any> = fields[ fieldName ];
+            const field: DomAdapter<any, any> = fields[fieldName];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setErrors(null);
             }
@@ -568,9 +597,11 @@ export class Form extends AbstractForm<FormProps, any> {
      * Met à jour les valeurs courantes des champs du formulaire et
      * supprime les nofifications d'erreurs et les erreurs associées à chaque champ de ce formulaire
      * @param data données du formulaire (clé : nom du champ -> valeur du champ)
+     * @param {boolean} partialUpdate si true alors on n'écrase pas les champs qui ne sont présentes
+     * dans data au moment du update. False par défaut
      */
-    updateFieldsAndClean(data: any) {
-        this.updateFields(data);
+    updateFieldsAndClean(data: any, partialUpdate: boolean = false) {
+        this.updateFields(data, partialUpdate);
         this.cleanFormErrors();
     }
 
@@ -590,33 +621,34 @@ export class Form extends AbstractForm<FormProps, any> {
     protected propagateParentState(): void {
         /* Le composant parent se charge de propager les propriétés readOnly et disabled */
         super.propagateParentState();
-        const fields: { [ key: string ]: DomAdapter<any, any> } = this.extractFields();
-        Object.keys(fields).every(function (key: string): boolean {
-            const field: DomAdapter<any, any> = fields[ key ];
+        const fields: { [key: string]: DomAdapter<any, any> } = this.extractFields();
+        Object.keys(fields).forEach(function (key: string): void {
+            const field: DomAdapter<any, any> = fields[key];
             if (field instanceof AbstractField) {
                 (field as AbstractField<any, any>).setMarkRequired(this.state.markRequired);
-                (field as AbstractField<any, any>).setImgFilePath(this.state.imgFilePath);
+                if (this.state.imgFilePath) {
+                    (field as AbstractField<any, any>).setImgFilePath(this.state.imgFilePath);
+                }
             }
-            return true;
-        },                        this);
+        }, this);
     }
 
     /** @override */
-    protected extractFields(): { [ key: string ]: DomAdapter<any, any> } {
-        const fields: { [ key: string ]: DomAdapter<any, any> } = {};
+    protected extractFields(): { [key: string]: DomAdapter<any, any> } {
+        const fields: { [key: string]: DomAdapter<any, any> } = {};
         if (this.formElement) {
             for (let index = 0; index < this.formElement.elements.length; index++) {
 
-                const item: Element = this.formElement.elements[ index ];
-                if (item[ "name" ]) {
-                    if (item[ "__component" ]) {
-                        fields[ item[ "name" ] ] = item[ "__component" ];
+                const item: Element = this.formElement.elements[index];
+                if (item["name"]) {
+                    if (item["__component"]) {
+                        fields[item["name"]] = item["__component"];
                     } else {
-                        if (fields[ item[ "name" ] ]) {
-                            fields[ item[ "name" ] ].addHtmlElement(item);
+                        if (fields[item["name"]]) {
+                            fields[item["name"]].addHtmlElement(item);
                         } else {
-                            fields[ item[ "name" ] ] = new DomAdapter<any, any>();
-                            fields[ item[ "name" ] ].registerHtmlElement(item);
+                            fields[item["name"]] = new DomAdapter<any, any>();
+                            fields[item["name"]].registerHtmlElement(item);
                         }
                     }
                 }
@@ -638,8 +670,8 @@ export class Form extends AbstractForm<FormProps, any> {
         React.Children.map(items, (child: React.ReactChild) => {
             if (!isMultiPart) {
                 if (child != null) {
-                    if (child[ "props" ] && child[ "props" ].children) {
-                        isMultiPart = this.isMultiPartForm(child[ "props" ].children);
+                    if (child["props"] && child["props"].children) {
+                        isMultiPart = this.isMultiPartForm(child["props"].children);
                     }
                     if (!isMultiPart && (child as React.ReactElement<any>).type === UploadFileField) {
                         isMultiPart = true;
@@ -688,7 +720,7 @@ export class Form extends AbstractForm<FormProps, any> {
      * @inheritDoc
      */
     render(): JSX.Element {
-        const classes: ClassDictionary = {
+        const classes = {
             form: true,
             clear: true,
             /* Application du style CSS readonly à tout le bloc lorsque tous les champs sont en lecture seule */
@@ -716,17 +748,23 @@ export class Form extends AbstractForm<FormProps, any> {
             ref: this.registerForm,
         };
 
+        let formClass = 'form-content';
+
         if (this.isMultiPartForm(this.state.children)) {
-            formProps[ "encType" ] = "multipart/form-data";
+            formProps["encType"] = "multipart/form-data";
+        }
+
+        if(this.state.isSticky) {
+            formClass += ' form-content-sticky'
         }
 
         const textHtmlProps = {
             lang: this.props.textLang ? this.props.textLang : null,
         };
 
-        const htmlProps = _.cloneDeep(this.getHtmlProps);
+        const htmlProps = cloneDeep(this.getHtmlProps);
         return (
-            <section className="form-container">
+            <section id="form-content" className={formClass}>
                 {customNotif}
                 <div className={classNames(classes)}>
                     <form  {...htmlProps}{...formProps}>
@@ -766,6 +804,70 @@ export class Form extends AbstractForm<FormProps, any> {
             }
         });
         return tableauButtonsArea;
+    }
+
+    /**
+     * Métohde de gestion du scroll à l'écran
+     */
+    protected handleScroll() {
+
+        if(this.state.isSticky) {
+            let footer = document.getElementById(this.props.footerId);
+
+            let rect = footer.getBoundingClientRect();
+            let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            
+            //gestions des boutons & du formulaire
+            let form = document.getElementById("form-content");
+            let buttonsArea = document.getElementById(this.props.buttonAreaIdSticky);
+            
+            if(buttonsArea) {
+                let buttonsRect = buttonsArea.getBoundingClientRect();
+                let buttonHeight = buttonsRect.height;
+        
+                //sauvegarde la taille visible du footer
+                let height = -(rect.top - viewHeight);
+                this.setState({ size: height });
+        
+                /*si le footer est visible, le composant s'affichera au dessus de celui-ci*/
+                let visible: boolean = false;
+                if (footer) {
+                    visible = this.checkvisible(footer);
+        
+                    // Si un formulaire sticky est présent
+                    if(form && form.classList.contains('form-content-sticky')) {
+                        // gestion des boutons si footer visible
+                        if(visible) {
+                            // change la classe de la div contenant les boutons
+                            buttonsArea.classList.replace('button-area-isFixed', 'button-area-isSticky');
+                        } else {
+                            buttonsArea.classList.replace('button-area-isSticky', 'button-area-isFixed');
+                        }
+            
+                        // ajoute le positionnement bottom sur les boutons sticky
+                        buttonsArea.classList.contains('button-area-isSticky') 
+                            ? buttonsArea.style.bottom = `-${buttonHeight}px`
+                            : buttonsArea.style.bottom = `0`;
+                    }
+                }        
+            }
+        }
+    }
+
+        /**
+     * Calcule si un élément est présent ou non a l'écran
+     * @param {Element} elm - l'élément a rechercher
+     * @return {boolean} true si l'élément est présent
+     */
+    protected checkvisible(elm) {
+        let rect = elm.getBoundingClientRect();
+        let viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+
+        //sauvegarde la la taille visible de l'élément
+        let height = -(rect.top - viewHeight) + 40;
+        this.setState({ size: height });
+
+        return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
     }
 
 }

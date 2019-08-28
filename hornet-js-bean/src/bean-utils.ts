@@ -73,14 +73,13 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
-import * as _ from "lodash";
-import { Register } from "hornet-js-utils/src/common-register";
+import { Logger } from "hornet-js-logger/src/logger";
 import { CodesError } from "hornet-js-utils/src/exception/codes-error";
 "use strict";
 
@@ -90,7 +89,7 @@ enum Methods {
     clone,
 }
 
-const logger = Register.getLogger("hornet-js-utils.bean-utils");
+const logger = Logger.getLogger("hornet-js-utils.bean-utils");
 export class BeanUtils {
 
     protected static _call(options) {
@@ -110,9 +109,8 @@ export class BeanUtils {
                 result = fn.apply(target, [ options ]);
             } else {
                 if (typeof target.pull !== "function") {
-                    const msg: string = _.join(
-                        [ "Cannot find @Bean for object :", clazz ? clazz.name : "", ".So, we cannot transform it to an object" ],
-                        " ");
+                    const msg: string = 
+                        "Cannot find @Bean for object : " + (clazz ? clazz.name : "") + ".So, we cannot transform it to an object" ;
                     logger.error(msg);
                     throw new TechnicalError("ERR_TECH_" + CodesError.BINDING_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
                 } else {
@@ -120,9 +118,8 @@ export class BeanUtils {
                 }
             }
         } else {
-            const msg: string = _.join(
-                [ "Cannot find @Bean for object :", object, ".So, we cannot transform it to an object", clazz ? clazz.name : "" ],
-                " ");
+            const msg: string = 
+            "Cannot find @Bean for object : " + object + ".So, we cannot transform it to an object " + (clazz ? clazz.name : "");
             logger.error(msg);
             throw new TechnicalError("ERR_TECH_" + CodesError.BINDING_ERROR, { errorMessage: CodesError.DEFAULT_ERROR_MSG });
         }
@@ -159,7 +156,7 @@ export class BeanUtils {
             } catch (e) {
                 let error = e;
                 if (!(e instanceof TechnicalError)) {
-                    const msg: string = _.join([ "Cannot bind", object, "to an object", clazz.name ], " ");
+                    const msg: string = "Cannot bind " + object + " to an object " + clazz.name;
                     error = new TechnicalError("ERR_TECH_BINDING", { message: msg }, e);
                 }
                 logger.error(e);

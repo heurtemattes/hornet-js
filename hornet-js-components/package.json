@@ -1,27 +1,26 @@
 {
   "name": "hornet-js-components",
-  "version": "5.2.4",
+  "version": "5.4.1",
   "license": "CECILL-2.1",
   "description": "Interfaces des composants web de hornet-js",
-  "bugs": {
-    "url": "https://github.com/diplomatiegouvfr/hornet-js/issues"
-  },
-  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/diplomatiegouvfr/hornet-js.git"
   },
-  "keywords": [
-    "hornet"
-  ],
-  "tsDefinitionDependencies": {
-    "hornet-js-ts-typings": "5.2.4",
-    "hornet-js-utils-dts": "5.2.4"
+  "bugs": {
+    "url": "https://github.com/diplomatiegouvfr/hornet-js/issues"
   },
-  "appDependencies": {
-    "hornet-js-utils": "5.2.4"
+  "main": "./index.js",
+  "types": "./index.dts",
+  "dependencies": {
+    "hornet-js-logger": "5.4.1",
+    "hornet-js-utils": "5.4.1",
+    "react": "16.6.3",
+    "tslib": "1.9.3"
   },
-  "buildDependencies": {},
-  "testDependencies": {},
+  "devDependencies": {
+    "@types/node": "10.14.9",
+    "@types/react": "16.7.22"
+  },
   "author": "MEAE - Ministère de l'Europe et des Affaires étrangères"
 }

@@ -73,19 +73,19 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
 import { Promise } from "hornet-js-utils/src/promise-api";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { BatchProcess, BatchProcessParent } from "src/core/batch-process";
 import { BatchUnit } from "src/core/batch-unit";
 import { STATUS } from "src/core/batch-status";
-import * as _ from "lodash";
-const logger: Logger = Utils.getLogger("hornet-js-batch.batch-executor");
+import find = require ("lodash.find");
+import remove = require("lodash.remove");
+const logger: Logger = Logger.getLogger("hornet-js-batch.batch-executor");
 
 /***
  * @classdesc Classe Batch
@@ -304,8 +304,8 @@ export class BatchExecutor {
      */
     getBatch(unit: BatchUnit): Batch {
         const criteria = { _id: "_" + unit.id };
-        const batch = _.find(BatchExecutor.processing[ unit.route ], criteria)
-            || _.find(BatchExecutor.queue[ unit.route ], criteria)
+        const batch = find(BatchExecutor.processing[ unit.route ], criteria)
+            || find(BatchExecutor.queue[ unit.route ], criteria)
             || function () {
                 const newBatch = new Batch(unit);
                 newBatch.status = STATUS.QUEUED;
@@ -373,7 +373,7 @@ export class BatchExecutor {
         // let batch = _.find(BatchExecutor.processing[ unit.route ], criteria);
         if (batch) {
             BatchExecutor.Instance.addToSummary(batch);
-            _.remove(BatchExecutor.processing[ unit.route ], batch);
+            remove(BatchExecutor.processing[ unit.route ], batch as any);
             if (BatchExecutor.processing[ unit.route ].length === 0) {
                 delete BatchExecutor.processing[ unit.route ];
             }
@@ -388,15 +388,15 @@ export class BatchExecutor {
      */
     runBatch(unit: BatchUnit): Promise<any> {
         const criteria = { _id: "_" + unit.id };
-        let batch: Batch = _.find(BatchExecutor.processing[ unit.route ], criteria) as Batch;
+        let batch = find(BatchExecutor.processing[ unit.route ], criteria  as any) as Batch;
         if (!batch) {
-            batch = _.find(BatchExecutor.queue[ unit.route ], criteria) as Batch;
+            batch = find(BatchExecutor.queue[ unit.route ], criteria as any) as Batch;
             batch.status = STATUS.RUNNING;
             if (!(BatchExecutor.processing[ unit.route ] instanceof Array)) {
                 BatchExecutor.processing[ unit.route ] = [];
             }
             BatchExecutor.processing[ unit.route ].push(batch);
-            _.remove(BatchExecutor.queue[ unit.route ], batch);
+            remove(BatchExecutor.queue[ unit.route ], batch as any);
             if (BatchExecutor.queue[ unit.route ].length === 0) {
                 delete BatchExecutor.queue[ unit.route ];
             }

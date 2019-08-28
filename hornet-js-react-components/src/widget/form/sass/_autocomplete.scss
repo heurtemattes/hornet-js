@@ -1,0 +1,209 @@
+@import '../../sass/core';
+
+$autocompleteBaseColor: theme-color('global', 'white');
+$autoCompleteBorder: rgba(175, 175, 175, 1); //#afafaf
+$containerBorder: rgba(170, 170, 170, 1); //#aaa
+$autoCompleteBorderFake: theme-color($variant: 'states');
+$autoCompleteDisabled: rgba(235, 235, 228, 1);
+$autoCompleteLabel: rgba(102, 51, 153, 1); //#663399
+$autoCompleteStates: theme-color($variant: 'states');
+$autocompleteblack: theme-color('global', 'dark');
+$inputResetFocusImg: rgba(158, 158, 158, 0.2);
+$inputResetFocusImgBoxShadow: rgba(0, 97, 255, 1); //#0061ff
+$autocompleteBadge: rgba(255, 64, 129, 1); //#ff4081
+
+/// Ici les svg ne font pas appel à un mixin, le mask cacherait le contenu
+.abstractfield-container {
+    .readonly {
+        .autocomplete-content {
+            cursor: pointer;
+        }
+    }
+
+    .autocomplete-container {
+        display: inline-flex;
+        flex-flow: row wrap;
+        align-items: stretch;
+        background: $autocompleteBaseColor;
+        border: 1px solid $containerBorder;
+        min-width: 100%;
+
+        &:hover,
+        &:focus,
+        &:focus-within {
+            border: 1px solid $autoCompleteBorderFake;
+        }
+
+        &.required {
+            background-color: theme-color('global', 'redErrorlight');
+            appearance: none;
+            border: 1px solid theme-color('global', 'redError');
+
+            .has-error {
+                border: none !important;
+            }
+        }
+
+        input {
+            padding: 0.5em 5em 0.5em 1em;
+            border: none;
+            flex: 1 0 0;
+
+            &[aria-autocomplete~="list"] {
+                outline: none !important;
+            }
+
+            &[aria-autocomplete~="list"]:invalid,
+            &[aria-autocomplete~="list"]:required {
+                box-shadow: none !important;
+            }
+            
+        }
+
+        .autocomplete-content {
+            position: relative;
+            width: 100%;
+            height: 2.653em;
+            appearance: none;
+            min-width: 15.469em;
+            background: url("../img/expand-close.svg") no-repeat calc(100% - 6px) 50% $autocompleteBaseColor;
+            background-size: 2.6875em;
+
+            &.has-error {
+                background-color: $globalErrorBg;
+                appearance: none;
+                border: 1px solid $globalErrorColor;
+            }
+        
+            &[disabled] {
+                background-color: $autoCompleteDisabled;
+                opacity: 0.5;
+                pointer-events: none;
+                cursor: not-allowed;
+                filter: grayscale(1);
+            }
+
+            &:read-only {
+                cursor: pointer;
+            }
+        }
+
+        .autocomplete-selector {
+            z-index: 1;
+            left: 0;
+            
+            &.widget-positioned {
+                height: 0;
+            }
+
+            &-hidden {
+                display: none;
+            }
+
+            .autocomplete-content-selector {
+                position: relative;
+                height: 0;
+            
+                .autocomplete-selector-list {
+                    position: absolute;
+                    overflow: hidden;
+                    margin: 0;
+                    padding: 0.5em;
+                    left: 0;
+                    z-index: 1;
+                    list-style: outside none none;
+                    background: none repeat scroll 0 0 $autocompleteBaseColor;
+                    outline: 1px solid $autoCompleteBorder;
+
+                    .autocomplete-item {
+                        @include smoothTransition(all, 0.3s);
+
+                        label {
+                            display: inline;
+                            vertical-align: text-top;
+                            min-height: 2em;
+                            line-height: 2em;
+            
+                            &:focus {
+                                background: $autoCompleteLabel;
+                            }
+                        }
+            
+                        .checkbox-content {
+                            margin-right: 1em;
+                            margin-left: 0.5em;
+                            margin-top: 0;
+                            width: 100%;
+                            display: block;
+            
+                            .checkbox-content {
+                                label {
+                                    display: block;
+                                }
+                            }
+            
+                            .checkbox-material {
+                                margin-right: 0.925em;
+                            }
+                        }
+            
+                        &:focus,
+                        &:hover,
+                        &-active {
+                            background: $autoCompleteStates;
+                            color: $autocompleteBaseColor;
+                        }
+                    }
+                }
+            }
+        }
+
+        .autocomplete-reset{
+            position: relative !important;
+            margin: 0.55em -1.5em 0 -1.5em !important;
+            right: 3em;
+            bottom: 0.1em;
+        }
+        
+        .input-reset {
+            a {
+                &:focus,
+                &:hover {
+                    outline-width: 0;
+                    color: $autocompleteblack;
+                
+                    svg {
+                        border-radius: 50%;
+                        outline: none;
+                        box-shadow: 0 0 0.2em 0 $inputResetFocusImgBoxShadow;
+                    }
+                }
+            }
+        }
+
+        .badge-autocomplete-selected-items-before {
+            ::before {
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                flex-flow: row wrap;
+                align-content: center;
+                align-items: center;
+                justify-content: center;
+                z-index: 1;
+                height: 1.375em;
+                width: 1.375em;
+                left: -0.6875em;
+                top: 0.75em;
+                margin-top: -1.375em;
+                background: $autocompleteBadge none repeat scroll 0 0;
+                color: $autocompleteBaseColor;
+                border-radius: 50%;
+                font-family: $roboto;
+                font-size: 0.6875em;
+                font-weight: 600;
+                content: attr(data-badge);
+            }
+        }
+    }
+}

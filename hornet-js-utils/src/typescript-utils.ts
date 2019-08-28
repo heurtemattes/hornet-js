@@ -73,13 +73,11 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-export type Class<T> = {
-    new(...args): T;
-};
+export type Class<T> = T extends (...args: any[]) => infer R ? R : any;
 
 export type AbstractClass<T> = Function & { prototype: T };

@@ -73,23 +73,20 @@
  * hornet-js-batch - Ensemble des composants de gestion de base hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Promise } from "hornet-js-utils/src/promise-api";
 import { BatchFilter } from "src/core/filter/batch-filter";
 import { BatchProcess } from "src/core/batch-process";
 import { STATUS } from "src/core/batch-status";
 
-import * as _ from "lodash";
+import filter = require ("lodash.filter");
 
-
-
-const logger: Logger = Utils.getLogger("hornet-js-batch.filter.batch-filter");
+const logger: Logger = Logger.getLogger("hornet-js-batch.filter.batch-filter");
 
 /**
 * @classdesc Classe de filter pour les batchs basé sur {@link https://lodash.com/docs/#filter}
@@ -107,7 +104,7 @@ export class Filter extends BatchProcess implements BatchFilter {
 
     filter(): Promise<any> {
         return new Promise<any>((resolve) => {
-            this.result = _.filter(this.options.args, this.options.service);
+            this.result = filter(this.options.args, this.options.service);
             this.status = STATUS.SUCCEEDED;
             resolve(this.result);
         });

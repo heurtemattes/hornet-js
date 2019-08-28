@@ -73,22 +73,22 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractBodyCell, AbstractBodyCellProps } from "src/widget/table/column/cell/abstract-body-cell";
 import * as React from "react";
 import { NotificationManager } from "hornet-js-core/src/notification/notification-manager";
-import { Picto } from "src/img/picto";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
 import { Template } from "hornet-js-utils/src/template";
-import * as classNames from "classnames";
+import classNames from "classnames";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.table.column.cell.action.edition-action-body-cell");
+import "src/widget/table/sass/_datatable-sortable.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.table.column.cell.action.edition-action-body-cell");
 
 export interface EditionActionBodyCellProps extends AbstractBodyCellProps {
     /** Fonction appelée pour rendre visible on non la cellule */
@@ -116,6 +116,9 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
     // gestion de la liste des refs des boutons
     protected buttonsRef: Array<any>;
 
+    protected editionButton: any;
+    protected focusEdition: boolean = false;
+
     constructor(props: P, context: any) {
         super(props, context);
 
@@ -132,17 +135,27 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         return super.shouldComponentUpdate(nextProps, nextState) || nextState.isEditing !== this.state.isEditing;
     }
 
+    componentDidUpdate(nextProps, nextState, nextContent){
+        super.componentDidUpdate(nextProps, nextState, nextContent);
+        if (this.editionButton && this.focusEdition && (this.editionButton as HTMLElement).focus) {
+            (this.editionButton as HTMLElement).focus();
+            this.focusEdition = false;
+        }
+    }
+
     /**
      * @inheritDoc
      */
     renderCell(): JSX.Element {
         logger.debug("render EditableActionBodyCell-> column:", this.props.coordinates.column, " - line:", this.props.coordinates.row);
 
-        const classes: ClassDictionary = {
+        const classes = {
             "edition-button-action": true,
+            "button-action": true,
         };
 
-        const classesBefore: ClassDictionary = {
+        const classesBefore = {
+            "button-action": true,
             "edition-button-action-before": true,
         };
 
@@ -167,6 +180,19 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         return "";
     }
 
+
+    /**
+     * Gestion de la touche espace et entre
+     * @param e
+     */
+    handleKeyDownButton(e: React.KeyboardEvent<HTMLElement>): void {
+        if (e.keyCode === KeyCodes.ENTER || e.keyCode === KeyCodes.SPACEBAR) {
+            e.preventDefault();
+            e.stopPropagation();
+            !this.state.isEditing && this.onClick(e);
+        }
+    }
+
     /**
      * clic sur l'icone d'edition
      * @param e
@@ -175,6 +201,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
         if (this.buttonsRef.indexOf(e.currentTarget) === 1 && this.props.messageAlert && this.props.showAlert) {
             e.stopPropagation();
             this.props.showAlert(this.state.messageAlert, this.state.titleAlert, this.setItemInEdition);
+            this.focusEdition = true;
         } else {
             this.setItemInEdition();
         }
@@ -200,18 +227,18 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      * @param classes
      * @returns {any}
      */
-    renderEditionBoutton(classes: ClassDictionary): JSX.Element {
+    renderEditionBoutton(classes: { [id: string]: any;}): JSX.Element {
         return (<a
+        ref={(ref) =>{this.editionButton = ref;}}
             className={classNames(classes)}
             title={this.i18n(this.state.titleEdit, this.props.value)}
             aria-label={this.i18n(this.state.titleEdit, this.props.value)}
             onClick={this.onClick}
             tabIndex={-1}
+            onKeyDown={this.handleKeyDownButton}
+            role="button"
         >
-            <img src={Picto.blue.quickEdit}
-                className={this.state.classNameImg}
-                alt={this.i18n(this.state.titleEdit, this.props.value)}
-                tabIndex={-1} />
+            <SvgSprites icon="quickEdit" color="#0579be" width="2em" height="2em" tabIndex={-1}/>
         </a>
         );
     }
@@ -221,7 +248,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
      * @param classes
      * @returns {any}
      */
-    renderSaveCancelBoutton(classes: ClassDictionary): JSX.Element {
+    renderSaveCancelBoutton(classes: { [id: string]: any;}): JSX.Element {
         return (
             <div onKeyDown={this.switchFocus}>
                 <button ref={(elt) => {
@@ -232,8 +259,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                     aria-label={this.state.titleSave}
                     type="submit"
                     tabIndex={0}>
-                    <img src={Picto.editable.valider} className={this.state.classNameImg} alt={this.state.titleSave}
-                        tabIndex={-1} />
+                    <SvgSprites icon="registerEdit" color="#006400" width="2em" height="2em" tabIndex={-1}/>
                 </button>
 
                 <button ref={(elt) => {
@@ -245,8 +271,7 @@ export class EditionActionBodyCell<P extends EditionActionBodyCellProps, S> exte
                     onClick={this.onClick}
                     type="button"
                     tabIndex={0}>
-                    <img src={Picto.editable.annuler} className={this.state.classNameImg} alt={this.state.titleCancel}
-                        tabIndex={-1} />
+                    <SvgSprites icon="cancelEdit" color="#D60000" width="2em" height="2em" tabIndex={-1}/>
                 </button>
             </div>
         );

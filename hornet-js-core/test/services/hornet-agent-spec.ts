@@ -73,18 +73,20 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { TestUtils } from "hornet-js-test/src/test-utils";
+import { TestLogger } from "hornet-js-test/src/test-logger";
+import { Logger } from "hornet-js-logger/src/logger";
+Logger.prototype.buildLogger = TestLogger.getLoggerBuilder();
 import { Utils } from "hornet-js-utils";
 import { HornetSuperAgent } from "src/services/hornet-superagent";
 import { HornetRequest } from "src/services/hornet-superagent-request";
 var expect = TestUtils.chai.expect;
 var sinon = TestUtils.sinon;
-import * as _ from "lodash";
 
 
 process.on("unhandledRejection", function (reason, promise) {

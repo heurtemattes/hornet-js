@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -81,7 +81,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { JSONLoader } from "hornet-js-utils/src/json-loader";
-import * as _ from "lodash";
+import merge = require("lodash.merge");
 import { II18n, AbstractI18nLoader } from "src/i18n/abstract-i18n-loader";
 /**
  * Classe utilisée uniquement côté serveur.
@@ -112,7 +112,7 @@ export class I18nLoader extends AbstractI18nLoader {
 
         /** chargement des fichiers 'message.json' */
         if (fs.existsSync(path.join(this.pathLang, "messages.json"))) {
-            _.merge(this.messagesLang[ "default" ].messages, require(path.join(this.pathLang, "messages.json")));
+            merge(this.messagesLang[ "default" ].messages, require(path.join(this.pathLang, "messages.json")));
         }
     }
 
@@ -134,7 +134,7 @@ export class I18nLoader extends AbstractI18nLoader {
             return this.messagesLang[ locales.locale ];
         }
 
-        const i18nMessages = _.merge({}, this.messagesLang[ "default" ].messages);
+        const i18nMessages = merge({}, this.messagesLang[ "default" ].messages);
 
         /** verifier sur localeI18n dans defaut.json existe */
         if (locales) {
@@ -142,10 +142,11 @@ export class I18nLoader extends AbstractI18nLoader {
             if (locales.locale) {
                 /** si le fichier de langue correspondant existe */
                 if (fs.existsSync(path.join(this.pathLang, "messages-" + locales.locale + ".json"))) {
-                    _.merge(i18nMessages, require(path.join(this.pathLang, "messages-" + locales.locale + ".json")));
+                    merge(i18nMessages, require(path.join(this.pathLang, "messages-" + locales.locale + ".json")));
                 }
             }
-            return { locale: locales.locale, lang: locales.lang, messages: i18nMessages };
+            this.messagesLang[locales.locale] = { locale: locales.locale, lang: locales.lang, messages: i18nMessages };
+            return this.messagesLang[locales.locale];
         }
     }
 

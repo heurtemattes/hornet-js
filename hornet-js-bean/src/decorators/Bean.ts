@@ -73,12 +73,14 @@
  * hornet-js-bean - Ensemble des décorateurs pour les beans hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
-import * as _ from "lodash";
+import forEach = require("lodash.foreach");
+import cloneDeep  = require("lodash.clonedeep");
+import clone = require("lodash.clone");
 import { ObjectUtils } from "hornet-js-utils/src/object-utils";
 
 export default function (target) {
@@ -118,7 +120,7 @@ export default function (target) {
                     const mapAlias = JSON.parse(this.__proto__.__alias__ ? this.__proto__.__alias__ : null);
                     if (mapAlias && mapAlias[ fieldName ]) {
                         const alias = mapAlias[ fieldName ];
-                        _.each(alias, (value) => {
+                        forEach(alias, (value) => {
                             let val;
                             try {
                                 // val = eval('object.'+value);
@@ -147,13 +149,13 @@ export default function (target) {
                             result = [];
                             prop.forEach(res => {
                                 if (Clazz) {
-                                    result.push(new Clazz().__pull__(_.extend(options, { object: res })));
+                                    result.push(new Clazz().__pull__({...options, ...{ object: res }}));
                                 } else {
                                     result.push(res);
                                 }
                             });
                         } else {
-                            result = new Clazz().__pull__(_.extend(options, { object: prop }));
+                            result = new Clazz().__pull__({...options, ...{ object: prop }});
                         }
                         this[ fieldName ] = result;
                     } else {
@@ -175,22 +177,22 @@ export default function (target) {
             let res;
             if (options.deep) {
 
-                res = _.cloneDeep(this);
+                res = cloneDeep(this);
             } else {
-                res = _.clone(this);
+                res = clone(this);
             }
             return res;
         };
     }
     if (!target.prototype.map) {
         target.prototype.map = function (options) {
-            return this.__pull__(_.extend(options, { serialize: false }));
+            return this.__pull__({...options, ...{ serialize: false }});
         };
     }
 
     if (!target.prototype.serialize) {
         target.prototype.serialize = function (options) {
-            return this.__pull__(_.extend(options, { serialize: true }));
+            return this.__pull__({...options, ...{ serialize: true }});
         };
     }
 }

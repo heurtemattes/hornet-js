@@ -73,37 +73,39 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
 
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import * as assert from "assert";
-import {ActionButton} from "src/widget/table/action-button";
-import { Utils } from "hornet-js-utils";
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { ActionButton } from "src/widget/table/action-button";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
-Utils.setConfigObj({});
-import { MenuActions } from "hornet-js-react-components/src/widget/table/menu-actions";
+import { Content } from "src/widget/table/content";
+import { MenuActions } from "src/widget/table/menu-actions";
+import { KeyCodes } from 'hornet-js-components/src/event/key-codes';
+
 
 let actionButtonElement: JSX.Element;
 let dataSourceTableEditable: DataSource<any>;
 
 @Decorators.describe("Test Action Button")
 class ActionButtonTest extends HornetReactTest {
+    actionButton: any;
 
     @Decorators.beforeEach
     beforeEach() {
@@ -114,12 +116,18 @@ class ActionButtonTest extends HornetReactTest {
         }
 
         dataSourceTableEditable = new DataSource(data);
+    }
 
+
+
+    @Decorators.it("Test disabled true avec displayedWithoutResult true")
+    testDisabledDisplayedWithoutResult() {
         actionButtonElement = (
             <Table id="tableActionButton">
                 <Header title="test">
                     <MenuActions>
-                        <ActionButton disabled={true} displayedWithoutResult={true} priority={true}/>
+                        <ActionButton disabled={true} displayedWithoutResult={true} priority={true}
+                        />
                     </MenuActions>
                 </Header>
                 <Content dataSource={dataSourceTableEditable} onSubmit={() => {
@@ -131,23 +139,77 @@ class ActionButtonTest extends HornetReactTest {
                 </Content>
             </Table>
         );
-    }
-
-    @Decorators.it("Test OK")
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
-    }
-
-    @Decorators.it("Test disabled true avec displayedWithoutResult true")
-    testDisabledDisplayedWithoutResult() {
         const id = this.generateMainId();
         this.renderIntoDocument(actionButtonElement, id);
         setTimeout(() => {
             expect(document.querySelector(`#${id} .button-action`)).to.exist;
             expect(document.querySelector(`#${id} .button-action`).hasAttribute("disabled")).to.be.true;
+            dataSourceTableEditable.removeAllListeners();
             this.end();
-        },         250);
+        }, 250);
+
+    }
+
+    @Decorators.it("Test presence role button pour ActionButton")
+    testAttributRoleValue() {
+        actionButtonElement = (
+            <Table id="tableActionButton">
+                <Header title="test">
+                    <MenuActions>
+                        <ActionButton />
+                    </MenuActions>
+                </Header>
+                <Content dataSource={dataSourceTableEditable} onSubmit={() => {
+                }}>
+                    <Columns>
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+            </Table>
+        );
+        const id = this.generateMainId();
+        this.renderIntoDocument(actionButtonElement, id);
+        setTimeout(() => {
+            expect(document.querySelector(`#${id} .button-action`), "Le bouton action n'existe pas").to.exist;
+            expect(document.querySelector(`#${id} .button-action`).hasAttribute("role"), "Le bouton action n'a pas d'attribut role").to.be.true;
+            expect(document.querySelector(`#${id} .button-action`).getAttribute("role"), "Le bouton action n'a pas l'attribut role à button").to.be.equal("button");
+            dataSourceTableEditable.removeAllListeners();
+            this.end();
+        }, 250);
+
+    }
+
+    @Decorators.it("Test accessibilité du bouton avec la barre d'espace")
+    testAccessibilityOfButtonWithSpace() {
+        const id = this.generateMainId();
+        const onClickHandler  = (e) => {
+            dataSourceTableEditable.removeAllListeners();
+            this.end();
+        }
+        actionButtonElement = (
+            <Table id="tableActionButtonAccessibiliteEspace">
+                <Header title="test">
+                    <MenuActions>
+                        <ActionButton displayedWithoutResult={true} priority={true}
+                            onClick={onClickHandler}
+                        />
+                    </MenuActions>
+                </Header>
+                <Content dataSource={dataSourceTableEditable} onSubmit={() => {
+                }}>
+                    <Columns>
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+            </Table>
+        );
+        this.renderIntoDocument(actionButtonElement, id);
+        setTimeout(() => {
+            expect(document.querySelector(`#${id} .button-action`)).to.exist;
+            this.triggerKeydownEvent(document.querySelector(`#${id} .button-action`), " ", KeyCodes.SPACEBAR);
+        }, 250);
 
     }
 

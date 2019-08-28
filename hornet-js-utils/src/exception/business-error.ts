@@ -73,7 +73,7 @@
  * hornet-js-utils - Partie commune et utilitaire à tous les composants hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -88,5 +88,25 @@ export class BusinessError extends BaseError {
     constructor(code: string, args?: { [ key: string ]: any }, cause?: Error) {
         super(code, undefined, args, cause);
         this.name = "BusinessError";
+    }
+
+    toLog() {
+
+        const errStr = this.toString();
+    
+        let infoSupp;
+        try {
+            infoSupp = JSON.stringify(this);
+        }
+        catch (err) {
+            infoSupp = "<stringifyErr>";
+        }
+
+        let stacks = this.backend ? "" : this.stack;
+        if (this.cause()) {
+            stacks = stacks + "\nCaused by:\n" + this.cause().toLog();
+        }
+        return errStr + "\nInformations supplémentaires :\n" + infoSupp + "\n" + stacks;
+
     }
 }

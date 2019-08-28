@@ -73,13 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Class } from "hornet-js-utils/src/typescript-utils";
 import { Router, DirectorRouter, DirectorRouterConfiguration } from "director";
 import {
@@ -88,11 +88,12 @@ import {
     RouteInfos,
     Routes,
     SubRoutes,
-    LazyRoutes,
     LazyRoutesAsyncClassResolver,
     RouteAuthorization,
 } from "src/routes/abstract-routes";
-import * as _ from "lodash";
+import set = require("lodash.set");
+import isFunction = require("lodash.isfunction");
+import merge = require("lodash.merge");
 import { LazyClassLoader } from "hornet-js-utils/src/lazy-class-loader";
 import { AsyncExecutor } from "src/executor/async-executor";
 import { AsyncElement } from "src/executor/async-element";
@@ -106,7 +107,7 @@ import {
 } from "src/routes/router-client-async-elements";
 import { listenOnceHornetEvent } from "src/event/hornet-event";
 
-const logger: Logger = Utils.getLogger("hornet-js-core.routes.router-client");
+const logger: Logger = Logger.getLogger("hornet-js-core.routes.router-client");
 
 declare global {
     interface Window {
@@ -218,10 +219,9 @@ export class RouterClient {
             this.computeRoutes(new routesClass(), prefix, newRoutes);
 
             // suppression de la route "wildcard" gérant le lazy loading
-            // _.set((this.directorPage as any).routes, (this.directorPage as any).getRoute().join("."), undefined);
             const lazyObjPath = prefix.split("/");
             lazyObjPath.shift();
-            _.set((this.directorPage as any).routes, lazyObjPath.join("."), undefined);
+            set((this.directorPage as any).routes, lazyObjPath.join("."), undefined);
 
             // montage des nouvelles routes
             this.directorPage.mount(newRoutes);
@@ -236,7 +236,7 @@ export class RouterClient {
                     window.clearInterval(iId);
 
                 } catch (err) {
-                    if (_.isFunction(window.onpopstate)) {
+                    if (isFunction(window.onpopstate)) {
                         logger.error(err);
                         window.clearInterval(iId);
                         done(err);
@@ -323,7 +323,7 @@ export class RouterClient {
             }
         },                           false);
 
-        this.directorPage.configure(_.merge({
+        this.directorPage.configure(merge({
             html5history: true,
             strict: false,
             convert_hash_in_init: false,
@@ -345,7 +345,7 @@ export class RouterClient {
      * Demande un changement d'url dans la barre d'adresse du navigateur (et donc un changement de route) mais sans recharger la page
      */
     setRoute(route: string, pageReady?: () => void) {
-        if (pageReady && _.isFunction(pageReady)) {
+        if (pageReady && isFunction(pageReady)) {
             listenOnceHornetEvent(PAGE_READY_EVENT, pageReady);
         }
         this.directorPage.setRoute(route);

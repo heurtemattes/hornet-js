@@ -73,18 +73,19 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import * as React from "react";
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { HornetComponent } from "src/widget/component/hornet-component";
-import EventHandler = __React.EventHandler;
+import EventHandler = React.EventHandler;
+import { SvgSprites } from '../icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.dialog.dropdown-item");
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.dialog.dropdown-item");
 
 /**
  * Composant contenant les élements du dropdown
@@ -111,23 +112,18 @@ export class DropdownItem extends HornetComponent<any, any> {
     render() {
         logger.debug("DropdownItem render");
 
-        let image;
+        let image = null;
         let checked = "";
         let rendu;
 
-        /* Si une image existe */
-        if (this.props.srcImg) {
+        if (this.props.icon) {
+            image = <SvgSprites icon={this.props.icon} tabIndex={-1}/>;
 
-            if (typeof this.props.srcImg === "string") {
-                image = <img
-                    src={this.props.srcImg}
-                    className={"imgItem"}
-                    alt={this.props.label} />;
-            } else {
-
-                image = this.props.srcImg;
+            if(typeof this.props.icon === 'object') {
+                image = <SvgSprites icon={ this.props.icon.props.icon } tabIndex={-1}/>;
             }
         }
+
         if (this.props.disabled) {
             checked = " checked";
         }
@@ -143,13 +139,14 @@ export class DropdownItem extends HornetComponent<any, any> {
                 onKeyDown: (e) => this.props.handleKeyDown(e, this.props.action, this.state.url),
                 role: "button",
                 title: this.props.title,
+                id : this.props.id,
             };
 
-            rendu = <a  {...aHtmlProps} >{image} {this.props.label}  </a>;
+            rendu = <a {...aHtmlProps}>{image} <span>{this.props.label}</span></a>;
         }
 
         return (
-            <li> {rendu} </li>
+            <li>{rendu}</li>
         );
     }
 }

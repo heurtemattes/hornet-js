@@ -1,0 +1,83 @@
+/*
+*
+* THEME 1 
+*
+*/
+/// Surcharge des variables de couleurs
+/// couleurs de composants - couleurs globales selon le thème voulu
+/// ici theme-color('theme1', 'primary')
+$globalSiteBg: theme-color($currentTheme, 'buttons');
+$globalSubTitle: theme-color($currentTheme, 'primary');
+$globalLinkColor: theme-color($currentTheme, 'primary');
+$calendarPrimaryColor: theme-color($currentTheme, 'primary');
+$tableHeaderColor: theme-color($currentTheme, 'primary');
+///
+$headerBg: theme-color($currentTheme, 'secondary');
+$headerBannerBg: theme-color($currentTheme, 'primary');
+$headerSubLinkHover: theme-color($currentTheme, 'states');
+$menuPrimaryColor: theme-color($currentTheme, 'primary');
+$breadcrumbLinkColor: theme-color($currentTheme, 'texts');
+$breadcrumbCurrentColor: theme-color($currentTheme, 'texts');
+$buttonBg: theme-color($currentTheme, 'buttons');
+$buttonBgStates: theme-color($currentTheme, 'secondary');
+
+/// header
+#header {
+    background: $headerBg none repeat scroll 0 0;
+
+    .header-link {
+        &:hover,
+        &:focus {
+            outline: 1px solid $headerSubLinkHover;
+        }
+    }
+}
+
+#header-container {
+    #banner {
+        background: $headerBannerBg;
+    }
+}
+
+/// menu header
+#menu-main {
+    button.toggler {
+        background: $menuPrimaryColor;
+    }
+}
+
+/// breadcrumb
+#breadcrumb {
+    .fil-ariane {
+        a {
+            color: $breadcrumbLinkColor;
+        }
+        .fil-ariane-courant {
+            color: $breadcrumbLinkColor;
+        }
+        .fil-ariane-chevron {
+            color: $breadcrumbLinkColor;
+        }
+    }
+}
+
+/// boutons
+button.hornet-button {
+    background: $buttonBg;
+
+    &:hover,
+    &:focus {
+        background: $buttonBgStates;
+    }
+}
+
+a.hornet-button {
+    @extend button.hornet-button;
+}
+
+button.toggler {
+    &:hover,
+    &:focus {
+        background: $buttonBgStates;
+    }
+}

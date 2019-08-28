@@ -73,24 +73,25 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 'use strict';
-var chai = require('chai');
-const expect = chai.expect;
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 import * as assert from "assert";
-import { Accordions } from "hornet-js-react-components/src/widget/accordion/accordions";
-import { Accordion } from "hornet-js-react-components/src/widget/accordion/accordion";
-import { AccordionHeader } from "hornet-js-react-components/src/widget/accordion/accordion-header";
-import { AccordionInfo } from "hornet-js-react-components/src/widget/accordion/accordion-info";
+import { Accordions } from "src/widget/accordion/accordions";
+import { Accordion } from "src/widget/accordion/accordion";
+import { AccordionHeader } from "src/widget/accordion/accordion-header";
+import { AccordionInfo } from "src/widget/accordion/accordion-info";
 
 
 let accordionsElement: JSX.Element;
@@ -139,8 +140,9 @@ class AccordionsTest extends BaseTest {
 
     @Decorators.it("test des méthodes afterShowAccordion")
     showAccordions() {
-        accordions = this.renderIntoDocument(accordionsElement, "main1");
-        this.triggerMouseEvent(document.querySelector("#main1 .accordion-header-container #accordions-test-accordionheader"), "focus");
+        const id = this.generateMainId();
+        accordions = this.renderIntoDocument(accordionsElement, id);
+        this.triggerMouseEvent(document.querySelector(`#${id} .accordion-header-container #accordions-test-accordionheader`), "focus");
         setTimeout(() => {
             expect(beforeHideAccordionCount).to.equal(0);
             expect(afterShowAccordionCount).to.equal(1);
@@ -150,10 +152,11 @@ class AccordionsTest extends BaseTest {
 
     @Decorators.it("test des méthodes afterShow/beforeHide")
     showHideAccordions() {
-        accordions = this.renderIntoDocument(accordionsElement, "main2");
-        this.triggerMouseEvent(document.querySelector("#main2 .accordion-header-container #accordions-test-accordionheader"), "focus");
+        const id = this.generateMainId();
+        accordions = this.renderIntoDocument(accordionsElement, id);
+        this.triggerMouseEvent(document.querySelector(`#${id} .accordion-header-container #accordions-test-accordionheader`), "focus");
         setTimeout(() => {
-            this.selectItemOnClick("#main2 #accordions-test-karma-0-tab");
+            this.selectItemOnClick(`#${id} #accordions-test-karma-0-tab`);
             setTimeout(() => {
                 expect(beforeHideAccordionCount, ("beforeHideAccordionCount n'est pas correctement incrémenté")).to.equal(1);
                 expect(afterShowAccordionCount, ("afterShowAccordionCount n'est pas correctement incrémenté")).to.equal(1);
@@ -164,10 +167,11 @@ class AccordionsTest extends BaseTest {
 
     @Decorators.it("test des méthodes afterShow/beforeHide no multiSelectable")
     showHideNoMultiSelectableAccordions() {
-        accordions = this.renderIntoDocument(accordionsElement, "main3");
-        this.triggerMouseEvent(document.querySelector("#main3 .accordion-header-container #accordions-test-accordionheader"), "focus");
+        const id = this.generateMainId();
+        accordions = this.renderIntoDocument(accordionsElement, id);
+        this.triggerMouseEvent(document.querySelector(`#${id} .accordion-header-container #accordions-test-accordionheader`), "focus");
         setTimeout(() => {
-            this.selectItemOnClick("#main3 #accordions-test-karma-1-tab");
+            this.selectItemOnClick(`#${id} #accordions-test-karma-1-tab`);
             setTimeout(() => {
                 expect(beforeHideAccordionCount, ("beforeHideAccordionCount n'est pas correctement incrémenté")).to.equal(1);
                 expect(afterShowAccordionCount, ("afterShowAccordionCount n'est pas correctement incrémenté")).to.equal(2);

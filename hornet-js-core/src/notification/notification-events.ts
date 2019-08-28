@@ -73,7 +73,7 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -89,6 +89,7 @@ export interface AddNotificationEventDetail {
     exceptions?: Array<BaseError>;
     personnals?: any;
     idComponent?: string;
+    cb?: Function;
 }
 
 export interface CleanNotificationEventDetail {

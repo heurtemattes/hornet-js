@@ -1,0 +1,15 @@
+// Buttons
+$buttonBaseColor: theme-color('global', 'white');
+$buttonBg: theme-color($variant: 'secondary');
+$buttonBgStates: theme-color($variant: 'buttons');
+$buttonBorderStates: rgba(249, 154, 5, 1); //#f99a05
+$topButtonBg: rgba(135, 207, 250, 1); //#87cffa
+$buttonMenuBgHover: rgba(0, 99, 156, 1); //#00639c
+$buttonMenuBgFocus: rgba(65, 160, 214, 1); //#e2eff7
+
+// Chips
+$chipsColor: theme-color('global', 'white');
+$chipsBgColor: theme-color($variant: 'primary');
+$chipsBgColorHover: theme-color($variant: 'secondary');
+$chipsDisabled: rgba(224, 224, 224, 1); //#e0e0e0
+$chipsDisabledColor: rgba(75, 75, 75, .87);

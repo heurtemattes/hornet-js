@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -85,15 +85,15 @@ import { HornetReactTest } from "hornet-js-test/src/hornet-react-test";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { Form } from "hornet-js-react-components/src/widget/form/form";
-import { ButtonsArea } from "hornet-js-react-components/src/widget/form/buttons-area";
-import { Button } from "hornet-js-react-components/src/widget/button/button";
-import { Notification } from "hornet-js-react-components/src/widget/notification/notification";
+import { Form } from "src/widget/form/form";
+import { ButtonsArea } from "src/widget/form/buttons-area";
+import { Button } from "src/widget/button/button";
+import { Notification } from "src/widget/notification/notification";
 import { NotificationManager, Notifications } from "hornet-js-core/src/notification/notification-manager";
 import { Modal } from "src/widget/dialog/modal";
-import { InputField } from "hornet-js-react-components/src/widget/form/input-field";
+import { InputField } from "src/widget/form/input-field";
 
-import * as schema2 from "test/widget/notification/validation2.json";
+const schema2 = require("test/widget/notification/validation2.json");
 
 let renderedElement;
 let maModal1: Modal;
@@ -208,7 +208,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
             let element = this.getNotificationMessageListForm("notifZone", "info-message-list");
             HornetTestAssert.assertEquals(1, element.length, "La zone de notification doit contenir un message d'info");
             this.end();
-        }, 500);
+        }, 750);
     };
 
     /**
@@ -227,7 +227,7 @@ class NotificationFormDispatchingTest extends HornetReactTest {
                 setTimeout(() => {
                     this.end();
                 }, 250);
-            }, 500);
+            }, 750);
         }, 500);
     };
 

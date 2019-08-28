@@ -73,11 +73,12 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
+import { Logger } from "hornet-js-logger/src/logger";
 import * as React from "react";
 
 import {
@@ -87,13 +88,14 @@ import {
     InlineStyle,
     AbstractFieldProps,
 } from "src/widget/form/abstract-field";
-import * as _ from "lodash";
+import assign = require("lodash.assign");
+import cloneDeep = require("lodash.clonedeep");
 import * as classNames from "classnames";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.checkbox-field");
+import "src/widget/form/sass/_checkbox.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.checkbox-field");
 
 export interface CheckBoxFieldProps extends AbstractFieldProps, HornetClickableProps,
     HornetBasicFormFieldProps {
@@ -113,7 +115,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
     public readonly props: Readonly<CheckBoxFieldProps>;
     public state: any;
 
-    static defaultProps = _.assign(_.cloneDeep(AbstractField.defaultProps), {
+    static defaultProps = assign(cloneDeep(AbstractField.defaultProps), {
         switch: false,
     });
 
@@ -133,12 +135,12 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
         }
     }
 
-        /**
-     * Méthode permettant de calculer les classNames du label
-     */
-    protected calculateLabelClassName():ClassDictionary {
+    /**
+ * Méthode permettant de calculer les classNames du label
+ */
+    protected calculateLabelClassName(): classNames.ClassDictionary {
 
-        const classes: ClassDictionary = {
+        const classes: classNames.ClassDictionary = {
             ...super.calculateLabelClassName(),
             "label-margin-right": true,
         };
@@ -164,7 +166,7 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
 
         const htmlProps = this.getHtmlProps();
         if (this.state.currentChecked != null) {
-            _.assign(htmlProps, { defaultChecked: this.state.currentChecked });
+            assign(htmlProps, { defaultChecked: this.state.currentChecked });
         }
 
         if (this.state.readOnly && !this.state.disabled) {
@@ -213,22 +215,20 @@ export class CheckBoxField extends AbstractField<CheckBoxFieldProps, any> {
      */
     renderCheckbox(htmlProps): JSX.Element {
 
-        const classNamesSpan: ClassDictionary = {
+        const classNamesSpan: classNames.ClassDictionary = {
             check: true,
-            readonly: this.state.readOnly ,
+            readonly: this.state.readOnly,
             disabled: this.state.disabled,
-            "has-error":this.hasErrors(),
+            "has-error": this.hasErrors(),
         };
 
         return (
-            <div className="checkbox-container">
-                <label className="checkbox-content" onKeyDown={this.handleKeyDown}>
-                    <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"  {...htmlProps} value="true" />
-                    <span className="checkbox-material">
-                        <span className={classNames(classNamesSpan)}></span>
-                    </span>
-                </label>
-            </div>
+            <label className="checkbox-content" onKeyDown={this.handleKeyDown}>
+                <input ref={(elt) => this.registerHtmlElement(elt)} type="checkbox"  {...htmlProps} value="true" />
+                <span className="checkbox-material">
+                    <span className={classNames(classNamesSpan)}></span>
+                </span>
+            </label>
         );
     }
 

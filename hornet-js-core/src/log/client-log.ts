@@ -73,12 +73,13 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
+import { Logger } from "hornet-js-logger/src/logger";
 
 declare global {
     interface Window {
@@ -130,7 +131,7 @@ export class ClientLog {
             ClientLog.defaultLogLevel = ClientLog.getLoggerKeyValue("LOG level", logConfig.level, ClientLog.defaultLogLevel);
             if (logConfig.appenders && Object.keys(logConfig.appenders).length) {
                 Object.keys(logConfig.appenders).forEach((keyAppender) => {
-                    const appender = logConfig.appenders[ keyAppender ];
+                    const appender = logConfig.appenders[keyAppender];
                     if (appender.type === "BrowserConsole") {
                         appenders.push(ClientLog.configureBrowserConsole(appender));
                     } else if (appender.type === "Ajax") {
@@ -145,31 +146,32 @@ export class ClientLog {
         } else {
             console.warn("LOGGER WEB : CONFIGURATION NOT DEFINED");
         }
-        const logLevel = Utils.log4js.Level.INFO.toLevel(ClientLog.setHornetJsLogLevel());
+
+        const logLevel = Logger.log4js.Level.INFO.toLevel(ClientLog.setHornetJsLogLevel());
         const remoteLog = ClientLog.setHornetJsRemoteLog();
 
         if (!appenders.length) {
             console.warn("LOGGER WEB : NONE APPENDER DEFINED, APPLY DEFAULT APPENDER BrowserConsoleAppender");
-            const consoleAppender = new Utils.log4js.BrowserConsoleAppender();
+            const consoleAppender = new Logger.log4js.BrowserConsoleAppender();
             const logLayout = ClientLog.getConsoleLayout(ClientLog.setHornetJsLogLayout());
             consoleAppender.setLayout(logLayout);
             appenders.push(consoleAppender);
         }
 
         return function (category) {
-            this.log4jsLogger = Utils.log4js.getLogger(category);
+            this.log4jsLogger = Logger.log4js.getLogger(category);
             this.log4jsLogger.setLevel(logLevel);
 
             appenders.forEach((appender) => {
-                if (!(appender instanceof Utils.log4js.AjaxAppender)
-                    || ((appender instanceof Utils.log4js.AjaxAppender) && remoteLog)) {
+                if (!(appender instanceof Logger.log4js.AjaxAppender)
+                    || ((appender instanceof Logger.log4js.AjaxAppender) && remoteLog)) {
                     this.log4jsLogger.addAppender(appender);
                 }
             });
         };
     }
 
-    protected static configureAjaxConsole(appender) {
+    private static configureAjaxConsole(appender) {
         if (appender.layout) {
             if (appender.layout.type === "pattern" && appender.layout.pattern) {
                 ClientLog.defaultRemoteLogLayout = ClientLog.getLoggerKeyValue(
@@ -194,12 +196,12 @@ export class ClientLog {
                 "AjaxAppender url", Utils.buildContextPath(appender.url), ClientLog.defaultRemoteUrl);
         }
 
-        const remoteLogUrl = ClientLog.setHornetJsRemoteLogUrl(ClientLog.defaultRemoteUrl);
-        const remoteLogLayout = ClientLog.setHornetJsRemoteLogLayout();
+        let remoteLogUrl = ClientLog.setHornetJsRemoteLogUrl(ClientLog.defaultRemoteUrl);
+        let remoteLogLayout = ClientLog.setHornetJsRemoteLogLayout();
 
-        const remoteStackErrorLog = ClientLog.setHornetJsStacksLog();
+        let remoteStackErrorLog = ClientLog.setHornetJsStacksLog();
 
-        const ajaxAppender = new Utils.log4js.AjaxAppender(remoteLogUrl);
+        let ajaxAppender = new Logger.log4js.AjaxAppender(remoteLogUrl);
         ajaxAppender.setLayout(ClientLog.getConsoleLayout(remoteLogLayout.layout));
         ajaxAppender.setThreshold(remoteLogLayout.threshold);
         ajaxAppender.setTimeout(remoteLogLayout.timeout);
@@ -216,7 +218,7 @@ export class ClientLog {
                     "BrowserConsoleAppender layout.type", appender.layout.type, ClientLog.defaultLogLayout);
             }
         }
-        const consoleAppender = new Utils.log4js.BrowserConsoleAppender();
+        const consoleAppender = new Logger.log4js.BrowserConsoleAppender();
         const logLayout = ClientLog.getConsoleLayout(ClientLog.setHornetJsLogLayout());
         consoleAppender.setLayout(logLayout);
         return consoleAppender;
@@ -304,7 +306,7 @@ export class ClientLog {
             if (!window.setHornetJsLogLevel) {
                 window.setHornetJsLogLevel = function (level: string) {
                     const logLevel = ClientLog.testParamLocalStorage(level, ClientLog.defaultLogLevel);
-                    const newLogLevel = Utils.log4js.Level.INFO.toLevel(logLevel, ClientLog.defaultLogLevel).toString();
+                    const newLogLevel = Logger.log4js.Level.INFO.toLevel(logLevel, ClientLog.defaultLogLevel).toString();
                     console.log("New log level :", newLogLevel, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_LEVEL_KEY, newLogLevel);
                 };
@@ -380,7 +382,7 @@ export class ClientLog {
                     const logTimeout = parseInt(timeout, 10) || ClientLog.defaultRemoteLogTimeout;
 
                     console.log("New remote log layout :", logLayout, " thresold :",
-                                logTreshold, ", logTimeout :", logTimeout, ". Reload page (F5) to activate");
+                        logTreshold, ", logTimeout :", logTimeout, ". Reload page (F5) to activate");
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_KEY, logLayout.toString());
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_THRESHOLD_KEY, logTreshold.toString());
                     window.localStorage.setItem(ClientLog.LOCAL_STORAGE_LOGGER_REMOTE_LAYOUT_TIMEOUT_KEY, logTimeout.toString());
@@ -425,7 +427,7 @@ export class ClientLog {
     }
 
     static getConsoleLayout(logLayout: string): any {
-        let newLayout = new Utils.log4js.BasicLayout();
+        let newLayout = new Logger.log4js.BasicLayout();
         if (logLayout) {
             let isPatternLayout;
             if (logLayout.indexOf("%") === -1) {
@@ -436,20 +438,20 @@ export class ClientLog {
                 isPatternLayout = true;
             }
             if (logLayout === "BASIC") {
-                newLayout = new Utils.log4js.BasicLayout();
+                newLayout = new Logger.log4js.BasicLayout();
             } else if (logLayout === "SIMPLE") {
-                newLayout = new Utils.log4js.SimpleLayout();
+                newLayout = new Logger.log4js.SimpleLayout();
             } else if (logLayout === "THIN") {
-                newLayout = new Utils.log4js.ThinLayout();
+                newLayout = new Logger.log4js.ThinLayout();
             } else if (logLayout === "JSON") {
-                newLayout = new Utils.log4js.JSONLayout();
+                newLayout = new Logger.log4js.JSONLayout();
             } else if (logLayout === "XML") {
-                newLayout = new Utils.log4js.XMLLayout();
+                newLayout = new Logger.log4js.XMLLayout();
             } else if (logLayout === "HTML") {
-                newLayout = new Utils.log4js.HtmlLayout();
+                newLayout = new Logger.log4js.HtmlLayout();
             } else {
                 if (isPatternLayout) {
-                    newLayout = new Utils.log4js.PatternLayout(logLayout);
+                    newLayout = new Logger.log4js.PatternLayout(logLayout);
                 } else {
                     newLayout = ClientLog.getDefaultConsoleLayout();
                     console.warn("PATTERN LAYOUT NOT FOUND : '", logLayout, "' APPLY DEFAULT");

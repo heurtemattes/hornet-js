@@ -1,5 +1,11 @@
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
+
+interface ITimer {
+    [K: string]: number[];
+}
+
+const CLS_KEY = "hornet.timers";
 
 export class Timer {
 
@@ -14,7 +20,7 @@ export class Timer {
     static NS_PER_SEC = 1e9;
     static NS_TO_MS_PER_SEC = 1e6;
 
-    protected static logger: Logger = Utils.getLogger("hornet-js-core.timers.Timer");
+    protected static logger: Logger = Logger.getLogger("hornet-js-core.timers.Timer");
 
     /**
      * Démarre un timer et en arrête un autre s'il est renseigné.
@@ -22,7 +28,7 @@ export class Timer {
      * @param {string}  stopTimerName id du timer à arrêter
      */
     static startTimer(timerName: string, stopTimerName?: string) {
-        let timers = Timer.getTimers("hornet.timers");
+        let timers = Timer.getTimers();
         
         if (!timers) {
             timers = {};
@@ -33,10 +39,10 @@ export class Timer {
         } 
 
         if (timers[timerName].length % 2 !== 0) {
-            Timer.logger.warn(`startTimer : Problème de Timers (${timerName}) non stoppé.`);
+            Timer.logger.debug(`startTimer : Problème de Timers (${timerName}) non stoppé.`);
         } else {
             timers[timerName].push(new Date().getTime());
-            Timer.setTimers("hornet.timers", timers);
+            Timer.setTimers(timers);
         }
         
 
@@ -50,13 +56,13 @@ export class Timer {
      * @param {string} timerName id du timer à démarrer
      */
     static stopTimer(timerName: string) {
-        const timers = Timer.getTimers("hornet.timers");
+        const timers = Timer.getTimers();
         
         if (!timers || !timers[timerName] || timers[timerName].length % 2 === 0) {
-            Timer.logger.warn(`startTimer : Problème de Timers (${timerName}) non démarré.`);
+            Timer.logger.debug(`startTimer : Problème de Timers (${timerName}) non démarré.`);
         } else {
             timers[timerName].push(new Date().getTime());
-            Timer.setTimers("hornet.timers", timers);
+            Timer.setTimers(timers);
         }
         
     }
@@ -66,7 +72,7 @@ export class Timer {
      */
     static stopAllTimers() {
 
-        const timers = Timer.getTimers("hornet.timers");
+        const timers = Timer.getTimers();
 
         if (timers) {
             Object.keys(timers).forEach((timerName) => {
@@ -74,7 +80,7 @@ export class Timer {
                     timers[timerName].push(new Date().getTime());
                 }                
             });
-            Timer.setTimers("hornet.timers", timers);
+            Timer.setTimers(timers);
         }
         
     }
@@ -85,7 +91,7 @@ export class Timer {
      * @param {integer} statusCode - status http à logger
      */
     static logFinally(url?, statusCode?) {
-        const timers = Timer.getTimers("hornet.timers");
+        const timers = Timer.getTimers();
         const valueTimers = {};
 
         if (timers) {
@@ -94,7 +100,20 @@ export class Timer {
             Timer.TIMERS_ORDER.forEach((timer) => {
                 if (timers[timer]) {
                     if (timers[timer].length % 2 !== 0) {
-                        Timer.logger.warn(`Problème de Timers (${timer}) non stoppé. Ajout automatique du stop.`);
+                        Timer.logger.debug(`Problème de Timers (${timer}) non stoppé. Ajout automatique du stop.`);
+                        timers[timer].push(new Date().getTime());
+                    }
+                    for (let tCount = 0; tCount < timers[timer].length; tCount += 2) {
+                        const tValue = timers[timer][tCount + 1] - timers[timer][tCount];
+                        valueTimers[timer] = valueTimers[timer] ? valueTimers[timer] + tValue : tValue;
+                    }
+                    log += ` - ${timer} ${valueTimers[timer]} ms`;
+                }
+            });
+            Object.keys(timers).filter(function (timerKey){ return this.indexOf(timerKey) -1}, Timer.TIMERS_ORDER).sort().forEach((timer) => {
+                if (timers[timer]) {
+                    if (timers[timer].length % 2 !== 0) {
+                        Timer.logger.debug(`Problème de Timers (${timer}) non stoppé. Ajout automatique du stop.`);
                         timers[timer].push(new Date().getTime());
                     }
                     for (let tCount = 0; tCount < timers[timer].length; tCount += 2) {
@@ -111,7 +130,7 @@ export class Timer {
 
     }
 
-    static getTimers(clsKey: string):any {
+    static getTimers(clsKey: string = CLS_KEY): ITimer {
         let timers;
         try {
             timers = Utils.getCls(clsKey);
@@ -122,7 +141,7 @@ export class Timer {
         return timers;
     }
 
-    static setTimers(clsKey: string, timers:any):any {
+    static setTimers(timers:any, clsKey: string = CLS_KEY):any {
         try {
             timers = Utils.setCls(clsKey, timers);
         } catch (e) {

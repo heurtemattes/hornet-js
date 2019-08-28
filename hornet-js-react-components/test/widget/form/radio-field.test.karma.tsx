@@ -73,7 +73,7 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
@@ -82,8 +82,12 @@ import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
 
-const chai = require("chai");
-const expect = chai.expect;
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 import * as assert from "assert";
 
@@ -92,7 +96,6 @@ import { Form } from "src/widget/form/form";
 import { HornetTestAssert } from "hornet-js-test/src/hornet-test-assert";
 
 let element: JSX.Element;
-let $element;
 
 @Decorators.describe("Test Karma radio-field")
 class RadioFieldTest extends BaseTest {
@@ -112,17 +115,11 @@ class RadioFieldTest extends BaseTest {
         },
     ];
 
-
-    @Decorators.it("Test OK")
-    testOk() {
-        assert.equal(1, 1);
-        this.end();
-    }
-
     @Decorators.it("Test radiofields sans datasource sans valeur par défaut")
     testRadioField1() {
+        const id = this.generateMainId();
         element = (
-            <div id="main1">
+            <div id={id}>
                 <Form id={"testForm-1"}>
                     <RadiosField
                         name="exampleRadio-1"
@@ -137,7 +134,7 @@ class RadioFieldTest extends BaseTest {
             </div>
         );
 
-        $element = this.renderIntoDocument(element, "main1");
+        this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-1-client");
         HornetTestAssert.assertNotNull(htmlElement, "Le radio 1 pour Client n'a pas bien été généré");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "exampleRadio-1-client ne doit pas être sélectionné");
@@ -149,8 +146,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields 2 sans datasource avec valeur par défaut premier item")
     testRadioField2() {
+        const id = this.generateMainId();
         element = (
-            <div id="main2">
+            <div id={id}>
                 <Form id={"testForm-2"}>
                     <RadiosField
                         name="exampleRadio-2"
@@ -160,13 +158,12 @@ class RadioFieldTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[ 0 ]}
+                        defaultValue={this.dataSet[0]}
                     />
                 </Form>
             </div>
         );
-
-        $element = this.renderIntoDocument(element, "main2");
+        this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-2-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
         HornetTestAssert.assertTrue((htmlElement as any).checked, "ExampleRadio-2-client doit être sélectionné");
@@ -178,8 +175,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields 3 sans datasource avec valeur par défaut deuxième item")
     testRadioField3() {
+        const id = this.generateMainId();
         element = (
-            <div id="main3">
+            <div id={id}>
                 <Form id={"testForm-3"}>
                     <RadiosField
                         name="exampleRadio-3"
@@ -189,13 +187,12 @@ class RadioFieldTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[ 1 ]}
+                        defaultValue={this.dataSet[1]}
                     />
                 </Form>
             </div>
         );
-
-        $element = this.renderIntoDocument(element, "main3");
+        this.renderIntoDocument(element, id);
         let htmlElement = document.getElementById("exampleRadio-3-client");
         HornetTestAssert.assertNotNull(htmlElement, "Radio pour le libellé Client non trouvé");
         HornetTestAssert.assertFalse((htmlElement as any).checked, "ExampleRadio-3-client ne doit pas être sélectionné");
@@ -208,8 +205,9 @@ class RadioFieldTest extends BaseTest {
 
     @Decorators.it("Test radiofields 4 sans datasource avec valeur par défaut deuxième item et gestion click")
     testRadioField4() {
+        const id = this.generateMainId();
         element = (
-            <div id="main4">
+            <div id={id}>
                 <Form id={"testForm-4"}>
                     <RadiosField
                         name="exampleRadio-4"
@@ -219,13 +217,12 @@ class RadioFieldTest extends BaseTest {
                         labelKey={"libelle"}
                         valueKey={"isClient"}
                         currentChecked={true}
-                        defaultValue={this.dataSet[ 1 ]}
+                        defaultValue={this.dataSet[1]}
                     />
                 </Form>
             </div>
         );
-
-        $element = this.renderIntoDocument(element, "main4");
+        this.renderIntoDocument(element, id);
 
         let htmlElement = document.getElementById("exampleRadio-4-fournisseur");
         this.triggerMouseEvent(document.getElementById("exampleRadio-4-client"), "click");
@@ -241,9 +238,38 @@ class RadioFieldTest extends BaseTest {
         this.end();
     }
 
+    @Decorators.it("Test fonctionnement de la props onChange")
+    testOnChangeProps() {
+        let isEnd: boolean;
+        let radioValue: string;
+        const onChangeHandler = (e) => {
+            expect(e.target.value, `la e.target.value n'est pas égale à ${radioValue}`).to.equal(radioValue);
+            if (isEnd) {
+                this.end();
+            }
+        };
+        const radioTag = (
+            <RadiosField
+                name={"radio-onChange-test"}
+                label={"test radio-onChange-test"}
+                inline={RadiosField.Inline.FIELD}
+                labelKey={"libelle"}
+                valueKey={"isClient"}
+                data={this.dataSet}
+                onChange={onChangeHandler}
+            />);
+        const id = this.generateMainId();
+        this.renderIntoDocument(radioTag, id);
+        radioValue = "false";
+        this.triggerMouseEvent(document.querySelector(`#${id} #radio-onChange-test-fournisseur`), "click");
 
+        setTimeout(() => {
+            radioValue = "true";
+            isEnd = true;
+            this.triggerMouseEvent(document.querySelector(`#${id} #radio-onChange-test-client`), "click");
+        }, 250);
+    }
 }
-
 
 // lancement des Tests
 runTest(new RadioFieldTest());

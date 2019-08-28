@@ -73,40 +73,38 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 "use strict";
-const chai = require("chai");
-const expect = chai.expect;
-import * as _ from "lodash";
+import { Utils } from "hornet-js-utils";
+Utils.setConfigObj({});
+
+import { TestUtils } from "hornet-js-test/src/test-utils";
+const expect = TestUtils.chai.expect;
+
 import * as React from "react";
 
 import { BaseTest } from "hornet-js-test/src/base-test";
 import { runTest } from "hornet-js-test/src/test-run";
 import { Decorators } from "hornet-js-test/src/decorators";
-import { SortData, SortDirection } from "hornet-js-core/src/component/sort-data";
 import * as assert from "assert";
 
-import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 import { PaginateDataSource } from "hornet-js-core/src/component/datasource/paginate-datasource";
-import { Table } from "hornet-js-react-components/src/widget/table/table";
-import { Header } from "hornet-js-react-components/src/widget/table/header";
+import { Table } from "src/widget/table/table";
+import { Header } from "src/widget/table/header";
 /* Composant Content */
-import { Content } from "hornet-js-react-components/src/widget/table/content";
+import { Content } from "src/widget/table/content";
 /*  Colonne du tableau */
-import { Column } from "hornet-js-react-components/src/widget/table/column";
-import { Columns } from "hornet-js-react-components/src/widget/table/columns";
+import { Column } from "src/widget/table/column";
+import { Columns } from "src/widget/table/columns";
 import { CheckColumn } from "src/widget/table/column/check-column";
-
-import { Footer } from "hornet-js-react-components/src/widget/table/footer";
-import { Picto } from "hornet-js-react-components/src/img/picto";
-import { Pager, PaginationProps } from "hornet-js-react-components/src/widget/pager/pager";
+import { Footer } from "src/widget/table/footer";
+import { Pager, PaginationProps } from "src/widget/pager/pager";
 import { ActionColumn } from "src/widget/table/column/action-column";
 import { MoreInfoColumn } from "src/widget/table/column/more-info-column";
-import { LineAfter } from "src/widget/table/line/line-after";
 
 
 @Decorators.describe("Test Karma table paginate")
@@ -114,6 +112,7 @@ class tableTest extends BaseTest {
     /** Tableau de liste de secteurs */
     private dataSource: PaginateDataSource<any>;
     private tableElement: JSX.Element;
+    private tableElementWithTotal: JSX.Element;
     private tableElementWithActionColumns: JSX.Element;
     private tableElementWithActionColumnsSupprimer: JSX.Element;
     private table;
@@ -167,7 +166,7 @@ class tableTest extends BaseTest {
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
                         <Column keyColumn="desc" title={"desc"} sortable={true} />
                         <ActionColumn keyColumn="editer"
-                            srcImg={Picto.blue.editer}
+                            // srcImg={Picto.blue.editer}
                             alt={"Editer {label}"}
                             action={() => { }}
                             keyShouldComponentUpdate="id"/>
@@ -193,16 +192,15 @@ class tableTest extends BaseTest {
                         <Column keyColumn="label" title={"libelle"} sortable={true} />
                         <Column keyColumn="desc" title={"desc"} sortable={true} />
                         <ActionColumn keyColumn="supprimer"
-                            srcImg={Picto.white.supprimer}
+                            // srcImg={Picto.white.supprimer}
                             titleAlert={"Suppression de ${label} alert title"}
                             messageAlert={"Voulez-vous vraiment supprimer ${label}"}
                             alt={"Supprimer {label}"}
                             action={() => { }}
                             keyShouldComponentUpdate="id" />
                         <ActionColumn keyColumn="editer"
-                            srcImg={Picto.white.supprimer}
+                            // srcImg={Picto.white.supprimer}
                             alt={"Editer {label}"}
-                            hasPopUp={true}
                             action={() => { }}
                             visible={(value) => value.label !== "libelle1"}
                             keyShouldComponentUpdate="id" />
@@ -210,6 +208,23 @@ class tableTest extends BaseTest {
                 </Content>
                 <Footer>
                     <Pager dataSource={this.dataSource} id="maTable-paginate-with-action-column-supprimer" />
+                </Footer>
+            </Table>
+        );
+
+        this.tableElementWithTotal = (
+            <Table id="lite">
+                <Header title={"Secteurs"}>
+                </Header>
+                <Content dataSource={this.dataSource}>
+                    <Columns>
+                        <CheckColumn keyColumn="id" />
+                        <Column keyColumn="label" title={"libelle"} sortable={true} />
+                        <Column keyColumn="desc" title={"desc"} sortable={true} />
+                    </Columns>
+                </Content>
+                <Footer>
+                    <Pager dataSource={this.dataSource} id="maTable-paginate" showTotalPage={true}/>
                 </Footer>
             </Table>
         );
@@ -302,16 +317,17 @@ class tableTest extends BaseTest {
         this.dataSource.on("pagination", (value) => {
             expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`)[ "title" ])
                 .to.equal("Supprimer libelle11");
-            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            const selector = document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`);
+            this.triggerMouseEvent(selector, "mousedown");
             setTimeout(() => {
                 expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
                 expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
-                expect(document.querySelector(`#dialogue-title h1`).innerHTML).to.equal("Suppression de libelle11 alert title");
-                expect(document.querySelector(`#widget-alert-body`)).to.exist;
-                expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle11");
+                expect(document.querySelector(`#dialogue-title h1`).innerHTML, "vérification du libelle1 failed").to.equal("Suppression de libelle11 alert title");
+                expect(document.querySelector(`#widget-alert-body`), "le widget alert n'existe pas").to.exist;
+                expect(document.querySelector(`#widget-alert-body`).innerHTML, "vérification du libelle1 pour suppression failed").to.equal("Voulez-vous vraiment supprimer libelle11");
                 this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
                 this.end();
-            }, 200);
+            }, 750);
         });
         this.dataSource.goToPage(2);
     }
@@ -323,7 +339,7 @@ class tableTest extends BaseTest {
         this.dataSource.on("pagination", (value) => {
             expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`)[ "title" ])
                 .to.equal("Supprimer libelle21");
-            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "click");
+            this.triggerMouseEvent(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-3 a`), "mousedown");
             setTimeout(() => {
                 expect(document.querySelector(`.dialog-content-alert`), "alerte n'existe pas").to.exist;
                 expect(document.querySelector(`#dialogue-title h1`), "h1 n'existe pas").to.exist;
@@ -332,7 +348,7 @@ class tableTest extends BaseTest {
                 expect(document.querySelector(`#widget-alert-body`).innerHTML).to.equal("Voulez-vous vraiment supprimer libelle21");
                 this.triggerMouseEvent(document.querySelector("#confirmCancel"), "click");
                 this.end();
-            }, 200);
+            }, 500);
         });
         this.dataSource.goToPage(3);
     }
@@ -347,10 +363,26 @@ class tableTest extends BaseTest {
             setTimeout(() => {
                 expect(document.querySelector(`#${this.id} #table-with-action-column-supprimer-0-colBody-0-4 a`).innerHTML).to.exist;
                 this.end();
-            }, 200);
+            }, 750);
         });
         this.dataSource.goToPage(2);
 
+    }
+
+    @Decorators.it("test de la props showTotalPage a true")
+    testRenderTotalPage() {
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElementWithTotal, this.id);
+        expect(document.querySelector(`#${this.id} .datatable-pagination-total-page`)).to.exist;
+        this.end();
+    }
+
+    @Decorators.it("test de la props showTotalPage a false")
+    testRenderTotalPageFalse() {
+        this.id = this.generateMainId();
+        this.table = this.renderIntoDocument(this.tableElement, this.id);
+        expect(document.querySelector(`#${this.id} .datatable-pagination-total-page`)).to.not.exist;
+        this.end();
     }
 }
 

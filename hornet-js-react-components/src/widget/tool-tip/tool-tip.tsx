@@ -73,19 +73,20 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
 import * as React from "react";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { KeyCodes } from "hornet-js-components/src/event/key-codes";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
+import { SvgSprites } from 'src/widget/icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-component.widget.tool-tip.tool-tip");
+import "src/widget/tool-tip/sass/_tooltip.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-component.widget.tool-tip.tool-tip");
 
 /**
  * Propriétés du ToolTip
@@ -106,9 +107,8 @@ export interface ToolTipProps extends HornetComponentProps {
 export class ToolTip extends HornetComponent<ToolTipProps, any> {
 
     static defaultProps = {
-        classImg: "tooltip-image",
-        classSpan: "tooltip",
-        icoToolTip: "/img/tooltip/tooltip.svg",
+        icoToolTip: <SvgSprites height="1em" width="1em" icon="tooltip" color="#027caf" />,
+        classSpan: "tooltip"
     };
 
     /**
@@ -116,7 +116,9 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
      */
     render(): JSX.Element {
         logger.debug("ToolTip render : idSpan: ", this.state.idSpan);
-        const urlIcoTooltip = this.state.src || ToolTip.genUrlTheme(this.state.icoToolTip);
+        
+        const urlIcoTooltip = this.state.src === "" || this.state.src === "undefined" ? this.state.icoToolTip : <img src={this.state.src} alt={this.state.alt} />;
+
         return (
 
             <span
@@ -125,14 +127,9 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
                 onBlur={this.hideTip}
                 onMouseLeave={this.hideTip}
                 className={this.state.classSpan}
-                aria-haspopup={true}
                 role="tooltip"
             >
-                <img id={this.state.idImg}
-                    alt={this.state.alt}
-                    src={urlIcoTooltip}
-                    className={this.state.classImg}
-                    tabIndex={0} />
+                { urlIcoTooltip }
                 <span id={this.state.idSpan}
                     className="tooltip-label"
                     role="tooltip"
@@ -167,7 +164,6 @@ export class ToolTip extends HornetComponent<ToolTipProps, any> {
         if (keyCode === KeyCodes.ESCAPE) {
             this.hideTip(event);
         }
-
     }
 
     /**

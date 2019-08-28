@@ -73,18 +73,17 @@
  * hornet-js-core - Ensemble des composants qui forment le coeur de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { RouteAuthorization } from "src/routes/abstract-routes";
 import * as nodeUtil from "util";
-import * as _ from "lodash";
-
-const logger: Logger = Utils.getLogger("hornet-js-core.event.hornet-event");
+import assign = require("lodash.assign");
+const logger: Logger = Logger.getLogger("hornet-js-core.event.hornet-event");
 
 declare global {
     interface Window {
@@ -170,7 +169,6 @@ export class HornetEvent<EventDetailInterface> extends BaseEvent {
         (cf. lodash.baseCLone() : https://github.com/lodash/lodash/blob/master/dist/lodash.js#L2330
         et https://github.com/lodash/lodash/blob/master/dist/lodash.js#L70)
         */
-        // var cloneEvent = _.clone(this, 1);
         const cloneEvent: HornetEvent<EventDetailInterface> = this.clone();
         cloneEvent.detail = data;
         return cloneEvent;
@@ -221,7 +219,7 @@ export function removeHornetEvent<T extends HornetEvent<any>>(event: T, callback
 export function fireHornetEvent<T extends HornetEvent<any>>(event: T, eventOptions: any = {}) {
     if (!Utils.isServer) {
 
-        const ev = new CustomEvent(event.name, _.assign({
+        const ev = new CustomEvent(event.name, assign({
             detail: event.detail,
         },                                              {
                 bubbles: true,

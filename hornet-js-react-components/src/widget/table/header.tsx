@@ -73,17 +73,16 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
-
-import { Utils } from "hornet-js-utils";
 import { ArrayUtils } from "hornet-js-utils/src/array-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 
 import * as React from "react";
-import * as classNames from "classnames";
+import classNames from "classnames";
+import cloneDeep = require("lodash.clonedeep");
 
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { HornetComponentProps } from "hornet-js-components/src/component/ihornet-component";
@@ -94,7 +93,11 @@ import { Confirm } from "src/widget/dialog/confirm";
 import { PaginateDataSource, Pagination } from "hornet-js-core/src/component/datasource/paginate-datasource";
 import { DataSource } from "hornet-js-core/src/component/datasource/datasource";
 
-const logger: Logger = Utils.getLogger("hornet-js-components.widget.table.header");
+import "src/widget/table/sass/_table.scss";
+import "src/widget/table/sass/_datatable-sortable.scss";
+import "src/widget/dropdown/sass/_dropdown.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-components.widget.table.header");
 
 /**
  * Propriétés du composant Header de tableau Hornet
@@ -164,9 +167,9 @@ export class Header extends HornetComponent<HeaderProps, any> {
         this.props.contentState.removeListener(ContentState.EDITION_CLIC_EVENT, this.handleEdition);
         if (this.props.dataSourcesList) {
             this.props.dataSourcesList.map((dataSource, index) => {
-                this.props.dataSourcesList[ index ].removeListener("select", this.handleChangeDataTable);
-                this.props.dataSourcesList[ index ].removeListener("pagination", this.handlePaginationChange);
-                this.props.dataSourcesList[ index ].removeListener("fetch", this.handlePaginationChange);
+                this.props.dataSourcesList[index].removeListener("select", this.handleChangeDataTable);
+                this.props.dataSourcesList[index].removeListener("pagination", this.handlePaginationChange);
+                this.props.dataSourcesList[index].removeListener("fetch", this.handlePaginationChange);
             });
         }
     }
@@ -176,10 +179,10 @@ export class Header extends HornetComponent<HeaderProps, any> {
         // on s'abonne au select du dataSource de chaque content
         if (this.props.dataSourcesList && Array.isArray(this.props.dataSourcesList) && this.props.dataSourcesList.length > 0) {
             this.props.dataSourcesList.map((dataSource, index) => {
-                this.props.dataSourcesList[ index ].setMaxListeners(Infinity);
-                this.props.dataSourcesList[ index ].on("select", this.handleChangeDataTable);
-                this.props.dataSourcesList[ index ].on("pagination", this.handlePaginationChange);
-                this.props.dataSourcesList[ index ].on("fetch", this.handlePaginationChange);
+                this.props.dataSourcesList[index].setMaxListeners(Infinity);
+                this.props.dataSourcesList[index].on("select", this.handleChangeDataTable);
+                this.props.dataSourcesList[index].on("pagination", this.handlePaginationChange);
+                this.props.dataSourcesList[index].on("fetch", this.handlePaginationChange);
             });
         }
         this.props.tableState.emit(TableState.RESIZE_EVENT, this.headerRef.clientWidth);
@@ -206,12 +209,14 @@ export class Header extends HornetComponent<HeaderProps, any> {
 
             <div {...headerContainerProps} ref={(instance) => { this.headerRef = instance; }}>
                 <div className="datatable-title">
-                    <span className="datatable-title-span">
+                    <span className="datatable-title-span" tabIndex={0}>
                         {this.state.title + " " + this.i18n(this.state.libelleNombreTotalItem,
-                                                            { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })}
+                            { count: this.getTotalItemsForAllDataSource(), ...this.getPaginationForFirstDataSource() })}
                     </span>
                 </div>
+                {this.renderOthersChildren(true)}
                 {(!this.state.hideMenuActions) ? this.renderMenuActions() : null}
+                {this.renderOthersChildren(false)}
                 <Confirm ref="alert" message={""}
                     onClickCancel={this.closeAlert}
                     onClickClose={this.closeAlert} />
@@ -248,27 +253,16 @@ export class Header extends HornetComponent<HeaderProps, any> {
         let WrappedToggleColumns = null;
         if (toggleColumnsButton) {
             const key: string = this.state.id + "toggleColumnsButton";
-           /* WrappedToggleColumns = Header.wrap(
-                ToggleColumnsButton,
-                toggleColumnsButton,
-                toggleColumnsButton.props,
-                {
-                    id: this.state.id,
-                    key,
-                    tabIndex: -1,
-                    columns: this.props.columns,
-                    contentState: this.props.contentState,
-                    hiddenColumns: this.hiddenColumns,
-                },
-            );*/
-            const props = {...toggleColumnsButton.props,
+            const props = {
+                ...toggleColumnsButton.props,
                 id: this.state.id,
                 key,
                 tabIndex: -1,
                 columns: this.props.columns,
                 contentState: this.props.contentState,
-                hiddenColumns: this.hiddenColumns};
-            WrappedToggleColumns = React.createElement( ToggleColumnsButton , props);
+                hiddenColumns: this.hiddenColumns
+            };
+            WrappedToggleColumns = React.createElement(ToggleColumnsButton, props);
         }
 
         const menuActionsProps: any = {
@@ -286,6 +280,37 @@ export class Header extends HornetComponent<HeaderProps, any> {
         return (
             <MenuActions {...menuActionsProps} />
         );
+    }
+
+    /**
+     * Render des noeuds fils de Header qui ne sont pas des MenusAction ni des ToggleColumnsButton
+     * @param beforeMenuAction indique s'il faut rendre les noeuds fils du header qui sont placés avant ou après le noeud MenuActions
+     */
+    protected renderOthersChildren(beforeMenuAction: boolean) {
+        logger.trace("renderOthersChildren. Noeuds avant MenuAction ? ", beforeMenuAction);
+        const othersChildren = [];
+        let isMenuActionFound: boolean;
+        React.Children.map(this.props.children, (child: React.ReactChild, index) => {
+            if (child && (child as React.ReactElement<any>).type !== MenuActions && (child as React.ReactElement<any>).type !== ToggleColumnsButton) {
+                const menuActionsProps: any = {
+                    items: this.state.items,
+                    showAlert: this.showAlert,
+                    showIconInfo: this.props.showIconInfo,
+                    selectedItems: this.getAllSelectedItems(),
+                    id: this.state.id + "-custom-header-" + index,
+                    key: this.state.id + "-custom-header-key-" + index,
+                    columns: this.props.columns,
+                    contentState: this.props.contentState
+                };
+                if ((beforeMenuAction && !isMenuActionFound) || (!beforeMenuAction && isMenuActionFound)) {
+                    othersChildren.push(React.createElement((child as React.ReactElement<any>).type, { ...menuActionsProps, ...(child as any).props }));
+                }
+            } else if ((child as React.ReactElement<any>).type === MenuActions) {
+                isMenuActionFound = true;
+            }
+        });
+        return othersChildren && othersChildren.length > 0 ?
+            othersChildren : null;
     }
 
     /**
@@ -355,7 +380,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
         let resultList: any[] = [];
         // recupere la liste de tous les items selectionés dans les dataSources des contents
         this.props.dataSourcesList.map((dataSource, index) => {
-            resultList = ArrayUtils.unionWith(this.props.dataSourcesList[ index ].selected, resultList, this.state.contentState.keyColumnMassSelection);
+            resultList = ArrayUtils.unionWith(this.props.dataSourcesList[index].selected, resultList, this.state.contentState.keyColumnMassSelection);
         });
         // intersection des items affichés avec les items selectionés dans le dataSource
         return resultList;
@@ -386,21 +411,21 @@ export class Header extends HornetComponent<HeaderProps, any> {
         return result;
     }
 
-        /**
-     * Retourne la somme totale des items de tous les dataSource de tous les contents
-     * @returns {number}
-     */
+    /**
+ * Retourne la somme totale des items de tous les dataSource de tous les contents
+ * @returns {number}
+ */
     protected getPaginationForFirstDataSource(): {} {
         logger.trace("getPaginationForFirstDataSource");
-        let result:Pagination = {} as any;
+        let result: Pagination = {} as any;
         this.props.dataSourcesList.every((dataSource: DataSource<any>) => {
             if (dataSource) {
                 // si le dataSource est de type PaginateDataSource, on prend le totalItems sinon on prend le result.length
                 if (dataSource instanceof PaginateDataSource) {
                     const pagDt: PaginateDataSource<any> = dataSource as PaginateDataSource<any>;
-                    result = {...pagDt.pagination};
+                    result = { ...pagDt.pagination };
                     if (!result.nbPages || result.nbPages === 0) {
-                            result.nbPages = Math.max(1, Math.ceil(result.totalItems / result.itemsPerPage)) || 0;
+                        result.nbPages = Math.max(1, Math.ceil(result.totalItems / result.itemsPerPage)) || 0;
                     }
                     return false;
                 }
@@ -426,7 +451,7 @@ export class Header extends HornetComponent<HeaderProps, any> {
         return result;
     }
 
-    handlePaginationChange(result):void {
-        this.setState({ pagination: _.cloneDeep(result.pagination) });
+    handlePaginationChange(result): void {
+        this.setState({ pagination: cloneDeep(result.pagination) });
     }
 }

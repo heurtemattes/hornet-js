@@ -73,13 +73,13 @@
  * hornet-js-react-components - Ensemble des composants web React de base de hornet-js
  *
  * @author MEAE - Ministère de l'Europe et des Affaires étrangères
- * @version v5.2.4
+ * @version v5.4.1
  * @link git+https://github.com/diplomatiegouvfr/hornet-js.git
  * @license CECILL-2.1
  */
 
 import { Utils } from "hornet-js-utils";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { AbstractHornetMiddleware, AbstractHornetSubMiddleware } from "hornet-js-core/src/middleware/middlewares";
 import { ServerConfiguration } from "hornet-js-core/src/server-conf";
 import * as React from "react";
@@ -88,16 +88,17 @@ import { RouteInfos, PageRouteInfos, RouteType } from "hornet-js-core/src/routes
 import { BaseError } from "hornet-js-utils/src/exception/base-error";
 import { BusinessError } from "hornet-js-utils/src/exception/business-error";
 import { TechnicalError } from "hornet-js-utils/src/exception/technical-error";
-import { HornetPage } from "src/widget/component/hornet-page";
+import { HornetPage, HornetPageProps } from "src/widget/component/hornet-page";
 import { HornetComponent } from "src/widget/component/hornet-component";
 import { Class } from "hornet-js-utils/src/typescript-utils";
-import * as _ from "lodash";
+import merge = require("lodash.merge");
+import clone = require("lodash.clone");
 
 // ------------------------------------------------------------------------------------------------------------------- //
 //                                      PageRenderingMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-react-components.middleware.PageRenderingMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-react-components.middleware.PageRenderingMiddleware");
 
     constructor(config?: ServerConfiguration) {
         super((req, res, next) => {
@@ -107,9 +108,9 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
                 const filterUserKeys = ["SessionNotOnOrAfter", "Profil", "Nom", "Prenom", "name", "Mail", "Login", "roles"];
                 const userKeys = [...userKeysToInclude, ...filterUserKeys];
 
-                const includeCls:{[key: string]: string[]} = _.merge(configuration && configuration.includeClsKey || {}, {"hornet.user": userKeys});
+                const includeCls:{[key: string]: string[]} = merge(configuration && configuration.includeClsKey || {}, {"hornet.user": userKeys});
 
-                const includeSession:{[key: string]: string[]} = _.merge(configuration && configuration.includeSessionKey || {}, {passport: [], strategy: []});
+                const includeSession:{[key: string]: string[]} = merge(configuration && configuration.includeSessionKey || {}, {passport: [], strategy: []});
                 const routeInfos: RouteInfos = Utils.getCls("hornet.routeInfos");
 
                 // route de type 'PAGE' uniquement
@@ -122,7 +123,7 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
                         shared: Utils.config.getOrDefault("shared", ""),
                         themeUrl: HornetComponent.genUrlTheme(),
                         themeHost: Utils.config.getIfExists("themeHost"),
-                        themeName: Utils.config.get("themeName"),
+                        themeName: Utils.config.getIfExists("themeName"),
                         fullSpa: Utils.config.getOrDefault("fullSpa", {
                             enabled: false,
                             host: "",
@@ -142,7 +143,7 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
                     res.expose(process.env.NODE_ENV, "Mode");
 
                     // On expose le CLS sans ce qui est spécifique serveur
-                    const cls = _.clone(Utils.getContinuationStorage().active);
+                    const cls = clone(Utils.getContinuationStorage().active);
                     delete cls[ "hornet.request" ];
                     delete cls[ "hornet.response" ];
                     delete cls[ "hornet.routeInfos" ];
@@ -180,14 +181,14 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
 
                     PageRenderingMiddleware.logger.trace("renderToString");
                     const htmlApp: string = ReactDOMServer.renderToString(
-                        React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).appComponent as Class<HornetPage<any, any, any>>)({
+                        React.createFactory<any, any, any>((this.config || AbstractHornetMiddleware.APP_CONFIG).appComponent as Class<HornetPage<any, any, any>>)({
                             content: pageRouteInfos.getViewComponent(),
                         }) as any,
                     );
 
                     // On rend la page entière en y intégrant l"appComponent rendu précédemment
                     const html: string = ReactDOMServer.renderToStaticMarkup(
-                        React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).layoutComponent as Class<HornetPage<any, any, any>>)({
+                        React.createFactory<any, any, any>((this.config || AbstractHornetMiddleware.APP_CONFIG).layoutComponent as Class<HornetPage<any, any, any>>)({
                             content: htmlApp,
                             state: res.locals.state,
                         }) as any,
@@ -209,7 +210,7 @@ export class PageRenderingMiddleware extends AbstractHornetSubMiddleware {
 //                                      UnmanagedViewErrorMiddleware
 // ------------------------------------------------------------------------------------------------------------------- //
 export class UnmanagedViewErrorMiddleware extends AbstractHornetSubMiddleware {
-    protected static logger: Logger = Utils.getLogger("hornet-js-react-components.middleware.UnmanagedViewErrorMiddleware");
+    protected static logger: Logger = Logger.getLogger("hornet-js-react-components.middleware.UnmanagedViewErrorMiddleware");
 
     constructor(config?: ServerConfiguration) {
         super((err, req, res, next: any) => {
@@ -232,14 +233,14 @@ export class UnmanagedViewErrorMiddleware extends AbstractHornetSubMiddleware {
                 Utils.getContinuationStorage().set("hornet.currentError", err);
 
                 const htmlApp: string = ReactDOMServer.renderToString(
-                    React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).appComponent as Class<HornetPage<any, any, any>>)({
+                    React.createFactory<any, any, any>((this.config || AbstractHornetMiddleware.APP_CONFIG).appComponent as Class<HornetPage<any, any, any>>)({
                         content: (this.config || AbstractHornetMiddleware.APP_CONFIG).errorComponent,
                     }) as any,
                 );
 
                 // On rend la page entière en y intégrant l"appComponent rendu précédemment
                 const html: string = ReactDOMServer.renderToStaticMarkup(
-                    React.createFactory((this.config || AbstractHornetMiddleware.APP_CONFIG).layoutComponent as Class<HornetPage<any, any, any>>)({
+                    React.createFactory<any, any, any>((this.config || AbstractHornetMiddleware.APP_CONFIG).layoutComponent as Class<HornetPage<any, any, any>>)({
                         content: htmlApp,
                         state: res.locals.state,
                         nojavascript: true,

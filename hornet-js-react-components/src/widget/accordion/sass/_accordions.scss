@@ -1,0 +1,80 @@
+@import '../../sass/core';
+@import './colors';
+
+.accordion {
+    padding-left: 0;
+    margin: 1.875em 0;
+
+    .hidden {
+        display: none;
+    }
+    
+    .errors-content {
+        font-style: italic;
+        font-family: $notoRegular;
+        color: $globalErrorColor;
+    }
+    
+    .accordion-header {
+        outline: none;
+        list-style-type: none;
+        background: $accordionHeaderBg;
+        margin-bottom: .938em;
+        box-shadow: 1px 2px 6px rgba(0,0,0,0.25);
+    }
+    
+    .accordion-label {
+        overflow: hidden;
+        display: block;
+        width: 100%;
+        padding-left: 1em;
+        text-align: left;
+        min-height: 3.125em;
+        line-height: 3.125em;
+        font-family: $notoBold;
+        color: $accordionLabel;
+        cursor: pointer;
+        
+        @include smoothTransition(all, .4s);
+
+        &:focus,
+        &:hover {
+            background: $accordionLabels;
+        }
+        
+        .accordion-arrow-open {
+            background: url("../img/expand-open.svg") no-repeat center;
+        }
+
+        .accordion-arrow-close {
+            background: url("../img/expand-close.svg") no-repeat center;
+        }
+
+        .arrow-content {
+            padding: 0 3.125em 0 1em;
+            min-width: 3.125em;
+            min-height: 3.125em;
+        }
+    }
+
+    .accordion-label-open {
+        margin-bottom: 1em;
+        outline: none;
+        background: $accordionLabels;
+        box-shadow: 1px 2px 6px $accordionlabelOpenBoxshadow;
+    }
+    
+    .accordion-header-container {
+        float: left;
+    }
+
+    .accordion-selected {
+        background: $accordionHeaderSelected;
+    }
+
+    .accordion-content.visible {
+        opacity: 1;
+        height: auto;
+        padding: 0 1em 0.5em 1em;
+    }
+}

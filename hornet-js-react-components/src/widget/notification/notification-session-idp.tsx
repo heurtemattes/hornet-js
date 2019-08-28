@@ -1,14 +1,14 @@
 import * as React from "react";
-import { Logger } from "hornet-js-utils/src/logger";
+import { Logger } from "hornet-js-logger/src/logger";
 import { Utils } from "hornet-js-utils";
 import { HornetComponent } from "src/widget/component/hornet-component";
-import { SESSION_REFRESHED_NOTIFICATION_EVENT, SESSION_WILL_EXPIRE_START_NOTIFICATION_EVENT, SESSION_WILL_EXPIRE_NOTIFICATION_EVENT, SessionEvent } from "hornet-js-core/src/services/hornet-superagent";
 import { HornetComponentProps, HornetComponentState } from "hornet-js-components/src/component/ihornet-component";
-import { HornetEvent } from "hornet-js-core/src/event/hornet-event";
-import { Picto } from "src/img/picto";
-import * as classNames from "classnames";
+import classNames from "classnames";
+import { SvgSprites } from '../icon/svg-sprites';
 
-const logger: Logger = Utils.getLogger("hornet-js-react-components.widget.notification.notification-message-item");
+import "src/widget/notification/sass/_notification.scss";
+
+const logger: Logger = Logger.getLogger("hornet-js-react-components.widget.notification.notification-message-item");
 
 /**
  * Propriétés de l'accordion
@@ -48,7 +48,7 @@ export class SessionIdpExpireNotification extends HornetComponent<SessionIdpExpi
     render(): JSX.Element {
         return (
             <div >
-            {this.state.isVisible ? this.renderNotification() : null}
+                {this.state.isVisible ? this.renderNotification() : null}
             </div>
         );
     }
@@ -88,25 +88,18 @@ export class SessionIdpExpireNotification extends HornetComponent<SessionIdpExpi
             id: "notification-idp-session"
         };
 
-        let labelClasses: ClassDictionary = {
+        let labelClasses = {
             "fl": true,
             "notification-session-idp-message": true,
             "notification-idp-expanded": !this.state.reduced,
             "notification-idp-reduced": this.state.reduced
         };
 
-        let imgSrc: string = Picto.darkBlue.close;
-        /*if (this.state.reduced) {
-            imgSrc = Picto.darkBlue.previous;
-        }*/
-
-        let tabIndex: number = this.state.reduced ? -1 : 0;
-
         return (
             <div {...divProps}>
                 <div className={"fl notification-session-idp-button"} onClick={this.handleToggleNotification}>
                     <a href={""} onClick={this.handleToggleNotification} tabIndex={0}>
-                        <img src={imgSrc} onClick={this.handleToggleNotification} />
+                        <SvgSprites icon="close" color="#2E586E" tabIndex={ -1 } />
                     </a>
                 </div>
                 <div className={classNames(labelClasses)}>
